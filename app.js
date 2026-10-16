@@ -12,6 +12,14 @@ const sample = (a, n) => shuffle(a).slice(0, n);
 const h = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
 const SPEAK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
 const speakBtn = (text, label) => `<button class="speak" type="button" data-say="${esc(text)}" aria-label="${esc(label || '朗读')}">${SPEAK_SVG}</button>`;
+// 例句：把单词（动词、形容词取词干）在句子里标出来
+const exList = w => (typeof EXAMPLES !== 'undefined' && EXAMPLES[w]) || [];
+function markWord(jp, w) {
+  const stem = w.length > 1 && /[るうくすつぬむぶぐい]$/.test(w) ? w.slice(0, -1) : w.replace(/する$/, '');
+  const i = jp.indexOf(stem);
+  return i < 0 ? esc(jp) : esc(jp.slice(0, i)) + '<mark>' + esc(stem) + '</mark>' + esc(jp.slice(i + stem.length));
+}
+const exHTML = (w, n = 5) => exList(w).slice(0, n).map(([jp, kana, zh]) => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp" lang="ja">${markWord(jp, w)}</div><div class="small muted">${esc(zh)}</div></div>${speakBtn(kana, '朗读例句')}</div>`).join('');
 
 /* ---------- 数据 ---------- */
 const VOCAB = {}, KANJI = {}, GRAM = {}, ITEMS = {};
@@ -331,6 +339,7 @@ function startCards(host, ids, title, onExit) {
         <div data-ans hidden><div class="reading" lang="ja">${esc(v.r)}</div><div class="meaning">${esc(v.m)}</div></div>
         <div class="hint" data-hint>先想一想读音和意思，再点卡片看答案（空格键）</div>
       </div>
+      <div class="ex-box" data-exbox hidden>${exList(v.w).length ? `<div class="eyebrow">例句</div>${exHTML(v.w)}` : ''}</div>
       <div class="grades" data-grades hidden style="margin-top:12px">
         ${['重来', '困难', '记得', '简单'].map((t, g) => `<button class="btn g${g}" type="button" data-g="${g}">${t}<small>${fmtDays(preview(c, g))}</small></button>`).join('')}
       </div>`;
@@ -338,7 +347,7 @@ function startCards(host, ids, title, onExit) {
     const reveal = () => {
       if (revealed) return; revealed = true;
       stage.querySelector('[data-ans]').hidden = false; stage.querySelector('[data-hint]').hidden = true;
-      stage.querySelector('[data-grades]').hidden = false; if (S.autoSpeak) speak(v.r);
+      stage.querySelector('[data-grades]').hidden = false; stage.querySelector('[data-exbox]').hidden = false; if (S.autoSpeak) speak(v.r);
     };
     card.onclick = reveal;
     stage.querySelectorAll('[data-g]').forEach(b => { b.onclick = () => rate(+b.dataset.g); });
@@ -375,19 +384,24 @@ function qVocab(v, kind) {
     const pool = same.filter(x => x.w !== x.r && x.r !== v.r).sort((a, b) => Math.abs(a.r.length - v.r.length) - Math.abs(b.r.length - v.r.length)).slice(0, 10).map(x => x.r);
     return makeQ(v, 'reading', distract(v.r, near(pool, x => x.r)), v.r, {
       prompt: `<div class="eyebrow">选择正确的读音</div><div class="q-big" lang="ja">${esc(v.w)}</div>`, optLang: 'ja', say: v.r,
-      explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}`
+      explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}${exTip(v.w)}`
     });
   }
   if (kind === 'word') {
     return makeQ(v, 'word', distract(v.w, same.map(x => x.w)), v.w, {
       prompt: `<div class="eyebrow">哪个日语单词是这个意思？</div><div class="q-big" style="font-family:var(--f-ui);font-size:1.8rem">${esc(v.m)}</div>`, optLang: 'ja', say: v.r,
-      explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}`
+      explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}${exTip(v.w)}`
     });
   }
   return makeQ(v, 'meaning', distract(v.m, same.map(x => x.m)), v.m, {
     prompt: `<div class="eyebrow">这个单词是什么意思？</div><div class="q-big" lang="ja">${esc(v.w)}</div>`, say: v.r,
-    explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}`
+    explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}${exTip(v.w)}`
   });
+}
+function exTip(w) {
+  const e = exList(w); if (!e.length) return '';
+  const [jp, , zh] = e[Math.floor(Math.random() * e.length)];
+  return `<br><span class="small"><span lang="ja">${esc(jp)}</span>　<span class="muted">${esc(zh)}</span></span>`;
 }
 function qKanji(k, kind = Math.random() < .5 ? 'meaning' : 'reading') {
   const same = KANJI[k.L];
@@ -762,7 +776,8 @@ function viewVocab() {
   const tbl = h(`<section class="panel">
     <div class="row"><input type="search" id="v-search" placeholder="搜索单词、读音或中文" value="${esc(vocabSearch)}" aria-label="搜索单词">
       <select id="v-filter" aria-label="筛选"><option value="all">全部</option><option value="new">没学过</option><option value="learn">学习中</option><option value="done">已掌握</option></select></div>
-    <div class="list-wrap"><table class="list"><thead><tr><th>单词</th><th>读音</th><th>意思</th><th>状态</th><th></th></tr></thead><tbody></tbody></table></div>
+    <p class="small muted">点一个单词展开 3 个例句，每句都能朗读。</p>
+    <div class="list-wrap"><table class="list"><thead><tr><th>单词</th><th>读音</th><th>意思</th><th class="col-st">状态</th><th></th></tr></thead><tbody></tbody></table></div>
   </section>`);
   const fill = () => {
     const q = vocabSearch.trim();
@@ -771,9 +786,18 @@ function viewVocab() {
     });
     tbl.querySelector('tbody').innerHTML = rows.map(v => {
       const st = mastered(v) ? '<span class="tag done">已掌握</span>' : learned(v) ? '<span class="tag learn">学习中</span>' : '<span class="tag">新</span>';
-      return `<tr><td class="w" lang="ja">${esc(v.w)}</td><td class="r" lang="ja">${esc(v.r)}</td><td>${esc(v.m)}</td><td>${st}</td><td>${speakBtn(v.r)}</td></tr>`;
+      return `<tr class="vrow" data-w="${esc(v.w)}" tabindex="0" aria-expanded="false"><td class="w" lang="ja">${esc(v.w)}</td><td class="r" lang="ja">${esc(v.r)}</td><td>${esc(v.m)}</td><td class="col-st">${st}</td><td>${speakBtn(v.r)}</td></tr>`;
     }).join('') || '<tr><td colspan="5" class="muted">没有符合条件的单词</td></tr>';
   };
+  const toggle = tr => {
+    const open = tr.nextElementSibling && tr.nextElementSibling.classList.contains('vex');
+    tbl.querySelectorAll('tr.vex').forEach(x => { x.previousElementSibling.setAttribute('aria-expanded', 'false'); x.remove(); });
+    if (open) return;
+    tr.setAttribute('aria-expanded', 'true');
+    tr.insertAdjacentHTML('afterend', `<tr class="vex"><td colspan="5"><div class="ex-box">${exHTML(tr.dataset.w) || '<span class="muted small">暂无例句</span>'}</div></td></tr>`);
+  };
+  tbl.querySelector('tbody').addEventListener('click', e => { const tr = e.target.closest('tr.vrow'); if (tr) toggle(tr); });
+  tbl.querySelector('tbody').addEventListener('keydown', e => { const tr = e.target.closest('tr.vrow'); if (tr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(tr); } });
   tbl.querySelector('#v-filter').value = vocabFilter;
   tbl.querySelector('#v-search').oninput = e => { vocabSearch = e.target.value; fill(); };
   tbl.querySelector('#v-filter').onchange = e => { vocabFilter = e.target.value; fill(); };

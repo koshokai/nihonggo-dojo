@@ -269,6 +269,8 @@ textarea { width: 100%; min-height: 90px; font: .8rem/1.4 ui-monospace, monospac
   .brand > span:last-child { font-size: .95rem; }
   .kana b { font-size: 1.35rem; }
   .opts { grid-template-columns: 1fr; }
+  .col-st { display: none; }
+  table.list td, table.list th { padding: 8px 6px; }
 }
 
 /* ---------- 可爱的部分 ---------- */
@@ -334,3 +336,11 @@ textarea { width: 100%; min-height: 90px; font: .8rem/1.4 ui-monospace, monospac
   .neko.big { width: 92px; height: 100px; }
   .neko.mini { width: 40px; height: 44px; }
 }
+
+.ex-box { display: grid; gap: 8px; margin-top: 12px; text-align: left; }
+.ex-box .ex { background: var(--surface); border: 1px solid var(--line); }
+tr.vrow { cursor: pointer; }
+tr.vrow:hover td { background: var(--ai-soft); }
+tr.vrow[aria-expanded="true"] td { background: var(--ai-soft); border-bottom-color: transparent; }
+tr.vex td { background: var(--ai-soft); padding-top: 0; }
+tr.vex .ex-box { margin-top: 0; }
