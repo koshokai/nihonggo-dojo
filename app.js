@@ -624,24 +624,35 @@ function finishOnboarding(pick, goal) {
   if (pick === 'zero') { toast('先从五十音开始，一天认一行就很好'); go('kana'); }
   else { toast(`已设为 ${S.level}，随时可以在「我的」里更改`); go('home'); }
 }
+// 分级测试：每级 4 题（读音 2、纯假名词 1、语法 1），都不能靠汉字字形猜出答案
 function placementTest() {
-  const qs = LEVELS.flatMap(L => sample(VOCAB[L].filter(x => x.q), 3).map(v => Object.assign(qVocab(v, 'meaning'), { lv: L })));
+  const qs = LEVELS.flatMap(L => {
+    const pool = VOCAB[L].filter(v => v.q);
+    const kanjiWords = pool.filter(v => v.w !== v.r && /[一-鿿]/.test(v.w));
+    const kanaWords = pool.filter(v => /^[ぁ-ん]{2,}$/.test(v.w));
+    const out = sample(kanjiWords, 2).map(v => qVocab(v, 'reading'));
+    out.push(kanaWords.length ? qVocab(sample(kanaWords, 1)[0], 'meaning') : qVocab(sample(kanjiWords, 1)[0], 'reading'));
+    out.push(qGrammar(sample(GRAM[L], 1)[0]));
+    return out.map(q => Object.assign(q, { lv: L }));
+  });
   main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
   runQuiz(host, qs, {
-    title: '分级小测试', exam: true, noRecord: true, onDone: r => {
+    title: '分级小测试 · 20 题', exam: true, noRecord: true, onDone: r => {
       if (!r) return render();
       const by = {}; LEVELS.forEach(L => { by[L] = 0; });
       r.res.forEach(x => { if (x.ok) by[x.q.lv]++; });
-      let rec = by.N5 >= 2 ? 'N5' : 'zero';
-      for (const L of LEVELS.slice(1)) { if (by[L] >= 2 && rec !== 'zero') rec = L; else break; }
-      const name = rec === 'zero' ? '五十音（零基础）' : rec;
+      let rec = by.N5 >= 3 ? 'N5' : 'zero';
+      if (rec !== 'zero') for (const L of LEVELS.slice(1)) { if (by[L] >= 3) rec = L; else break; }
+      // 通过某一级就从下一级开始学；全部通过就停在 N1
+      const next = rec === 'zero' ? 'zero' : rec === 'N1' ? 'N1' : LEVELS[LEVELS.indexOf(rec) + 1];
+      const name = next === 'zero' ? '五十音（零基础）' : next;
       host.innerHTML = '';
       const box = h(`<section class="panel">
-        <div class="welcome-hi">${neko('wow', 'big')}<div class="bubble"><b>推荐你从 ${name} 开始</b><span>每个级别 3 题，答对 2 题以上算过关。不想照推荐来也没关系，可以自己选。</span></div></div>
-        <div class="breakdown">${LEVELS.map(L => `<div class="bd-row"><span>${L}</span><div class="bar"><i style="width:${by[L] / 3 * 100}%"></i></div><span class="small">${by[L]}/3</span></div>`).join('')}</div>
+        <div class="welcome-hi">${neko('wow', 'big')}<div class="bubble"><b>推荐你从 ${name} 开始</b><span>${rec === 'zero' ? 'N5 还没过关，先打好假名和基础单词。' : `你已经能通过 ${rec}，接下来挑战 ${name}。`}每级 4 题，答对 3 题算过关。</span></div></div>
+        <div class="breakdown">${LEVELS.map(L => `<div class="bd-row"><span>${L}</span><div class="bar"><i style="width:${by[L] / 4 * 100}%"></i></div><span class="small">${by[L]}/4</span></div>`).join('')}</div>
         <div class="row"><button class="btn pri big" type="button" data-ok>就从 ${name} 开始</button><button class="btn" type="button" data-back>我自己选</button></div>
       </section>`);
-      box.querySelector('[data-ok]').onclick = () => finishOnboarding(rec, S.goal);
+      box.querySelector('[data-ok]').onclick = () => finishOnboarding(next, S.goal);
       box.querySelector('[data-back]').onclick = render;
       host.append(box);
     }
