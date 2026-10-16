@@ -89,7 +89,7 @@ function migrateIds() {
     }
   }
 }
-const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: true, autoSpeak: true, lastBackup: 0, lastBackupXp: 0 });
+const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: true, autoSpeak: true, lastBackup: 0, lastBackupXp: 0, stages: {}, games: {} });
 function load() {
   try { const t = localStorage.getItem(KEY); if (t) return Object.assign(blank(), JSON.parse(t)); } catch (e) { /* 浏览器禁用存储时从空进度开始 */ }
   return blank();
@@ -401,7 +401,7 @@ function makeQ(item, kind, opts, correct, extra) {
   const options = shuffle([correct, ...opts]);
   return Object.assign({ id: item ? item.id : null, kind, options, answer: options.indexOf(correct) }, extra);
 }
-const KIND_NAMES = { reading: '读音', meaning: '词义', word: '选词', kanji: '汉字', grammar: '语法', kana: '假名' };
+const KIND_NAMES = { reading: '读音', meaning: '词义', word: '选词', kanji: '汉字', grammar: '语法', kana: '假名', listen: '听力' };
 function qVocab(v, kind) {
   const same = VOCAB[v.L].filter(x => x.q), all = allVocab().filter(x => x.q);
   const near = (arr, fn) => arr.length >= 4 ? arr : all.map(fn);
@@ -409,6 +409,12 @@ function qVocab(v, kind) {
     const pool = same.filter(x => x.w !== x.r && x.r !== v.r).sort((a, b) => Math.abs(a.r.length - v.r.length) - Math.abs(b.r.length - v.r.length)).slice(0, 10).map(x => x.r);
     return makeQ(v, 'reading', distract(v.r, near(pool, x => x.r)), v.r, {
       prompt: `<div class="eyebrow">选择正确的读音</div><div class="q-big" lang="ja">${esc(v.w)}</div>`, optLang: 'ja', say: v.r,
+      explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}${exTip(v.w)}`
+    });
+  }
+  if (kind === 'listen') {
+    return makeQ(v, 'listen', distract(v.w, same.filter(x => x.r !== v.r).map(x => x.w)), v.w, {
+      prompt: `<div class="eyebrow">听发音，选出对应的单词</div><button class="listen" type="button" data-say="${esc(v.r)}" aria-label="再听一次">${SPEAK_SVG}<span>再听一次</span></button>`, optLang: 'ja', autoSay: v.r, say: v.r,
       explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}${exTip(v.w)}`
     });
   }
@@ -483,8 +489,10 @@ function qKana([kana, ro], reverse, pool) {
 const itemQ = it => it.type === 'v' ? qVocab(it, sample(['reading', 'meaning', 'word'], 1)[0]) : it.type === 'k' ? qKanji(it) : qGrammar(it);
 
 /* ---------- 测验引擎 ---------- */
-function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false, noRecord = false, xpEach = 10, onDone }) {
-  let i = 0, combo = 0, answered = false;
+function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false, noRecord = false, xpEach = 10, hearts = 0, requeue = false, onDone }) {
+  let i = 0, combo = 0, answered = false, life = hearts, failed = false;
+  const requeued = new Set();
+  const heartsHTML = () => hearts ? `<span class="hearts" aria-label="剩余 ${life} 条命">${Array.from({ length: hearts }, (_, k) => `<svg viewBox="0 0 24 24" class="${k < life ? 'on' : ''}"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.6 4.5c2 0 3.6 1.1 4.4 2.6.8-1.5 2.4-2.6 4.4-2.6 3.6 0 5.7 3.9 4.2 7.3C19.5 16.4 12 21 12 21z"/></svg>`).join('')}</span>` : '';
   const res = [];
   host.innerHTML = '';
   const box = h(`<section class="panel quiz">
@@ -508,11 +516,12 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
     const q = qs[i]; answered = false;
     box.querySelector('[data-count]').textContent = `${i + 1} / ${qs.length}`;
     box.querySelector('[data-bar]').style.width = (i / qs.length * 100) + '%';
-    if (!exam) extra.innerHTML = combo >= 3 ? `<span class="combo">${combo} 连对</span>` : '';
+    if (!exam) extra.innerHTML = (combo >= 3 ? `<span class="combo">${combo} 连对</span> ` : '') + heartsHTML();
     stage.innerHTML = `<div class="q-prompt pop">${q.prompt}</div>
       <div class="opts">${q.options.map((o, j) => `<button class="opt" type="button" data-o="${j}"><span class="k">${j + 1}</span><span ${q.optLang ? `lang="${q.optLang}"` : ''}>${esc(o)}</span></button>`).join('')}</div>
       <div data-fb></div>`;
     stage.querySelectorAll('[data-o]').forEach(b => { b.onclick = () => pick(+b.dataset.o); });
+    if (q.autoSay) speak(q.autoSay);
     keyHandler = e => {
       if (!answered && '1234'.includes(e.key) && +e.key <= q.options.length) pick(+e.key - 1);
       else if (answered && e.key === 'Enter') next();
@@ -527,24 +536,30 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
       else if (fromWrong && S.wrong[q.id]) { delete S.wrong[q.id]; S.fixed++; }
     }
     if (q.kind === 'kana' && ok) S.kanaRight++;
+    if (!ok && hearts) {
+      life--;
+      if (life <= 0) failed = true;
+      else if (requeue && q.item && !requeued.has(q.id)) { requeued.add(q.id); qs.push(Object.assign(qVocab(q.item, q.kind), { item: q.item })); }
+    }
     if (exam) { save(); next(); return; }
     const btns = stage.querySelectorAll('[data-o]');
     btns.forEach((b, k) => { b.disabled = true; if (k === q.answer) b.classList.add('right'); else if (k === j) b.classList.add('wrong'); });
     if (ok) popFrom(btns[j]);
     combo = ok ? combo + 1 : 0;
+    if (hearts) extra.innerHTML = (combo >= 3 ? `<span class="combo">${combo} 连对</span> ` : '') + heartsHTML();
     if (ok) addXP(xpEach + (combo && combo % 5 === 0 ? 5 : 0)); else save();
     if (q.say && S.autoSpeak) speak(q.say);
     const cheer = ok ? sample(['やった！', 'すごい！', 'いいね！', '正解！'], 1)[0] : sample(['ドンマイ！', '大丈夫！', '次は行ける！'], 1)[0];
     stage.querySelector('[data-fb]').innerHTML = `<div class="feedback ${ok ? 'ok' : 'no'}">${neko(ok ? 'happy' : 'sad', 'mini')}<div class="fb-t"><div class="row"><b lang="ja" class="cheer">${cheer}</b>${q.say ? speakBtn(q.say) : ''}</div><b>${ok ? (combo >= 5 && combo % 5 === 0 ? `答对了！${combo} 连对，额外 +5` : '答对了') : (noRecord ? '答错了' : '答错了，已记入错题本')}</b><div>${q.explain || ''}</div></div></div>
-      <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn pri" type="button" data-next>${i + 1 < qs.length ? '下一题' : '查看结果'}（Enter）</button></div>`;
+      <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn pri" type="button" data-next>${failed ? '生命值用完了，看结果' : i + 1 < qs.length ? '下一题' : '查看结果'}（Enter）</button></div>`;
     stage.querySelector('[data-next]').onclick = next;
     stage.querySelector('[data-next]').focus({ preventScroll: true });
   }
-  function next() { i++; if (i < qs.length && res.length < qs.length) show(); else finish(); }
+  function next() { i++; if (!failed && i < qs.length && res.length < qs.length) show(); else finish(); }
   function finish() {
     clearInterval(examTimer); keyHandler = null;
     const score = res.filter(r => r.ok).length;
-    onDone({ res, score, total: qs.length });
+    onDone({ res, score, total: res.length, hearts: life, failed });
   }
   show();
 }
@@ -568,7 +583,7 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, me: viewMe, welcome: viewWelcome };
+const VIEWS = { home: viewHome, game: viewGame, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, me: viewMe, welcome: viewWelcome };
 function render() {
   const v = (location.hash || '#home').slice(1);
   let view = VIEWS[v] ? v : 'home';
@@ -714,7 +729,9 @@ function viewHome() {
     </div>
   </section>`));
 
+  const ns = nextStage(S.level);
   const tasks = [
+    { ic: '関', t: `闯关 · ${S.level} 第 ${ns} 关${isBoss(ns) ? '（头目关）' : ''}`, d: `已获得 ${totalStars(S.level)} 颗星，每关 10 个新词`, go: () => stageIntro(S.level, ns) },
     { ic: '復', t: '复习到期单词卡', d: due ? `${due} 张卡片到了复习时间` : '没有到期的卡片', done: !due, go: () => { if (due) { const host = h('<div></div>'); main.innerHTML = ''; main.append(host); startCards(host, shuffle(dueList(LEVELS)).map(v => v.id), '复习到期卡片', () => go('home')); } } },
     { ic: '新', t: `学习 ${S.level} 新单词`, d: nl ? `今天还可以学 ${nl} 个新词` : newList(S.level).length ? `今天的 ${S.newPerDay} 个新词已学完` : `${S.level} 的单词都学过了，去「我的」换个级别吧`, done: !nl, go: () => { if (nl) { const host = h('<div></div>'); main.innerHTML = ''; main.append(host); startCards(host, newList(S.level).slice(0, nl).map(v => v.id), `${S.level} 新单词`, () => go('home')); } } },
     { ic: '文', t: `${S.level} 语法练习`, d: '8 道填空题，每题 10 经验', go: () => grammarQuiz(S.level, () => go('home')) },
