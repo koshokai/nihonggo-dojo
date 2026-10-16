@@ -91,7 +91,7 @@ def main():
             word = alias.get(word, word)
             out.setdefault(word, []).append([jp, reading(jp), zh])
     js = '// 自动生成：python3 tools/build_examples.py（请编辑 tools/examples_*.txt）\n'
-    js += '// 每个单词：[日语例句, 朗读用假名, 中文翻译]\nconst EXAMPLES = ' + json.dumps(out, ensure_ascii=False, indent=0) + ';\n'
+    js += '// 每个单词：[日语例句, 朗读用假名, 中文翻译]\nconst EXAMPLES = ' + json.dumps(out, ensure_ascii=False, separators=(',', ':')).replace('],"', '],\n"') + ';\n'
     (ROOT / 'examples.js').write_text(js, encoding='utf-8')
     print(f'{sum(len(v) for v in out.values())} 句，{len(out)} 个单词')
 
