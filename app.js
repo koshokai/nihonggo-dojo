@@ -1109,6 +1109,7 @@ function viewMe() {
 applyTheme();
 checkBadges();
 render();
+initGlobalSearch();
 startPetals();
 if (S.onboarded) requestPersist();
 // 例句库有 3 MB 多，等页面出来以后再在后台加载；加载完后单词页、词典页刷新一下就能看到

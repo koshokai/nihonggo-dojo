@@ -199,3 +199,41 @@ function jmCard(e) {
     <div class="row between small"><span class="muted">英文释义来自 JMdict</span><a href="https://translate.google.com/?sl=ja&tl=zh-CN&text=${encodeURIComponent(w)}&op=translate" target="_blank" rel="noopener">看中文翻译 ↗</a></div>
   </section>`);
 }
+
+/* ---------- 每一页顶部的查词框 ---------- */
+// 输入时下拉显示前几个结果，点一个直接弹出释义卡；回车打开词典页看全部结果和翻译。
+function initGlobalSearch() {
+  const form = document.querySelector('.gsearch'); if (!form) return;
+  const input = form.querySelector('input'), drop = form.querySelector('.gs-drop');
+  const hide = () => { drop.hidden = true; };
+  const toHit = x => x.type === 'v' ? { w: x.w, r: x.r, zh: x.m, v: x } : { w: x.k[0] || x.r[0], r: x.r[0], en: x.s.slice(0, 3).map(g => g.join('; ')), jm: x };
+  let items = [];
+  const show = () => {
+    const q = input.value.trim();
+    if (!q) { hide(); return; }
+    const r = searchAll(q);
+    items = [...r.vocab.slice(0, 6), ...r.jm.slice(0, Math.max(0, 6 - r.vocab.length))];
+    drop.innerHTML = items.map((x, i) => {
+      const t = toHit(x);
+      return `<button type="button" class="gs-item" data-i="${i}"><span class="gs-w" lang="ja">${esc(t.w)}</span><span class="gs-r" lang="ja">${t.r !== t.w ? esc(t.r) : ''}</span><span class="gs-m">${esc(t.zh || t.en[0] || '')}</span>${t.v ? `<span class="tag lv">${t.v.L}</span>` : ''}</button>`;
+    }).join('') + `<button type="button" class="gs-all" data-all>${items.length ? '查看全部结果和整句翻译 →' : (JMDICT ? '没有找到这个词，去词典页翻译 →' : '扩展词典加载中…… 去词典页 →')}</button>`;
+    drop.hidden = false;
+  };
+  const goDict = () => { dictQuery = input.value.trim(); dictDir = null; input.value = ''; hide(); input.blur(); if (location.hash === '#dict') render(); else location.hash = 'dict'; };
+  let t;
+  input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(show, 150); });
+  input.addEventListener('focus', () => { loadJmdict().then(() => { if (document.activeElement === input && input.value.trim()) show(); }).catch(() => {}); if (input.value.trim()) show(); });
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') { hide(); input.blur(); } });
+  form.addEventListener('submit', e => { e.preventDefault(); if (input.value.trim()) goDict(); });
+  drop.addEventListener('mousedown', e => e.preventDefault());   // 点下拉项时输入框不要先失焦
+  drop.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    e.stopPropagation();
+    if (b.dataset.all !== undefined) return goDict();
+    const x = items[+b.dataset.i]; hide(); input.blur();
+    showSheet(toHit(x).w, toHit(x), null);
+  });
+  document.addEventListener('click', e => { if (!form.contains(e.target)) hide(); });
+  addEventListener('hashchange', () => { hide(); document.body.classList.toggle('on-dict', location.hash === '#dict'); });
+  document.body.classList.toggle('on-dict', location.hash === '#dict');
+}

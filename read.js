@@ -60,7 +60,7 @@ function showSheet(text, hit, a) {
   const add = sh.querySelector('[data-add]');
   if (add) add.onclick = () => { S.srs[hit.v.id] = { i: 0, e: 2.5, r: 0, due: Date.now() }; save(); add.textContent = '已加入'; add.disabled = true; toast(`「${hit.v.w}」已加入单词卡`); };
   sh.querySelector('[data-more]').onclick = () => {
-    readReturn = { id: a.id, y: scrollY, title: a.title };
+    readReturn = a ? { id: a.id, y: scrollY, title: a.title } : null;
     dictQuery = hit ? hit.w : text; dictDir = null;
     closeSheet(); location.hash = 'dict';
   };
