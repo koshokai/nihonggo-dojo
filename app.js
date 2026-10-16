@@ -587,7 +587,7 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, game: viewGame, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, me: viewMe, welcome: viewWelcome };
+const VIEWS = { home: viewHome, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, me: viewMe, welcome: viewWelcome };
 function render() {
   const v = (location.hash || '#home').slice(1);
   let view = VIEWS[v] ? v : 'home';
@@ -1066,7 +1066,8 @@ function viewMe() {
 
   const counts = LEVELS.map(L => `<tr><td>${L}</td><td>${VOCAB[L].length}</td><td>${KANJI[L].length}</td><td>${GRAM[L].length}</td></tr>`).join('');
   const about = h(`<section class="panel"><h2>关于内容</h2>
-    <p class="small">每个级别收录的是该级别的核心精选，不是完整考纲。适合作为每天的练习和查漏补缺，备考时请配合官方真题和教材。发音使用浏览器自带的日语语音。</p>
+    <p class="small">单词约 8,000 个、汉字 2,211 个、语法 176 个句型，覆盖 JLPT N5–N1。中文释义和例句由本站编写，未经专业审核，备考时请配合官方真题和教材。发音使用浏览器自带的日语语音。</p>
+    <p class="small muted">数据来源：单词表 <a href="https://github.com/jamsinclair/open-anki-jlpt-decks" target="_blank" rel="noopener">open-anki-jlpt-decks</a>（MIT），基于 <a href="http://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller 的 JLPT 资料</a>（CC BY）；汉字 <a href="https://github.com/davidluzgouveia/kanji-data" target="_blank" rel="noopener">kanji-data</a>（MIT）与 KANJIDIC；词典英文释义 <a href="https://www.edrdg.org/jmdict/j_jmdict.html" target="_blank" rel="noopener">JMdict</a>（EDRDG，CC BY-SA 4.0）。</p>
     <div class="list-wrap"><table class="list"><thead><tr><th>级别</th><th>单词</th><th>汉字</th><th>语法</th></tr></thead><tbody>${counts}</tbody></table></div>
   </section>`);
   const ps = bk.querySelector('[data-persist]');

@@ -398,3 +398,18 @@ tr.vex .ex-box { margin-top: 0; }
 .tile.sel { border-color: var(--ai); background: var(--ai-soft); transform: scale(1.03); }
 .tile.miss { border-color: var(--bad); background: var(--bad-soft); }
 .tile.gone { opacity: 0; transform: scale(.8); pointer-events: none; }
+
+/* 词典 */
+.dict-form { display: flex; gap: 8px; }
+.dict-form input { flex: 1; min-width: 0; font-size: 1.1rem; min-height: 48px; border-radius: 999px; padding: 0 18px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); }
+.dict-form input:focus { border-color: var(--ai); outline: none; box-shadow: 0 0 0 4px var(--ai-soft); }
+.chip-btn { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 3px 12px; cursor: pointer; color: var(--ai); font: inherit; }
+.chip-btn.big { font-size: 1.1rem; padding: 6px 14px; }
+.chip-btn:hover { border-color: var(--ai); }
+.dict-res { display: grid; gap: 12px; }
+.dict-card { gap: 8px; }
+.dict-w { font-family: var(--f-disp); font-weight: 800; font-size: 1.8rem; line-height: 1.2; }
+.dict-r { color: var(--ind); font-size: 1.05rem; }
+.dict-m { font-size: 1.1rem; }
+.dict-senses { margin: 0; padding-left: 1.4em; display: grid; gap: 2px; }
+.trans { background: var(--ai-soft); border-color: transparent; box-shadow: none; }
