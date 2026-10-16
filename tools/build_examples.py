@@ -74,6 +74,11 @@ def reading(sentence):
 
 
 def main():
+    alias = {}
+    for line in (ROOT / 'tools/vocab/alias.txt').read_text(encoding='utf-8').splitlines():
+        if line.strip() and not line.startswith('#'):
+            a, b = line.split('|')
+            alias[a] = b
     out = {}
     for L in LEVELS:
         src = ROOT / 'tools' / f'examples_{L}.txt'
@@ -86,6 +91,7 @@ def main():
             if len(parts) != 3:
                 sys.exit(f'{src.name}:{n} 需要 3 列：{line}')
             word, jp, zh = parts
+            word = alias.get(word, word)
             out.setdefault(word, []).append([jp, reading(jp), zh])
     js = '// 自动生成：python3 tools/build_examples.py（请编辑 tools/examples_*.txt）\n'
     js += '// 每个单词：[日语例句, 朗读用假名, 中文翻译]\nconst EXAMPLES = ' + json.dumps(out, ensure_ascii=False, indent=0) + ';\n'

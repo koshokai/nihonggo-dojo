@@ -18,7 +18,8 @@
 
 ## 内容说明
 
-每个级别收录的是核心精选，不是完整考纲。词条在 `data.js` 里，格式简单，欢迎补充。
+- **单词**：JLPT N5–N1 共约 8,000 词。词表来自 [open-anki-jlpt-decks](https://github.com/jamsinclair/open-anki-jlpt-decks)（MIT），基于 [Jonathan Waller 的 JLPT 资料](http://www.tanos.co.uk/jlpt/)（CC BY）；中文释义由本项目编写（`tools/vocab/zh_n*.txt`），运行 `python3 tools/build_vocab.py` 生成 `vocab.js`。
+- 中文释义和例句没有经过专业审核，发现错误欢迎提 issue。
 
 ## 例句和朗读
 

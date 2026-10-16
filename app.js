@@ -24,7 +24,13 @@ const exHTML = (w, n = 5) => exList(w).slice(0, n).map(([jp, kana, zh]) => `<div
 /* ---------- 数据 ---------- */
 const VOCAB = {}, KANJI = {}, GRAM = {}, ITEMS = {};
 for (const L of LEVELS) {
-  VOCAB[L] = VOCAB_RAW[L].trim().split('\n').map(l => { const [w, r, m] = l.split('|'); return { id: `v|${L}|${w}`, type: 'v', L, w, r, m }; });
+  const used = new Set();
+  VOCAB[L] = VOCAB_DATA[L].map(([w, r, m, en, alt]) => {
+    const id = used.has(w) ? `v|${L}|${w}|${r}` : `v|${L}|${w}`;
+    used.add(w);
+    // 词缀（～円）和带括号的条目只在词表里显示，不拿来出题
+    return { id, type: 'v', L, w, r, m, en: en || '', alt: alt || [], q: !/[～〜(（]/.test(w + r) };
+  });
   KANJI[L] = KANJI_RAW[L].trim().split('\n').map(l => { const [k, on, kun, m] = l.split('|'); return { id: `k|${L}|${k}`, type: 'k', L, k, on, kun, m }; });
   GRAM[L] = GRAMMAR[L].map((g, i) => ({
     id: `g|${L}|${i}`, type: 'g', L, p: g[0], m: g[1], how: g[2], s: g[3], t: g[4], ex: g[5] || [],
@@ -65,6 +71,20 @@ const RANKS = [
 ];
 
 /* ---------- 进度存储 ---------- */
+// 词表扩充后，旧版本的单词 id 可能换了级别或写法：按单词（及常见写法对应）找到新 id
+const OLD_ALIAS = { 'ご飯': '御飯', '勉強する': '勉強', 'おいしい': '美味しい', 'きれい': '綺麗', 'せっかく': '折角', '曖昧': 'あいまい', '夥しい': 'おびただしい', 'もっぱら': '専ら', 'あらかじめ': '予め', 'おのずから': '自ずから' };
+function migrateIds() {
+  const byWord = {};
+  LEVELS.forEach(L => VOCAB[L].forEach(v => { if (!byWord[v.w]) byWord[v.w] = v.id; }));
+  for (const store of [S.srs, S.wrong]) {
+    for (const id of Object.keys(store)) {
+      if (!id.startsWith('v|') || ITEMS[id]) continue;
+      const w = id.split('|')[2], nid = byWord[OLD_ALIAS[w] || w];
+      if (nid && !store[nid]) store[nid] = store[id];
+      delete store[id];
+    }
+  }
+}
 const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: true, autoSpeak: true, lastBackup: 0, lastBackupXp: 0 });
 function load() {
   try { const t = localStorage.getItem(KEY); if (t) return Object.assign(blank(), JSON.parse(t)); } catch (e) { /* 浏览器禁用存储时从空进度开始 */ }
@@ -72,6 +92,7 @@ function load() {
 }
 let S = load();
 if (S.xp > 0) S.onboarded = true;
+migrateIds();
 let storageOk = true;
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(S)); storageOk = true; } catch (e) { storageOk = false; }
@@ -378,7 +399,7 @@ function makeQ(item, kind, opts, correct, extra) {
 }
 const KIND_NAMES = { reading: '读音', meaning: '词义', word: '选词', kanji: '汉字', grammar: '语法', kana: '假名' };
 function qVocab(v, kind) {
-  const same = VOCAB[v.L], all = allVocab();
+  const same = VOCAB[v.L].filter(x => x.q), all = allVocab().filter(x => x.q);
   const near = (arr, fn) => arr.length >= 4 ? arr : all.map(fn);
   if (kind === 'reading' && v.w !== v.r) {
     const pool = same.filter(x => x.w !== x.r && x.r !== v.r).sort((a, b) => Math.abs(a.r.length - v.r.length) - Math.abs(b.r.length - v.r.length)).slice(0, 10).map(x => x.r);
@@ -572,7 +593,7 @@ function finishOnboarding(pick, goal) {
   else { toast(`已设为 ${S.level}，随时可以在「我的」里更改`); go('home'); }
 }
 function placementTest() {
-  const qs = LEVELS.flatMap(L => sample(VOCAB[L], 3).map(v => Object.assign(qVocab(v, 'meaning'), { lv: L })));
+  const qs = LEVELS.flatMap(L => sample(VOCAB[L].filter(x => x.q), 3).map(v => Object.assign(qVocab(v, 'meaning'), { lv: L })));
   main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
   runQuiz(host, qs, {
     title: '分级小测试', exam: true, noRecord: true, onDone: r => {
@@ -767,26 +788,32 @@ function viewVocab() {
     startCards(host, ids, `背单词 · ${L}`, () => render());
   };
   const vq = () => {
-    const qs = sample(list, 10).map(v => qVocab(v, sample(['reading', 'meaning', 'word'], 1)[0]));
+    const qs = sample(list.filter(x => x.q), 10).map(v => qVocab(v, sample(['reading', 'meaning', 'word'], 1)[0]));
     main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
     runQuiz(host, qs, { title: `单词测验 · ${L}`, onDone: r => { if (!r) return render(); quizSummary(host, r, { title: `单词测验 · ${L}`, again: vq }); } });
   };
   top.querySelector('[data-quiz]').onclick = vq;
 
   const tbl = h(`<section class="panel">
-    <div class="row"><input type="search" id="v-search" placeholder="搜索单词、读音或中文" value="${esc(vocabSearch)}" aria-label="搜索单词">
+    <div class="row"><input type="search" id="v-search" placeholder="搜索单词、读音、中文或英文" value="${esc(vocabSearch)}" aria-label="搜索单词">
       <select id="v-filter" aria-label="筛选"><option value="all">全部</option><option value="new">没学过</option><option value="learn">学习中</option><option value="done">已掌握</option></select></div>
-    <p class="small muted">点一个单词展开 3 个例句，每句都能朗读。</p>
+    <p class="small muted">点一个单词展开例句，每句都能朗读。<span data-count></span></p>
     <div class="list-wrap"><table class="list"><thead><tr><th>单词</th><th>读音</th><th>意思</th><th class="col-st">状态</th><th></th></tr></thead><tbody></tbody></table></div>
+    <button class="btn" type="button" data-more hidden>显示更多</button>
   </section>`);
+  let shown = 100;
+  tbl.querySelector('[data-more]').onclick = () => { shown += 200; fill(); };
   const fill = () => {
-    const q = vocabSearch.trim();
-    const rows = list.filter(v => !q || v.w.includes(q) || v.r.includes(q) || v.m.includes(q)).filter(v => {
+    const q = vocabSearch.trim(), ql = q.toLowerCase();
+    const all = list.filter(v => !q || v.w.includes(q) || v.r.includes(q) || v.m.includes(q) || v.en.toLowerCase().includes(ql)).filter(v => {
       const st = mastered(v) ? 'done' : learned(v) ? 'learn' : 'new'; return vocabFilter === 'all' || vocabFilter === st;
     });
+    const rows = all.slice(0, shown);
+    tbl.querySelector('[data-count]').textContent = `共 ${all.length} 个`;
+    tbl.querySelector('[data-more]').hidden = all.length <= shown;
     tbl.querySelector('tbody').innerHTML = rows.map(v => {
       const st = mastered(v) ? '<span class="tag done">已掌握</span>' : learned(v) ? '<span class="tag learn">学习中</span>' : '<span class="tag">新</span>';
-      return `<tr class="vrow" data-w="${esc(v.w)}" tabindex="0" aria-expanded="false"><td class="w" lang="ja">${esc(v.w)}</td><td class="r" lang="ja">${esc(v.r)}</td><td>${esc(v.m)}</td><td class="col-st">${st}</td><td>${speakBtn(v.r)}</td></tr>`;
+      return `<tr class="vrow" data-id="${esc(v.id)}" tabindex="0" aria-expanded="false"><td class="w" lang="ja">${esc(v.w)}</td><td class="r" lang="ja">${esc(v.r)}</td><td>${esc(v.m)}</td><td class="col-st">${st}</td><td>${speakBtn(v.r)}</td></tr>`;
     }).join('') || '<tr><td colspan="5" class="muted">没有符合条件的单词</td></tr>';
   };
   const toggle = tr => {
@@ -794,13 +821,15 @@ function viewVocab() {
     tbl.querySelectorAll('tr.vex').forEach(x => { x.previousElementSibling.setAttribute('aria-expanded', 'false'); x.remove(); });
     if (open) return;
     tr.setAttribute('aria-expanded', 'true');
-    tr.insertAdjacentHTML('afterend', `<tr class="vex"><td colspan="5"><div class="ex-box">${exHTML(tr.dataset.w) || '<span class="muted small">暂无例句</span>'}</div></td></tr>`);
+    const v = ITEMS[tr.dataset.id];
+    const extra = `${v.alt.length ? `<div class="small muted">其他写法：<span lang="ja">${esc(v.alt.join('、'))}</span></div>` : ''}${v.en ? `<div class="small muted">英文：${esc(v.en)}</div>` : ''}`;
+    tr.insertAdjacentHTML('afterend', `<tr class="vex"><td colspan="5"><div class="ex-box">${extra}${exHTML(v.w) || '<span class="muted small">这个词的例句还在补充中。</span>'}</div></td></tr>`);
   };
   tbl.querySelector('tbody').addEventListener('click', e => { const tr = e.target.closest('tr.vrow'); if (tr) toggle(tr); });
   tbl.querySelector('tbody').addEventListener('keydown', e => { const tr = e.target.closest('tr.vrow'); if (tr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(tr); } });
   tbl.querySelector('#v-filter').value = vocabFilter;
-  tbl.querySelector('#v-search').oninput = e => { vocabSearch = e.target.value; fill(); };
-  tbl.querySelector('#v-filter').onchange = e => { vocabFilter = e.target.value; fill(); };
+  tbl.querySelector('#v-search').oninput = e => { vocabSearch = e.target.value; shown = 100; fill(); };
+  tbl.querySelector('#v-filter').onchange = e => { vocabFilter = e.target.value; shown = 100; fill(); };
   fill();
   main.append(top, tbl);
 }
@@ -861,7 +890,7 @@ function viewGrammar() {
 
 /* 模拟考 */
 function buildExam(L) {
-  const vs = VOCAB[L];
+  const vs = VOCAB[L].filter(x => x.q);
   const readable = shuffle(vs.filter(v => v.w !== v.r));
   const rest = shuffle(vs.filter(v => !readable.slice(0, 5).includes(v)));
   return [
