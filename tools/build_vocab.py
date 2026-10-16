@@ -14,7 +14,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LEVELS = ['N5', 'N4', 'N3', 'N2', 'N1']
 # 来源数据里的个别错误：(写法, 读音) → 正确写法
-FIX_WORD = {('副', 'とりわけ'): 'とりわけ'}
+FIX_WORD = {('副', 'とりわけ'): 'とりわけ', ('落る', 'おちる'): '落ちる', ('楽む', 'たのしむ'): '楽しむ', ('下る', 'さがる'): '下がる'}
 
 
 def first(s):
