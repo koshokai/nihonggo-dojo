@@ -174,18 +174,37 @@ function currentVoice() {
   return vs.find(v => v.name === S.voice) || vs.sort((a, b) => voiceScore(b) - voiceScore(a))[0] || null;
 }
 let warnedVoice = false;
+// Chrome 的已知问题：cancel() 之后马上 speak() 偶尔会被吞掉；长时间不用后引擎会卡在暂停状态；
+// utterance 被回收后会中途没声音。所以：保留引用、先 resume()、正在读时隔一小会儿再读，没开始就重试一次。
+let curUtt = null, speakSeq = 0;
 function speak(text, opts = {}) {
   if (!hasTTS) { if (!warnedVoice) { warnedVoice = true; toast('这个浏览器不支持朗读'); } return; }
   const clean = text.replace(/[～~＿[\]]/g, '');
-  const u = new SpeechSynthesisUtterance(clean);
-  u.lang = 'ja-JP';
-  // 句子比单词再慢一点，方便跟读
-  u.rate = (opts.rate || S.rate) * (clean.length > 8 ? .95 : 1);
-  u.pitch = 1;
-  const v = currentVoice(); if (v) u.voice = v;
-  if (opts.onend) { u.onend = opts.onend; u.onerror = opts.onend; }
-  speechSynthesis.cancel(); speechSynthesis.speak(u);
-  if (!v && speechSynthesis.getVoices().length && !warnedVoice) { warnedVoice = true; toast('没有找到日语语音，可以在系统设置里添加日语语音包'); }
+  const seq = ++speakSeq;
+  const make = () => {
+    const u = new SpeechSynthesisUtterance(clean);
+    u.lang = 'ja-JP';
+    // 句子比单词再慢一点，方便跟读
+    u.rate = (opts.rate || S.rate) * (clean.length > 8 ? .95 : 1);
+    u.pitch = 1;
+    const v = currentVoice(); if (v) u.voice = v;
+    let started = false;
+    u.onstart = () => { started = true; };
+    u.onend = u.onerror = e => { if (curUtt === u) curUtt = null; if (opts.onend && !(e && e.error === 'interrupted' && seq !== speakSeq)) opts.onend(); };
+    u.check = () => started;
+    return u;
+  };
+  const go = (retry) => {
+    if (seq !== speakSeq) return;
+    const u = make(); curUtt = u;
+    try { speechSynthesis.resume(); } catch (e) { /* 忽略 */ }
+    speechSynthesis.speak(u);
+    // 0.9 秒还没开始读，多半是被吞了：再试一次
+    if (retry) setTimeout(() => { if (seq === speakSeq && curUtt === u && !u.check() && !speechSynthesis.speaking) { speechSynthesis.cancel(); setTimeout(() => go(false), 60); } }, 900);
+  };
+  const busy = speechSynthesis.speaking || speechSynthesis.pending;
+  if (busy) { speechSynthesis.cancel(); setTimeout(() => go(true), 80); } else go(true);
+  if (!currentVoice() && speechSynthesis.getVoices().length && !warnedVoice) { warnedVoice = true; toast('没有找到日语语音，可以在系统设置里添加日语语音包'); }
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-say]');

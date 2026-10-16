@@ -2,6 +2,110 @@
 // 数据在 reading.js（tools/build_reading.py 生成），插图在 scenes.js。
 const READ_CATS = { 常识: '💡', 运动: '⚽', 笑话: '😂', 传统文化: '⛩️', 人文情感: '💗', 感人故事: '🌸', 美食: '🍜', 旅行: '🧳' };
 let readFilter = { L: null, cat: '' };
+let readReturn = null;   // 从文章点「查看详情」去词典时记下位置，回来接着读
+
+/* ---------- 生词：画线、点词释义、长按/选中翻译 ---------- */
+let WORD_IDX = null, JM_IDX = null;
+function wordIndex() {
+  if (!WORD_IDX) {
+    WORD_IDX = new Map();
+    for (const v of allVocab()) for (const w of [v.w, ...v.alt]) if (!WORD_IDX.has(w)) WORD_IDX.set(w, v);
+  }
+  return WORD_IDX;
+}
+function jmIndex() {
+  if (!JM_IDX && JMDICT) {
+    JM_IDX = new Map();
+    for (const e of JMDICT) for (const w of [...e.k, ...e.r]) if (!JM_IDX.has(w)) JM_IDX.set(w, e);
+  }
+  return JM_IDX;
+}
+// 按 原形 → 另一种写法 → 表层 的顺序查：本站词表（中文）优先，其次 JMdict（英文）
+function lookupWord(forms, keyset) {
+  for (const f of forms) if (f && keyset && keyset.has(f)) { const [w, r, zh] = keyset.get(f); const v = wordIndex().get(w); return { w, r, zh, v, key: true }; }
+  for (const f of forms) { const v = f && wordIndex().get(f); if (v) return { w: v.w, r: v.r, zh: v.m, v }; }
+  const jm = jmIndex();
+  if (jm) for (const f of forms) { const e = f && jm.get(f); if (e) return { w: e.k[0] || e.r[0], r: e.r[0], en: e.s.slice(0, 3).map(g => g.join('; ')), jm: e }; }
+  return null;
+}
+function tokHTML(toks, keyset) {
+  if (!toks) return '';
+  return toks.map(t => {
+    if (t.length === 1) return esc(t[0]);
+    const forms = t.slice(1).concat(t[0]);
+    const hit = lookupWord(forms, keyset);
+    const cls = hit ? (hit.key ? 'wd key' : 'wd u') : 'wd';
+    return `<span class="${cls}" data-f="${esc(forms.join('|'))}">${esc(t[0])}</span>`;
+  }).join('');
+}
+function closeSheet() { const o = document.querySelector('.word-sheet'); if (o) o.remove(); document.querySelectorAll('.wd.on').forEach(x => x.classList.remove('on')); }
+function showSheet(text, hit, a) {
+  closeSheet();
+  const say = hit ? hit.r : text;
+  const meaning = !hit ? '' : hit.zh ? `<div class="ws-m">${esc(hit.zh)}</div>` : `<ol class="ws-en">${hit.en.map(x => `<li>${esc(x)}</li>`).join('')}</ol><div class="small muted">英文释义来自 JMdict · <a href="https://translate.google.com/?sl=ja&tl=zh-CN&text=${encodeURIComponent(hit.w)}&op=translate" target="_blank" rel="noopener">看中文翻译 ↗</a></div>`;
+  const ex = hit && hit.v ? exList(hit.v.w)[0] : null;
+  const inDeck = hit && hit.v && S.srs[hit.v.id];
+  const sh = h(`<div class="word-sheet" role="dialog" aria-label="释义">
+    <button class="ws-x" type="button" aria-label="关闭">×</button>
+    <div class="row"><span class="ws-w" lang="ja">${esc(hit ? hit.w : text)}</span>${hit && hit.r !== hit.w ? `<span class="ws-r" lang="ja">${esc(hit.r)}</span>` : ''}${speakBtn(say)}${hit && hit.v ? `<span class="tag lv">${hit.v.L}</span>` : ''}</div>
+    ${meaning || '<div class="ws-m ws-empty"></div>'}
+    ${ex ? `<div class="small"><span lang="ja">${esc(ex[0])}</span><br><span class="muted">${esc(ex[2])}</span></div>` : ''}
+    <div class="row">
+      ${hit && hit.v && hit.v.q ? `<button class="btn soft" type="button" data-add ${inDeck ? 'disabled' : ''}>${inDeck ? '已在单词卡' : '+ 单词卡'}</button>` : ''}
+      <button class="btn" type="button" data-more>查看详情 →</button>
+    </div>
+  </div>`);
+  document.body.append(sh);
+  sh.querySelector('.ws-x').onclick = closeSheet;
+  const add = sh.querySelector('[data-add]');
+  if (add) add.onclick = () => { S.srs[hit.v.id] = { i: 0, e: 2.5, r: 0, due: Date.now() }; save(); add.textContent = '已加入'; add.disabled = true; toast(`「${hit.v.w}」已加入单词卡`); };
+  sh.querySelector('[data-more]').onclick = () => {
+    readReturn = { id: a.id, y: scrollY, title: a.title };
+    dictQuery = hit ? hit.w : text; dictDir = null;
+    closeSheet(); location.hash = 'dict';
+  };
+}
+function bindWords(p, a) {
+  const keyset = new Map(a.w.map(x => [x[0], x]));
+  const formsOf = el => el.dataset.f.split('|');
+  p.querySelectorAll('.wd').forEach(el => {
+    el.onclick = e => {
+      e.stopPropagation();
+      const hit = lookupWord(formsOf(el), keyset);
+      showSheet(el.textContent, hit, a); el.classList.add('on');
+    };
+  });
+  // JMdict 加载好以后，把词表里没有、JMdict 里有的词也画上线
+  loadJmdict().then(() => {
+    if (!document.body.contains(p)) return;
+    p.querySelectorAll('.wd:not(.u):not(.key)').forEach(el => { if (lookupWord(formsOf(el), keyset)) el.classList.add('u', 'jm'); });
+  }).catch(() => {});
+  // 长按或拖选一段文字：查得到就给释义，查不到释义留空
+  let t;
+  const onSel = () => {
+    if (!document.body.contains(p)) { document.removeEventListener('selectionchange', onSel); return; }
+    clearTimeout(t);
+    t = setTimeout(() => {
+      const sel = getSelection();
+      if (!sel || sel.isCollapsed || !sel.anchorNode || !p.querySelector('.ra-text').contains(sel.anchorNode)) return;
+      const an = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement;
+      if (an && an.closest('.ra-zh')) return;
+      const text = sel.toString().replace(/\s+/g, '').trim();
+      if (!text || text.length > 40) return;
+      let hit = lookupWord([text, toHira(text)], keyset);
+      if (!hit) {
+        // 选中的正好是一个词的变形（登りました → 登る）
+        const el = [...p.querySelectorAll('.wd')].find(x => x.textContent === text || text.startsWith(x.textContent) && text.length - x.textContent.length <= 4);
+        if (el) hit = lookupWord(formsOf(el), keyset);
+      }
+      showSheet(text, hit, a);
+    }, 450);
+  };
+  document.addEventListener('selectionchange', onSel);
+}
+document.addEventListener('click', e => { if (!e.target.closest('.word-sheet') && !e.target.closest('.wd')) closeSheet(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+addEventListener('hashchange', closeSheet);
 
 function viewRead(id) {
   if (id) { const a = READING.find(x => x.id === id); if (a) return readArticle(a); }
@@ -44,7 +148,8 @@ function readArticle(a) {
   const done = (S.read || {})[a.id];
   const sents = a.p.flat();
   let idx = 0;
-  const vocabOf = w => allVocab().find(v => v.w === w || v.alt.includes(w));
+  const vocabOf = w => wordIndex().get(w);
+  const keyset = new Map(a.w.map(x => [x[0], x]));
   const p = h(`<article class="panel read-art">
     <div class="ra-hero">${scene(a.img)}</div>
     <div class="row between"><a class="small" href="#read">← 返回阅读</a><span class="row"><span class="tag lv">${a.L}</span><span class="tag">${READ_CATS[a.cat] || ''} ${a.cat}</span>${done ? '<span class="tag done">已读</span>' : ''}</span></div>
@@ -56,20 +161,22 @@ function readArticle(a) {
       <label class="switch"><input type="checkbox" data-zh> 全部中文</label>
     </div>
     <p class="small muted">点一句话：朗读并显示中文。</p>
-    <div class="ra-text">${a.p.map(para => `<p>${para.map(([jp, kana, zh]) => `<span class="ra-s" data-i="${idx++}" tabindex="0" role="button"><span class="ra-jp" lang="ja">${esc(jp)}</span><span class="ra-kana" lang="ja">${esc(kana)}</span><span class="ra-zh">${esc(zh)}</span></span>`).join('')}</p>`).join('')}</div>
+    <div class="ra-text">${a.p.map(para => `<p>${para.map(([jp, kana, zh, toks]) => `<span class="ra-s" data-i="${idx++}" tabindex="0" role="button"><span class="ra-jp" lang="ja">${tokHTML(toks, keyset)}</span><span class="ra-kana" lang="ja">${esc(kana)}</span><span class="ra-zh">${esc(zh)}</span></span>`).join('')}</p>`).join('')}</div>
     <h3>生词</h3>
     <div class="ra-words">${a.w.map(([w, r, zh]) => { const v = vocabOf(w); return `<div class="ra-word"><span lang="ja" class="rw-w">${esc(w)}</span><span lang="ja" class="rw-r">${esc(r)}</span>${speakBtn(r)}<span class="rw-m">${esc(zh)}</span>${v && v.q ? `<button type="button" class="chip-btn" data-add="${esc(v.id)}">${S.srs[v.id] ? '已在单词卡' : '+ 单词卡'}</button>` : ''}</div>`; }).join('')}</div>
     <h3>读后小测验</h3>
     <div class="ra-quiz"></div>
   </article>`);
   main.append(p);
+  bindWords(p, a);
+  if (readReturn && readReturn.id === a.id) { const y = readReturn.y; readReturn = null; setTimeout(() => scrollTo({ top: y, behavior: 'instant' }), 30); }
   const nodes = [...p.querySelectorAll('.ra-s')];
   const textBox = p.querySelector('.ra-text');
   p.querySelector('[data-kana]').onchange = e => textBox.classList.toggle('show-kana', e.target.checked);
   p.querySelector('[data-zh]').onchange = e => textBox.classList.toggle('show-zh', e.target.checked);
   const mark = i => nodes.forEach((n, j) => n.classList.toggle('now', j === i));
   nodes.forEach((n, i) => {
-    const go = () => { stopPlay(); n.classList.add('open'); mark(i); speak(sents[i][1], { onend: () => mark(-1) }); };
+    const go = e => { if (e && (e.target.closest('.wd') || String(getSelection()).trim())) return; stopPlay(); n.classList.add('open'); mark(i); speak(sents[i][1], { onend: () => mark(-1) }); };
     n.onclick = go; n.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } };
   });
   // 全文朗读：一句一句接着读，当前句高亮

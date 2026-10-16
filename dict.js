@@ -118,6 +118,10 @@ function viewDict() {
     <p class="small muted" data-status></p>
   </section>`);
   const res = h('<div class="dict-res"></div>');
+  if (typeof readReturn !== 'undefined' && readReturn) {
+    const back = h(`<a class="btn pri back-read" href="#read/${esc(readReturn.id)}">← 返回继续阅读《<span lang="ja">${esc(readReturn.title)}</span>》</a>`);
+    main.append(back);
+  }
   main.append(p, res);
   const input = p.querySelector('#dict-q'), status = p.querySelector('[data-status]');
   const run = () => {

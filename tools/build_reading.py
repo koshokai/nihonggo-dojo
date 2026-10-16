@@ -7,7 +7,60 @@ import json
 import re
 import sys
 
-from build_examples import ROOT, reading
+from build_examples import ROOT, reading, tagger
+
+CONTENT = {'名詞', '動詞', '形容詞', '形状詞', '副詞', '連体詞', '接続詞', '感動詞', '代名詞', '接頭辞'}
+
+
+def headwords():
+    vt = (ROOT / 'vocab.js').read_text(encoding='utf-8')
+    vocab = json.loads(vt[vt.index('= {') + 2:vt.rindex('}') + 1])
+    ws = set()
+    for items in vocab.values():
+        for it in items:
+            ws.add(it[0])
+            if len(it) > 4:
+                ws.update(it[4])
+    for e in json.loads((ROOT / 'dict.json').read_text(encoding='utf-8')):
+        ws.update(e[0])
+    return ws
+
+
+WORDS = headwords()
+
+
+def tokens(sentence, extra):
+    """分词：[表层] 是助词等虚词；[表层, 原形, 另一种写法?] 是可以点开查的实词。相邻几块拼起来是词典里的词就合并。"""
+    toks = [(w.surface, w.feature) for w in tagger(sentence)]
+    out, i = [], 0
+    while i < len(toks):
+        for j in range(min(len(toks), i + 4), i + 1, -1):
+            cat = ''.join(t[0] for t in toks[i:j])
+            if (cat in WORDS or cat in extra) and not re.search(r'[、。「」！？]', cat):
+                out.append([cat, cat])
+                i = j
+                break
+        else:
+            surf, f = toks[i]
+            pos = getattr(f, 'pos1', '')
+            if pos in CONTENT and not re.fullmatch(r'[\W\d０-９]+', surf):
+                base = getattr(f, 'orthBase', None) or surf
+                lemma = (getattr(f, 'lemma', None) or '').split('-')[0]
+                t = [surf, base if base != '*' else surf]
+                if lemma and lemma not in (t[1], '*'):
+                    t.append(lemma)
+                out.append(t)
+            else:
+                out.append([surf])
+            i += 1
+    # 连续的虚词合成一块，减小体积
+    merged = []
+    for t in out:
+        if len(t) == 1 and merged and len(merged[-1]) == 1:
+            merged[-1][0] += t[0]
+        else:
+            merged.append(t)
+    return merged
 
 SRC = ROOT / 'tools/reading'
 LEVELS = ['N5', 'N4', 'N3', 'N2', 'N1']
@@ -23,12 +76,13 @@ def parse(path):
         meta = {k.strip('# ').strip(): v.strip() for k, v in meta.items()}
         body, rest = rest.split('\n---words\n', 1)
         words, quiz = rest.split('\n---quiz\n', 1)
+        keys = {l.split('|')[0].strip() for l in words.strip().splitlines() if l.strip()}
         paras = []
         for para in re.split(r'\n\s*\n', body.strip()):
             sents = []
             for line in para.splitlines():
                 jp, zh = [x.strip() for x in line.split(' | ')]
-                sents.append([jp, reading(jp), zh])
+                sents.append([jp, reading(jp), zh, tokens(jp, keys)])
             paras.append(sents)
         a = {
             'id': meta['id'], 'L': meta['level'], 'cat': meta['cat'], 'img': meta['img'],
@@ -54,7 +108,7 @@ def main():
         if f.exists():
             arts += parse(f)
     js = ('// 自动生成：python3 tools/build_reading.py（请编辑 tools/reading/N*.txt）\n'
-          '// 每篇：{id, L, cat, img, title, zh, p:[[ [日语, 朗读假名, 中文], … ] 段落…], w:[[词, 读音, 中文]], q:[[问题, 正确, 错1, 错2, 错3]]}\n'
+          '// 每篇：{id, L, cat, img, title, zh, p:[[ [日语, 朗读假名, 中文, 分词], … ] 段落…], w:[[词, 读音, 中文]], q:[[问题, 正确, 错1, 错2, 错3]]}\n'
           'const READING = ' + json.dumps(arts, ensure_ascii=False, separators=(',', ':')).replace('},{', '},\n{') + ';\n')
     (ROOT / 'reading.js').write_text(js, encoding='utf-8')
     print(len(arts), '篇', sum(len(s) for a in arts for s in a['p']), '段')
