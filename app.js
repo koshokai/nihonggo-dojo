@@ -13,7 +13,14 @@ const h = html => { const t = document.createElement('template'); t.innerHTML = 
 const SPEAK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
 const speakBtn = (text, label) => `<button class="speak" type="button" data-say="${esc(text)}" aria-label="${esc(label || '朗读')}">${SPEAK_SVG}</button>`;
 // 例句：把单词（动词、形容词取词干）在句子里标出来
-const exList = w => (typeof EXAMPLES !== 'undefined' && EXAMPLES[w]) || [];
+// 例句：优先用这个词的专属例句；没有的话，从全站例句库（单词例句 + 语法例句）里找含这个词的句子
+const exList = w => {
+  const own = (typeof EXAMPLES !== 'undefined' && EXAMPLES[w]) || [];
+  if (own.length >= 3 || typeof sentencesWith !== 'function' || w.length < 2 && !/[\u4e00-\u9fff]/.test(w)) return own;
+  const seen = new Set(own.map(x => x[0]));
+  const more = sentencesWith(w.length > 1 && /[るうくすつぬむぶぐい]$/.test(w) ? w.slice(0, -1) : w, 5).filter(x => !seen.has(x.jp)).map(x => [x.jp, x.kana, x.zh]);
+  return own.concat(more).slice(0, 5);
+};
 function markWord(jp, w) {
   const stem = w.length > 1 && /[るうくすつぬむぶぐい]$/.test(w) ? w.slice(0, -1) : w.replace(/する$/, '');
   const i = jp.indexOf(stem);

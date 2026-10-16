@@ -33,7 +33,7 @@ def hira(s):
 
 KATA = set(chr(c) for c in range(0x30A1, 0x30FB)) | {'ー'}
 # 合并后再修正的少数读法
-FIX = [('ようひ', 'ようび'), ('にっぽん', 'にほん'), ('にほんにん', 'にほんじん'), ('ちゅうごくにん', 'ちゅうごくじん'), ('がいこくにん', 'がいこくじん'), ('よんにん', 'よにん'), ('いちこくにちょう', 'いっせきにちょう'), ('ねんの わりに', 'としの わりに')]
+FIX = [('ようひ', 'ようび'), ('にっぽん', 'にほん'), ('にほんにん', 'にほんじん'), ('ちゅうごくにん', 'ちゅうごくじん'), ('がいこくにん', 'がいこくじん'), ('よんにん', 'よにん'), ('いちこくにちょう', 'いっせきにちょう'), ('ねんの わりに', 'としの わりに'), ('こんばんは ', 'こんばん わ '), ('こんにちは ', 'こんにち わ '), ('きゅうがつ', 'くがつ'), ('きゅうじに', 'くじに'), ('きゅうじから', 'くじから'), ('きゅうじまで', 'くじまで'), ('きゅうじは', 'くじは'), ('たんじょうひ', 'たんじょうび'), ('けいにく', 'とりにく')]
 
 
 def reading(sentence):
@@ -80,10 +80,7 @@ def main():
             a, b = line.split('|')
             alias[a] = b
     out = {}
-    for L in LEVELS:
-        src = ROOT / 'tools' / f'examples_{L}.txt'
-        if not src.exists():
-            continue
+    for src in sorted((ROOT / 'tools').glob('examples_*.txt')):
         for n, line in enumerate(src.read_text(encoding='utf-8').splitlines(), 1):
             if not line.strip() or line.startswith('#'):
                 continue
