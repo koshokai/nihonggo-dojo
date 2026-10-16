@@ -1,0 +1,14 @@
+{
+  "name": "日语道场 · 从五十音到 N1",
+  "short_name": "日语道场",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFF8FA",
+  "theme_color": "#F7EEF2",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

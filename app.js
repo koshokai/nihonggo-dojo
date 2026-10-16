@@ -20,7 +20,7 @@ for (const L of LEVELS) {
   KANJI[L] = KANJI_RAW[L].trim().split('\n').map(l => { const [k, on, kun, m] = l.split('|'); return { id: `k|${L}|${k}`, type: 'k', L, k, on, kun, m }; });
   GRAM[L] = GRAMMAR[L].map((g, i) => ({
     id: `g|${L}|${i}`, type: 'g', L, p: g[0], m: g[1], how: g[2], s: g[3], t: g[4], ex: g[5] || [],
-    frag: g[3].match(/\[(.+?)\]/)[1], full: g[3].replace(/[[\]]/g, ''), blank: g[3].replace(/\[.+?\]/, '＿＿＿')
+    frag: g[3].match(/\[(.+?)\]/)[1], full: g[3].replace(/[[\]]/g, ''), kana: GRAMMAR_KANA[L][i], blank: g[3].replace(/\[.+?\]/, '＿＿＿')
   }));
   [...VOCAB[L], ...KANJI[L], ...GRAM[L]].forEach(it => { ITEMS[it.id] = it; });
 }
@@ -57,12 +57,13 @@ const RANKS = [
 ];
 
 /* ---------- 进度存储 ---------- */
-const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '' });
+const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: true, autoSpeak: true, lastBackup: 0, lastBackupXp: 0 });
 function load() {
   try { const t = localStorage.getItem(KEY); if (t) return Object.assign(blank(), JSON.parse(t)); } catch (e) { /* 浏览器禁用存储时从空进度开始 */ }
   return blank();
 }
 let S = load();
+if (S.xp > 0) S.onboarded = true;
 let storageOk = true;
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(S)); storageOk = true; } catch (e) { storageOk = false; }
@@ -119,23 +120,31 @@ function checkBadges() {
 }
 
 /* ---------- 发音 ---------- */
-let jaVoice = null;
-function pickVoice() {
-  if (!('speechSynthesis' in window)) return;
-  const vs = speechSynthesis.getVoices();
-  jaVoice = vs.find(v => /^ja/i.test(v.lang) && /Google|Kyoko|Otoya|Nanami|Haruka/i.test(v.name)) || vs.find(v => /^ja/i.test(v.lang)) || null;
+// 浏览器自带语音质量参差不齐：优先选「Natural / Online / Google」这类较自然的日语语音，
+// 朗读一律用假名读音（见 data.js），避免把汉字读错。
+const hasTTS = 'speechSynthesis' in window;
+const jaVoices = () => hasTTS ? speechSynthesis.getVoices().filter(v => /^ja/i.test(v.lang)) : [];
+const voiceScore = v => (/Natural|Neural/i.test(v.name) ? 40 : 0) + (/Online/i.test(v.name) ? 20 : 0) + (/Google/i.test(v.name) ? 15 : 0) + (/Nanami|Keita|Kyoko|O-ren|Hattori|Otoya/i.test(v.name) ? 10 : 0) + (v.localService ? 0 : 3);
+function currentVoice() {
+  const vs = jaVoices();
+  return vs.find(v => v.name === S.voice) || vs.sort((a, b) => voiceScore(b) - voiceScore(a))[0] || null;
 }
-if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-function speak(text) {
-  if (!('speechSynthesis' in window)) { toast('这个浏览器不支持朗读'); return; }
-  const u = new SpeechSynthesisUtterance(text.replace(/[～~＿[\]]/g, ''));
-  u.lang = 'ja-JP'; u.rate = .9; if (jaVoice) u.voice = jaVoice;
+let warnedVoice = false;
+function speak(text, opts = {}) {
+  if (!hasTTS) { if (!warnedVoice) { warnedVoice = true; toast('这个浏览器不支持朗读'); } return; }
+  const clean = text.replace(/[～~＿[\]]/g, '');
+  const u = new SpeechSynthesisUtterance(clean);
+  u.lang = 'ja-JP';
+  // 句子比单词再慢一点，方便跟读
+  u.rate = (opts.rate || S.rate) * (clean.length > 8 ? .95 : 1);
+  u.pitch = 1;
+  const v = currentVoice(); if (v) u.voice = v;
   speechSynthesis.cancel(); speechSynthesis.speak(u);
-  if (!jaVoice && speechSynthesis.getVoices().length) toast('没有找到日语语音，可在系统设置里添加日语语音包');
+  if (!v && speechSynthesis.getVoices().length && !warnedVoice) { warnedVoice = true; toast('没有找到日语语音，可以在系统设置里添加日语语音包'); }
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-say]');
-  if (b) { e.stopPropagation(); speak(b.dataset.say); }
+  if (b) { e.stopPropagation(); speak(b.dataset.say); b.classList.remove('talk'); void b.offsetWidth; b.classList.add('talk'); }
 }, true);
 
 /* ---------- 小部件 ---------- */
@@ -145,20 +154,104 @@ function toast(msg) {
   t.textContent = msg; t.hidden = false;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2800);
 }
-function celebrate() {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const cv = document.getElementById('confetti'), ctx = cv.getContext('2d');
-  const W = cv.width = innerWidth, H = cv.height = innerHeight;
-  const css = getComputedStyle(document.documentElement);
-  const cols = ['--shu', '--ai', '--ok', '--heat2'].map(v => css.getPropertyValue(v).trim());
-  const ps = Array.from({ length: 140 }, () => ({ x: W / 2 + (Math.random() - .5) * W * .3, y: H * .35, vx: (Math.random() - .5) * 14, vy: -Math.random() * 14 - 4, r: Math.random() * 6 + 4, a: Math.random() * 6, va: (Math.random() - .5) * .3, c: cols[Math.floor(Math.random() * cols.length)] }));
-  const t0 = performance.now();
-  (function frame(t) {
-    ctx.clearRect(0, 0, W, H);
-    for (const p of ps) { p.vy += .4; p.x += p.vx; p.y += p.vy; p.a += p.va; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = p.c; ctx.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); ctx.restore(); }
-    if (t - t0 < 2200) requestAnimationFrame(frame); else ctx.clearRect(0, 0, W, H);
-  })(t0);
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const tok = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function drawPetal(ctx, r, color) {
+  // 樱花花瓣：一头圆、一头带小缺口
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(0, -r);
+  ctx.bezierCurveTo(r * .9, -r * .7, r * .8, r * .6, 0, r);
+  ctx.bezierCurveTo(-r * .8, r * .6, -r * .9, -r * .7, 0, -r);
+  ctx.fill();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath(); ctx.moveTo(-r * .18, -r); ctx.lineTo(0, -r * .72); ctx.lineTo(r * .18, -r); ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
 }
+const petalColors = () => [tok('--sakura'), tok('--sakura-2'), tok('--sakura-3')];
+
+// 一次性的花瓣喷发：庆祝（全屏）或答对（从某个元素冒出来）
+let burst = [], burstRAF = 0;
+function petalBurst(x, y, n, power) {
+  if (reduceMotion()) return;
+  const cv = document.getElementById('confetti'), ctx = cv.getContext('2d');
+  const dpr = devicePixelRatio || 1;
+  if (cv.width !== innerWidth * dpr) { cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; }
+  const cols = petalColors();
+  for (let i = 0; i < n; i++) {
+    const ang = Math.random() * Math.PI * 2, sp = (Math.random() * .7 + .3) * power;
+    burst.push({ x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - power * .6, r: Math.random() * 5 + 5, a: Math.random() * 6, va: (Math.random() - .5) * .25, c: cols[i % cols.length], life: 0, max: 90 + Math.random() * 60 });
+  }
+  if (burstRAF) return;
+  const frame = () => {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    burst = burst.filter(p => p.life < p.max);
+    for (const p of burst) {
+      p.life++; p.vy += .12; p.vx *= .985; p.vy *= .985; p.x += p.vx + Math.sin(p.life / 9) * .6; p.y += p.vy; p.a += p.va;
+      ctx.save(); ctx.globalAlpha = Math.min(1, (p.max - p.life) / 30); ctx.translate(p.x, p.y); ctx.rotate(p.a); drawPetal(ctx, p.r, p.c); ctx.restore();
+    }
+    burstRAF = burst.length ? requestAnimationFrame(frame) : (ctx.clearRect(0, 0, innerWidth, innerHeight), 0);
+  };
+  burstRAF = requestAnimationFrame(frame);
+}
+function celebrate() { petalBurst(innerWidth / 2, innerHeight * .4, 90, 11); bounceNeko(); }
+function popFrom(el) { const r = el.getBoundingClientRect(); petalBurst(r.left + r.width / 2, r.top + r.height / 2, 16, 5); }
+
+// 背景里缓缓飘落的樱花，可在「我的」关闭
+let ambient = null;
+function startPetals() {
+  stopPetals();
+  if (!S.petals || reduceMotion()) return;
+  const cv = document.getElementById('petals'), ctx = cv.getContext('2d');
+  let W, H; const dpr = devicePixelRatio || 1;
+  const size = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; };
+  size(); addEventListener('resize', size);
+  const cols = petalColors();
+  const n = Math.round(Math.min(22, Math.max(10, innerWidth / 60)));
+  const ps = Array.from({ length: n }, (_, i) => ({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 4 + 5, s: Math.random() * .4 + .35, ph: Math.random() * 6, a: Math.random() * 6, va: (Math.random() - .5) * .02, c: cols[i % cols.length] }));
+  let last = performance.now(), raf;
+  const frame = t => {
+    const dt = Math.min(50, t - last) / 16; last = t;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    for (const p of ps) {
+      p.ph += .012 * dt; p.y += p.s * dt; p.x += Math.sin(p.ph) * .5 * dt; p.a += p.va * dt;
+      if (p.y > H + 12) { p.y = -12; p.x = Math.random() * W; }
+      ctx.save(); ctx.globalAlpha = .55; ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.scale(1, .75 + Math.sin(p.ph * 2) * .25); drawPetal(ctx, p.r, p.c); ctx.restore();
+    }
+    raf = requestAnimationFrame(frame);
+  };
+  raf = requestAnimationFrame(frame);
+  ambient = { stop: () => { cancelAnimationFrame(raf); removeEventListener('resize', size); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); } };
+}
+function stopPetals() { if (ambient) { ambient.stop(); ambient = null; } }
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopPetals(); else startPetals(); });
+
+// 招财猫吉祥物
+function neko(mood = 'happy', cls = '') {
+  const eyes = mood === 'sad'
+    ? '<path d="M44 52 q5 5 10 0M66 52 q5 5 10 0" />'
+    : mood === 'wow' ? '<circle cx="49" cy="50" r="3.2" class="nk-ink"/><circle cx="71" cy="50" r="3.2" class="nk-ink"/>'
+    : '<path d="M44 52 q5 -6 10 0M66 52 q5 -6 10 0" />';
+  return `<svg class="neko ${cls}" viewBox="0 0 120 130" aria-hidden="true">
+    <g class="nk-body">
+      <ellipse cx="60" cy="100" rx="34" ry="27" class="nk-fur"/>
+      <ellipse cx="60" cy="104" rx="17" ry="14" class="nk-belly"/>
+      <path d="M29 42 L35 13 L53 30 Z" class="nk-fur"/><path d="M91 42 L85 13 L67 30 Z" class="nk-fur"/>
+      <path d="M35 33 L38 21 L46 29Z" class="nk-pink"/><path d="M85 33 L82 21 L74 29Z" class="nk-pink"/>
+      <ellipse cx="60" cy="50" rx="35" ry="28" class="nk-fur"/>
+      <g class="nk-line">${eyes}<path d="M54 62 q3 3 6 0 q3 3 6 0"/></g>
+      <path d="M57.5 58 h5 l-2.5 2.6z" class="nk-pink"/>
+      <circle cx="41" cy="61" r="5" class="nk-blush"/><circle cx="79" cy="61" r="5" class="nk-blush"/>
+      <path d="M31 74 q29 13 58 0" class="nk-collar"/>
+      <circle cx="60" cy="82" r="5" class="nk-bell"/>
+      <ellipse cx="45" cy="122" rx="10" ry="6" class="nk-fur"/><ellipse cx="75" cy="122" rx="10" ry="6" class="nk-fur"/>
+    </g>
+    <g class="nk-paw"><ellipse cx="97" cy="66" rx="11" ry="14" class="nk-fur"/><path d="M92 58 v5M97 57 v5M102 58 v5" class="nk-line"/></g>
+  </svg>`;
+}
+function bounceNeko() { document.querySelectorAll('.neko').forEach(n => { n.classList.remove('jump'); void n.getBoundingClientRect(); n.classList.add('jump'); }); }
+
 function updateTop() {
   const s = streak();
   document.getElementById('streak-n').textContent = s;
@@ -166,6 +259,7 @@ function updateTop() {
   document.getElementById('xp-today').textContent = todayXP();
   document.getElementById('xp-goal').textContent = '/' + S.goal;
   document.getElementById('chip-xp').classList.toggle('lit', todayXP() >= S.goal);
+  document.getElementById('chip-lv').textContent = S.level;
 }
 function applyTheme() {
   if (S.theme) document.documentElement.dataset.theme = S.theme; else delete document.documentElement.dataset.theme;
@@ -232,7 +326,7 @@ function startCards(host, ids, title, onExit) {
     revealed = false;
     stage.innerHTML = `<div class="card" data-card tabindex="0" role="button" aria-label="显示答案">
         <span class="corner tag ${c ? 'learn' : ''}">${c ? '复习' : '新词'} · ${v.L}</span>
-        <span class="corner-r">${speakBtn(v.w, '朗读单词')}</span>
+        <span class="corner-r">${speakBtn(v.r, '朗读单词')}</span>
         <div class="word" lang="ja">${esc(v.w)}</div>
         <div data-ans hidden><div class="reading" lang="ja">${esc(v.r)}</div><div class="meaning">${esc(v.m)}</div></div>
         <div class="hint" data-hint>先想一想读音和意思，再点卡片看答案（空格键）</div>
@@ -244,7 +338,7 @@ function startCards(host, ids, title, onExit) {
     const reveal = () => {
       if (revealed) return; revealed = true;
       stage.querySelector('[data-ans]').hidden = false; stage.querySelector('[data-hint]').hidden = true;
-      stage.querySelector('[data-grades]').hidden = false; speak(v.w);
+      stage.querySelector('[data-grades]').hidden = false; if (S.autoSpeak) speak(v.r);
     };
     card.onclick = reveal;
     stage.querySelectorAll('[data-g]').forEach(b => { b.onclick = () => rate(+b.dataset.g); });
@@ -280,18 +374,18 @@ function qVocab(v, kind) {
   if (kind === 'reading' && v.w !== v.r) {
     const pool = same.filter(x => x.w !== x.r && x.r !== v.r).sort((a, b) => Math.abs(a.r.length - v.r.length) - Math.abs(b.r.length - v.r.length)).slice(0, 10).map(x => x.r);
     return makeQ(v, 'reading', distract(v.r, near(pool, x => x.r)), v.r, {
-      prompt: `<div class="eyebrow">选择正确的读音</div><div class="q-big" lang="ja">${esc(v.w)}</div>`, optLang: 'ja', say: v.w,
+      prompt: `<div class="eyebrow">选择正确的读音</div><div class="q-big" lang="ja">${esc(v.w)}</div>`, optLang: 'ja', say: v.r,
       explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}`
     });
   }
   if (kind === 'word') {
     return makeQ(v, 'word', distract(v.w, same.map(x => x.w)), v.w, {
-      prompt: `<div class="eyebrow">哪个日语单词是这个意思？</div><div class="q-big" style="font-family:var(--f-ui);font-size:1.8rem">${esc(v.m)}</div>`, optLang: 'ja', say: v.w,
+      prompt: `<div class="eyebrow">哪个日语单词是这个意思？</div><div class="q-big" style="font-family:var(--f-ui);font-size:1.8rem">${esc(v.m)}</div>`, optLang: 'ja', say: v.r,
       explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}`
     });
   }
   return makeQ(v, 'meaning', distract(v.m, same.map(x => x.m)), v.m, {
-    prompt: `<div class="eyebrow">这个单词是什么意思？</div><div class="q-big" lang="ja">${esc(v.w)}</div>`, say: v.w,
+    prompt: `<div class="eyebrow">这个单词是什么意思？</div><div class="q-big" lang="ja">${esc(v.w)}</div>`, say: v.r,
     explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}`
   });
 }
@@ -308,7 +402,7 @@ function qGrammar(g) {
   if (pool.length < 3) pool = pool.concat(LEVELS.flatMap(L => GRAM[L]).filter(x => x.frag !== g.frag && !g.ex.includes(x.frag)).map(x => x.frag));
   const sent = esc(g.blank).replace('＿＿＿', '<span class="blank">　？　</span>');
   return makeQ(g, 'grammar', distract(g.frag, pool), g.frag, {
-    prompt: `<div class="eyebrow">选择填入空白处的内容</div><div class="q-sent" lang="ja">${sent}</div>`, optLang: 'ja', say: g.full,
+    prompt: `<div class="eyebrow">选择填入空白处的内容</div><div class="q-sent" lang="ja">${sent}</div>`, optLang: 'ja', say: g.kana,
     explain: `<b lang="ja">${esc(g.p)}</b>：${esc(g.m)}<br><span lang="ja">${esc(g.full)}</span><br><span class="muted">${esc(g.t)}</span>`
   });
 }
@@ -322,7 +416,7 @@ function qKana([kana, ro], reverse, pool) {
 const itemQ = it => it.type === 'v' ? qVocab(it, sample(['reading', 'meaning', 'word'], 1)[0]) : it.type === 'k' ? qKanji(it) : qGrammar(it);
 
 /* ---------- 测验引擎 ---------- */
-function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false, xpEach = 10, onDone }) {
+function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false, noRecord = false, xpEach = 10, onDone }) {
   let i = 0, combo = 0, answered = false;
   const res = [];
   host.innerHTML = '';
@@ -361,7 +455,7 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
     if (answered) return; answered = true;
     const q = qs[i], ok = j === q.answer;
     res.push({ q, pick: j, ok });
-    if (q.id) {
+    if (q.id && !noRecord) {
       if (!ok) S.wrong[q.id] = { n: ((S.wrong[q.id] || {}).n || 0) + 1, t: Date.now() };
       else if (fromWrong && S.wrong[q.id]) { delete S.wrong[q.id]; S.fixed++; }
     }
@@ -369,10 +463,12 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
     if (exam) { save(); next(); return; }
     const btns = stage.querySelectorAll('[data-o]');
     btns.forEach((b, k) => { b.disabled = true; if (k === q.answer) b.classList.add('right'); else if (k === j) b.classList.add('wrong'); });
+    if (ok) popFrom(btns[j]);
     combo = ok ? combo + 1 : 0;
     if (ok) addXP(xpEach + (combo && combo % 5 === 0 ? 5 : 0)); else save();
-    if (q.say) speak(q.say);
-    stage.querySelector('[data-fb]').innerHTML = `<div class="feedback ${ok ? 'ok' : 'no'}"><b>${ok ? (combo >= 5 && combo % 5 === 0 ? `答对了！${combo} 连对，额外 +5` : '答对了') : '答错了，已记入错题本'}</b><div>${q.explain || ''}</div></div>
+    if (q.say && S.autoSpeak) speak(q.say);
+    const cheer = ok ? sample(['やった！', 'すごい！', 'いいね！', '正解！'], 1)[0] : sample(['ドンマイ！', '大丈夫！', '次は行ける！'], 1)[0];
+    stage.querySelector('[data-fb]').innerHTML = `<div class="feedback ${ok ? 'ok' : 'no'}">${neko(ok ? 'happy' : 'sad', 'mini')}<div class="fb-t"><b lang="ja" class="cheer">${cheer}</b><b>${ok ? (combo >= 5 && combo % 5 === 0 ? `答对了！${combo} 连对，额外 +5` : '答对了') : (noRecord ? '答错了' : '答错了，已记入错题本')}</b><div>${q.explain || ''}</div></div></div>
       <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn pri" type="button" data-next>${i + 1 < qs.length ? '下一题' : '查看结果'}（Enter）</button></div>`;
     stage.querySelector('[data-next]').onclick = next;
     stage.querySelector('[data-next]').focus({ preventScroll: true });
@@ -405,10 +501,12 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, me: viewMe };
+const VIEWS = { home: viewHome, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, me: viewMe, welcome: viewWelcome };
 function render() {
   const v = (location.hash || '#home').slice(1);
-  const view = VIEWS[v] ? v : 'home';
+  let view = VIEWS[v] ? v : 'home';
+  if (!S.onboarded && view !== 'me') view = 'welcome';
+  if (S.onboarded && view === 'welcome') view = 'home';
   clearInterval(examTimer); keyHandler = null;
   document.querySelectorAll('.tabs a').forEach(a => a.classList.toggle('on', a.dataset.go === view));
   const on = document.querySelector('.tabs a.on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -418,6 +516,87 @@ function render() {
 }
 addEventListener('hashchange', () => { render(); scrollTo(0, 0); });
 const go = view => { if (location.hash === '#' + view) render(); else location.hash = view; };
+
+/* 欢迎 + 分级测试 */
+const START_OPTS = [
+  ['zero', 'あ', '零基础', '还不会假名，从五十音开始'],
+  ['N5', 'N5', '入门', '会假名，认识一些简单单词'],
+  ['N4', 'N4', '初级', '能看懂简单的句子和对话'],
+  ['N3', 'N3', '中级', '日常会话基本没问题'],
+  ['N2', 'N2', '中高级', '能读文章、看新闻'],
+  ['N1', 'N1', '高级', '冲刺最高级别 N1']
+];
+function viewWelcome() {
+  let pick = S.level, goal = S.goal;
+  const p = h(`<section class="panel welcome">
+    <div class="welcome-hi">${neko('happy', 'big wave')}<div class="bubble"><b lang="ja">ようこそ！</b><span>欢迎来到日语道场。先告诉我你的水平，我帮你安排今天学什么。</span></div></div>
+    <h2>你现在的日语水平？</h2>
+    <div class="lvl-opts">${START_OPTS.map(o => `<button type="button" class="lvl-opt" data-pick="${o[0]}"><span class="lvl-badge" lang="ja">${o[1]}</span><b>${o[2]}</b><span class="small muted">${o[3]}</span></button>`).join('')}</div>
+    <button type="button" class="btn soft" data-place>不确定？做个 2 分钟分级小测试</button>
+    <h2>每天想学多少？</h2>
+    <div class="seg" data-goals>${[[30, '轻松 · 约 5 分钟'], [50, '标准 · 约 10 分钟'], [100, '认真 · 约 20 分钟']].map(([v, t]) => `<button type="button" data-goal="${v}">${t}</button>`).join('')}</div>
+    <div class="row"><button type="button" class="btn pri big" data-start disabled>开始学习</button><a class="btn ghost" href="#me">我有备份，去恢复进度</a></div>
+  </section>`);
+  const sync = () => {
+    p.querySelectorAll('[data-pick]').forEach(b => b.classList.toggle('on', b.dataset.pick === pick));
+    p.querySelectorAll('[data-goal]').forEach(b => b.classList.toggle('on', +b.dataset.goal === goal));
+    p.querySelector('[data-start]').disabled = !pick;
+  };
+  pick = null;
+  p.querySelectorAll('[data-pick]').forEach(b => { b.onclick = () => { pick = b.dataset.pick; sync(); }; });
+  p.querySelectorAll('[data-goal]').forEach(b => { b.onclick = () => { goal = +b.dataset.goal; sync(); }; });
+  p.querySelector('[data-place]').onclick = placementTest;
+  p.querySelector('[data-start]').onclick = () => finishOnboarding(pick, goal);
+  sync();
+  main.append(p);
+}
+function finishOnboarding(pick, goal) {
+  S.onboarded = true; S.goal = goal || S.goal;
+  S.level = pick === 'zero' ? 'N5' : pick;
+  save(); requestPersist(); celebrate();
+  if (pick === 'zero') { toast('先从五十音开始，一天认一行就很好'); go('kana'); }
+  else { toast(`已设为 ${S.level}，随时可以在「我的」里更改`); go('home'); }
+}
+function placementTest() {
+  const qs = LEVELS.flatMap(L => sample(VOCAB[L], 3).map(v => Object.assign(qVocab(v, 'meaning'), { lv: L })));
+  main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
+  runQuiz(host, qs, {
+    title: '分级小测试', exam: true, noRecord: true, onDone: r => {
+      if (!r) return render();
+      const by = {}; LEVELS.forEach(L => { by[L] = 0; });
+      r.res.forEach(x => { if (x.ok) by[x.q.lv]++; });
+      let rec = by.N5 >= 2 ? 'N5' : 'zero';
+      for (const L of LEVELS.slice(1)) { if (by[L] >= 2 && rec !== 'zero') rec = L; else break; }
+      const name = rec === 'zero' ? '五十音（零基础）' : rec;
+      host.innerHTML = '';
+      const box = h(`<section class="panel">
+        <div class="welcome-hi">${neko('wow', 'big')}<div class="bubble"><b>推荐你从 ${name} 开始</b><span>每个级别 3 题，答对 2 题以上算过关。不想照推荐来也没关系，可以自己选。</span></div></div>
+        <div class="breakdown">${LEVELS.map(L => `<div class="bd-row"><span>${L}</span><div class="bar"><i style="width:${by[L] / 3 * 100}%"></i></div><span class="small">${by[L]}/3</span></div>`).join('')}</div>
+        <div class="row"><button class="btn pri big" type="button" data-ok>就从 ${name} 开始</button><button class="btn" type="button" data-back>我自己选</button></div>
+      </section>`);
+      box.querySelector('[data-ok]').onclick = () => finishOnboarding(rec, S.goal);
+      box.querySelector('[data-back]').onclick = render;
+      host.append(box);
+    }
+  });
+}
+
+/* 存储保护：请求持久保存 + 备份 */
+let persisted = null;
+function requestPersist() {
+  if (!navigator.storage || !navigator.storage.persist) { persisted = false; return Promise.resolve(false); }
+  return navigator.storage.persisted().then(p => p || navigator.storage.persist()).then(p => { persisted = p; return p; }).catch(() => { persisted = false; return false; });
+}
+const backupJSON = () => JSON.stringify(Object.assign({ app: 'nihongo-dojo', v: 1 }, S));
+function markBackedUp() { S.lastBackup = Date.now(); S.lastBackupXp = S.xp; save(); }
+function downloadBackup() {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([backupJSON()], { type: 'application/json' }));
+  a.download = `nihongo-dojo-${dkey()}.json`; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  markBackedUp(); toast('备份已下载，换设备时在「我的」里导入');
+}
+const needBackup = () => S.xp >= 150 && (S.xp - S.lastBackupXp >= 300 || (S.lastBackup && Date.now() - S.lastBackup > 14 * DAY)) && !(S.snooze && Date.now() - S.snooze < 3 * DAY);
 
 /* 今天 */
 function viewHome() {
@@ -429,16 +608,23 @@ function viewHome() {
   const s = streak();
   const greet = (() => { const hr = new Date().getHours(); return hr < 11 ? 'おはようございます' : hr < 18 ? 'こんにちは' : 'こんばんは'; })();
 
+  const mood = pct >= 1 ? ['wow', 'すごい！今日の目標達成！', '今天的目标完成啦，给你盖个小红花。'] : tx > 0 ? ['happy', 'いい調子！', `再拿 ${S.goal - tx} 经验就完成今天的目标。`] : s > 0 ? ['happy', `${s}日連続！`, '今天也来学一点，别让连续打卡断掉哦。'] : ['happy', greet, '每天十分钟，从今天开始吧。'];
+  main.append(h(`<div class="welcome-hi">${neko(mood[0], 'wave')}<div class="bubble"><b lang="ja">${mood[1]}</b><span>${mood[2]}</span></div></div>`));
+  if (needBackup()) {
+    const bn = h(`<section class="banner"><div><b>记得备份一下</b><div class="small">你已经攒了 ${S.xp} 经验、学过 ${learnedN} 个单词。进度存在这个浏览器里，清理浏览器数据或换设备前先备份，就不怕丢。</div></div><div class="row"><button class="btn pri" type="button" data-bk>下载备份</button><button class="btn ghost" type="button" data-later>过几天再说</button></div></section>`);
+    bn.querySelector('[data-bk]').onclick = () => { downloadBackup(); bn.remove(); };
+    bn.querySelector('[data-later]').onclick = () => { S.snooze = Date.now(); save(); bn.remove(); };
+    main.append(bn);
+  }
   main.append(h(`<section class="panel">
     <div class="hero">
-      <div class="ring ${pct >= 1 ? 'full' : ''}"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="52"/><circle class="val" cx="60" cy="60" r="52" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}"/></svg>
+      <div class="ring ${pct >= 1 ? 'full' : ''}"><svg viewBox="0 0 120 120"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--sakura)"/><stop offset="1" style="stop-color:var(--ai)"/></linearGradient></defs><circle class="trk" cx="60" cy="60" r="52"/><circle class="val" cx="60" cy="60" r="52" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}"/></svg>
         <div class="ring-c"><b>${tx}</b><span class="small muted">/ ${S.goal} 经验</span></div></div>
       <div class="rank">
-        <div class="eyebrow" lang="ja">${greet}</div>
+        <div class="eyebrow">当前段位</div>
         <div class="rank-name"><span lang="ja">${rk[1]}</span> <span class="small muted" style="font-family:var(--f-ui);font-weight:400">${rk[2]}</span></div>
         <div class="bar"><i style="width:${nx ? (S.xp - rk[0]) / (nx[0] - rk[0]) * 100 : 100}%"></i></div>
         <p class="small muted">${nx ? `累计 ${S.xp} 经验，距离「${nx[2]}」还差 ${nx[0] - S.xp}` : `累计 ${S.xp} 经验，已是最高段位`}</p>
-        <p>${pct >= 1 ? `今天的目标完成了。${s >= 2 ? `已经连续 ${s} 天，` : ''}明天继续！` : tx > 0 ? `再拿 ${S.goal - tx} 经验就完成今天的目标。` : s > 0 ? `已经连续 ${s} 天，今天也来学一点，别断了。` : '每天十分钟，从今天开始。'}</p>
       </div>
     </div>
     <div class="stats">
@@ -465,7 +651,7 @@ function viewHome() {
   });
   main.append(tp);
 
-  main.append(h(`<div class="proverb"><span class="eyebrow">今日一句</span><div class="row"><span class="jp-big" lang="ja">${pv[0]}</span>${speakBtn(pv[0])}</div><span class="small muted" lang="ja">${pv[1]}</span><span>${pv[2]}</span></div>`));
+  main.append(h(`<div class="proverb"><span class="eyebrow">今日一句</span><div class="row"><span class="jp-big" lang="ja">${pv[0]}</span>${speakBtn(pv[3] || pv[1])}</div><span class="small muted" lang="ja">${pv[1]}</span><span>${pv[2]}</span></div>`));
 
   // 学习热力图：最近 20 周
   const end = new Date(); end.setHours(0, 0, 0, 0);
@@ -585,7 +771,7 @@ function viewVocab() {
     });
     tbl.querySelector('tbody').innerHTML = rows.map(v => {
       const st = mastered(v) ? '<span class="tag done">已掌握</span>' : learned(v) ? '<span class="tag learn">学习中</span>' : '<span class="tag">新</span>';
-      return `<tr><td class="w" lang="ja">${esc(v.w)}</td><td class="r" lang="ja">${esc(v.r)}</td><td>${esc(v.m)}</td><td>${st}</td><td>${speakBtn(v.w)}</td></tr>`;
+      return `<tr><td class="w" lang="ja">${esc(v.w)}</td><td class="r" lang="ja">${esc(v.r)}</td><td>${esc(v.m)}</td><td>${st}</td><td>${speakBtn(v.r)}</td></tr>`;
     }).join('') || '<tr><td colspan="5" class="muted">没有符合条件的单词</td></tr>';
   };
   tbl.querySelector('#v-filter').value = vocabFilter;
@@ -642,7 +828,7 @@ function viewGrammar() {
     <div class="row"><button class="btn pri" type="button" data-quiz>语法填空 8 题</button><span class="small muted">本级 ${GRAM[L].length} 个句型，点开看接续和例句</span></div>
     <div style="display:grid;gap:8px">${GRAM[L].map(g => `<details class="gp"><summary><span class="pat" lang="ja">${esc(g.p)}</span><span class="muted">${esc(g.m)}</span></summary>
       <div class="gp-body"><div><span class="small muted">接续</span>　${esc(g.how)}</div>
-      <div class="ex"><div style="flex:1;min-width:0"><div class="jp" lang="ja">${esc(g.s).replace(/\[(.+?)\]/, '<mark>$1</mark>')}</div><div class="small muted">${esc(g.t)}</div></div>${speakBtn(g.full)}</div></div></details>`).join('')}</div>
+      <div class="ex"><div style="flex:1;min-width:0"><div class="jp" lang="ja">${esc(g.s).replace(/\[(.+?)\]/, '<mark>$1</mark>')}</div><div class="small muted">${esc(g.t)}</div></div>${speakBtn(g.kana)}</div></div></details>`).join('')}</div>
   </section>`);
   bindLevel(p);
   p.querySelector('[data-quiz]').onclick = () => grammarQuiz(L, render);
@@ -705,15 +891,32 @@ function viewMe() {
     <div class="row between"><span>每日经验目标</span><div class="seg">${opt([[30, '30 轻松'], [50, '50 标准'], [100, '100 认真'], [200, '200 冲刺']], S.goal, 'data-goal')}</div></div>
     <div class="row between"><span>每天新单词</span><div class="seg">${opt([[5, '5'], [10, '10'], [20, '20'], [30, '30']], S.newPerDay, 'data-new')}</div></div>
     <div class="row between"><span>外观</span><div class="seg">${opt([['', '跟随系统'], ['light', '浅色'], ['dark', '深色']], S.theme, 'data-theme-set')}</div></div>
+    <div class="row between"><span>樱花飘落</span><div class="seg">${opt([[1, '开'], [0, '关']], S.petals ? 1 : 0, 'data-petals')}</div></div>
     <p class="small muted">经验怎么来：测验答对 10（假名 5），单词卡每张 5，模拟考每题 10，合格再加 50，每 5 连对额外 5。</p>
   </section>`);
   bindLevel(p);
   p.querySelectorAll('[data-goal]').forEach(b => { b.onclick = () => { S.goal = +b.dataset.goal; save(); render(); }; });
   p.querySelectorAll('[data-new]').forEach(b => { b.onclick = () => { S.newPerDay = +b.dataset.new; save(); render(); }; });
-  p.querySelectorAll('[data-theme-set]').forEach(b => { b.onclick = () => { S.theme = b.dataset.themeSet; applyTheme(); save(); render(); }; });
+  p.querySelectorAll('[data-petals]').forEach(b => { b.onclick = () => { S.petals = b.dataset.petals === '1'; save(); startPetals(); render(); }; });
+  const vs = jaVoices();
+  const cur = currentVoice();
+  const voiceP = h(`<section class="panel"><h2>发音</h2>
+    <div class="row between"><span>语速</span><div class="seg">${opt([[.6, '很慢'], [.8, '慢'], [.95, '正常']], S.rate, 'data-rate')}</div></div>
+    <div class="row between"><span>翻卡和答题后自动朗读</span><div class="seg">${opt([[1, '开'], [0, '关']], S.autoSpeak ? 1 : 0, 'data-auto')}</div></div>
+    <div class="row between"><label for="voice-sel">语音</label><div class="row"><select id="voice-sel" ${vs.length ? '' : 'disabled'}>${vs.length ? vs.map(v => `<option value="${esc(v.name)}" ${cur && cur.name === v.name ? 'selected' : ''}>${esc(v.name)}</option>`).join('') : '<option>没有找到日语语音</option>'}</select><button class="btn" type="button" data-try>试听</button></div></div>
+    <p class="small muted">发音来自你设备自带的语音，不同设备差别很大。名字里带 Natural、Online 或 Google 的通常更自然（例如 Edge 浏览器的 Nanami Online）。手机上没有日语语音时，可以在系统设置的「文字转语音」里下载日语语音。</p>
+  </section>`);
+  voiceP.querySelectorAll('[data-rate]').forEach(b => { b.onclick = () => { S.rate = +b.dataset.rate; save(); speak('きょうも がんばりましょう。'); render(); }; });
+  voiceP.querySelectorAll('[data-auto]').forEach(b => { b.onclick = () => { S.autoSpeak = b.dataset.auto === '1'; save(); render(); }; });
+  voiceP.querySelector('#voice-sel').onchange = e => { S.voice = e.target.value; save(); speak('こんにちは。いっしょに にほんごを べんきょうしましょう。'); };
+  voiceP.querySelector('[data-try]').onclick = () => speak('こんにちは。いっしょに にほんごを べんきょうしましょう。');
+  p.querySelectorAll('[data-theme-set]').forEach(b => { b.onclick = () => { S.theme = b.dataset.themeSet; applyTheme(); save(); startPetals(); render(); }; });
 
   const bk = h(`<section class="panel"><h2>备份与换设备</h2>
-    <p class="small muted">进度只存在这个浏览器里。换手机或电脑前，先下载备份文件，到新设备上导入即可。${storageOk ? '' : '<b>当前浏览器无法保存进度（可能是无痕模式），关闭页面后进度会丢失。</b>'}</p>
+    <p class="small">刷新页面、关掉网页都不会丢进度。只有这几种情况会丢：清除浏览器数据、无痕模式、换设备。另外 iPhone 的 Safari 超过 7 天没打开这个网站会自动清理，把网站「添加到主屏幕」后从图标打开就不会被清理。</p>
+    <p class="small" data-persist></p>
+    ${storageOk ? '' : '<p class="small" style="color:var(--bad)"><b>当前浏览器无法保存进度（可能是无痕模式），关闭页面后进度会丢失。请先下载备份。</b></p>'}
+    <p class="small muted">${S.lastBackup ? `上次备份：${dkey(new Date(S.lastBackup))}` : '还没有备份过'}</p>
     <div class="row"><button class="btn" type="button" data-dl>下载备份文件</button>
       <label class="btn" for="imp-file">导入备份文件</label><input type="file" id="imp-file" accept="application/json,.json" hidden>
       <button class="btn" type="button" data-copy>复制备份文本</button></div>
@@ -721,22 +924,18 @@ function viewMe() {
     <div class="row"><button class="btn" type="button" data-imp>导入文本</button></div>
     <div data-reset-area class="row"><button class="btn danger" type="button" data-reset>清空全部进度</button></div>
   </section>`);
-  const dump = () => JSON.stringify(Object.assign({ app: 'nihongo-dojo', v: 1 }, S));
-  bk.querySelector('[data-dl]').onclick = () => {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([dump()], { type: 'application/json' }));
-    a.download = `nihongo-dojo-${dkey()}.json`; document.body.append(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  };
+  const dump = backupJSON;
+  bk.querySelector('[data-dl]').onclick = downloadBackup;
   bk.querySelector('[data-copy]').onclick = () => {
     const ta = bk.querySelector('#imp-text'); ta.value = dump();
+    markBackedUp();
     navigator.clipboard.writeText(ta.value).then(() => toast('已复制备份文本'), () => { ta.select(); toast('请手动复制选中的文本'); });
   };
   const importText = txt => {
     try {
       const o = JSON.parse(txt);
       if (!o || o.app !== 'nihongo-dojo' || typeof o.xp !== 'number') throw new Error();
-      delete o.app; delete o.v; S = Object.assign(blank(), o); save(); applyTheme(); toast('导入成功'); render();
+      delete o.app; delete o.v; S = Object.assign(blank(), o); S.onboarded = true; save(); applyTheme(); startPetals(); toast('导入成功，欢迎回来'); go('home');
     } catch (e) { toast('导入失败：这不是日语道场的备份'); }
   };
   bk.querySelector('#imp-file').onchange = e => { const f = e.target.files[0]; if (f) f.text().then(importText); };
@@ -744,7 +943,7 @@ function viewMe() {
   bk.querySelector('[data-reset]').onclick = () => {
     const area = bk.querySelector('[data-reset-area]');
     area.innerHTML = '<div class="confirm"><span>确定清空？经验、打卡、单词卡和成就都会删除，无法恢复。</span><button class="btn danger" type="button" data-yes>确定清空</button><button class="btn" type="button" data-no>取消</button></div>';
-    area.querySelector('[data-yes]').onclick = () => { const th = S.theme; S = blank(); S.theme = th; save(); toast('已清空'); render(); };
+    area.querySelector('[data-yes]').onclick = () => { const th = S.theme; S = blank(); S.theme = th; save(); toast('已清空'); go('home'); };
     area.querySelector('[data-no]').onclick = render;
   };
 
@@ -753,10 +952,15 @@ function viewMe() {
     <p class="small">每个级别收录的是该级别的核心精选，不是完整考纲。适合作为每天的练习和查漏补缺，备考时请配合官方真题和教材。发音使用浏览器自带的日语语音。</p>
     <div class="list-wrap"><table class="list"><thead><tr><th>级别</th><th>单词</th><th>汉字</th><th>语法</th></tr></thead><tbody>${counts}</tbody></table></div>
   </section>`);
-  main.append(p, bk, about);
+  const ps = bk.querySelector('[data-persist]');
+  requestPersist().then(ok => { ps.innerHTML = ok ? '<span class="tag done">已开启</span> 浏览器已同意持久保存，空间不足时也不会自动清理这里的数据。' : '<span class="tag">未开启</span> 这个浏览器没有同意持久保存，建议添加到主屏幕并定期备份。'; });
+  main.append(p, voiceP, bk, about);
 }
 
 /* ---------- 启动 ---------- */
 applyTheme();
 checkBadges();
 render();
+startPetals();
+if (S.onboarded) requestPersist();
+if (hasTTS) speechSynthesis.onvoiceschanged = () => { if ((location.hash || '').slice(1) === 'me') render(); };
