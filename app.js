@@ -35,9 +35,10 @@ for (const L of LEVELS) {
     return { id, type: 'v', L, w, r, m, en: en || '', alt: alt || [], q: !/[～〜(（]/.test(w + r) };
   });
   KANJI[L] = KANJI_DATA[L].map(([k, on, kun, en, strokes]) => ({ id: `k|${L}|${k}`, type: 'k', L, k, on, kun, en, strokes, zh: KANJI_ZH[k] || '' }));
-  GRAM[L] = GRAMMAR[L].map((g, i) => ({
-    id: `g|${L}|${i}`, type: 'g', L, p: g[0], m: g[1], how: g[2], s: g[3], t: g[4], ex: g[5] || [],
-    frag: g[3].match(/\[(.+?)\]/)[1], full: g[3].replace(/[[\]]/g, ''), kana: GRAMMAR_KANA[L][i], blank: g[3].replace(/\[.+?\]/, '＿＿＿')
+  // 每个句型 3–5 句例句：eg = [{s: 带 [填空] 的句子, kana, t: 译文, frag, full, blank}]
+  GRAM[L] = GRAMMAR_DATA[L].map(g => ({
+    id: `g|${L}|${g.p}`, type: 'g', L, p: g.p, m: g.m, how: g.how, ex: g.ex,
+    eg: g.eg.map(([s, kana, t]) => ({ s, kana, t, frag: s.match(/\[(.+?)\]/)[1], full: s.replace(/[[\]]/g, ''), blank: s.replace(/\[.+?\]/, '＿＿＿') }))
   }));
   [...VOCAB[L], ...KANJI[L], ...GRAM[L]].forEach(it => { ITEMS[it.id] = it; });
 }
@@ -82,6 +83,7 @@ function migrateIds() {
   for (const store of [S.srs, S.wrong]) {
     for (const id of Object.keys(store)) {
       if (id.startsWith('k|') && !ITEMS[id]) { const ch = id.split('|')[2]; const L2 = LEVELS.find(L => KANJI[L].some(k => k.k === ch)); if (L2 && !store[`k|${L2}|${ch}`]) store[`k|${L2}|${ch}`] = store[id]; delete store[id]; continue; }
+      if (id.startsWith('g|') && !ITEMS[id]) { delete store[id]; continue; }
       if (!id.startsWith('v|') || ITEMS[id]) continue;
       const w = id.split('|')[2], nid = byWord[OLD_ALIAS[w] || w];
       if (nid && !store[nid]) store[nid] = store[id];
@@ -470,13 +472,15 @@ function qKanji(k) {
     prompt: `<div class="eyebrow">这个汉字的${kind === 'on' ? '音读' : '训读'}是？</div><div class="q-big" lang="ja">${esc(k.k)}</div>`, optLang: 'ja', explain: exp
   });
 }
-function qGrammar(g) {
-  let pool = GRAM[g.L].filter(x => x.frag !== g.frag && !g.ex.includes(x.frag)).map(x => x.frag);
-  if (pool.length < 3) pool = pool.concat(LEVELS.flatMap(L => GRAM[L]).filter(x => x.frag !== g.frag && !g.ex.includes(x.frag)).map(x => x.frag));
-  const sent = esc(g.blank).replace('＿＿＿', '<span class="blank">　？　</span>');
-  return makeQ(g, 'grammar', distract(g.frag, pool), g.frag, {
-    prompt: `<div class="eyebrow">选择填入空白处的内容</div><div class="q-sent" lang="ja">${sent}</div>`, optLang: 'ja', say: g.kana,
-    explain: `<b lang="ja">${esc(g.p)}</b>：${esc(g.m)}<br><span lang="ja">${esc(g.full)}</span><br><span class="muted">${esc(g.t)}</span>`
+function qGrammar(g, e = sample(g.eg, 1)[0]) {
+  const own = new Set(g.eg.map(x => x.frag));
+  const ok = x => !own.has(x) && !g.ex.includes(x);
+  let pool = GRAM[g.L].filter(x => x !== g).map(x => sample(x.eg, 1)[0].frag).filter(ok);
+  if (pool.length < 3) pool = pool.concat(LEVELS.flatMap(L => GRAM[L]).filter(x => x !== g).map(x => x.eg[0].frag).filter(ok));
+  const sent = esc(e.blank).replace('＿＿＿', '<span class="blank">　？　</span>');
+  return makeQ(g, 'grammar', distract(e.frag, pool), e.frag, {
+    prompt: `<div class="eyebrow">选择填入空白处的内容</div><div class="q-sent" lang="ja">${sent}</div>`, optLang: 'ja', say: e.kana,
+    explain: `<b lang="ja">${esc(g.p)}</b>：${esc(g.m)}<br><span lang="ja">${esc(e.full)}</span><br><span class="muted">${esc(e.t)}</span>`
   });
 }
 function qKana([kana, ro], reverse, pool) {
@@ -938,10 +942,10 @@ function viewGrammar() {
   const L = S.level;
   const p = h(`<section class="panel">
     <div class="row between"><h2>语法 · ${L}</h2>${levelSeg(L)}</div>
-    <div class="row"><button class="btn pri" type="button" data-quiz>语法填空 8 题</button><span class="small muted">本级 ${GRAM[L].length} 个句型，点开看接续和例句</span></div>
+    <div class="row"><button class="btn pri" type="button" data-quiz>语法填空 8 题</button><span class="small muted">本级 ${GRAM[L].length} 个句型，每个 4 句例句，点开看接续和例句</span></div>
     <div style="display:grid;gap:8px">${GRAM[L].map(g => `<details class="gp"><summary><span class="pat" lang="ja">${esc(g.p)}</span><span class="muted">${esc(g.m)}</span></summary>
       <div class="gp-body"><div><span class="small muted">接续</span>　${esc(g.how)}</div>
-      <div class="ex"><div style="flex:1;min-width:0"><div class="jp" lang="ja">${esc(g.s).replace(/\[(.+?)\]/, '<mark>$1</mark>')}</div><div class="small muted">${esc(g.t)}</div></div>${speakBtn(g.kana)}</div></div></details>`).join('')}</div>
+      ${g.eg.map(e => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp" lang="ja">${esc(e.s).replace(/\[(.+?)\]/, '<mark>$1</mark>')}</div><div class="small muted">${esc(e.t)}</div></div>${speakBtn(e.kana)}</div>`).join('')}</div></details>`).join('')}</div>
   </section>`);
   bindLevel(p);
   p.querySelector('[data-quiz]').onclick = () => grammarQuiz(L, render);
