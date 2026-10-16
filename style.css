@@ -344,3 +344,9 @@ tr.vrow:hover td { background: var(--ai-soft); }
 tr.vrow[aria-expanded="true"] td { background: var(--ai-soft); border-bottom-color: transparent; }
 tr.vex td { background: var(--ai-soft); padding-top: 0; }
 tr.vex .ex-box { margin-top: 0; }
+
+.kj-words { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.kw { display: grid; text-align: left; gap: 0; padding: 6px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); cursor: pointer; }
+.kw:hover { border-color: var(--ai); }
+.kw b { font-size: 1.05rem; } .kw span { color: var(--ind); font-size: .85rem; } .kw small { color: var(--muted); font-size: .75rem; }
+.kanji-grid { max-height: 60vh; overflow-y: auto; padding: 2px; }

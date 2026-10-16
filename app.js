@@ -23,6 +23,9 @@ const exHTML = (w, n = 5) => exList(w).slice(0, n).map(([jp, kana, zh]) => `<div
 
 /* ---------- 数据 ---------- */
 const VOCAB = {}, KANJI = {}, GRAM = {}, ITEMS = {};
+// 早期版本手写的汉字中文释义，作为补充显示
+const KANJI_ZH = {};
+LEVELS.forEach(L => KANJI_RAW[L].trim().split('\n').forEach(l => { const p = l.split('|'); KANJI_ZH[p[0]] = p[3]; }));
 for (const L of LEVELS) {
   const used = new Set();
   VOCAB[L] = VOCAB_DATA[L].map(([w, r, m, en, alt]) => {
@@ -31,7 +34,7 @@ for (const L of LEVELS) {
     // 词缀（～円）和带括号的条目只在词表里显示，不拿来出题
     return { id, type: 'v', L, w, r, m, en: en || '', alt: alt || [], q: !/[～〜(（]/.test(w + r) };
   });
-  KANJI[L] = KANJI_RAW[L].trim().split('\n').map(l => { const [k, on, kun, m] = l.split('|'); return { id: `k|${L}|${k}`, type: 'k', L, k, on, kun, m }; });
+  KANJI[L] = KANJI_DATA[L].map(([k, on, kun, en, strokes]) => ({ id: `k|${L}|${k}`, type: 'k', L, k, on, kun, en, strokes, zh: KANJI_ZH[k] || '' }));
   GRAM[L] = GRAMMAR[L].map((g, i) => ({
     id: `g|${L}|${i}`, type: 'g', L, p: g[0], m: g[1], how: g[2], s: g[3], t: g[4], ex: g[5] || [],
     frag: g[3].match(/\[(.+?)\]/)[1], full: g[3].replace(/[[\]]/g, ''), kana: GRAMMAR_KANA[L][i], blank: g[3].replace(/\[.+?\]/, '＿＿＿')
@@ -78,6 +81,7 @@ function migrateIds() {
   LEVELS.forEach(L => VOCAB[L].forEach(v => { if (!byWord[v.w]) byWord[v.w] = v.id; }));
   for (const store of [S.srs, S.wrong]) {
     for (const id of Object.keys(store)) {
+      if (id.startsWith('k|') && !ITEMS[id]) { const ch = id.split('|')[2]; const L2 = LEVELS.find(L => KANJI[L].some(k => k.k === ch)); if (L2 && !store[`k|${L2}|${ch}`]) store[`k|${L2}|${ch}`] = store[id]; delete store[id]; continue; }
       if (!id.startsWith('v|') || ITEMS[id]) continue;
       const w = id.split('|')[2], nid = byWord[OLD_ALIAS[w] || w];
       if (nid && !store[nid]) store[nid] = store[id];
@@ -424,13 +428,41 @@ function exTip(w) {
   const [jp, , zh] = e[Math.floor(Math.random() * e.length)];
   return `<br><span class="small"><span lang="ja">${esc(jp)}</span>　<span class="muted">${esc(zh)}</span></span>`;
 }
-function qKanji(k, kind = Math.random() < .5 ? 'meaning' : 'reading') {
-  const same = KANJI[k.L];
-  const exp = `<span lang="ja">${esc(k.k)}</span>　音读 <span lang="ja">${esc(k.on)}</span>　训读 <span lang="ja">${esc(k.kun)}</span>　${esc(k.m)}`;
-  if (kind === 'reading') {
-    return makeQ(k, 'kanji', distract(k.on, same.map(x => x.on)), k.on, { prompt: `<div class="eyebrow">这个汉字的音读是？</div><div class="q-big" lang="ja">${esc(k.k)}</div>`, optLang: 'ja', explain: exp });
+// 含某个汉字的单词（只取能出题的词，按级别从易到难）
+let kanjiWordIdx = null;
+function wordsWith(ch) {
+  if (!kanjiWordIdx) {
+    kanjiWordIdx = {};
+    for (const v of allVocab()) {
+      if (!v.q || v.w === v.r) continue;
+      for (const c of new Set(v.w)) if (c >= '一' && c <= '鿿') (kanjiWordIdx[c] = kanjiWordIdx[c] || []).push(v);
+    }
   }
-  return makeQ(k, 'kanji', distract(k.m, same.map(x => x.m)), k.m, { prompt: `<div class="eyebrow">这个汉字是什么意思？</div><div class="q-big" lang="ja">${esc(k.k)}</div>`, explain: exp });
+  return kanjiWordIdx[ch] || [];
+}
+// 中文母语者看字形就能猜到意思，所以汉字题只考读音
+function qKanji(k) {
+  const same = KANJI[k.L];
+  const words = wordsWith(k.k);
+  const kinds = [];
+  if (k.on !== '—') kinds.push('on');
+  if (k.kun !== '—') kinds.push('kun');
+  if (words.length) kinds.push('word', 'word');
+  const kind = sample(kinds.length ? kinds : ['on'], 1)[0];
+  const exp = `<span lang="ja">${esc(k.k)}</span>　音读 <span lang="ja">${esc(k.on)}</span>　训读 <span lang="ja">${esc(k.kun)}</span>${k.zh ? '　' + esc(k.zh) : ''}`;
+  if (kind === 'word') {
+    const v = sample(words, 1)[0];
+    const pool = allVocab().filter(x => x.q && x.w !== x.r && x.r !== v.r && Math.abs(x.r.length - v.r.length) <= 1).map(x => x.r);
+    const marked = esc(v.w).replace(esc(k.k), `<span style="color:var(--ai)">${esc(k.k)}</span>`);
+    return makeQ(k, 'kanji', distract(v.r, sample(pool, 40)), v.r, {
+      prompt: `<div class="eyebrow">这个词怎么读？</div><div class="q-big" lang="ja">${marked}</div>`, optLang: 'ja', say: v.r,
+      explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}<br>${exp}`
+    });
+  }
+  const f = kind === 'on' ? 'on' : 'kun';
+  return makeQ(k, 'kanji', distract(k[f], same.filter(x => x[f] !== '—').map(x => x[f])), k[f], {
+    prompt: `<div class="eyebrow">这个汉字的${kind === 'on' ? '音读' : '训读'}是？</div><div class="q-big" lang="ja">${esc(k.k)}</div>`, optLang: 'ja', explain: exp
+  });
 }
 function qGrammar(g) {
   let pool = GRAM[g.L].filter(x => x.frag !== g.frag && !g.ex.includes(x.frag)).map(x => x.frag);
@@ -477,7 +509,7 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
     box.querySelector('[data-count]').textContent = `${i + 1} / ${qs.length}`;
     box.querySelector('[data-bar]').style.width = (i / qs.length * 100) + '%';
     if (!exam) extra.innerHTML = combo >= 3 ? `<span class="combo">${combo} 连对</span>` : '';
-    stage.innerHTML = `<div class="q-prompt pop">${q.prompt}${q.say && !exam ? speakBtn(q.say) : ''}</div>
+    stage.innerHTML = `<div class="q-prompt pop">${q.prompt}</div>
       <div class="opts">${q.options.map((o, j) => `<button class="opt" type="button" data-o="${j}"><span class="k">${j + 1}</span><span ${q.optLang ? `lang="${q.optLang}"` : ''}>${esc(o)}</span></button>`).join('')}</div>
       <div data-fb></div>`;
     stage.querySelectorAll('[data-o]').forEach(b => { b.onclick = () => pick(+b.dataset.o); });
@@ -503,7 +535,7 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
     if (ok) addXP(xpEach + (combo && combo % 5 === 0 ? 5 : 0)); else save();
     if (q.say && S.autoSpeak) speak(q.say);
     const cheer = ok ? sample(['やった！', 'すごい！', 'いいね！', '正解！'], 1)[0] : sample(['ドンマイ！', '大丈夫！', '次は行ける！'], 1)[0];
-    stage.querySelector('[data-fb]').innerHTML = `<div class="feedback ${ok ? 'ok' : 'no'}">${neko(ok ? 'happy' : 'sad', 'mini')}<div class="fb-t"><b lang="ja" class="cheer">${cheer}</b><b>${ok ? (combo >= 5 && combo % 5 === 0 ? `答对了！${combo} 连对，额外 +5` : '答对了') : (noRecord ? '答错了' : '答错了，已记入错题本')}</b><div>${q.explain || ''}</div></div></div>
+    stage.querySelector('[data-fb]').innerHTML = `<div class="feedback ${ok ? 'ok' : 'no'}">${neko(ok ? 'happy' : 'sad', 'mini')}<div class="fb-t"><div class="row"><b lang="ja" class="cheer">${cheer}</b>${q.say ? speakBtn(q.say) : ''}</div><b>${ok ? (combo >= 5 && combo % 5 === 0 ? `答对了！${combo} 连对，额外 +5` : '答对了') : (noRecord ? '答错了' : '答错了，已记入错题本')}</b><div>${q.explain || ''}</div></div></div>
       <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn pri" type="button" data-next>${i + 1 < qs.length ? '下一题' : '查看结果'}（Enter）</button></div>`;
     stage.querySelector('[data-next]').onclick = next;
     stage.querySelector('[data-next]').focus({ preventScroll: true });
@@ -845,16 +877,16 @@ function viewKanji() {
   const p = h(`<section class="panel">
     <div class="row between"><h2>汉字 · ${L}</h2>${levelSeg(L)}</div>
     <div class="kj-detail" data-detail></div>
-    <div class="row"><button class="btn pri" type="button" data-quiz>汉字测验 10 题</button><span class="small muted">本级 ${list.length} 个汉字，点击查看读音和相关单词</span></div>
+    <div class="row"><button class="btn pri" type="button" data-quiz>汉字测验 10 题</button><span class="small muted">本级 ${list.length} 个汉字，按常用程度排列。点击查看读音和相关单词（点单词可朗读）</span></div>
     <div class="kanji-grid">${list.map(k => `<button type="button" class="kj" data-k="${esc(k.id)}" lang="ja" aria-label="${esc(k.k)}">${esc(k.k)}</button>`).join('')}</div>
   </section>`);
   bindLevel(p);
   const detail = () => {
     const k = kanjiSel;
-    const words = allVocab().filter(v => v.w.includes(k.k)).slice(0, 6);
+    const words = wordsWith(k.k).slice(0, 8);
     p.querySelector('[data-detail]').innerHTML = `<div class="kj-big" lang="ja">${esc(k.k)}</div>
-      <div style="display:grid;gap:8px;min-width:0"><dl class="kv"><dt>意思</dt><dd>${esc(k.m)}</dd><dt>音读</dt><dd lang="ja">${esc(k.on)}</dd><dt>训读</dt><dd lang="ja">${esc(k.kun)}</dd></dl>
-      ${words.length ? `<div class="row small">${words.map(v => `<span class="tag learn" lang="ja">${esc(v.w)}（${esc(v.r)}）</span>`).join('')}</div>` : '<span class="small muted">单词库里暂时没有含这个字的词</span>'}</div>`;
+      <div style="display:grid;gap:8px;min-width:0"><dl class="kv"><dt>音读</dt><dd lang="ja">${esc(k.on)}</dd><dt>训读</dt><dd lang="ja">${esc(k.kun)}</dd>${k.zh ? `<dt>意思</dt><dd>${esc(k.zh)}</dd>` : ''}<dt>英文</dt><dd>${esc(k.en)}</dd><dt>笔画</dt><dd>${k.strokes}</dd></dl>
+      ${words.length ? `<div class="kj-words">${words.map(v => `<button type="button" class="kw" data-say="${esc(v.r)}"><b lang="ja">${esc(v.w)}</b><span lang="ja">${esc(v.r)}</span><small>${esc(v.m)} · ${v.L}</small></button>`).join('')}</div>` : '<span class="small muted">单词库里暂时没有含这个字的词</span>'}</div>`;
     p.querySelectorAll('.kj').forEach(b => b.classList.toggle('on', b.dataset.k === k.id));
   };
   p.querySelectorAll('[data-k]').forEach(b => { b.onclick = () => { kanjiSel = ITEMS[b.dataset.k]; detail(); }; });
