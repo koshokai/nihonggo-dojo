@@ -83,7 +83,7 @@ const RANKS = [
 
 /* ---------- 进度存储 ---------- */
 // 词表扩充后，旧版本的单词 id 可能换了级别或写法：按单词（及常见写法对应）找到新 id
-const OLD_ALIAS = { 'ご飯': '御飯', '勉強する': '勉強', 'おいしい': '美味しい', 'きれい': '綺麗', 'せっかく': '折角', '曖昧': 'あいまい', '夥しい': 'おびただしい', 'もっぱら': '専ら', 'あらかじめ': '予め', 'おのずから': '自ずから', '落る': '落ちる', '楽む': '楽しむ', '下る': '下がる', '清む': '澄む', '所為': 'せい', '押える': '押さえる', '下す': '下ろす', '可愛そう': '可哀想', '代る': '代わる', '当り': '当たり', '付合う': '付き合う', '知合い': '知り合い', '釣': '釣り', '年寄': '年寄り', '塵': 'ごみ' };
+const OLD_ALIAS = { 'ご飯': '御飯', '勉強する': '勉強', 'おいしい': '美味しい', 'きれい': '綺麗', 'せっかく': '折角', '曖昧': 'あいまい', '夥しい': 'おびただしい', 'もっぱら': '専ら', 'あらかじめ': '予め', 'おのずから': '自ずから', '落る': '落ちる', '楽む': '楽しむ', '下る': '下がる', '清む': '澄む', '所為': 'せい', '押える': '押さえる', '下す': '下ろす', '可愛そう': '可哀想', '代る': '代わる', '当り': '当たり', '付合う': '付き合う', '知合い': '知り合い', '釣': '釣り', '年寄': '年寄り', '塵': 'ごみ', '浮ぶ': '浮かぶ', '売行き': '売れ行き', '落着く': '落ち着く', '落し物': '落とし物', '書取': '書き取り', '卒直': '率直', 'タイア': 'タイヤ', '田ぼ': '田んぼ', '傾らか': 'なだらか', '剥す': '剥がす', '引受る': '引き受ける', '引算': '引き算', '陽射': '陽射し', '日日': '日にち', '湯飲': '湯飲み', 'レクリェーション': 'レクリエーション', 'こくせき': '国籍', 'つうか': '通貨', 'ひゃっかじてん': '百科事典' };
 function migrateIds() {
   const byWord = {};
   LEVELS.forEach(L => VOCAB[L].forEach(v => { if (!byWord[v.w]) byWord[v.w] = v.id; }));
@@ -98,7 +98,7 @@ function migrateIds() {
     }
   }
 }
-const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: true, autoSpeak: true, lastBackup: 0, lastBackupXp: 0, stages: {}, games: {} });
+const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: true, autoSpeak: true, lastBackup: 0, lastBackupXp: 0, stages: {}, games: {}, read: {} });
 function load() {
   try { const t = localStorage.getItem(KEY); if (t) return Object.assign(blank(), JSON.parse(t)); } catch (e) { /* 浏览器禁用存储时从空进度开始 */ }
   return blank();
@@ -153,6 +153,8 @@ const BADGES = [
   { id: 'fix', ch: '改', name: '知错能改', desc: '订正 20 道错题', test: () => S.fixed >= 20 },
   { id: 'pass', ch: '合', name: '合格', desc: '任意级别模拟考合格（≥ 60%）', test: () => S.exams.some(e => e.score / e.total >= .6) },
   { id: 'full', ch: '満', name: '满分', desc: '模拟考拿到满分', test: () => S.exams.some(e => e.score === e.total) },
+  { id: 'r5', ch: '読', name: '小书虫', desc: '读完 5 篇阅读', test: () => Object.keys(S.read || {}).length >= 5 },
+  { id: 'r30', ch: '書', name: '博览群书', desc: '读完 30 篇阅读', test: () => Object.keys(S.read || {}).length >= 30 },
   { id: 'n1', ch: '頂', name: '登顶', desc: 'N1 模拟考合格', test: () => S.exams.some(e => e.L === 'N1' && e.score / e.total >= .6) }
 ];
 function checkBadges() {
@@ -181,6 +183,7 @@ function speak(text, opts = {}) {
   u.rate = (opts.rate || S.rate) * (clean.length > 8 ? .95 : 1);
   u.pitch = 1;
   const v = currentVoice(); if (v) u.voice = v;
+  if (opts.onend) { u.onend = opts.onend; u.onerror = opts.onend; }
   speechSynthesis.cancel(); speechSynthesis.speak(u);
   if (!v && speechSynthesis.getVoices().length && !warnedVoice) { warnedVoice = true; toast('没有找到日语语音，可以在系统设置里添加日语语音包'); }
 }
@@ -595,9 +598,9 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, me: viewMe, welcome: viewWelcome };
+const VIEWS = { home: viewHome, read: viewRead, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, me: viewMe, welcome: viewWelcome };
 function render() {
-  const v = (location.hash || '#home').slice(1);
+  const [v, arg] = (location.hash || '#home').slice(1).split('/');
   let view = VIEWS[v] ? v : 'home';
   if (!S.onboarded && view !== 'me') view = 'welcome';
   if (S.onboarded && view === 'welcome') view = 'home';
@@ -605,7 +608,7 @@ function render() {
   document.querySelectorAll('.tabs a').forEach(a => a.classList.toggle('on', a.dataset.go === view));
   const on = document.querySelector('.tabs a.on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   main.innerHTML = '';
-  VIEWS[view]();
+  VIEWS[view](arg ? decodeURIComponent(arg) : undefined);
   updateTop();
 }
 addEventListener('hashchange', () => { render(); scrollTo(0, 0); });
