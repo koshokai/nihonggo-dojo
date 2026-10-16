@@ -479,7 +479,8 @@ function qKanji(k) {
     prompt: `<div class="eyebrow">这个汉字的${kind === 'on' ? '音读' : '训读'}是？</div><div class="q-big" lang="ja">${esc(k.k)}</div>`, optLang: 'ja', explain: exp
   });
 }
-function qGrammar(g, e = sample(g.eg, 1)[0]) {
+function qGrammar(g, e) {
+  if (!e || typeof e !== 'object') e = sample(g.eg, 1)[0];
   const own = new Set(g.eg.map(x => x.frag));
   const ok = x => !own.has(x) && !g.ex.includes(x);
   let pool = GRAM[g.L].filter(x => x !== g).map(x => sample(x.eg, 1)[0].frag).filter(ok);
@@ -941,7 +942,7 @@ function viewKanji() {
 /* 语法 */
 function grammarQuiz(L, back) {
   main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
-  runQuiz(host, sample(GRAM[L], Math.min(8, GRAM[L].length)).map(qGrammar), {
+  runQuiz(host, sample(GRAM[L], Math.min(8, GRAM[L].length)).map(g => qGrammar(g)), {
     title: `语法练习 · ${L}`, onDone: r => { if (!r) return back(); quizSummary(host, r, { title: `语法练习 · ${L}`, again: () => grammarQuiz(L, back) }); }
   });
 }
@@ -969,7 +970,7 @@ function buildExam(L) {
     ...rest.slice(0, 5).map(v => qVocab(v, 'meaning')),
     ...rest.slice(5, 8).map(v => qVocab(v, 'word')),
     ...sample(KANJI[L], 3).map(k => qKanji(k)),
-    ...sample(GRAM[L], 4).map(qGrammar)
+    ...sample(GRAM[L], 4).map(g => qGrammar(g))
   ];
 }
 function viewExam() {

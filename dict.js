@@ -2,7 +2,7 @@
 /* 日语道场 — 词典。依赖 app.js 的全局函数，在 app.js 之前加载，只定义函数。
    数据：本站 JLPT 词表（中文释义）+ JMdict 常用词（dict.json，英文释义，CC BY-SA 4.0）+ 本站全部例句。 */
 
-let JMDICT = null, jmLoading = null, dictQuery = '';
+let JMDICT = null, jmLoading = null, dictQuery = '', dictDir = null;
 function loadJmdict() {
   if (JMDICT) return Promise.resolve(JMDICT);
   if (!jmLoading) {
@@ -129,16 +129,23 @@ function viewDict() {
     const longText = q.length >= 6 && (hasKana(q) || hasCJK(q)) && !r.vocab.length && !r.jm.length;
     const total = r.vocab.length + r.jm.length;
     status.textContent = total ? `找到 ${total} 个结果${!JMDICT ? '（扩展词典加载中……）' : ''}` : (JMDICT ? '没有找到这个词。' : '扩展词典加载中……');
-    // 翻译链接：总是提供
+    // 翻译链接：自动判断方向，也可以手动切换
     const enc = encodeURIComponent(q);
+    const isJa = hasKana(q) || r.vocab.some(v => v.w === q || v.alt.includes(q)) || r.jm.some(e => e.k.includes(q) || e.r.includes(q));
+    const auto = isJa ? 'ja-zh' : isLatin(q) ? 'en-ja' : 'zh-ja';
+    const dir = dictDir || auto;
+    const DIRS = { 'ja-zh': ['日→中', 'ja', 'zh-CN', 'ja/zh'], 'zh-ja': ['中→日', 'zh-CN', 'ja', 'zh/ja'], 'en-ja': ['英→日', 'en', 'ja', 'en/ja'] };
+    const [, sl, tl, dl] = DIRS[dir];
     const tr = h(`<section class="panel trans">
       <div class="row between"><b>翻译</b>${hasKana(q) ? speakBtn(toHira(q)) : r.vocab[0] ? speakBtn(r.vocab[0].r) : r.jm[0] ? speakBtn(r.jm[0].r[0]) : ''}</div>
+      <div class="seg" role="group" aria-label="翻译方向">${Object.entries(DIRS).map(([k, [lab]]) => `<button type="button" data-dir="${k}" class="${k === dir ? 'on' : ''}" aria-pressed="${k === dir}">${lab}${k === auto ? '<span class="small muted">（自动）</span>' : ''}</button>`).join('')}</div>
       <div class="row">
-        <a class="btn" href="https://translate.google.com/?sl=auto&tl=${hasKana(q) ? 'zh-CN' : 'ja'}&text=${enc}&op=translate" target="_blank" rel="noopener">Google 翻译</a>
-        <a class="btn" href="https://www.deepl.com/translator#${hasKana(q) ? 'ja/zh' : isLatin(q) ? 'en/ja' : 'zh/ja'}/${enc}" target="_blank" rel="noopener">DeepL 翻译</a>
+        <a class="btn pri" href="https://translate.google.com/?sl=${sl}&tl=${tl}&text=${enc}&op=translate" target="_blank" rel="noopener">Google 翻译</a>
+        <a class="btn" href="https://www.deepl.com/translator#${dl}/${enc}" target="_blank" rel="noopener">DeepL 翻译</a>
       </div>
-      <p class="small muted">整句翻译会在新标签页打开 Google 或 DeepL。下面是本站词典里的结果。</p>
+      <p class="small muted">整句翻译会在新标签页打开 Google 或 DeepL。方向不对的话点上面切换。下面是本站词典里的结果。</p>
     </section>`);
+    tr.querySelectorAll('[data-dir]').forEach(b => { b.onclick = () => { dictDir = b.dataset.dir === auto ? null : b.dataset.dir; run(); }; });
     res.append(tr);
     if (longText) {
       const segs = segment(q);
@@ -153,7 +160,7 @@ function viewDict() {
   };
   p.querySelector('[data-form]').addEventListener('submit', e => { e.preventDefault(); run(); });
   let t;
-  input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(run, 250); });
+  input.addEventListener('input', () => { dictDir = null; clearTimeout(t); t = setTimeout(run, 250); });
   p.querySelectorAll('[data-try]').forEach(b => { b.onclick = () => { input.value = b.dataset.try; run(); }; });
   run();
   loadJmdict().then(() => { if (location.hash === '#dict') run(); }).catch(() => { status.textContent = '扩展词典加载失败，只能查 JLPT 词表。请检查网络后刷新。'; });
@@ -185,6 +192,6 @@ function jmCard(e) {
     <ol class="dict-senses">${e.s.map(g => `<li>${esc(g.join('; '))}</li>`).join('')}</ol>
     ${e.k.length > 1 ? `<div class="small muted">其他写法：<span lang="ja">${esc(e.k.slice(1).join('、'))}</span></div>` : ''}
     ${sents.length ? `<div class="ex-box">${sents.map(x => sentenceHTML(x, w)).join('')}</div>` : ''}
-    <div class="small muted">英文释义来自 JMdict</div>
+    <div class="row between small"><span class="muted">英文释义来自 JMdict</span><a href="https://translate.google.com/?sl=ja&tl=zh-CN&text=${encodeURIComponent(w)}&op=translate" target="_blank" rel="noopener">看中文翻译 ↗</a></div>
   </section>`);
 }
