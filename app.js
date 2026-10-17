@@ -727,12 +727,36 @@ function downloadBackup() {
 }
 const needBackup = () => S.xp >= 150 && (S.xp - S.lastBackupXp >= 300 || (S.lastBackup && Date.now() - S.lastBackup > 14 * DAY)) && !(S.snooze && Date.now() - S.snooze < 3 * DAY);
 
+/* 今日一句：一年 366 句，按日期取（闰年的第几天），可以翻看前后几天 */
+let dailyOff = 0;
+const LEAP_MONTHS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const dailySlot = d => LEAP_MONTHS.slice(0, d.getMonth()).reduce((a, b) => a + b, 0) + d.getDate() - 1;
+function dailyCard() {
+  const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + dailyOff);
+  if (typeof DAILY === 'undefined' || !DAILY.length) {
+    const pv = PROVERBS[Math.floor(startOfToday() / DAY) % PROVERBS.length];
+    return h(`<div class="proverb"><span class="eyebrow">今日一句</span><div class="row"><span class="jp-big" lang="ja">${pv[0]}</span>${speakBtn(pv[3] || pv[1])}</div><span class="small muted" lang="ja">${pv[1]}</span><span>${pv[2]}</span></div>`);
+  }
+  const [jp, yomi, zh, note, ex, exk, exzh, kind, say] = DAILY[dailySlot(d) % DAILY.length];
+  const label = dailyOff === 0 ? '今日一句' : dailyOff === -1 ? '昨日一句' : dailyOff === 1 ? '明日一句' : `${d.getMonth() + 1}月${d.getDate()}日`;
+  const c = h(`<div class="proverb daily">
+    <div class="row between"><span class="row"><span class="eyebrow">${label}</span><span class="tag">${esc(kind)}</span><span class="small muted">${d.getMonth() + 1}月${d.getDate()}日</span></span>
+      <span class="row daily-nav"><button type="button" class="chip-btn" data-d="-1" aria-label="前一天">‹</button>${dailyOff ? '<button type="button" class="chip-btn" data-d="0">今天</button>' : ''}<button type="button" class="chip-btn" data-d="1" aria-label="后一天">›</button></span></div>
+    <div class="row"><span class="jp-big" lang="ja">${esc(jp)}</span>${speakBtn(say)}</div>
+    <span class="small muted" lang="ja">${esc(yomi)}</span>
+    <b>${esc(zh)}</b>
+    <span class="small muted">${esc(note)}</span>
+    <div class="ex"><div style="flex:1;min-width:0"><div class="jp" lang="ja">${esc(ex)}</div><div class="small muted">${esc(exzh)}</div></div>${speakBtn(exk, '朗读例句')}</div>
+  </div>`);
+  c.querySelectorAll('[data-d]').forEach(b => { b.onclick = () => { dailyOff = +b.dataset.d === 0 ? 0 : dailyOff + +b.dataset.d; c.replaceWith(dailyCard()); }; });
+  return c;
+}
+
 /* 今天 */
 function viewHome() {
   const tx = todayXP(), pct = Math.min(1, tx / S.goal), C = 2 * Math.PI * 52;
   const ri = rankOf(S.xp), rk = RANKS[ri], nx = RANKS[ri + 1];
   const due = dueList(LEVELS).length, nl = Math.min(newLeft(), newList(S.level).length), wrongN = Object.keys(S.wrong).length;
-  const pv = PROVERBS[Math.floor(startOfToday() / DAY) % PROVERBS.length];
   const learnedN = allVocab().filter(learned).length, masteredN = allVocab().filter(mastered).length;
   const s = streak();
   const greet = (() => { const hr = new Date().getHours(); return hr < 11 ? 'おはようございます' : hr < 18 ? 'こんにちは' : 'こんばんは'; })();
@@ -782,7 +806,7 @@ function viewHome() {
   });
   main.append(tp);
 
-  main.append(h(`<div class="proverb"><span class="eyebrow">今日一句</span><div class="row"><span class="jp-big" lang="ja">${pv[0]}</span>${speakBtn(pv[3] || pv[1])}</div><span class="small muted" lang="ja">${pv[1]}</span><span>${pv[2]}</span></div>`));
+  main.append(dailyCard());
 
   // 学习热力图：最近 20 周
   const end = new Date(); end.setHours(0, 0, 0, 0);

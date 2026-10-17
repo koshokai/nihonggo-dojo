@@ -535,3 +535,6 @@ body.on-dict .gsearch { display: none; }
   .kg-h > span:first-child { display: none; }
   .bubble-line { max-width: 94%; }
 }
+.daily { gap: 6px; }
+.daily .daily-nav .chip-btn { min-width: 34px; padding: 3px 10px; }
+.daily .ex { margin-top: 4px; }
