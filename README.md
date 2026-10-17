@@ -11,6 +11,7 @@
 - **汉字**：分级汉字的音读、训读、意思和相关单词；汉字测验
 - **语法**：N5–N1 共 176 个句型，每个句型 4 句例句（带译文和朗读）；语法填空练习
 - **阅读**：N5–N1 每级 12 篇短文（常识、运动、笑话、传统文化、人文情感、感人故事、美食、旅行），图片卡片排列；逐句点读和全文朗读、假名/中文开关；文中生词画线，点词看释义，长按或选中任意文字查翻译；读后小测验
+- **商务日语**：16 个职场场景会话（电话、拜访、名片、会议、报联商、道歉、谈判、面试、应酬、出差），聊天气泡形式，带礼仪要点、角色扮演和小测验；敬语表（尊敬语/谦让语、商务说法替换、固定表达）和练习；12 封商务邮件模板（可复制）；10 类共 300 个商务词汇和测验
 - **词典**：查日语、假名、罗马字、中文或英文；JLPT 词有中文释义和例句，其余约 22,000 个常用词来自 JMdict（英文释义）；整句可跳转 Google / DeepL 翻译，并列出句中的词
 - **闯关**：每关 10 个词、3 颗心、星级评价，每 10 关一个头目关；还有 60 秒冲刺和配对消除小游戏
 - **模拟考**：每级 20 题、限时 15 分钟，交卷后批改并按题型给出正确率
@@ -25,6 +26,7 @@
 - **词典**：`dict.json` 由 JMdict（[EDRDG](https://www.edrdg.org/)，CC BY-SA 4.0）生成，该文件按 CC BY-SA 4.0 发布；生成方法见 `tools/build_dict.py`。
 - **汉字**：`kanji.js` 由 [kanji-data](https://github.com/davidluzgouveia/kanji-data)（MIT）生成，汉字信息来自 KANJIDIC（EDRDG，CC BY-SA 4.0）。
 - **阅读**：写在 `tools/reading/N*.txt`（格式见文件开头的文章），插图是 `scenes.js` 里的手绘 SVG；运行 `python3 tools/build_reading.py` 生成 `reading.js`（含朗读假名和分词）。
+- **商务日语**：写在 `tools/business/`（scenes_*.txt、keigo.txt、mail.txt、vocab.txt），运行 `python3 tools/build_business.py` 生成 `business.js`。
 - **语法**：写在 `tools/grammar/N*.txt`，运行 `python3 tools/build_grammar.py` 生成 `grammar.js`。
 - 中文释义和例句没有经过专业审核，发现错误欢迎提 issue。
 
