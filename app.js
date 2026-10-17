@@ -740,7 +740,7 @@ function dailyCard() {
   const [jp, yomi, zh, note, ex, exk, exzh, kind, say] = DAILY[dailySlot(d) % DAILY.length];
   const label = dailyOff === 0 ? '今日一句' : dailyOff === -1 ? '昨日一句' : dailyOff === 1 ? '明日一句' : `${d.getMonth() + 1}月${d.getDate()}日`;
   const c = h(`<div class="proverb daily">
-    <div class="row between"><span class="row"><span class="eyebrow">${label}</span><span class="tag">${esc(kind)}</span><span class="small muted">${d.getMonth() + 1}月${d.getDate()}日</span></span>
+    <div class="row between"><span class="row"><span class="eyebrow">${label}</span><span class="tag">${esc(kind)}</span>${Math.abs(dailyOff) <= 1 ? `<span class="small muted">${d.getMonth() + 1}月${d.getDate()}日</span>` : ''}</span>
       <span class="row daily-nav"><button type="button" class="chip-btn" data-d="-1" aria-label="前一天">‹</button>${dailyOff ? '<button type="button" class="chip-btn" data-d="0">今天</button>' : ''}<button type="button" class="chip-btn" data-d="1" aria-label="后一天">›</button></span></div>
     <div class="row"><span class="jp-big" lang="ja">${esc(jp)}</span>${speakBtn(say)}</div>
     <span class="small muted" lang="ja">${esc(yomi)}</span>
