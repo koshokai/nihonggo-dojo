@@ -60,16 +60,21 @@ function showSheet(text, hit, a) {
   const add = sh.querySelector('[data-add]');
   if (add) add.onclick = () => { S.srs[hit.v.id] = { i: 0, e: 2.5, r: 0, due: Date.now() }; save(); add.textContent = '已加入'; add.disabled = true; toast(`「${hit.v.w}」已加入单词卡`); };
   sh.querySelector('[data-more]').onclick = () => {
-    readReturn = a ? { id: a.id, y: scrollY, title: a.title } : null;
+    readReturn = a ? { hash: location.hash.slice(1), y: scrollY, title: a.title } : null;
     dictQuery = hit ? hit.w : text; dictDir = null;
     closeSheet(); location.hash = 'dict';
   };
 }
+// 从词典页返回时回到原来的位置
+function restoreReadPos() {
+  if (readReturn && readReturn.hash === location.hash.slice(1)) { const y = readReturn.y; readReturn = null; setTimeout(() => scrollTo({ top: y, behavior: 'instant' }), 30); }
+}
 function bindWords(p, a) {
-  const keyset = new Map(a.w.map(x => [x[0], x]));
+  const keyset = new Map((a.w || []).map(x => [x[0], x]));
   const formsOf = el => el.dataset.f.split('|');
   p.querySelectorAll('.wd').forEach(el => {
     el.onclick = e => {
+      if (el.closest('.hide-jp:not(.shown)')) return;   // 角色扮演时先揭开整句
       e.stopPropagation();
       const hit = lookupWord(formsOf(el), keyset);
       showSheet(el.textContent, hit, a); el.classList.add('on');
@@ -169,7 +174,7 @@ function readArticle(a) {
   </article>`);
   main.append(p);
   bindWords(p, a);
-  if (readReturn && readReturn.id === a.id) { const y = readReturn.y; readReturn = null; setTimeout(() => scrollTo({ top: y, behavior: 'instant' }), 30); }
+  restoreReadPos();
   const nodes = [...p.querySelectorAll('.ra-s')];
   const textBox = p.querySelector('.ra-text');
   p.querySelector('[data-kana]').onchange = e => textBox.classList.toggle('show-kana', e.target.checked);

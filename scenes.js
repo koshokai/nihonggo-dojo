@@ -123,5 +123,38 @@ const SCENES = {
   kimono: u => sky(u, '#FFE6EF', '#F2E6FF') + `<g transform="translate(160 100)"><circle cy="-50" r="16" fill="#FFE8DA"/><path d="M-18-56Q0-80 18-56Q14-68 0-70Q-14-68-18-56Z" fill="#2A2433"/><circle cx="12" cy="-66" r="5" fill="#F6A9C0"/>` +
     `<path d="M-20-34L20-34L36 70H-36Z" fill="#D9578A"/><path d="M-20-34L0-14L20-34" fill="none" stroke="#fff" stroke-width="3"/><rect x="-24" y="0" width="48" height="16" fill="#F2C14B"/><path d="M-20-34L-52 20L-30 26L-16-6Z M20-34L52 20L30 26L16-6Z" fill="#E77AA0"/>` +
     [[-20, 40], [12, 50], [-6, 30], [20, 20]].map(([x, y]) => blossom(x, y, 5, '#FFE0EA')).join('') + `</g>` + petals(12, 61)
+  ,
+  // —— 商务 ——
+  office: u => sky(u, '#DCEBFA', '#F4F7FC') + `<rect y="128" width="320" height="52" fill="#C9B79C"/>` +
+    `<rect x="24" y="22" width="120" height="70" rx="4" fill="#BFE0F7" stroke="#fff" stroke-width="5"/><path d="M84 22V92M24 57H144" stroke="#fff" stroke-width="3"/>` + cloud(70, 44, .6) +
+    `<rect x="60" y="112" width="200" height="12" rx="3" fill="#8E6A4A"/><rect x="70" y="124" width="8" height="40" fill="#8E6A4A"/><rect x="242" y="124" width="8" height="40" fill="#8E6A4A"/>` +
+    `<rect x="150" y="70" width="70" height="44" rx="4" fill="#3A3F4F"/><rect x="155" y="75" width="60" height="32" fill="#7FB7E6"/><rect x="178" y="114" width="14" height="4" fill="#3A3F4F"/>` +
+    `<path d="M162 84h30M162 92h40M162 100h22" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>` +
+    `<g transform="translate(110 100)"><path d="M-8 12H8L6 -2H-6Z" fill="#fff"/><path d="M-6-2Q0 -8 6 -2" fill="none" stroke="#F2A13B" stroke-width="2"/></g>` +
+    `<g transform="translate(270 128)"><rect x="-6" y="-30" width="12" height="30" rx="2" fill="#B07A4F"/><circle cy="-40" r="18" fill="#7FB35A"/><circle cx="-10" cy="-48" r="10" fill="#93C46A"/></g>`,
+  phone: u => sky(u, '#FFE9F1', '#F2F0FF') + `<rect y="132" width="320" height="48" fill="#E3D3C2"/>` +
+    `<g transform="translate(160 96)"><rect x="-70" y="10" width="140" height="40" rx="12" fill="#3F57A8"/><rect x="-46" y="20" width="92" height="20" rx="6" fill="#DCE6FF"/>${[0, 1, 2].map(r => [0, 1, 2].map(c => `<circle cx="${-14 + c * 14}" cy="${26 + r * 0}" r="0"/>`).join('')).join('')}` +
+    `<path d="M-60 6Q-60 -26 -40 -26H40Q60 -26 60 6" fill="none" stroke="#2C3E86" stroke-width="16" stroke-linecap="round"/><rect x="-74" y="-6" width="30" height="20" rx="8" fill="#2C3E86"/><rect x="44" y="-6" width="30" height="20" rx="8" fill="#2C3E86"/></g>` +
+    [0, 1, 2].map(i => `<path d="M${226 + i * 12} ${40 - i * 6}q12 14 0 28" stroke="#D9578A" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="${1 - i * .25}"/>`).join('') +
+    `<g transform="translate(70 44)"><rect x="-26" y="-16" width="52" height="30" rx="10" fill="#fff" stroke="#F1DDE5"/><text x="0" y="5" text-anchor="middle" font-size="13" font-weight="700" fill="#D9578A" font-family="sans-serif">もしもし</text></g>`,
+  meeting: u => sky(u, '#E6F0FA', '#F7F3EE') + `<rect x="40" y="18" width="110" height="64" rx="4" fill="#fff" stroke="#C9D3E3" stroke-width="3"/>` +
+    `<path d="M54 66V52M74 66V40M94 66V46M114 66V30M134 66V36" stroke="#D9578A" stroke-width="8"/><path d="M50 70H140" stroke="#9AA6B8" stroke-width="2"/>` +
+    `<ellipse cx="160" cy="138" rx="130" ry="26" fill="#8E6A4A"/><ellipse cx="160" cy="134" rx="130" ry="24" fill="#A9825E"/>` +
+    [[70, '#3F57A8'], [120, '#4A3F52'], [200, '#3F57A8'], [250, '#4A3F52']].map(([x, c]) => `<g transform="translate(${x} 112)"><path d="M-16 20V2Q0-10 16 2V20Z" fill="${c}"/><circle cy="-14" r="11" fill="#FFE0CC"/><path d="M-11-18Q0-30 11-18Q6-24 0-25Q-6-24-11-18Z" fill="#2A2433"/><path d="M-3 0L0 12L3 0Z" fill="#fff"/></g>`).join('') +
+    [[110, 128], [180, 130], [230, 126]].map(([x, y]) => `<rect x="${x}" y="${y}" width="22" height="14" rx="2" fill="#fff" transform="rotate(-6 ${x} ${y})"/>`).join('') +
+    `<g transform="translate(250 50)"><rect x="-26" y="-18" width="52" height="30" rx="10" fill="#fff" stroke="#E1E6EF"/><circle cx="-10" cy="-3" r="3" fill="#9AA6B8"/><circle cx="0" cy="-3" r="3" fill="#9AA6B8"/><circle cx="10" cy="-3" r="3" fill="#9AA6B8"/></g>`,
+  bow: u => sky(u, '#FFF0E0', '#FFE3EC') + `<rect y="146" width="320" height="34" fill="#D9C3A5"/>` +
+    `<g transform="translate(110 146)"><path d="M-8 0V-44L-10 -44Q-6 -70 14 -84L20 -78Q6 -64 8 -44V0Z" fill="#2E3A5C"/><path d="M2 -84 L18 -72" stroke="#fff" stroke-width="4"/><circle cx="26" cy="-84" r="11" fill="#FFE0CC"/><path d="M18 -92Q30 -100 36 -86Q28 -92 18 -92Z" fill="#2A2433"/><rect x="-10" y="-4" width="22" height="4" rx="2" fill="#2A2433"/></g>` +
+    `<g transform="translate(220 146)"><path d="M-14 0V-58Q0 -70 14 -58V0Z" fill="#6B5B8A"/><circle cy="-76" r="12" fill="#FFE0CC"/><path d="M-12 -80Q0 -94 12 -80Q6 -88 0 -89Q-6 -88 -12 -80Z" fill="#2A2433"/><circle cx="-4" cy="-76" r="1.5" fill="#2A2433"/><circle cx="4" cy="-76" r="1.5" fill="#2A2433"/><path d="M-3 -70q3 2 6 0" stroke="#2A2433" stroke-width="1.4" fill="none"/></g>` +
+    `<g fill="#F2A13B" opacity=".8"><text x="150" y="44" font-size="22" font-family="sans-serif">✦</text><text x="40" y="70" font-size="14" font-family="sans-serif">✦</text></g>` +
+    `<g transform="translate(164 60)"><rect x="-44" y="-18" width="88" height="30" rx="10" fill="#fff" stroke="#F1DDE5"/><text x="0" y="3" text-anchor="middle" font-size="11" font-weight="700" fill="#D9578A" font-family="sans-serif">よろしくお願いします</text></g>`,
+  mail: u => sky(u, '#E8F1FF', '#FFF1F6') + `<g transform="translate(160 96)"><rect x="-90" y="-50" width="180" height="110" rx="10" fill="#fff" stroke="#D5DDEB" stroke-width="2"/><path d="M-90 -44L0 16L90 -44" fill="none" stroke="#D5DDEB" stroke-width="3"/><path d="M-90 58L-24 2M90 58L24 2" stroke="#E6EBF3" stroke-width="2"/>` +
+    `<circle cx="70" cy="-48" r="16" fill="#D9578A"/><text x="70" y="-43" text-anchor="middle" font-size="15" font-weight="700" fill="#fff" font-family="sans-serif">1</text></g>` +
+    `<g transform="translate(60 40) rotate(-12)"><rect x="-20" y="-12" width="40" height="24" rx="3" fill="#FBC8D6"/><path d="M-20 -12L0 2L20 -12" fill="none" stroke="#fff" stroke-width="2"/></g>` +
+    `<path d="M250 150q20 -30 50 -36" stroke="#9CC9F2" stroke-width="3" fill="none" stroke-dasharray="4 6"/><path d="M300 108l6 6-9 2z" fill="#9CC9F2"/>` + petals(6, 71),
+  card: u => sky(u, '#F3EEE6', '#FFE9F1') + `<rect y="130" width="320" height="50" fill="#BFA588"/>` +
+    `<g transform="translate(125 92) rotate(-6)"><rect x="-60" y="-34" width="120" height="70" rx="5" fill="#fff" stroke="#E3DCCF" stroke-width="2"/><rect x="-50" y="-24" width="14" height="14" fill="#D9578A"/><path d="M-30 -18h44" stroke="#9AA6B8" stroke-width="3"/><path d="M-50 4h60" stroke="#2A2433" stroke-width="5"/><path d="M-50 18h80M-50 26h56" stroke="#C9CFD9" stroke-width="2.5"/></g>` +
+    `<g transform="translate(212 104) rotate(5)"><rect x="-52" y="-30" width="104" height="60" rx="5" fill="#FFF8EE" stroke="#E3DCCF" stroke-width="2"/><circle cx="-38" cy="-16" r="7" fill="#3F57A8"/><path d="M-24 -16h40" stroke="#9AA6B8" stroke-width="3"/><path d="M-40 4h56" stroke="#2A2433" stroke-width="5"/><path d="M-40 16h70" stroke="#C9CFD9" stroke-width="2.5"/></g>` +
+    `<g fill="#FFE0CC"><ellipse cx="60" cy="122" rx="16" ry="10"/><ellipse cx="270" cy="128" rx="16" ry="10"/></g>`
 };
 const SCENE_KEYS = Object.keys(SCENES);

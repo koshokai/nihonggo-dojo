@@ -98,7 +98,7 @@ function migrateIds() {
     }
   }
 }
-const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: true, autoSpeak: true, lastBackup: 0, lastBackupXp: 0, stages: {}, games: {}, read: {} });
+const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: true, autoSpeak: true, lastBackup: 0, lastBackupXp: 0, stages: {}, games: {}, read: {}, biz: {} });
 function load() {
   try { const t = localStorage.getItem(KEY); if (t) return Object.assign(blank(), JSON.parse(t)); } catch (e) { /* 浏览器禁用存储时从空进度开始 */ }
   return blank();
@@ -155,6 +155,7 @@ const BADGES = [
   { id: 'full', ch: '満', name: '满分', desc: '模拟考拿到满分', test: () => S.exams.some(e => e.score === e.total) },
   { id: 'r5', ch: '読', name: '小书虫', desc: '读完 5 篇阅读', test: () => Object.keys(S.read || {}).length >= 5 },
   { id: 'r30', ch: '書', name: '博览群书', desc: '读完 30 篇阅读', test: () => Object.keys(S.read || {}).length >= 30 },
+  { id: 'biz5', ch: '商', name: '职场新人', desc: '完成 5 个商务场景', test: () => Object.keys((S.biz || {}).s || {}).length >= 5 },
   { id: 'n1', ch: '頂', name: '登顶', desc: 'N1 模拟考合格', test: () => S.exams.some(e => e.L === 'N1' && e.score / e.total >= .6) }
 ];
 function checkBadges() {
@@ -617,9 +618,10 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, read: viewRead, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, me: viewMe, welcome: viewWelcome };
+const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, me: viewMe, welcome: viewWelcome };
 function render() {
-  const [v, arg] = (location.hash || '#home').slice(1).split('/');
+  const [v, ...rest] = (location.hash || '#home').slice(1).split('/');
+  const arg = rest.join('/');
   let view = VIEWS[v] ? v : 'home';
   if (!S.onboarded && view !== 'me') view = 'welcome';
   if (S.onboarded && view === 'welcome') view = 'home';
