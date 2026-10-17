@@ -1058,6 +1058,16 @@ function buildExam(L) {
     return [...readable.slice(0, 5).map(v => qVocab(v, 'reading')), ...rest.slice(0, 5).map(v => qVocab(v, 'meaning')), ...rest.slice(5, 8).map(v => qVocab(v, 'word')),
       ...sample(KANJI[L], 3).map(k => qKanji(k)), ...sample(GRAM[L], 4).map(g => qGrammar(g))];
   }
+  // 题型少的级别（N1 没有表记、语形成）用语法、读解、文脉补到 30 题左右，和真实试卷的比重一致
+  for (const t of ['文法', '読解', '文脈', '文法', '読解']) {
+    if (qs.length >= 30) break;
+    const used = new Set(qs.map(q => q.prompt));
+    const extra = shuffle(bank.filter(x => x[0] === t)).map(x => qJlpt(L, x)).find(q => !used.has(q.prompt));
+    if (extra) {
+      const at = qs.map(q => q.kind).lastIndexOf('j' + t);
+      qs.splice(at + 1, 0, extra);
+    }
+  }
   if (short) {
     const vs = shuffle(VOCAB[L].filter(x => x.q && x.w !== x.r)).slice(0, short);
     qs.unshift(...vs.map(v => qVocab(v, 'reading')));

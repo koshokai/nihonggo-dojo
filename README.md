@@ -27,6 +27,8 @@
 - **汉字**：`kanji.js` 由 [kanji-data](https://github.com/davidluzgouveia/kanji-data)（MIT）生成，汉字信息来自 KANJIDIC（EDRDG，CC BY-SA 4.0）。
 - **阅读**：写在 `tools/reading/N*.txt`（格式见文件开头的文章），插图是 `scenes.js` 里的手绘 SVG；运行 `python3 tools/build_reading.py` 生成 `reading.js`（含朗读假名和分词）。
 - **商务日语**：写在 `tools/business/`（scenes_*.txt、keigo.txt、mail.txt、vocab.txt），运行 `python3 tools/build_business.py` 生成 `business.js`。
+- **模拟考题库**：写在 `tools/jlpt/N*.txt`（本站原创，按 JLPT 题型编写，不是真题），运行 `python3 tools/build_jlpt.py` 生成 `jlpt.js`。
+- **今日一句**：写在 `tools/daily/`，运行 `python3 tools/build_daily.py` 生成 `daily.js`（366 天不重样）。
 - **语法**：写在 `tools/grammar/N*.txt`，运行 `python3 tools/build_grammar.py` 生成 `grammar.js`。
 - 中文释义和例句没有经过专业审核，发现错误欢迎提 issue。
 
