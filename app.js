@@ -1009,25 +1009,78 @@ function viewGrammar() {
 }
 
 /* 模拟考 */
+/* JLPT 题型（原创题库 jlpt.js）：题干里【】是画线词，（　）是空格，＿＿/★ 是排序题的空位 */
+const JTYPE = {
+  読み: ['漢字読み', '＿＿＿の　ことばの　読み方として　最も　よい　ものを　えらんで　ください。'],
+  表記: ['表記', '＿＿＿の　ことばを　漢字で　書くとき、最も　よい　ものを　えらんで　ください。'],
+  語形成: ['語形成', '（　）に　入れるのに　最も　よい　ものを　えらんで　ください。'],
+  文脈: ['文脈規定', '（　）に　入れるのに　最も　よい　ものを　えらんで　ください。'],
+  言換: ['言い換え類義', '＿＿＿に　意味が　最も　近い　ものを　えらんで　ください。'],
+  用法: ['用法', 'つぎの　ことばの　使い方として　最も　よい　ものを　えらんで　ください。'],
+  文法: ['文法形式の判断', '（　）に　入れるのに　最も　よい　ものを　えらんで　ください。'],
+  組立: ['文の組み立て', '★　に　入る　最も　よい　ものを　えらんで　ください。'],
+  読解: ['読解', 'つぎの　文章を　読んで、質問に　答えて　ください。']
+};
+for (const [k, [name]] of Object.entries(JTYPE)) KIND_NAMES['j' + k] = name;
+function jlptStem(t, q) {
+  let s = esc(q).replace(/【(.+?)】/g, '<u class="jl-u">$1</u>').replace(/（\s*）/g, '<span class="blank">　　　</span>');
+  if (t === '組立') s = s.replace(/＿＿|★/g, m => `<span class="jl-slot${m === '★' ? ' star' : ''}">${m === '★' ? '★' : ''}</span>`);
+  return s;
+}
+function qJlpt(L, [t, q, opts, note]) {
+  const [name, inst] = JTYPE[t];
+  let stem;
+  if (t === '読解') {
+    const [passage, ques] = q.split('◆').map(x => x.trim());
+    stem = `<div class="jl-passage" lang="ja">${esc(passage)}</div><div class="q-sent" lang="ja">${esc(ques)}</div>`;
+  } else if (t === '用法') stem = `<div class="q-big" lang="ja">${esc(q)}</div>`;
+  else stem = `<div class="q-sent" lang="ja">${jlptStem(t, q)}</div>`;
+  return makeQ(null, 'j' + t, shuffle(opts.slice(1)).slice(0, 3), opts[0], {
+    prompt: `<div class="eyebrow">${name}　<span lang="ja" class="jl-inst">${inst}</span></div>${stem}`,
+    optLang: 'ja', explain: `<b lang="ja">${esc(opts[0])}</b>　${esc(note)}`
+  });
+}
+// 模拟考按 JLPT 试卷的顺序出题：文字・语汇 → 语法 → 读解；题库里没有的题型用自动生成的题补上
+const EXAM_PLAN = [['読み', 4], ['表記', 3], ['語形成', 2], ['文脈', 4], ['言換', 3], ['用法', 2], ['文法', 6], ['組立', 3], ['読解', 3]];
+const EXAM_MIN = { N5: 25, N4: 30, N3: 35, N2: 40, N1: 45 };
 function buildExam(L) {
-  const vs = VOCAB[L].filter(x => x.q);
-  const readable = shuffle(vs.filter(v => v.w !== v.r));
-  const rest = shuffle(vs.filter(v => !readable.slice(0, 5).includes(v)));
-  return [
-    ...readable.slice(0, 5).map(v => qVocab(v, 'reading')),
-    ...rest.slice(0, 5).map(v => qVocab(v, 'meaning')),
-    ...rest.slice(5, 8).map(v => qVocab(v, 'word')),
-    ...sample(KANJI[L], 3).map(k => qKanji(k)),
-    ...sample(GRAM[L], 4).map(g => qGrammar(g))
-  ];
+  const bank = (typeof JLPT !== 'undefined' && JLPT[L]) || [];
+  const qs = [];
+  let short = 0;
+  for (const [t, n] of EXAM_PLAN) {
+    const pool = bank.filter(x => x[0] === t);
+    if (!pool.length) { if (['表記', '語形成', '用法'].includes(t)) continue; short += n; continue; }
+    sample(pool, Math.min(n, pool.length)).forEach(x => qs.push(qJlpt(L, x)));
+    short += Math.max(0, n - pool.length);
+  }
+  if (qs.length < 10) {   // 题库还没有这个级别：用原来的自动出题
+    const vs = VOCAB[L].filter(x => x.q), readable = shuffle(vs.filter(v => v.w !== v.r)), rest = shuffle(vs.filter(v => !readable.slice(0, 5).includes(v)));
+    return [...readable.slice(0, 5).map(v => qVocab(v, 'reading')), ...rest.slice(0, 5).map(v => qVocab(v, 'meaning')), ...rest.slice(5, 8).map(v => qVocab(v, 'word')),
+      ...sample(KANJI[L], 3).map(k => qKanji(k)), ...sample(GRAM[L], 4).map(g => qGrammar(g))];
+  }
+  if (short) {
+    const vs = shuffle(VOCAB[L].filter(x => x.q && x.w !== x.r)).slice(0, short);
+    qs.unshift(...vs.map(v => qVocab(v, 'reading')));
+  }
+  return qs;
+}
+// 按题型专项练习：不限时，每题都有解说
+function jlptDrill(L, t) {
+  const pool = ((typeof JLPT !== 'undefined' && JLPT[L]) || []).filter(x => !t || x[0] === t);
+  const qs = sample(pool, Math.min(10, pool.length)).map(x => qJlpt(L, x));
+  main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
+  const title = `${L} ${t ? JTYPE[t][0] : '综合'}练习`;
+  runQuiz(host, qs, { title, noRecord: true, xpEach: 8, onDone: r => { if (!r) return render(); quizSummary(host, r, { title, again: () => jlptDrill(L, t) }); } });
 }
 function viewExam() {
   const L = S.level;
   const hist = S.exams.slice(-6).reverse();
   const p = h(`<section class="panel">
     <div class="row between"><h2>模拟考 · ${L}</h2>${levelSeg(L)}</div>
-    <p>20 道题，限时 15 分钟：读音 5、词义 5、选词 3、汉字 3、语法 4。考试中不显示对错，交卷后统一批改。正确率 60% 以上盖「合格」章。</p>
+    <p>按 JLPT 试卷的题型和顺序出题：文字・语汇（汉字读法、表记、文脉、近义替换、用法）→ 语法（语法形式、★排序题）→ 读解。约 30 题，限时 ${EXAM_MIN[L]} 分钟，考试中不显示对错，交卷后统一批改。正确率 60% 以上盖「合格」章。</p>
+    <p class="small muted">题目为本站原创，按 JLPT 官方题型编写（真题有版权，不能直接收录），难度略高于考试，干扰项专门挑容易混淆的。</p>
     <div class="row"><button class="btn pri" type="button" data-start>开始考试</button></div>
+    ${(typeof JLPT !== 'undefined' && JLPT[L] && JLPT[L].length) ? `<h3>题型专项练习</h3><div class="row">${Object.keys(JTYPE).filter(t => JLPT[L].some(x => x[0] === t)).map(t => `<button class="chip-btn" type="button" data-drill="${t}">${JTYPE[t][0]} <span class="small">${JLPT[L].filter(x => x[0] === t).length}</span></button>`).join('')}</div>` : ''}
     ${hist.length ? `<h3>最近成绩</h3><div class="list-wrap"><table class="list"><thead><tr><th>日期</th><th>级别</th><th>得分</th><th>结果</th></tr></thead><tbody>${hist.map(e => `<tr><td>${e.date}</td><td>${e.L}</td><td>${e.score}/${e.total}</td><td>${e.score / e.total >= .6 ? '<span class="tag done">合格</span>' : '<span class="tag">未合格</span>'}</td></tr>`).join('')}</tbody></table></div>` : ''}
   </section>`);
   bindLevel(p);
@@ -1035,7 +1088,7 @@ function viewExam() {
     const qs = buildExam(L);
     main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
     runQuiz(host, qs, {
-      title: `${L} 模拟考`, exam: true, minutes: 15, onDone: r => {
+      title: `${L} 模拟考`, exam: true, minutes: EXAM_MIN[L], onDone: r => {
         if (!r) return render();
         S.exams.push({ L, score: r.score, total: r.total, date: dkey() });
         const pass = r.score / r.total >= .6;
@@ -1053,6 +1106,7 @@ function viewExam() {
     });
   };
   p.querySelector("[data-start]").onclick = start;
+  p.querySelectorAll('[data-drill]').forEach(b => { b.onclick = () => jlptDrill(L, b.dataset.drill); });
   main.append(p);
 }
 
