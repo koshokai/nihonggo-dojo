@@ -1,12 +1,12 @@
 # 用 VOICEVOX 生成日语发音（MP3），提交到 audio/。在 GitHub 的 Actions 页面手动运行。
-# probe：列出声音角色和使用规定并生成试听样本；words / daily：批量生成。
+# probe：列出声音角色和使用规定并生成试听样本；words / daily：批量生成；listen：听力题（多人对话）。
 name: VOICEVOX audio
 
 on:
   workflow_dispatch:
     inputs:
       mode:
-        description: probe / words / daily
+        description: probe / words / daily / listen
         required: true
         default: probe
       speaker:

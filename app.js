@@ -661,7 +661,7 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, me: viewMe, welcome: viewWelcome };
+const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, me: viewMe, welcome: viewWelcome };
 function render() {
   const [v, ...rest] = (location.hash || '#home').slice(1).split('/');
   const arg = rest.join('/');
@@ -669,6 +669,7 @@ function render() {
   if (!S.onboarded && view !== 'me') view = 'welcome';
   if (S.onboarded && view === 'welcome') view = 'home';
   clearInterval(examTimer); keyHandler = null;
+  if (lsStop) lsStop();
   document.querySelectorAll('.tabs a').forEach(a => a.classList.toggle('on', a.dataset.go === view));
   const on = document.querySelector('.tabs a.on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   main.innerHTML = '';
@@ -1138,6 +1139,7 @@ function viewExam() {
     <div class="row between"><h2>模拟考 · ${L}</h2>${levelSeg(L)}</div>
     <p>按 JLPT 试卷的题型和顺序出题：文字・语汇（汉字读法、表记、文脉、近义替换、用法）→ 语法（语法形式、★排序题）→ 读解。约 30 题，限时 ${EXAM_MIN[L]} 分钟，考试中不显示对错，交卷后统一批改。正确率 60% 以上盖「合格」章。</p>
     <p class="small muted">题目为本站原创，按 JLPT 官方题型编写（真题有版权，不能直接收录），难度略高于考试，干扰项专门挑容易混淆的。</p>
+    <p class="small">听力部分单独练：<a href="#listen">听力测验 →</a></p>
     <div class="row"><button class="btn pri" type="button" data-start>开始考试</button></div>
     ${(typeof JLPT !== 'undefined' && JLPT[L] && JLPT[L].length) ? `<h3>题型专项练习</h3><div class="row">${Object.keys(JTYPE).filter(t => JLPT[L].some(x => x[0] === t)).map(t => `<button class="chip-btn" type="button" data-drill="${t}">${JTYPE[t][0]} <span class="small">${JLPT[L].filter(x => x[0] === t).length}</span></button>`).join('')}</div>` : ''}
     ${hist.length ? `<h3>最近成绩</h3><div class="list-wrap"><table class="list"><thead><tr><th>日期</th><th>级别</th><th>得分</th><th>结果</th></tr></thead><tbody>${hist.map(e => `<tr><td>${e.date}</td><td>${e.L}</td><td>${e.score}/${e.total}</td><td>${e.score / e.total >= .6 ? '<span class="tag done">合格</span>' : '<span class="tag">未合格</span>'}</td></tr>`).join('')}</tbody></table></div>` : ''}
@@ -1239,7 +1241,7 @@ function viewMe() {
   const about = h(`<section class="panel"><h2>关于内容</h2>
     <p class="small">单词约 8,000 个、汉字 2,211 个、语法 176 个句型，覆盖 JLPT N5–N1。中文释义和例句由本站编写，未经专业审核，备考时请配合官方真题和教材。发音使用浏览器自带的日语语音。</p>
     <p class="small muted">数据来源：单词表 <a href="https://github.com/jamsinclair/open-anki-jlpt-decks" target="_blank" rel="noopener">open-anki-jlpt-decks</a>（MIT），基于 <a href="http://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller 的 JLPT 资料</a>（CC BY）；汉字 <a href="https://github.com/davidluzgouveia/kanji-data" target="_blank" rel="noopener">kanji-data</a>（MIT）与 KANJIDIC；词典英文释义 <a href="https://www.edrdg.org/jmdict/j_jmdict.html" target="_blank" rel="noopener">JMdict</a>（EDRDG，CC BY-SA 4.0）。</p>
-    <p class="small muted">音声：<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>:冥鳴ひまり（<a href="https://meimeihimari.wixsite.com/himari/terms-of-use" target="_blank" rel="noopener">利用規約</a>）。</p>
+    <p class="small muted">音声：<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>:冥鳴ひまり（<a href="https://meimeihimari.wixsite.com/himari/terms-of-use" target="_blank" rel="noopener">利用規約</a>）、VOICEVOX:玄野武宏、VOICEVOX:九州そら、VOICEVOX:春日部つむぎ、VOICEVOX:雀松朱司（听力）。</p>
     <div class="list-wrap"><table class="list"><thead><tr><th>级别</th><th>单词</th><th>汉字</th><th>语法</th></tr></thead><tbody>${counts}</tbody></table></div>
   </section>`);
   const ps = bk.querySelector('[data-persist]');

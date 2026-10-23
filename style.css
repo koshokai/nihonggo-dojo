@@ -599,3 +599,15 @@ body.gated { overflow: hidden; }
 .acc-form .btn.small { justify-self: start; padding: 4px 6px; min-height: 0; }
 .otp-row input { letter-spacing: .4em; text-align: center; font-size: 1.3rem !important; }
 .auth-note { margin: -4px 0 0; text-align: center; }
+
+/* 听力 */
+.ls-player { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.ls-play { min-width: 132px; }
+.ls-script { display: grid; gap: 6px; margin-top: 8px; }
+.ls-script p { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 8px; }
+.ls-script p > .small.muted:first-child { grid-column: 1 / -1; }
+.ls-zh { grid-column: 2; }
+.ls-spk { font-size: .72rem; padding: 1px 6px; border-radius: 4px; background: var(--ai-soft); color: var(--ai); height: fit-content; }
+.ls-spk.F { background: var(--bad-soft); color: var(--bad); }
+.ls-details { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin: 8px 0; }
+.ls-details summary { cursor: pointer; }

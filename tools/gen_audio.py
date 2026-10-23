@@ -5,6 +5,7 @@ docker run -p 50021:50021 voicevox/voicevox_engine:cpu-latest），然后
     python3 tools/gen_audio.py probe                       列出声音角色及使用规定，生成试听样本
     python3 tools/gen_audio.py words --speaker 14 --level N5
     python3 tools/gen_audio.py daily --speaker 14
+    python3 tools/gen_audio.py listen                      听力题（多人对话，声音见 LISTEN_VOICES）
 
 输出 audio/<集合>/<哈希>.mp3，以及 audio/index-<集合>.json（朗读文本 → 文件）。已经生成过的会跳过，可以断点续跑。
 VOICEVOX 的每个声音角色有自己的使用规定（多数要求注明「VOICEVOX:角色名」），见 probe 输出和网站「我的」页的致谢。
@@ -18,6 +19,8 @@ import sys
 import time
 import urllib.parse
 import urllib.request
+import wave
+from io import BytesIO
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -144,6 +147,49 @@ def commit(msg):
     sys.exit('push failed')
 
 
+# 听力题的声音（都是可以商用、只需注明「VOICEVOX:角色名」的角色，见 audio/samples/speakers.json）
+LISTEN_VOICES = {'N': 16, 'F': 14, 'M': 11, 'F2': 8, 'M2': 52}   # 九州そら 冥鳴ひまり 玄野武宏 春日部つむぎ 雀松朱司
+
+
+def listen(engine, commit_every=0):
+    sys.path.insert(0, str(ROOT / 'tools'))
+    from build_listen import items, segs, SPEED
+    idx_path = OUT / 'index-listen.json'
+    idx = json.loads(idx_path.read_text(encoding='utf-8')) if idx_path.exists() else {}
+    t0, n = time.time(), 0
+    for L, lst in items().items():
+        for x in lst:
+            if x['id'] in idx:
+                continue
+            pcm, rate = b'', 24000
+            try:
+                for spk, text, pause in segs(x):
+                    wav, _ = synth(engine, LISTEN_VOICES[spk], text, '', 1.0 if spk == 'N' else SPEED[L])
+                    with wave.open(BytesIO(wav)) as w:
+                        rate = w.getframerate()
+                        pcm += w.readframes(w.getnframes())
+                    pcm += b'\0\0' * int(rate * pause)
+            except Exception as e:
+                print('  failed', x['id'], e)
+                continue
+            buf = BytesIO()
+            with wave.open(buf, 'wb') as w:
+                w.setnchannels(1); w.setsampwidth(2); w.setframerate(rate); w.writeframes(pcm)
+            file = f"listen/{x['id']}.mp3"
+            to_mp3(buf.getvalue(), OUT / file, kbps=48)
+            idx[x['id']] = file
+            n += 1
+            if n % 10 == 0:
+                print(f'  {n}  {time.time() - t0:.0f}s', flush=True)
+                idx_path.write_text(json.dumps(idx, ensure_ascii=False, indent=0), encoding='utf-8')
+            if commit_every and n % commit_every == 0:
+                commit(f'audio: listen +{commit_every}')
+    live = {x['id'] for lst in items().values() for x in lst}
+    idx = {k: v for k, v in idx.items() if k in live}      # 改过台词的旧音频不再引用
+    idx_path.write_text(json.dumps(idx, ensure_ascii=False, indent=0), encoding='utf-8')
+    print(f'listen: {n} new files, index {len(idx)}')
+
+
 def probe(engine):
     """列出每个声音角色的使用规定，并用同一句话给每个角色的「ノーマル」风格生成试听样本。"""
     speakers = api(engine, '/speakers')
@@ -163,7 +209,7 @@ def probe(engine):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('mode', choices=['probe', 'words', 'daily'])
+    ap.add_argument('mode', choices=['probe', 'words', 'daily', 'listen'])
     ap.add_argument('--engine', default='http://127.0.0.1:50021')
     ap.add_argument('--speaker', type=int, default=None)
     ap.add_argument('--level', default='')
@@ -173,6 +219,8 @@ def main():
     print('engine', wait_engine(a.engine))
     if a.mode == 'probe':
         return probe(a.engine)
+    if a.mode == 'listen':
+        return listen(a.engine, min(a.commit_every, 40) if a.commit_every else 0)
     if a.speaker is None:
         sys.exit('--speaker is required')
     items = items_words(a.level) if a.mode == 'words' else items_daily()
