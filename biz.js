@@ -49,7 +49,7 @@ function bindLines(p, list) {
   const playBtn = p.querySelector('[data-play]');
   const stop = () => { playing = false; if (playBtn) playBtn.querySelector('span').textContent = '全文朗读'; if (hasTTS) speechSynthesis.cancel(); mark(-1); };
   nodes.forEach((n, i) => {
-    const go = e => { const hidden = n.closest('.hide-jp:not(.shown)'); if (!hidden && e && (e.target.closest('.wd') || String(getSelection()).trim())) return; stop(); n.classList.add('open'); n.closest('.bubble-line')?.classList.add('shown'); mark(i); speak(list[i], { onend: () => mark(-1) }); };
+    const go = e => { const hidden = n.closest('.hide-jp:not(.shown)'); const sm = p.querySelector('[data-shadowmode]'); if (!(sm && sm.checked) && !hidden && e && (e.target.closest('.wd') || String(getSelection()).trim())) return; if (sm && sm.checked) { e && e.stopPropagation(); stop(); n.closest('.bubble-line')?.classList.add('shown'); mark(i); return shadowSheet(n.querySelector('.ra-jp').textContent, list[i], n.querySelector('.ra-zh').textContent); } stop(); n.classList.add('open'); n.closest('.bubble-line')?.classList.add('shown'); mark(i); speak(list[i], { onend: () => mark(-1) }); };
     n.onclick = go; n.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } };
   });
   const playFrom = i => {
@@ -97,6 +97,7 @@ function bizScene(sc) {
       <button class="btn pri" type="button" data-play>${SPEAK_SVG}<span>全文朗读</span></button>
       <label class="switch"><input type="checkbox" data-kana> 假名</label>
       <label class="switch"><input type="checkbox" data-zh> 全部中文</label>
+      <label class="switch"><input type="checkbox" data-shadowmode> 🎙 跟读模式</label>
     </div>
     <div class="row small"><span class="muted">角色扮演：</span><div class="seg" role="group">${['', ...speakers].map(s => `<button type="button" data-role="${esc(s)}" class="${s ? '' : 'on'}">${s ? esc(s) : '不扮演'}</button>`).join('')}</div></div>
     <p class="small muted">点一句话朗读并显示中文；画线的词可以点开看释义。选择角色扮演后，那个角色的台词会先隐藏，试着自己说出来再点开对照。</p>
@@ -211,6 +212,7 @@ function bizMail(m) {
       <button class="btn pri" type="button" data-play>${SPEAK_SVG}<span>全文朗读</span></button>
       <label class="switch"><input type="checkbox" data-kana> 假名</label>
       <label class="switch"><input type="checkbox" data-zh> 全部中文</label>
+      <label class="switch"><input type="checkbox" data-shadowmode> 🎙 跟读模式</label>
       <button class="btn" type="button" data-copy>复制邮件</button>
     </div>
     <div class="mail-box">

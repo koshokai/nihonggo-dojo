@@ -51,7 +51,7 @@ function corpus() {
 function sentencesWith(q, n = 5) {
   return corpus().filter(x => x.jp.includes(q)).sort((a, b) => a.jp.length - b.jp.length).slice(0, n);
 }
-const sentenceHTML = (x, mark) => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp" lang="ja">${mark ? esc(x.jp).split(esc(mark)).join(`<mark>${esc(mark)}</mark>`) : esc(x.jp)}</div><div class="small muted">${esc(x.zh)}</div></div>${speakBtn(x.kana, '朗读例句')}</div>`;
+const sentenceHTML = (x, mark) => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp" lang="ja">${mark ? esc(x.jp).split(esc(mark)).join(`<mark>${esc(mark)}</mark>`) : esc(x.jp)}</div><div class="small muted">${esc(x.zh)}</div></div>${speakBtn(x.kana, '朗读例句')}${shadowBtn(x.jp, x.kana, x.zh)}</div>`;
 
 /* 搜索 */
 function searchAll(raw) {

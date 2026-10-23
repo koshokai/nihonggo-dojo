@@ -75,6 +75,7 @@ function bindWords(p, a) {
   p.querySelectorAll('.wd').forEach(el => {
     el.onclick = e => {
       if (el.closest('.hide-jp:not(.shown)')) return;   // 角色扮演时先揭开整句
+      if (p.querySelector('[data-shadowmode]:checked')) return;   // 跟读模式下点哪里都是跟读整句
       e.stopPropagation();
       const hit = lookupWord(formsOf(el), keyset);
       showSheet(el.textContent, hit, a); el.classList.add('on');
@@ -164,6 +165,7 @@ function readArticle(a) {
       <button class="btn pri" type="button" data-play>${SPEAK_SVG}<span>全文朗读</span></button>
       <label class="switch"><input type="checkbox" data-kana> 假名</label>
       <label class="switch"><input type="checkbox" data-zh> 全部中文</label>
+      <label class="switch"><input type="checkbox" data-shadowmode> 🎙 跟读模式</label>
     </div>
     <p class="small muted">点一句话：朗读并显示中文。</p>
     <div class="ra-text">${a.p.map(para => `<p>${para.map(([jp, kana, zh, toks]) => `<span class="ra-s" data-i="${idx++}" tabindex="0" role="button"><span class="ra-jp" lang="ja">${tokHTML(toks, keyset)}</span><span class="ra-kana" lang="ja">${esc(kana)}</span><span class="ra-zh">${esc(zh)}</span></span>`).join('')}</p>`).join('')}</div>
@@ -181,7 +183,7 @@ function readArticle(a) {
   p.querySelector('[data-zh]').onchange = e => textBox.classList.toggle('show-zh', e.target.checked);
   const mark = i => nodes.forEach((n, j) => n.classList.toggle('now', j === i));
   nodes.forEach((n, i) => {
-    const go = e => { if (e && (e.target.closest('.wd') || String(getSelection()).trim())) return; stopPlay(); n.classList.add('open'); mark(i); speak(sents[i][1], { onend: () => mark(-1) }); };
+    const go = e => { if (p.querySelector('[data-shadowmode]').checked) { e && e.stopPropagation(); stopPlay(); mark(i); return shadowSheet(sents[i][0], sents[i][1], sents[i][2]); } if (e && (e.target.closest('.wd') || String(getSelection()).trim())) return; stopPlay(); n.classList.add('open'); mark(i); speak(sents[i][1], { onend: () => mark(-1) }); };
     n.onclick = go; n.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } };
   });
   // 全文朗读：一句一句接着读，当前句高亮

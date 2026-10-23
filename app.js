@@ -50,6 +50,18 @@ for (const L of LEVELS) {
   [...VOCAB[L], ...KANJI[L], ...GRAM[L]].forEach(it => { ITEMS[it.id] = it; });
 }
 
+// 学习顺序：原始词表按假名排序，直接按顺序出题会一关全是同一个音开头的词。
+// 每个级别用固定种子打乱一次（每次打开都一样，进度不会乱），闯关和背新词都按这个顺序。
+function seededShuffle(arr, seed) {
+  const a = arr.slice();
+  let t = seed >>> 0;
+  const rnd = () => { t += 0x6D2B79F5; let r = Math.imul(t ^ t >>> 15, 1 | t); r ^= r + Math.imul(r ^ r >>> 7, 61 | r); return ((r ^ r >>> 14) >>> 0) / 4294967296; };
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+const LEARN = {};
+LEVELS.forEach((L, i) => { LEARN[L] = seededShuffle(VOCAB[L], 20261023 + i * 7919); });
+
 /* 假名 */
 const KANA_BASIC = [
   [['あ', 'a'], ['い', 'i'], ['う', 'u'], ['え', 'e'], ['お', 'o']],
@@ -362,7 +374,7 @@ function grade(id, g) {
 const fmtDays = d => d === 0 ? '马上' : d === 1 ? '明天' : d < 30 ? `${d} 天` : d < 365 ? `${Math.round(d / 30)} 个月` : `${(d / 365).toFixed(1)} 年`;
 const dueList = levels => levels.flatMap(L => VOCAB[L]).filter(v => S.srs[v.id] && S.srs[v.id].due <= Date.now());
 const newLeft = () => Math.max(0, S.newPerDay - (S.newLog[dkey()] || 0));
-const newList = L => VOCAB[L].filter(v => !S.srs[v.id]);
+const newList = L => LEARN[L].filter(v => !S.srs[v.id]);
 
 function startCards(host, ids, title, onExit) {
   let queue = ids.slice(), done = 0, revealed = false;
@@ -438,8 +450,11 @@ function qVocab(v, kind) {
   const same = VOCAB[v.L].filter(x => x.q), all = allVocab().filter(x => x.q);
   const near = (arr, fn) => arr.length >= 4 ? arr : all.map(fn);
   if (kind === 'reading' && v.w !== v.r) {
+    // 干扰项：1 个长度相近的同级读音（有迷惑性）+ 2 个从全部级别随机抽的读音（避免四个选项长得都一样）
     const pool = same.filter(x => x.w !== x.r && x.r !== v.r).sort((a, b) => Math.abs(a.r.length - v.r.length) - Math.abs(b.r.length - v.r.length)).slice(0, 10).map(x => x.r);
-    return makeQ(v, 'reading', distract(v.r, near(pool, x => x.r)), v.r, {
+    const far = sample(all.filter(x => x.w !== x.r && x.r !== v.r && x.r[0] !== v.r[0]), 12).map(x => x.r);
+    const opts = [...new Set([...sample(near(pool, x => x.r), 1), ...far])].filter(r => r !== v.r).slice(0, 3);
+    return makeQ(v, 'reading', opts, v.r, {
       prompt: `<div class="eyebrow">选择正确的读音</div><div class="q-big" lang="ja">${esc(v.w)}</div>`, optLang: 'ja', say: v.r,
       explain: `<span lang="ja">${esc(v.w)}（${esc(v.r)}）</span>：${esc(v.m)}${exTip(v.w)}`
     });

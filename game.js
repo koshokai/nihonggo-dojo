@@ -5,7 +5,7 @@ const STAGE_SIZE = 10;      // 每关 10 个词
 const CHAPTER = 10;         // 每 10 关一章，第 10 关是头目关
 let gameChapter = {};       // 每个级别当前查看的章节
 
-const stageWords = (L, n) => VOCAB[L].filter(v => v.q).slice((n - 1) * STAGE_SIZE, n * STAGE_SIZE);
+const stageWords = (L, n) => LEARN[L].filter(v => v.q).slice((n - 1) * STAGE_SIZE, n * STAGE_SIZE);
 const stageCount = L => Math.ceil(VOCAB[L].filter(v => v.q).length / STAGE_SIZE);
 const stageStars = (L, n) => ((S.stages || {})[L] || {})[n] || 0;
 const stageOpen = (L, n) => n === 1 || stageStars(L, n - 1) > 0;

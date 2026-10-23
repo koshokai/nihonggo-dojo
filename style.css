@@ -547,3 +547,15 @@ body.on-dict .gsearch { display: none; }
 .q-prompt .jl-passage { text-align: left; color: var(--ink); font-size: 1rem; }
 .q-prompt .jl-passage + .q-sent { font-size: 1.1rem; }
 .jl-slot.star { border-bottom-color: var(--ai); }
+
+/* ---------- 跟读 ---------- */
+.speak.mic svg { fill: var(--ai); }
+.shadow-sheet .sh-jp { font-family: var(--f-jp); font-size: 1.3rem; font-weight: 700; line-height: 1.6; }
+.sh-ctl .btn svg { width: 18px; height: 18px; fill: currentColor; }
+.sh-ctl .btn.live { background: var(--bad); border-color: var(--bad); color: #fff; animation: pulse 1.2s infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--bad) 25%, transparent); } }
+.sh-res { display: grid; gap: 4px; }
+.sh-score { font-size: 2rem; font-weight: 800; color: var(--muted); font-family: var(--f-round); }
+.sh-score.good { color: var(--ok); }
+.sh-score small { font-size: .9rem; }
+.miss { color: var(--bad); text-decoration: underline wavy; text-underline-offset: 4px; }
