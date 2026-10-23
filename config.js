@@ -3,5 +3,5 @@
 // Publishable key 本来就是公开的（网页里任何人都能看到），数据安全靠数据库的行级权限（RLS），不靠保密这个 key。
 const CLOUD = {
   url: 'https://tpwljbzjixdggqjsgltf.supabase.co',
-  anonKey: ''     // Publishable key（sb_publishable_…）或旧版 anon public key（eyJ…）
+  anonKey: 'sb_publishable_R4ZXdXpCjxuTg0iH7EXTbQ_tIg1HdLm'
 };

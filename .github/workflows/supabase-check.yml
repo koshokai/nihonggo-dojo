@@ -1,0 +1,20 @@
+# 检查 Supabase 后端是否配置正确：表是否存在、权限是否生效、反馈能否提交。在 Actions 页面手动运行。
+name: Supabase check
+on: workflow_dispatch
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check
+        run: |
+          U=$(grep -oP "url: '\K[^']+" config.js); K=$(grep -oP "anonKey: '\K[^']+" config.js)
+          H=(-H "apikey: $K" -H "Authorization: Bearer $K" -H "Content-Type: application/json")
+          echo "== auth settings";   curl -s -w "  [%{http_code}]\n" "$U/auth/v1/settings" "${H[@]}" | head -c 300; echo
+          echo "== progress (anonymous read must return [] )"; curl -s -w "  [%{http_code}]\n" "$U/rest/v1/progress?select=user_id&limit=1" "${H[@]}"
+          echo "== feedback read (must return [] : nobody can read feedback)"; curl -s -w "  [%{http_code}]\n" "$U/rest/v1/feedback?select=id&limit=1" "${H[@]}"
+          echo "== feedback insert (must be 201)"; curl -s -w "  [%{http_code}]\n" -X POST "$U/rest/v1/feedback" "${H[@]}" -H "Prefer: return=minimal" \
+            -d '{"kind":"other","message":"[自动检查] 部署测试，可以删除","page":"ci","app_version":"ci"}'
+          echo "== anonymous progress write (must be rejected, 401/403)"; curl -s -w "  [%{http_code}]\n" -X POST "$U/rest/v1/progress" "${H[@]}" \
+            -d '{"user_id":"00000000-0000-0000-0000-000000000000","data":{},"xp":0}'
+          echo "== delete_my_account as anonymous (must be rejected)"; curl -s -w "  [%{http_code}]\n" -X POST "$U/rest/v1/rpc/delete_my_account" "${H[@]}" -d '{}'
