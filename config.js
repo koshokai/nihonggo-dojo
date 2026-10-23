@@ -5,5 +5,5 @@ const CLOUD = {
   url: 'https://tpwljbzjixdggqjsgltf.supabase.co',
   anonKey: 'sb_publishable_R4ZXdXpCjxuTg0iH7EXTbQ_tIg1HdLm',
   requireLogin: true,   // true：必须登录才能使用（上架 App Store 前建议改成 false，见 docs/SUPABASE_SETUP.md）
-  google: false         // 在 Supabase 开通 Google 登录后改成 true，登录页会出现「用 Google 登录」
+  google: true          // Google 登录（需在 Supabase 后台开通 Google provider，见 docs/SUPABASE_SETUP.md 7.3）
 };

@@ -173,6 +173,13 @@ document.addEventListener('click', e => {
 // mode：login 密码登录 | signup 注册 | otp 邮箱验证码登录 | forgot 忘记密码 | newpw 设置新密码 | linkerr 邮件链接失效
 // 强制登录（CLOUD.requireLogin）时这个界面挡住整个网站，登录成功才消失；否则是可以关掉的弹层。
 const REDIRECT = () => location.origin + location.pathname;
+// 从邮件链接或 Google 登录跳回来时带着错误：显示具体原因
+function linkErrText() {
+  const q = new URLSearchParams((location.hash.replace(/^#/, '') + '&' + location.search.replace(/^\?/, '')));
+  const d = q.get('error_description') || q.get('error') || '';
+  if (/expired|invalid/i.test(d) && /email|link|otp|token/i.test(d)) return '<p>这个邮件链接已经失效或用过了。</p>';
+  return d ? `<p>登录没有完成：${esc(authMsg(d).replace(/^出错了：/, ''))}</p>` : '<p>这个链接已经失效或用过了。</p>';
+}
 function authGate(state) {
   let g = document.getElementById('auth-gate');
   if (!state) { if (g) g.remove(); document.body.classList.remove('gated'); return; }
@@ -191,6 +198,8 @@ function authMsg(m) {
   if (/Token has expired|invalid.*otp|otp.*invalid/i.test(m)) return '验证码不对或已过期，请重新获取。';
   if (/should be at least|Password should/i.test(m)) return '密码至少 8 位。';
   if (/same.*password|different from the old/i.test(m)) return '新密码不能和旧密码一样。';
+  if (/provider is not enabled|Unsupported provider/i.test(m)) return 'Google 登录还没有开通好，请先用邮箱登录。';
+  if (/access_denied|access denied/i.test(m)) return '你取消了 Google 登录，或者这个 Google 账号暂时不能使用（应用还在测试中）。';
   if (/fetch|network/i.test(m)) return '连不上服务器，请检查网络。';
   return '出错了：' + m;
 }
@@ -222,10 +231,10 @@ function authScreen(mode = 'login') {
       <button class="btn pri big" type="submit">发送重置邮件</button><button class="btn ghost small" type="button" data-mode="login">← 返回登录</button>`,
     newpw: `<p>设置一个新密码。</p>${pw('pw', '新密码（至少 8 位）', 'new-password')}${pw('pw2', '再输一次', 'new-password')}
       <button class="btn pri big" type="submit">保存新密码</button>`,
-    linkerr: `<p>这个邮件链接已经失效或用过了。</p><p class="small muted">重新登录；忘记密码的话，再发一次重置邮件。</p>
+    linkerr: `${linkErrText()}<p class="small muted">重新登录；忘记密码的话，再发一次重置邮件。</p>
       <button class="btn pri big" type="button" data-mode="login">去登录</button><button class="btn ghost small" type="button" data-mode="forgot">忘记密码</button>`
   };
-  const title = { login: '欢迎回来', signup: '创建账号', otp: '验证码登录', forgot: '找回密码', newpw: '设置新密码', linkerr: '链接已失效' }[mode];
+  const title = { login: '欢迎回来', signup: '创建账号', otp: '验证码登录', forgot: '找回密码', newpw: '设置新密码', linkerr: '没有登录成功' }[mode];
   host.innerHTML = `<div class="auth-card">
     ${gate ? '' : '<button class="ws-x" type="button" data-close aria-label="关闭">×</button>'}
     <div class="auth-brand">${typeof neko === 'function' ? neko('happy', 'mini') : ''}<span>日语道场</span></div>
