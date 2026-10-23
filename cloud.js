@@ -223,8 +223,8 @@ function authScreen(mode = 'login') {
     signup: `<input type="email" name="email" placeholder="邮箱" autocomplete="email" required>${pw('pw', '密码（至少 8 位）', 'new-password')}${pw('pw2', '再输一次密码', 'new-password')}
       <label class="small agree"><input type="checkbox" name="agree" required> 我已阅读并同意 <a href="privacy.html" target="_blank">隐私政策</a></label>
       <button class="btn pri big" type="submit">注册</button>`,
-    otp: `<p class="small muted">不用密码：输入邮箱，我们发一个 6 位验证码给你。</p><input type="email" name="email" placeholder="邮箱" autocomplete="email" required>
-      <div class="otp-row" hidden><input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6 位验证码"></div>
+    otp: `<p class="small muted">不用密码：输入邮箱，我们发一个验证码给你。</p><input type="email" name="email" placeholder="邮箱" autocomplete="email" required>
+      <div class="otp-row" hidden><input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="邮件里的验证码"></div>
       <button class="btn pri big" type="submit" data-otp-btn>发送验证码</button>`,
     forgot: `<p>输入注册时用的邮箱，我们会发一封重置密码的邮件。点邮件里的链接回到这里，就可以设置新密码。</p>
       <input type="email" name="email" placeholder="邮箱" autocomplete="email" required>
