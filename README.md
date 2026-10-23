@@ -1,6 +1,6 @@
 # 日语道场 · Nihongo Dojo
 
-免费的日语学习网站，从五十音一直到 JLPT N1。打开即用，不需要注册。
+免费的日语学习网站，从五十音一直到 JLPT N1。用邮箱或 Google 账号登录，学习进度自动云端同步，也可以添加到手机主屏幕当 App 用。
 
 **在线使用：** https://koshokai.github.io/nihonggo-dojo/
 

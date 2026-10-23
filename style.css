@@ -564,7 +564,7 @@ body.on-dict .gsearch { display: none; }
 .acc-form { display: grid; gap: 10px; max-width: 420px; }
 .acc-form input, .word-sheet textarea, .word-sheet input[type=text] { font: inherit; font-size: max(16px, 1em); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); width: 100%; box-sizing: border-box; }
 .acc-form input:focus, .word-sheet textarea:focus, .word-sheet input[type=text]:focus { outline: none; border-color: var(--ai); }
-.foot [data-feedback-link] { margin-left: 8px; color: var(--ai); }
+.foot a { margin-left: 8px; color: var(--ai); }
 
 /* ---------- 安装与分享 ---------- */
 .inst-steps { margin: 0; padding-left: 22px; display: grid; gap: 6px; line-height: 1.6; }
