@@ -1261,26 +1261,60 @@ async function doInstall() {
   if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice; if (r.outcome === 'accepted') installEvt = null; return; }
   installGuide();
 }
+// 安卓上 Chrome、Edge、三星浏览器能一键安装（beforeinstallprompt）；国产浏览器和微信不支持，只能按它们自己的菜单添加到桌面
+function androidBrowser() {
+  const ua = navigator.userAgent;
+  if (/MicroMessenger/i.test(ua)) return 'wechat';
+  if (/HuaweiBrowser|HonorBrowser/i.test(ua)) return 'huawei';
+  if (/MiuiBrowser|XiaoMi/i.test(ua)) return 'xiaomi';
+  if (/HeyTapBrowser|OppoBrowser/i.test(ua)) return 'oppo';
+  if (/VivoBrowser/i.test(ua)) return 'vivo';
+  if (/UCBrowser|Quark/i.test(ua)) return 'uc';
+  if (/MQQBrowser/i.test(ua)) return 'qqbrowser';
+  if (/SamsungBrowser/i.test(ua)) return 'samsung';
+  if (/Firefox/i.test(ua)) return 'firefox';
+  if (/EdgA/i.test(ua)) return 'edge';
+  return 'chrome';
+}
 function installGuide() {
   closeSheet();
-  const ios = isIOS();
+  const ios = isIOS(), br = ios ? '' : androidBrowser();
+  const inApp = /MicroMessenger| QQ\//i.test(navigator.userAgent);
+  const menu = {
+    huawei: ['华为 / 荣耀浏览器', '点屏幕下方的 <b>≡</b> 菜单', '点 <b>添加至</b> → <b>桌面</b>（有的版本叫「添加快捷方式到桌面」）'],
+    xiaomi: ['小米浏览器', '点屏幕下方的 <b>≡</b> 菜单', '点 <b>添加到桌面</b>（有的版本在「工具箱」里）'],
+    oppo: ['OPPO / 一加浏览器', '点屏幕下方的 <b>≡</b> 菜单', '点 <b>添加到</b> → <b>桌面</b>'],
+    vivo: ['vivo 浏览器', '点屏幕下方的 <b>≡</b> 菜单', '点 <b>添加到桌面</b>'],
+    uc: ['UC / 夸克浏览器', '点屏幕下方的 <b>≡</b> 菜单', '点 <b>添加到桌面</b>（夸克在「工具」→「添加到桌面」）'],
+    qqbrowser: ['QQ 浏览器', '点屏幕下方的 <b>≡</b> 菜单', '点 <b>添加到桌面</b>'],
+    samsung: ['三星浏览器', '点屏幕下方的 <b>≡</b> 菜单', '点 <b>添加页面到</b> → <b>主屏幕</b>'],
+    firefox: ['Firefox', '点右上角 <b>⋮</b> 菜单', '点 <b>安装</b>（或「添加到主屏幕」）'],
+    edge: ['Edge', '点屏幕下方的 <b>≡</b> 菜单', '点 <b>添加到手机</b>（或「安装应用」）'],
+    chrome: ['Chrome', '点右上角 <b>⋮</b> 菜单', '点 <b>安装应用</b>（或「添加到主屏幕」）']
+  }[br];
   const sh = h(`<div class="word-sheet" role="dialog" aria-label="安装到手机">
     <button class="ws-x" type="button" aria-label="关闭">×</button>
     <b>把日语道场装到手机上</b>
-    ${ios ? `<ol class="inst-steps">
-      <li>用 <b>Safari</b> 打开本站（微信里打开的话，先点右上角「…」→「在浏览器中打开」）</li>
+    ${inApp ? `<ol class="inst-steps">
+      <li>微信 / QQ 里不能添加到桌面。点右上角 <b>…</b>，选 <b>在浏览器中打开</b></li>
+      <li>或者点下面的按钮复制链接，粘贴到手机自带的浏览器里打开</li>
+      <li>在浏览器里打开后，再点一次「安装到手机」，会告诉你那个浏览器怎么装</li></ol>
+      <div class="row"><button class="btn pri" type="button" data-copy>复制链接</button></div>`
+    : ios ? `<ol class="inst-steps">
+      <li>用 <b>Safari</b> 打开本站</li>
       <li>点屏幕下方的 <b>分享</b> 按钮 <span class="inst-ic">⬆︎</span></li>
       <li>往下滑，点 <b>添加到主屏幕</b></li>
       <li>点右上角 <b>添加</b>，主屏幕上就出现日语道场的图标了</li></ol>`
-    : `<ol class="inst-steps">
-      <li>用 <b>Chrome</b> 打开本站（微信里打开的话，先点右上角「…」→「在浏览器中打开」）</li>
-      <li>点右上角 <b>⋮</b> 菜单</li>
-      <li>点 <b>安装应用</b>（或「添加到主屏幕」）</li>
-      <li>确认后，桌面上就出现日语道场的图标了</li></ol>`}
+    : `<p class="small">你现在用的是 <b>${menu[0]}</b>：</p>
+      <ol class="inst-steps"><li>${menu[1]}</li><li>${menu[2]}</li><li>确认后，桌面上就出现日语道场的图标了</li></ol>
+      <p class="small muted">点了没反应、桌面上没出现图标？安卓手机要允许浏览器「创建桌面快捷方式」：<b>设置 → 应用 → 这个浏览器 → 权限</b>，打开「桌面快捷方式」。</p>
+      ${['chrome', 'edge', 'samsung'].includes(br) ? '' : '<p class="small muted">最省事的是装 <b>Chrome</b> 或 <b>Edge</b> 浏览器：打开本站后点「安装到手机」，一键就装好。</p>'}`}
     <div class="small muted">装好以后全屏打开、可以离线使用，进度和网页版是同一份。</div>
   </div>`);
   document.body.append(sh);
   sh.querySelector('.ws-x').onclick = closeSheet;
+  const cp = sh.querySelector('[data-copy]');
+  if (cp) cp.onclick = e => { e.stopPropagation(); navigator.clipboard.writeText(SITE_URL).then(() => toast('链接已复制，去浏览器里粘贴打开'), () => toast(SITE_URL)); };
 }
 function installPanel() {
   const p = h(`<section class="panel"><h2>安装到手机 · 分享</h2>
