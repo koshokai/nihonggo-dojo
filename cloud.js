@@ -8,7 +8,7 @@ function cloudClient() {
   if (!sbLoading) {
     sbLoading = new Promise((ok, fail) => {
       const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js';
       s.onload = () => { sb = window.supabase.createClient(CLOUD.url, CLOUD.anonKey, { auth: { persistSession: true, autoRefreshToken: true } }); ok(sb); };
       s.onerror = () => { sbLoading = null; fail(new Error('无法连接服务器')); };
       document.head.append(s);

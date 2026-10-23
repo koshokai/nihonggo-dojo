@@ -77,20 +77,22 @@ grant execute on function public.delete_my_account() to authenticated;
 
 ## 5. 把两个值告诉网站
 
-1. 左侧 **Project Settings**（齿轮）→ **Data API**（或 **API**），复制：
-   - **Project URL**，形如 `https://abcdefghijkl.supabase.co`
-   - **Project API keys** 里的 **anon public**（一长串以 `eyJ` 开头）
-2. 把这两个值发给我，或者自己填进仓库里的 `config.js`：
+1. **Project URL**：左下角齿轮 **Project Settings** → **Data API**，页面上的 **API URL**
+   （形如 `https://abcdefghijkl.supabase.co/rest/v1/`）去掉末尾的 `/rest/v1/` 就是。
+2. **Publishable key**：**Project Settings** → **API Keys**，复制 **Publishable key**（以 `sb_publishable_` 开头）。
+   - 如果有 **Legacy API Keys** 标签页，里面的 **anon public**（以 `eyJ` 开头）也可以用，二选一。
+3. 把这两个值发给我，或者自己填进仓库里的 `config.js`：
 
 ```js
 const CLOUD = {
   url: 'https://abcdefghijkl.supabase.co',
-  anonKey: 'eyJhbGciOi...'
+  anonKey: 'sb_publishable_...'
 };
 ```
 
-**anon key 可以公开**：它本来就会出现在网页里，数据安全由第 3 步的行级权限保证——每个人只能读写自己的进度，
-反馈只能提交、不能读取。**绝对不要**把 **service_role** key 填进网站或发给任何人。
+**Publishable key 可以公开**：它本来就会出现在网页里，数据安全由第 3 步的行级权限保证——每个人只能读写自己的进度，
+反馈只能提交、不能读取。**绝对不要**把 **Secret key**（`sb_secret_…`）或旧版的 **service_role** key
+填进网站或发给任何人。
 
 ## 6. 看用户反馈
 
