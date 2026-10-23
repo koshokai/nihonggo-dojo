@@ -126,14 +126,19 @@ Supabase 免费版自带的邮件服务**每小时只能发很少几封**，只�
 
 ### 7.3 Google 一键登录（可选）
 
-1. 打开 <https://console.cloud.google.com>，新建一个项目（名字随意）。
-2. **APIs & Services → OAuth consent screen**：User type 选 **External**，填应用名「日语道场」和你的邮箱，保存。
-3. **APIs & Services → Credentials → Create credentials → OAuth client ID**：
+Google 后台现在叫 **Google Auth Platform**，直接用下面的链接打开（顶部先选好项目，没有就新建一个）：
+
+1. <https://console.cloud.google.com/auth/overview>：第一次会显示 **Get started**。App name 填「日语道场」，选支持邮箱；
+   Audience 选 **External**；填联系邮箱；勾选同意后 **Create**。
+2. <https://console.cloud.google.com/auth/clients>：点 **+ Create client**。
    - Application type：**Web application**
-   - Authorized redirect URIs：填 `https://tpwljbzjixdggqjsgltf.supabase.co/auth/v1/callback`
-4. 创建后复制 **Client ID** 和 **Client secret**。
-5. 回到 Supabase：**Authentication → Sign In / Providers → Google**，打开开关，粘贴这两个值，保存。
-6. 告诉我，我把 `config.js` 里的 `google` 改成 `true`，登录页就会出现「用 Google 登录」。
+   - Authorized redirect URIs → **+ Add URI**：`https://tpwljbzjixdggqjsgltf.supabase.co/auth/v1/callback`
+     （Authorized JavaScript origins 不用填）
+   - **Create**，复制弹窗里的 **Client ID** 和 **Client secret**（secret 只完整显示这一次）。
+3. <https://console.cloud.google.com/auth/audience>：发布状态是 **Testing** 时点 **Publish app**，否则只有测试用户能登录。
+   只用邮箱和基本资料，不需要 Google 审核。
+4. Supabase：**Authentication → Sign In / Providers → Google**，打开开关，粘贴 Client ID 和 Client secret，保存。
+5. 把 `config.js` 里的 `google` 改成 `true`（或者告诉我），登录页就会出现「用 Google 登录」。
 
 > Client secret 只填在 Supabase 后台，**不要**发给任何人，也不要放进网站代码。
 
