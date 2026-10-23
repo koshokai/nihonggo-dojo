@@ -598,3 +598,4 @@ body.gated { overflow: hidden; }
 .auth-foot { margin: 0; text-align: center; }
 .acc-form .btn.small { justify-self: start; padding: 4px 6px; min-height: 0; }
 .otp-row input { letter-spacing: .4em; text-align: center; font-size: 1.3rem !important; }
+.auth-note { margin: -4px 0 0; text-align: center; }

@@ -8,7 +8,7 @@ function cloudClient() {
   if (!sbLoading) {
     sbLoading = new Promise((ok, fail) => {
       const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js';
+      s.src = 'vendor/supabase.js';   // 放在本站：jsDelivr 在中国大陆经常连不上
       s.onload = () => { sb = window.supabase.createClient(CLOUD.url, CLOUD.anonKey, { auth: { persistSession: true, autoRefreshToken: true } }); ok(sb); };
       s.onerror = () => { sbLoading = null; fail(new Error('无法连接服务器')); };
       document.head.append(s);
@@ -242,7 +242,7 @@ function authScreen(mode = 'login') {
     ${tabs}
     <form class="acc-form" data-af novalidate>${forms[mode]}</form>
     <p class="small auth-msg" data-msg role="status"></p>
-    ${['login', 'signup', 'otp'].includes(mode) && CLOUD.google ? '<div class="auth-or"><span>或者</span></div><button class="btn big google-btn" type="button" data-google><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9h-4v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.7V6.6h-4a12 12 0 0 0 0 10.9l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"/></svg>用 Google 登录</button>' : ''}
+    ${['login', 'signup', 'otp'].includes(mode) && CLOUD.google ? '<div class="auth-or"><span>或者</span></div><button class="btn big google-btn" type="button" data-google><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9h-4v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.7V6.6h-4a12 12 0 0 0 0 10.9l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"/></svg>用 Google 登录</button><p class="small muted auth-note">中国大陆网络无法使用 Google 登录，请用邮箱注册。</p>' : ''}
     ${['login', 'signup', 'otp'].includes(mode) ? '<p class="small muted auth-foot">登录后学习进度会自动同步到云端。<a href="privacy.html" target="_blank">隐私政策</a></p>' : ''}
   </div>`;
   const form = host.querySelector('[data-af]'), msg = host.querySelector('[data-msg]');
