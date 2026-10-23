@@ -41,6 +41,8 @@ jobs:
           which ffmpeg || (sudo apt-get update -q && sudo apt-get install -yq ffmpeg)
           git config user.name "voicevox-bot"
           git config user.email "voicevox-bot@users.noreply.github.com"
+          # 触发时的版本之后，main 上可能又多了音频提交（例如上一次被取消的任务），先同步，避免中途提交时冲突
+          git pull -q --rebase origin main
       - name: Generate
         run: |
           ARGS="${{ github.event.inputs.mode }}"
