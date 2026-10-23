@@ -573,3 +573,28 @@ body.on-dict .gsearch { display: none; }
 .share-box img { border-radius: 12px; border: 1px solid var(--line); background: #fff; }
 .share-box > div { flex: 1; min-width: 180px; }
 .share-box a { overflow-wrap: anywhere; }
+
+/* ---------- 登录 / 注册 ---------- */
+body.gated { overflow: hidden; }
+.auth-gate { position: fixed; inset: 0; z-index: 100; background: linear-gradient(160deg, var(--paper) 0%, var(--ai-soft) 100%); display: grid; place-items: center; padding: 16px; overflow-y: auto; }
+.auth-card { width: min(420px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 20px 60px -20px rgba(60, 20, 40, .35); padding: 26px 22px; display: grid; gap: 12px; position: relative; }
+.auth-sheet { padding: 0; border: 0; background: transparent; box-shadow: none; }
+.auth-sheet .auth-card { width: 100%; }
+.auth-brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.1rem; color: var(--ai); }
+.auth-brand .neko { width: 44px; height: 48px; }
+.auth-card h2 { margin: 0; font-size: 1.4rem; }
+.auth-tabs { display: grid; grid-template-columns: repeat(3, 1fr); border-radius: 14px; }
+.auth-tabs button { padding: 8px 4px; }
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 64px !important; }
+.pw-eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: transparent; color: var(--ai); font: inherit; font-size: .85rem; cursor: pointer; padding: 6px 8px; }
+.agree { display: flex; gap: 6px; align-items: center; }
+.agree input { width: auto !important; }
+.auth-msg { min-height: 1.2em; color: var(--bad); margin: 0; }
+.auth-msg.ok { color: var(--ok); }
+.auth-or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .85rem; }
+.auth-or::before, .auth-or::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+.google-btn { gap: 10px; }
+.auth-foot { margin: 0; text-align: center; }
+.acc-form .btn.small { justify-self: start; padding: 4px 6px; min-height: 0; }
+.otp-row input { letter-spacing: .4em; text-align: center; font-size: 1.3rem !important; }

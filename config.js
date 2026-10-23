@@ -3,5 +3,7 @@
 // Publishable key 本来就是公开的（网页里任何人都能看到），数据安全靠数据库的行级权限（RLS），不靠保密这个 key。
 const CLOUD = {
   url: 'https://tpwljbzjixdggqjsgltf.supabase.co',
-  anonKey: 'sb_publishable_R4ZXdXpCjxuTg0iH7EXTbQ_tIg1HdLm'
+  anonKey: 'sb_publishable_R4ZXdXpCjxuTg0iH7EXTbQ_tIg1HdLm',
+  requireLogin: true,   // true：必须登录才能使用（上架 App Store 前建议改成 false，见 docs/SUPABASE_SETUP.md）
+  google: false         // 在 Supabase 开通 Google 登录后改成 true，登录页会出现「用 Google 登录」
 };

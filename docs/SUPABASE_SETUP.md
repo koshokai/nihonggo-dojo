@@ -99,6 +99,54 @@ const CLOUD = {
 左侧 **Table Editor** → **feedback**，按 `created_at` 倒序就是最新的反馈。`kind` 的含义：
 `bug` 出错了、`content` 内容有误、`idea` 建议、`other` 其他。`contact` 是用户自愿留的联系方式。
 
+## 7. 登录相关设置（必须登录模式）
+
+`config.js` 里 `requireLogin: true` 时，没登录看不到任何内容。下面几项决定注册和登录顺不顺：
+
+### 7.1 邮件额度（最重要）
+
+Supabase 免费版自带的邮件服务**每小时只能发很少几封**，只适合测试。注册确认、验证码、重置密码都要发邮件，用户一多就会卡住。二选一：
+
+- **简单做法：关掉注册确认。** **Authentication → Sign In / Providers → Email**，关闭 **Confirm email**。
+  用户填邮箱和密码就直接注册成功，不发邮件；只有「忘记密码」和「验证码登录」才发邮件。缺点是别人可以用不属于自己的邮箱注册。
+- **正式做法：接自己的邮件服务。** 例如 [Resend](https://resend.com)（每月 3000 封免费，需要你有一个自己的域名），
+  在 **Authentication → Emails → SMTP Settings** 填进去。之后额度在 **Authentication → Rate Limits** 里可以调高。
+
+### 7.2 验证码登录（6 位数字）
+
+**Authentication → Emails → Magic Link** 模板里加上验证码，例如把正文改成：
+
+```html
+<h2>日语道场 登录验证码</h2>
+<p>你的验证码是：<b style="font-size:24px">{{ .Token }}</b>（10 分钟内有效）</p>
+<p>也可以直接点这个链接登录：<a href="{{ .ConfirmationURL }}">登录日语道场</a></p>
+```
+
+**Confirm signup**（注册确认）和 **Reset Password**（重置密码）模板也可以改成中文或日文。
+
+### 7.3 Google 一键登录（可选）
+
+1. 打开 <https://console.cloud.google.com>，新建一个项目（名字随意）。
+2. **APIs & Services → OAuth consent screen**：User type 选 **External**，填应用名「日语道场」和你的邮箱，保存。
+3. **APIs & Services → Credentials → Create credentials → OAuth client ID**：
+   - Application type：**Web application**
+   - Authorized redirect URIs：填 `https://tpwljbzjixdggqjsgltf.supabase.co/auth/v1/callback`
+4. 创建后复制 **Client ID** 和 **Client secret**。
+5. 回到 Supabase：**Authentication → Sign In / Providers → Google**，打开开关，粘贴这两个值，保存。
+6. 告诉我，我把 `config.js` 里的 `google` 改成 `true`，登录页就会出现「用 Google 登录」。
+
+> Client secret 只填在 Supabase 后台，**不要**发给任何人，也不要放进网站代码。
+
+### 7.4 上架 App Store 前
+
+苹果审核规定（5.1.1）：App 的主要功能不需要账号时，不能强制注册；提供 Google 等第三方登录时，还必须同时提供「通过 Apple 登录」。
+所以上架苹果前，要么把 `requireLogin` 改成 `false`，要么加上 Apple 登录并说明必须登录的理由（例如云端同步学习记录）。
+
+### 7.5 微信登录
+
+微信开放平台的网站登录只对**中国大陆企业**开放（需企业资质认证），个人无法申请，Supabase 也不内置微信登录，所以暂时不做。
+在日本更常用的 LINE 登录可以以后再加（需要额外开发）。
+
 ## 免费版的限制
 
 - 项目 **一周没有任何访问会被暂停**，在 Supabase 后台点一下就能恢复，数据不会丢。网站有人用就不会暂停。
