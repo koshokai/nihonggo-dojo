@@ -112,17 +112,30 @@ Supabase 免费版自带的邮件服务**每小时只能发很少几封**，只�
 - **正式做法：接自己的邮件服务。** 例如 [Resend](https://resend.com)（每月 3000 封免费，需要你有一个自己的域名），
   在 **Authentication → Emails → SMTP Settings** 填进去。之后额度在 **Authentication → Rate Limits** 里可以调高。
 
-### 7.2 验证码登录（6 位数字）
+### 7.2 邮件里加上验证码（重要）
 
-**Authentication → Emails → Magic Link** 模板里加上验证码，例如把正文改成：
+Supabase 默认的邮件**只有链接、没有验证码**。装到桌面的版本点链接会跳到浏览器里，登录状态带不回桌面版，所以要在邮件里加上验证码，用户直接在 App 里填写。
+
+**Authentication → Emails → Templates**，下面两个模板都要改（改完点 **Save**）：
+
+**Confirm signup**（注册确认）：
+
+```html
+<h2>日语道场 注册验证码</h2>
+<p>你的验证码是：<b style="font-size:24px">{{ .Token }}</b></p>
+<p>回到日语道场的注册页面填写这个验证码，就完成注册了。</p>
+<p>也可以直接点这个链接：<a href="{{ .ConfirmationURL }}">完成注册</a></p>
+```
+
+**Magic Link**（验证码登录。新邮箱用「验证码登录」时，发的是上面的 Confirm signup）：
 
 ```html
 <h2>日语道场 登录验证码</h2>
-<p>你的验证码是：<b style="font-size:24px">{{ .Token }}</b>（10 分钟内有效）</p>
+<p>你的验证码是：<b style="font-size:24px">{{ .Token }}</b></p>
 <p>也可以直接点这个链接登录：<a href="{{ .ConfirmationURL }}">登录日语道场</a></p>
 ```
 
-**Confirm signup**（注册确认）和 **Reset Password**（重置密码）模板也可以改成中文或日文。
+**Reset Password**（重置密码）是链接，不用改，也可以把文字改成中文或日文。
 
 ### 7.3 Google 一键登录（可选）
 

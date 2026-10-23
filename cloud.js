@@ -252,7 +252,7 @@ function authScreen(mode = 'login') {
   const x = host.querySelector('[data-close]'); if (x) x.onclick = () => host.remove();
   const g = host.querySelector('[data-google]');
   if (g) g.onclick = async () => { const c = await cloudClient(); const { error } = await c.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: REDIRECT() } }); if (error) say(authMsg(error)); };
-  let otpSent = false;
+  let otpSent = false, signupEmail = '';
   form.onsubmit = async e => {
     e.preventDefault();
     const email = form.email ? form.email.value.trim() : '', pwd = form.pw ? form.pw.value : '';
@@ -273,9 +273,30 @@ function authScreen(mode = 'login') {
         if (r.error) throw r.error;
         if (r.data.user && r.data.user.identities && !r.data.user.identities.length) throw new Error('already registered');
         if (r.data.session) return afterLogin(r.data.user);
-        form.innerHTML = `<p>差一步！我们给 <b>${esc(email)}</b> 发了一封确认邮件，点里面的链接就完成注册了。</p><p class="small muted">没收到的话看看垃圾邮件文件夹。</p><button class="btn ghost small" type="button" data-mode="login">← 返回登录</button>`;
+        // 邮件里有链接，也有验证码（Supabase 的 Confirm signup 模板里要加 {{ .Token }}，见 docs/SUPABASE_SETUP.md 7.2）。
+        // 装到桌面的版本点链接会跳到浏览器里登录，所以优先让用户在这里填验证码。
+        form.innerHTML = `<p>差一步！我们给 <b>${esc(email)}</b> 发了一封确认邮件。</p>
+          <p class="small">把邮件里的<b>验证码</b>填在下面；邮件里只有链接的话，直接点链接也能完成注册。</p>
+          <input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="邮件里的验证码">
+          <button class="btn pri big" type="submit">完成注册</button>
+          <div class="row between"><button class="btn ghost small" type="button" data-resend>重新发送邮件</button><button class="btn ghost small" type="button" data-mode="login">← 返回登录</button></div>
+          <p class="small muted">没收到的话看看垃圾邮件文件夹。</p>`;
         form.querySelector('[data-mode]').onclick = () => authScreen('login');
+        form.querySelector('[data-resend]').onclick = async e => {
+          e.stopPropagation();
+          const r2 = await c.auth.resend({ type: 'signup', email, options: { emailRedirectTo: REDIRECT() } });
+          say(r2.error ? authMsg(r2.error) : '已重新发送，请查看邮箱。', !r2.error);
+        };
+        form.code.focus();
+        mode = 'signupcode'; signupEmail = email;
         return say('');
+      }
+      if (mode === 'signupcode') {
+        const code = form.code.value.replace(/\D/g, '');
+        if (code.length < 6) return say('请输入邮件里的验证码。');
+        const r = await c.auth.verifyOtp({ email: signupEmail, token: code, type: 'signup' });
+        if (r.error) throw r.error;
+        return afterLogin(r.data.user);
       }
       if (mode === 'otp') {
         if (!otpSent) {
@@ -287,7 +308,7 @@ function authScreen(mode = 'login') {
           return say('验证码已发送，请查看邮箱（也可以直接点邮件里的链接）。', true);
         }
         const code = form.code.value.replace(/\D/g, '');
-        if (code.length !== 6) return say('请输入 6 位验证码。');
+        if (code.length < 6) return say('请输入邮件里的验证码。');
         const r = await c.auth.verifyOtp({ email, token: code, type: 'email' });
         if (r.error) throw r.error;
         return afterLogin(r.data.user);
