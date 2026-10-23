@@ -53,12 +53,15 @@ function showSheet(text, hit, a) {
     <div class="row">
       ${hit && hit.v && hit.v.q ? `<button class="btn soft" type="button" data-add ${inDeck ? 'disabled' : ''}>${inDeck ? '已在单词卡' : '+ 单词卡'}</button>` : ''}
       <button class="btn" type="button" data-more>查看详情 →</button>
+      ${cloudOn() ? '<button class="btn ghost" type="button" data-report>报错</button>' : ''}
     </div>
   </div>`);
   document.body.append(sh);
   sh.querySelector('.ws-x').onclick = closeSheet;
   const add = sh.querySelector('[data-add]');
   if (add) add.onclick = () => { S.srs[hit.v.id] = { i: 0, e: 2.5, r: 0, due: Date.now() }; save(); add.textContent = '已加入'; add.disabled = true; toast(`「${hit.v.w}」已加入单词卡`); };
+  const rep = sh.querySelector('[data-report]');
+  if (rep) rep.onclick = () => feedbackSheet('content', `「${hit ? hit.w : text}」${hit && hit.zh ? '（' + hit.zh + '）' : ''}：`);
   sh.querySelector('[data-more]').onclick = () => {
     readReturn = a ? { hash: location.hash.slice(1), y: scrollY, title: a.title } : null;
     dictQuery = hit ? hit.w : text; dictDir = null;
@@ -189,7 +192,7 @@ function readArticle(a) {
   // 全文朗读：一句一句接着读，当前句高亮
   let playing = false;
   const playBtn = p.querySelector('[data-play]');
-  const stopPlay = () => { playing = false; playBtn.querySelector('span').textContent = '全文朗读'; if (hasTTS) speechSynthesis.cancel(); mark(-1); };
+  const stopPlay = () => { playing = false; playBtn.querySelector('span').textContent = '全文朗读'; stopSpeech(); mark(-1); };
   const playFrom = i => {
     if (!playing || i >= sents.length || !document.body.contains(p)) return stopPlay();
     mark(i); nodes[i].scrollIntoView({ block: 'nearest', behavior: 'smooth' });

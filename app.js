@@ -110,7 +110,7 @@ function migrateIds() {
     }
   }
 }
-const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: true, autoSpeak: true, lastBackup: 0, lastBackupXp: 0, stages: {}, games: {}, read: {}, biz: {} });
+const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: true, autoSpeak: true, lastBackup: 0, lastBackupXp: 0, stages: {}, games: {}, read: {}, biz: {}, voiceSrc: 'vv' });
 function load() {
   try { const t = localStorage.getItem(KEY); if (t) return Object.assign(blank(), JSON.parse(t)); } catch (e) { /* 浏览器禁用存储时从空进度开始 */ }
   return blank();
@@ -120,7 +120,9 @@ if (S.xp > 0) S.onboarded = true;
 migrateIds();
 let storageOk = true;
 function save() {
+  S.modAt = Date.now();
   try { localStorage.setItem(KEY, JSON.stringify(S)); storageOk = true; } catch (e) { storageOk = false; }
+  if (typeof cloudQueue === 'function') cloudQueue();   // 登录了账号就自动同步到云端
 }
 
 const dkey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -190,7 +192,33 @@ let warnedVoice = false;
 // Chrome 的已知问题：cancel() 之后马上 speak() 偶尔会被吞掉；长时间不用后引擎会卡在暂停状态；
 // utterance 被回收后会中途没声音。所以：保留引用、先 resume()、正在读时隔一小会儿再读，没开始就重试一次。
 let curUtt = null, speakSeq = 0;
+// VOICEVOX 预生成的音频（audio/index-*.json：朗读文本 → mp3）。有就优先播放，没有或加载失败退回浏览器朗读。
+const AUDIO_IDX = {};
+let curAudio = null;
+['words', 'daily'].forEach(n => fetch(`audio/index-${n}.json`).then(r => r.ok ? r.json() : {}).then(d => Object.assign(AUDIO_IDX, d)).catch(() => {}));
+function stopSpeech() {
+  if (curAudio) { curAudio.onended = curAudio.onerror = null; curAudio.pause(); curAudio = null; }
+  if (hasTTS) speechSynthesis.cancel();
+}
 function speak(text, opts = {}) {
+  const file = S.voiceSrc !== 'tts' && AUDIO_IDX[text];
+  if (file) {
+    stopSpeech(); ++speakSeq;
+    const a = new Audio('audio/' + file);
+    // 语速设置是给浏览器朗读定的（默认 0.8）；真人音频本来就慢一些，整体上调 0.2
+    a.playbackRate = Math.min(1.5, Math.max(0.5, (opts.rate || S.rate) + 0.2));
+    let fell = false;
+    const fallback = () => { if (fell) return; fell = true; curAudio = null; speakTTS(text, opts); };
+    a.onended = () => { if (curAudio === a) curAudio = null; if (opts.onend) opts.onend(); };
+    a.onerror = fallback;
+    curAudio = a;
+    a.play().catch(fallback);
+    return;
+  }
+  if (curAudio) { curAudio.pause(); curAudio = null; }
+  speakTTS(text, opts);
+}
+function speakTTS(text, opts = {}) {
   if (!hasTTS) { if (!warnedVoice) { warnedVoice = true; toast('这个浏览器不支持朗读'); } return; }
   const clean = text.replace(/[～~＿[\]]/g, '');
   const seq = ++speakSeq;
@@ -1154,11 +1182,13 @@ function viewMe() {
   const cur = currentVoice();
   const voiceP = h(`<section class="panel"><h2>发音</h2>
     <div class="row between"><span>语速</span><div class="seg">${opt([[.6, '很慢'], [.8, '慢'], [.95, '正常']], S.rate, 'data-rate')}</div></div>
+    <div class="row between"><span>发音来源</span><div class="seg">${opt([['vv', '真人感（VOICEVOX）'], ['tts', '设备自带']], S.voiceSrc || 'vv', 'data-vsrc')}</div></div>
     <div class="row between"><span>翻卡和答题后自动朗读</span><div class="seg">${opt([[1, '开'], [0, '关']], S.autoSpeak ? 1 : 0, 'data-auto')}</div></div>
     <div class="row between"><label for="voice-sel">语音</label><div class="row"><select id="voice-sel" ${vs.length ? '' : 'disabled'}>${vs.length ? vs.map(v => `<option value="${esc(v.name)}" ${cur && cur.name === v.name ? 'selected' : ''}>${esc(v.name)}</option>`).join('') : '<option>没有找到日语语音</option>'}</select><button class="btn" type="button" data-try>试听</button></div></div>
-    <p class="small muted">发音来自你设备自带的语音，不同设备差别很大。名字里带 Natural、Online 或 Google 的通常更自然（例如 Edge 浏览器的 Nanami Online）。手机上没有日语语音时，可以在系统设置的「文字转语音」里下载日语语音。</p>
+    <p class="small muted">单词和今日一句优先使用 VOICEVOX 预先生成的真人感发音；其余句子和没有音频的内容使用设备自带的语音，不同设备差别很大。名字里带 Natural、Online 或 Google 的通常更自然（例如 Edge 浏览器的 Nanami Online）。手机上没有日语语音时，可以在系统设置的「文字转语音」里下载日语语音。</p>
   </section>`);
   voiceP.querySelectorAll('[data-rate]').forEach(b => { b.onclick = () => { S.rate = +b.dataset.rate; save(); speak('きょうも がんばりましょう。'); render(); }; });
+  voiceP.querySelectorAll('[data-vsrc]').forEach(b => { b.onclick = () => { S.voiceSrc = b.dataset.vsrc; save(); render(); }; });
   voiceP.querySelectorAll('[data-auto]').forEach(b => { b.onclick = () => { S.autoSpeak = b.dataset.auto === '1'; save(); render(); }; });
   voiceP.querySelector('#voice-sel').onchange = e => { S.voice = e.target.value; save(); speak('こんにちは。いっしょに にほんごを べんきょうしましょう。'); };
   voiceP.querySelector('[data-try]').onclick = () => speak('こんにちは。いっしょに にほんごを べんきょうしましょう。');
@@ -1203,11 +1233,13 @@ function viewMe() {
   const about = h(`<section class="panel"><h2>关于内容</h2>
     <p class="small">单词约 8,000 个、汉字 2,211 个、语法 176 个句型，覆盖 JLPT N5–N1。中文释义和例句由本站编写，未经专业审核，备考时请配合官方真题和教材。发音使用浏览器自带的日语语音。</p>
     <p class="small muted">数据来源：单词表 <a href="https://github.com/jamsinclair/open-anki-jlpt-decks" target="_blank" rel="noopener">open-anki-jlpt-decks</a>（MIT），基于 <a href="http://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller 的 JLPT 资料</a>（CC BY）；汉字 <a href="https://github.com/davidluzgouveia/kanji-data" target="_blank" rel="noopener">kanji-data</a>（MIT）与 KANJIDIC；词典英文释义 <a href="https://www.edrdg.org/jmdict/j_jmdict.html" target="_blank" rel="noopener">JMdict</a>（EDRDG，CC BY-SA 4.0）。</p>
+    <p class="small muted">音声：<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>:冥鳴ひまり（<a href="https://meimeihimari.wixsite.com/himari/terms-of-use" target="_blank" rel="noopener">利用規約</a>）。</p>
     <div class="list-wrap"><table class="list"><thead><tr><th>级别</th><th>单词</th><th>汉字</th><th>语法</th></tr></thead><tbody>${counts}</tbody></table></div>
   </section>`);
   const ps = bk.querySelector('[data-persist]');
   requestPersist().then(ok => { ps.innerHTML = ok ? '<span class="tag done">已开启</span> 浏览器已同意持久保存，空间不足时也不会自动清理这里的数据。' : '<span class="tag">未开启</span> 这个浏览器没有同意持久保存，建议添加到主屏幕并定期备份。'; });
-  main.append(p, voiceP, bk, about);
+  const acc = accountPanel();
+  main.append(...[p, acc, voiceP, bk, about].filter(Boolean));
 }
 
 /* ---------- 启动 ---------- */
@@ -1215,6 +1247,7 @@ applyTheme();
 checkBadges();
 render();
 initGlobalSearch();
+cloudInit();
 startPetals();
 if (S.onboarded) requestPersist();
 // 例句库有 3 MB 多，等页面出来以后再在后台加载；加载完后单词页、词典页刷新一下就能看到

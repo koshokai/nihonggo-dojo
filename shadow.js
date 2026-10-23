@@ -71,7 +71,7 @@ function shadowSheet(jp, kana, zh) {
   };
   const start = async () => {
     if (active) return stopAll();
-    if (hasTTS) speechSynthesis.cancel();
+    stopSpeech();
     heard = ''; active = true;
     recBtn.querySelector('span').textContent = '停止'; recBtn.classList.add('live');
     res.innerHTML = '请说……';

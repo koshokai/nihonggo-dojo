@@ -47,7 +47,7 @@ function bindLines(p, list) {
   const mark = i => nodes.forEach((n, j) => n.classList.toggle('now', j === i));
   let playing = false;
   const playBtn = p.querySelector('[data-play]');
-  const stop = () => { playing = false; if (playBtn) playBtn.querySelector('span').textContent = '全文朗读'; if (hasTTS) speechSynthesis.cancel(); mark(-1); };
+  const stop = () => { playing = false; if (playBtn) playBtn.querySelector('span').textContent = '全文朗读'; stopSpeech(); mark(-1); };
   nodes.forEach((n, i) => {
     const go = e => { const hidden = n.closest('.hide-jp:not(.shown)'); const sm = p.querySelector('[data-shadowmode]'); if (!(sm && sm.checked) && !hidden && e && (e.target.closest('.wd') || String(getSelection()).trim())) return; if (sm && sm.checked) { e && e.stopPropagation(); stop(); n.closest('.bubble-line')?.classList.add('shown'); mark(i); return shadowSheet(n.querySelector('.ra-jp').textContent, list[i], n.querySelector('.ra-zh').textContent); } stop(); n.classList.add('open'); n.closest('.bubble-line')?.classList.add('shown'); mark(i); speak(list[i], { onend: () => mark(-1) }); };
     n.onclick = go; n.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } };
