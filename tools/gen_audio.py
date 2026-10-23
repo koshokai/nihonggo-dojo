@@ -59,7 +59,7 @@ def mora_text(q):
     return ''.join(m['text'] for ap in q['accent_phrases'] for m in ap['moras'])
 
 
-def synth(engine, speaker, surface, kana, speed=1.0):
+def synth(engine, speaker, surface, kana, speed=1.0, style=None):
     """先用汉字原文（重音更自然），读音和我们的假名对不上时改用假名，避免读错。"""
     q = api(engine, '/audio_query', {'text': surface, 'speaker': speaker})
     used = 'surface'
@@ -67,6 +67,7 @@ def synth(engine, speaker, surface, kana, speed=1.0):
         q = api(engine, '/audio_query', {'text': kana, 'speaker': speaker})
         used = 'kana'
     q['speedScale'] = speed
+    q.update(style or {})
     q['outputSamplingRate'] = 24000
     wav = api(engine, '/synthesis', {'speaker': speaker}, body=q, raw=True)
     return wav, used
@@ -149,6 +150,9 @@ def commit(msg):
 
 # 听力题的声音（都是可以商用、只需注明「VOICEVOX:角色名」的角色，见 audio/samples/speakers.json）
 LISTEN_VOICES = {'N': 16, 'F': 14, 'M': 11, 'F2': 8, 'M2': 52}   # 九州そら 冥鳴ひまり 玄野武宏 春日部つむぎ 雀松朱司
+# 对话角色抑扬顿挫大一点、句首句尾留一点气口，听起来更像说话而不是念稿；旁白保持平稳
+LISTEN_STYLE = {'talk': {'intonationScale': 1.25, 'prePhonemeLength': 0.05, 'postPhonemeLength': 0.15},
+                'N': {'intonationScale': 1.05, 'prePhonemeLength': 0.05, 'postPhonemeLength': 0.1}}
 
 
 def listen(engine, commit_every=0):
@@ -164,7 +168,8 @@ def listen(engine, commit_every=0):
             pcm, rate = b'', 24000
             try:
                 for spk, text, pause in segs(x):
-                    wav, _ = synth(engine, LISTEN_VOICES[spk], text, '', 1.0 if spk == 'N' else SPEED[L])
+                    wav, _ = synth(engine, LISTEN_VOICES[spk], text, '', 1.0 if spk == 'N' else SPEED[L],
+                                   LISTEN_STYLE['N' if spk == 'N' else 'talk'])
                     with wave.open(BytesIO(wav)) as w:
                         rate = w.getframerate()
                         pcm += w.readframes(w.getnframes())
@@ -185,7 +190,10 @@ def listen(engine, commit_every=0):
             if commit_every and n % commit_every == 0:
                 commit(f'audio: listen +{commit_every}')
     live = {x['id'] for lst in items().values() for x in lst}
-    idx = {k: v for k, v in idx.items() if k in live}      # 改过台词的旧音频不再引用
+    idx = {k: v for k, v in idx.items() if k in live}      # 改过台词或参数的旧音频删掉
+    for f in (OUT / 'listen').glob('*.mp3'):
+        if f.stem not in live:
+            f.unlink()
     idx_path.write_text(json.dumps(idx, ensure_ascii=False, indent=0), encoding='utf-8')
     print(f'listen: {n} new files, index {len(idx)}')
 

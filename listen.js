@@ -41,7 +41,7 @@ function lsSegs(x) {
 
 // 播放一题。返回 stop()。onend 在完整播完时调用。
 let lsStop = null;
-function lsPlay(x, L, { slow = false, onend } = {}) {
+function lsPlay(x, L, { slow = false, onend, onTTS } = {}) {
   if (lsStop) lsStop();
   stopSpeech();
   let dead = false, timer = 0, audio = null;
@@ -50,6 +50,7 @@ function lsPlay(x, L, { slow = false, onend } = {}) {
   const done = () => { if (!dead) { dead = true; if (lsStop === stop) lsStop = null; if (onend) onend(); } };
   const viaTTS = () => {
     if (!hasTTS) { toast('这个浏览器不支持朗读'); return done(); }
+    if (onTTS) onTTS();
     const vs = jaVoices(), male = vs.find(v => /ichiro|otoya|keita|hattori|male|男/i.test(v.name));
     const segs = lsSegs(x);
     const next = k => {
@@ -61,7 +62,8 @@ function lsPlay(x, L, { slow = false, onend } = {}) {
       u.rate = (spk === 'N' ? 1 : LRATE[L]) * (slow ? .8 : 1);
       const isM = spk[0] === 'M';
       u.voice = (isM && male) || currentVoice() || null;
-      u.pitch = spk === 'N' ? 1 : isM ? (male ? 1 : .55) : spk === 'F2' ? 1.45 : 1.2;
+      // 音调只轻微区分：压得太低或抬得太高，设备语音会变得很怪
+      u.pitch = spk === 'N' || (isM && male) ? 1 : isM ? (spk === 'M2' ? .8 : .88) : spk === 'F2' ? 1.12 : 1.04;
       u.onend = u.onerror = () => { if (!dead) timer = setTimeout(() => next(k + 1), pause * 1000); };
       speechSynthesis.speak(u);
     };
@@ -150,7 +152,8 @@ function runListen(qs, L, { exam = false, title, again }) {
     const spoken = LSPOKEN[x.t];
     stage.innerHTML = `<div class="q-prompt pop"><div class="eyebrow">${LTYPE[x.t][0]}</div><div class="small muted">${LTYPE[x.t][1]}</div>
       <div class="ls-player"><button class="btn pri ls-play" type="button" data-play>▶ 播放</button>
-      ${exam ? '<span class="small muted">考试模式：只能听一遍</span>' : '<label class="small"><input type="checkbox" data-slow> 慢速</label>'}</div></div>
+      ${exam ? '<span class="small muted">考试模式：只能听一遍</span>' : '<label class="small"><input type="checkbox" data-slow> 慢速</label>'}</div>
+      <div class="small muted" data-ttsnote hidden>这道题的真人语音还在制作中，暂时用手机自带的朗读，声音会比较生硬。</div></div>
       <div class="opts">${x.c.map((c, j) => `<button class="opt" type="button" data-o="${j}"><span class="k">${j + 1}</span><span lang="ja">${spoken ? '' : esc(c)}</span></button>`).join('')}</div>
       <div data-fb></div>`;
     const btn = stage.querySelector('[data-play]');
@@ -162,7 +165,7 @@ function runListen(qs, L, { exam = false, title, again }) {
       if (playing) { if (lsStop) lsStop(); playing = false; played = true; return setBtn(); }
       if (exam && played) return;
       playing = true; played = true; setBtn();
-      lsPlay(x, L, { slow, onend: () => { playing = false; setBtn(); } });
+      lsPlay(x, L, { slow, onend: () => { playing = false; setBtn(); }, onTTS: () => { const n = stage.querySelector('[data-ttsnote]'); if (n && S.voiceSrc !== 'tts') n.hidden = false; } });
     };
     const sl = stage.querySelector('[data-slow]');
     if (sl) sl.onchange = () => { slow = sl.checked; };

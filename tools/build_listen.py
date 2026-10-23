@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / 'tools' / 'listen'
 LEVELS = ['N5', 'N4', 'N3', 'N2', 'N1']
 SPEED = {'N5': 0.9, 'N4': 0.95, 'N3': 1.0, 'N2': 1.05, 'N1': 1.1}   # 对话语速；旁白一直是 1.0
+AUDIO_VER = 2   # 合成参数（gen_audio.py 的 LISTEN_STYLE）改了就加一，所有题重新生成
 SPOKEN = {'gaiyou', 'hatsuwa', 'sokuji'}                           # 选项只朗读、不显示
 NUM = ['いち', 'に', 'さん', 'よん']
 OTHER = {'M': 'F', 'F': 'M', 'M2': 'F', 'F2': 'M'}
@@ -45,7 +46,7 @@ def items():
             continue
         lst = []
         for x in json.loads(f.read_text(encoding='utf-8')):
-            key = json.dumps([segs(x), SPEED[L]], ensure_ascii=False)
+            key = json.dumps([segs(x), SPEED[L], AUDIO_VER], ensure_ascii=False)
             x = dict(x, id=f'{L}-' + hashlib.sha1(key.encode()).hexdigest()[:10])
             lst.append(x)
         out[L] = lst
