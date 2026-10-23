@@ -806,6 +806,12 @@ function viewHome() {
 
   const mood = pct >= 1 ? ['wow', 'すごい！今日の目標達成！', '今天的目标完成啦，给你盖个小红花。'] : tx > 0 ? ['happy', 'いい調子！', `再拿 ${S.goal - tx} 经验就完成今天的目标。`] : s > 0 ? ['happy', `${s}日連続！`, '今天也来学一点，别让连续打卡断掉哦。'] : ['happy', greet, '每天十分钟，从今天开始吧。'];
   main.append(h(`<div class="welcome-hi">${neko(mood[0], 'wave')}<div class="bubble"><b lang="ja">${mood[1]}</b><span>${mood[2]}</span></div></div>`));
+  if (!isStandalone() && S.xp >= 30 && !S.installHint) {
+    const ib = h(`<section class="banner"><div><b>把日语道场装到手机上</b><div class="small">像 App 一样从主屏幕打开，没有网络也能学。</div></div><div class="row"><button class="btn pri" type="button" data-i>安装</button><button class="btn ghost" type="button" data-x>不用了</button></div></section>`);
+    ib.querySelector('[data-i]').onclick = e => { e.stopPropagation(); doInstall(); };
+    ib.querySelector('[data-x]').onclick = () => { S.installHint = 1; save(); ib.remove(); };
+    main.append(ib);
+  }
   if (needBackup()) {
     const bn = h(`<section class="banner"><div><b>记得备份一下</b><div class="small">你已经攒了 ${S.xp} 经验、学过 ${learnedN} 个单词。进度存在这个浏览器里，清理浏览器数据或换设备前先备份，就不怕丢。</div></div><div class="row"><button class="btn pri" type="button" data-bk>下载备份</button><button class="btn ghost" type="button" data-later>过几天再说</button></div></section>`);
     bn.querySelector('[data-bk]').onclick = () => { downloadBackup(); bn.remove(); };
@@ -1239,7 +1245,60 @@ function viewMe() {
   const ps = bk.querySelector('[data-persist]');
   requestPersist().then(ok => { ps.innerHTML = ok ? '<span class="tag done">已开启</span> 浏览器已同意持久保存，空间不足时也不会自动清理这里的数据。' : '<span class="tag">未开启</span> 这个浏览器没有同意持久保存，建议添加到主屏幕并定期备份。'; });
   const acc = accountPanel();
-  main.append(...[p, acc, voiceP, bk, about].filter(Boolean));
+  main.append(...[p, installPanel(), acc, voiceP, bk, about].filter(Boolean));
+}
+
+/* ---------- 安装到手机（PWA）---------- */
+const SITE_URL = 'https://koshokai.github.io/nihonggo-dojo/';
+let installEvt = null;
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; document.querySelectorAll('[data-install]').forEach(b => { b.hidden = false; }); });
+addEventListener('appinstalled', () => { installEvt = null; S.installed = 1; save(); toast('安装好了！以后从主屏幕的图标打开就行'); });
+async function doInstall() {
+  if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice; if (r.outcome === 'accepted') installEvt = null; return; }
+  installGuide();
+}
+function installGuide() {
+  closeSheet();
+  const ios = isIOS();
+  const sh = h(`<div class="word-sheet" role="dialog" aria-label="安装到手机">
+    <button class="ws-x" type="button" aria-label="关闭">×</button>
+    <b>把日语道场装到手机上</b>
+    ${ios ? `<ol class="inst-steps">
+      <li>用 <b>Safari</b> 打开本站（微信里打开的话，先点右上角「…」→「在浏览器中打开」）</li>
+      <li>点屏幕下方的 <b>分享</b> 按钮 <span class="inst-ic">⬆︎</span></li>
+      <li>往下滑，点 <b>添加到主屏幕</b></li>
+      <li>点右上角 <b>添加</b>，主屏幕上就出现日语道场的图标了</li></ol>`
+    : `<ol class="inst-steps">
+      <li>用 <b>Chrome</b> 打开本站（微信里打开的话，先点右上角「…」→「在浏览器中打开」）</li>
+      <li>点右上角 <b>⋮</b> 菜单</li>
+      <li>点 <b>安装应用</b>（或「添加到主屏幕」）</li>
+      <li>确认后，桌面上就出现日语道场的图标了</li></ol>`}
+    <div class="small muted">装好以后全屏打开、可以离线使用，进度和网页版是同一份。</div>
+  </div>`);
+  document.body.append(sh);
+  sh.querySelector('.ws-x').onclick = closeSheet;
+}
+function installPanel() {
+  const p = h(`<section class="panel"><h2>安装到手机 · 分享</h2>
+    ${isStandalone() ? '<p class="small"><span class="tag done">已安装</span> 你正在使用安装版。</p>'
+      : `<p class="small muted">装到主屏幕后，像 App 一样全屏打开，没有网络也能学。</p>
+         <div class="row"><button class="btn pri" type="button" data-install-btn>安装到手机</button></div>`}
+    <div class="share-box"><img src="share-qr.png" width="140" height="140" alt="日语道场的二维码"><div>
+      <p class="small">把这个二维码或链接发给朋友，扫码就能用：</p>
+      <p class="small" lang="en"><a href="${SITE_URL}">${SITE_URL}</a></p>
+      <div class="row"><button class="btn" type="button" data-share>${navigator.share ? '分享' : '复制链接'}</button></div>
+    </div></div>
+  </section>`);
+  const ib = p.querySelector('[data-install-btn]');
+  if (ib) ib.onclick = e => { e.stopPropagation(); doInstall(); };
+  p.querySelector('[data-share]').onclick = () => {
+    const data = { title: '日语道场', text: '免费学日语：从五十音到 N1，单词、语法、阅读、商务日语、模拟考', url: SITE_URL };
+    if (navigator.share) navigator.share(data).catch(() => {});
+    else navigator.clipboard.writeText(SITE_URL).then(() => toast('链接已复制'), () => toast(SITE_URL));
+  };
+  return p;
 }
 
 /* ---------- 启动 ---------- */
@@ -1248,6 +1307,7 @@ checkBadges();
 render();
 initGlobalSearch();
 cloudInit();
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
 startPetals();
 if (S.onboarded) requestPersist();
 // 例句库有 3 MB 多，等页面出来以后再在后台加载；加载完后单词页、词典页刷新一下就能看到
