@@ -1,0 +1,56 @@
+# 用 VOICEVOX 生成日语发音（MP3），提交到 audio/。在 GitHub 的 Actions 页面手动运行。
+# probe：列出声音角色和使用规定并生成试听样本；words / daily：批量生成。
+name: VOICEVOX audio
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: probe / words / daily
+        required: true
+        default: probe
+      speaker:
+        description: VOICEVOX style id（probe 时不用填）
+        required: false
+        default: ''
+      level:
+        description: 只生成某个级别（N5…N1），留空为全部
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: voicevox
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    services:
+      voicevox:
+        image: voicevox/voicevox_engine:cpu-latest
+        ports:
+          - 50021:50021
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: |
+          which ffmpeg || (sudo apt-get update -q && sudo apt-get install -yq ffmpeg)
+          git config user.name "voicevox-bot"
+          git config user.email "voicevox-bot@users.noreply.github.com"
+      - name: Generate
+        run: |
+          ARGS="${{ github.event.inputs.mode }}"
+          [ -n "${{ github.event.inputs.speaker }}" ] && ARGS="$ARGS --speaker ${{ github.event.inputs.speaker }}"
+          [ -n "${{ github.event.inputs.level }}" ] && ARGS="$ARGS --level ${{ github.event.inputs.level }}"
+          python3 tools/gen_audio.py $ARGS --commit_every 1000
+      - name: Commit
+        if: always()
+        run: |
+          git add audio
+          git diff --cached --quiet && exit 0
+          git commit -qm "audio: ${{ github.event.inputs.mode }} ${{ github.event.inputs.level }} (VOICEVOX)"
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 5; done
