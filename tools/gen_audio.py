@@ -141,7 +141,7 @@ def commit(msg):
         return
     subprocess.run(['git', 'commit', '-qm', msg], cwd=ROOT, check=True)
     for _ in range(3):
-        if subprocess.run(['git', 'pull', '-q', '--rebase', 'origin', 'main'], cwd=ROOT).returncode == 0 and \
+        if subprocess.run(['git', 'pull', '-q', '--rebase', '-X', 'theirs', 'origin', 'main'], cwd=ROOT).returncode == 0 and \
            subprocess.run(['git', 'push', '-q', 'origin', 'HEAD:main'], cwd=ROOT).returncode == 0:
             return
         time.sleep(5)
