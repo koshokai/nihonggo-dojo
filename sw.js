@@ -2,7 +2,7 @@
 // 页面和脚本：有网时先取最新版（最多等 3 秒），拿到就更新缓存；没网或太慢才用缓存。所以更新后打开就是新版本。
 // 发音 MP3：文件名是内容哈希，不会变，缓存了就一直用（cache-first）。
 // 账号、同步等跨域请求（Supabase、jsDelivr）不经过缓存。
-const VERSION = 'v7';
+const VERSION = 'v8';
 const SHELL = `shell-${VERSION}`, AUDIO = 'audio-v1';
 const CORE = ['./', 'index.html', 'style.css', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon.svg',
   'vocab.js', 'kanji.js', 'grammar.js', 'data.js', 'daily.js', 'jlpt.js', 'game.js', 'dict.js', 'reading.js',

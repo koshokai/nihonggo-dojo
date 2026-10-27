@@ -275,6 +275,90 @@ function langLevels(tr) {
   }).catch(() => { if (p.isConnected) p.innerHTML = '<h2>分级词库</h2><p>加载失败：这部分词库可能还在准备中，或者网络有问题，请稍后再试。</p>'; });
 }
 
+/* ---------- 模拟考：TOPIK / 四六级（排版和日语模拟考一致） ---------- */
+const LEXAM = {
+  ko: {
+    levels: [['topik1', 'TOPIK I'], ['topik2', 'TOPIK II']],
+    types: { 어휘: ['어휘·문법', '（　）에 들어갈 가장 알맞은 것을 고르십시오.'], 유의: ['비슷한 의미', '밑줄 친 부분과 의미가 비슷한 것을 고르십시오.'], 주제: ['주제·중심 생각', '무엇에 대한 내용입니까? / 중심 생각을 고르십시오.'],
+      일치: ['내용 일치', '다음 글의 내용과 같은 것을 고르십시오.'], 순서: ['순서 배열', '다음을 순서대로 맞게 배열한 것을 고르십시오.'], 제목: ['신문 기사 제목', '다음 신문 기사의 제목을 가장 잘 설명한 것을 고르십시오.'], 독해: ['독해', '다음을 읽고 물음에 답하십시오.'] },
+    plan: { topik1: [['어휘', 7], ['유의', 3], ['주제', 3], ['일치', 5], ['순서', 2], ['독해', 5]], topik2: [['어휘', 5], ['유의', 3], ['제목', 3], ['일치', 4], ['주제', 4], ['순서', 2], ['독해', 6]] },
+    min: { topik1: 40, topik2: 50 },
+    intro: '按 TOPIK 阅读试卷的题型出题：词汇语法 → 近义替换 → 主题 → 内容一致 → 排序 → 阅读理解。约 25 题，限时作答，交卷后统一批改，正确率 60% 以上盖「合格」章。'
+  },
+  en: {
+    levels: [['cet4', '四级 CET-4'], ['cet6', '六级 CET-6']],
+    types: { 词汇: ['词汇', '选出最适合填入空白处的词。'], 语法: ['语法结构', '选出语法正确的一项。'], 翻译: ['汉译英', '选出最准确、地道的英文翻译。'], 匹配: ['段落匹配', '这句话的信息出自哪一段？'], 阅读: ['仔细阅读', '阅读短文，回答问题。'] },
+    plan: { cet4: [['词汇', 7], ['语法', 5], ['翻译', 4], ['匹配', 4], ['阅读', 10]], cet6: [['词汇', 7], ['语法', 5], ['翻译', 4], ['匹配', 4], ['阅读', 10]] },
+    min: { cet4: 40, cet6: 45 },
+    intro: '按大学英语四六级的题型出题：词汇 → 语法 → 汉译英 → 段落信息匹配 → 仔细阅读。30 题，限时作答，交卷后统一批改，正确率 60% 以上盖「合格」章。'
+  }
+};
+let lexamSel = {};
+function qLexam(tr, [t, q, opts, note]) {
+  const X = LEXAM[tr], [name, inst] = X.types[t];
+  const mark = s => esc(s).replace(/【(.+?)】/g, '<u class="jl-u">$1</u>').replace(/（\s*）/g, '<span class="blank">　　　</span>').replace(/\n/g, '<br>');
+  const stem = q.includes('◆')
+    ? (([pa, qu]) => `<div class="jl-passage" lang="${tr}">${mark(pa.trim())}</div><div class="q-sent" lang="${tr}">${mark(qu.trim())}</div>`)(q.split('◆'))
+    : `<div class="q-sent" lang="${t === '翻译' ? 'zh' : tr}">${mark(q)}</div>`;
+  return makeQ(null, 'x' + t, shuffle(opts.slice(1)).slice(0, 3), opts[0], {
+    prompt: `<div class="eyebrow">${esc(name)}　<span class="jl-inst">${esc(inst)}</span></div>${stem}`,
+    optLang: tr, explain: `<b lang="${tr}">${esc(opts[0])}</b>　${esc(note)}`
+  });
+}
+function langExam(tr) {
+  const X = LEXAM[tr];
+  Object.entries(X.types).forEach(([k, [n]]) => { KIND_NAMES['x' + k] = n; });   // 成绩分析里显示题型名
+  const L = lexamSel[tr] || X.levels[0][0]; lexamSel[tr] = L;
+  const lname = X.levels.find(l => l[0] === L)[1];
+  const p = h(`<section class="panel"><h2>模拟考 · ${esc(lname)}</h2><p class="muted">加载中……</p></section>`);
+  main.append(p);
+  lvFetch(`exam-${L}`).then(bank => {
+    if (!p.isConnected) return;
+    S.lexams = S.lexams || [];
+    const hist = S.lexams.filter(e => X.levels.some(l => l[0] === e.L)).slice(-6).reverse();
+    const types = Object.keys(X.types).filter(t => bank.some(x => x[0] === t));
+    p.innerHTML = `<div class="row between"><h2>模拟考 · ${esc(lname)}</h2><div class="seg" role="group">${X.levels.map(([k, n]) => `<button type="button" data-xl="${k}" class="${k === L ? 'on' : ''}">${esc(n)}</button>`).join('')}</div></div>
+      <p>${X.intro.replace('限时作答', `限时 ${X.min[L]} 分钟`)}</p>
+      <p class="small muted">题目为本站原创，按${tr === 'ko' ? ' TOPIK ' : '四六级'}官方题型编写（真题有版权，不能直接收录），干扰项专门挑容易混淆的。听力和写作部分以后补充。</p>
+      <div class="row"><button class="btn pri" type="button" data-start>开始考试</button></div>
+      <h3>题型专项练习</h3><div class="row">${types.map(t => `<button class="chip-btn" type="button" data-drill="${t}">${esc(X.types[t][0])} <span class="small">${bank.filter(x => x[0] === t).length}</span></button>`).join('')}</div>
+      ${hist.length ? `<h3>最近成绩</h3><div class="list-wrap"><table class="list"><thead><tr><th>日期</th><th>考试</th><th>得分</th><th>结果</th></tr></thead><tbody>${hist.map(e => `<tr><td>${e.date}</td><td>${esc(X.levels.find(l => l[0] === e.L)[1])}</td><td>${e.score}/${e.total}</td><td>${e.score / e.total >= .6 ? '<span class="tag done">合格</span>' : '<span class="tag">未合格</span>'}</td></tr>`).join('')}</tbody></table></div>` : ''}`;
+    p.querySelectorAll('[data-xl]').forEach(b => { b.onclick = () => { lexamSel[tr] = b.dataset.xl; render(); }; });
+    const start = () => {
+      const qs = [];
+      X.plan[L].forEach(([t, n]) => sample(bank.filter(x => x[0] === t), n).forEach(x => qs.push(qLexam(tr, x))));
+      main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
+      runQuiz(host, qs, {
+        title: `${lname} 模拟考`, exam: true, minutes: X.min[L], onDone: r => {
+          if (!r) return render();
+          S.lexams.push({ L, score: r.score, total: r.total, date: dkey() });
+          const pass = r.score / r.total >= .6;
+          addXP(r.score * 10 + (pass ? 50 : 0)); save();
+          const by = {};
+          r.res.forEach(x => { const k = x.q.kind; by[k] = by[k] || [0, 0]; by[k][1]++; if (x.ok) by[k][0]++; });
+          const bd = `<div class="breakdown">${Object.entries(by).map(([k, [a, n]]) => `<div class="bd-row"><span>${KIND_NAMES[k]}</span><div class="bar"><i style="width:${a / n * 100}%"></i></div><span class="small">${a}/${n}</span></div>`).join('')}</div>
+            <p class="small muted">获得 ${r.score * 10 + (pass ? 50 : 0)} 经验${pass ? '（含合格奖励 50）' : ''}。</p>`;
+          quizSummary(host, r, { title: `${lname} 模拟考`, again: start, extraHTML: bd });
+          const seal = host.querySelector('.seal');
+          seal.textContent = pass ? '合格' : (tr === 'ko' ? '재도전' : 'Retry'); seal.style.fontSize = pass ? '2.2rem' : '1.3rem';
+          if (pass) celebrate();
+        }
+      });
+    };
+    p.querySelector('[data-start]').onclick = start;
+    p.querySelectorAll('[data-drill]').forEach(b => {
+      const t = b.dataset.drill;
+      const go = () => {
+        const qs = sample(bank.filter(x => x[0] === t), 10).map(x => qLexam(tr, x));
+        main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
+        const title = `${lname} ${X.types[t][0]}练习`;
+        runQuiz(host, qs, { title, noRecord: true, xpEach: 8, onDone: r => { if (!r) return render(); quizSummary(host, r, { title, again: go }); } });
+      };
+      b.onclick = go;
+    });
+  }).catch(() => { if (p.isConnected) p.innerHTML = `<h2>模拟考 · ${esc(lname)}</h2><p>加载失败：题库可能还在准备中，或者网络有问题，请稍后再试。</p>`; });
+}
+
 /* ---------- 页面 ---------- */
 let langLoading = {};
 function langReady(tr) {
@@ -294,6 +378,7 @@ function viewLangTrack(tr, sub) {
   if (S.track !== tr) { S.track = tr; save(); }
   if (sub === 'abc') return main.append(tr === 'ko' ? koHangul() : enAbc());
   if (sub === 'levels') return langLevels(tr);
+  if (sub === 'exam') return langExam(tr);
   if (!langReady(tr)) return;
   if (sub === 'words' || sub === 'phrases') return main.append(langList(tr, sub));
   // 首页
@@ -309,6 +394,7 @@ function viewLangTrack(tr, sub) {
       <a class="lang-tile" href="#${tr}/abc"><b>${tr === 'ko' ? '한글 字母' : 'Aa 字母音标'}</b><span class="small muted">${tr === 'ko' ? '40 个字母 + 拼读表 + 测验' : '26 个字母 + 美式音标'}</span></a>
       <a class="lang-tile" href="#${tr}/words"><b>单词 ${words.length}</b><span class="small muted">按主题分类，闪卡 + 测验</span></a>
       <a class="lang-tile" href="#${tr}/phrases"><b>常用句 ${phrases.length}</b><span class="small muted">按场景分类，点击朗读</span></a>
+      <a class="lang-tile" href="#${tr}/exam"><b>模拟考 ${tr === 'ko' ? 'TOPIK' : '四六级'}</b><span class="small muted">${tr === 'ko' ? 'TOPIK I / II 题型，限时考试 + 专项练习' : '四级 / 六级题型，限时考试 + 专项练习'}</span></a>
       <a class="lang-tile" href="#${tr}/levels"><b>${tr === 'ko' ? '分级词库 TOPIK' : '分级词库 中考→GRE'}</b><span class="small muted">${tr === 'ko' ? '初级 / 中级 / 高级，约 1.1 万词' : '中考、高考、四六级、考研、雅思、托福、GRE，约 1.5 万词'}</span></a>
     </div>
     <p class="small muted">发音：真人感语音由开源的 MeloTTS 生成（陆续补全中），还没有音频的词用手机或浏览器自带的${T.title}语音。「我的 → 发音来源」可以切换。</p>
