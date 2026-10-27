@@ -1,0 +1,2415 @@
+[
+ {
+  "t": "sokuji",
+  "lv": "基础",
+  "intro": "",
+  "lines": [
+   [
+    "F",
+    "Excuse me, which gate does the flight to Chicago leave from?",
+    "打扰一下，飞芝加哥的航班在哪个登机口？"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "It's Gate twelve, just down on the left.",
+   "It leaves at about six.",
+   "Yes, I flew to Chicago last year."
+  ],
+  "cz": [
+   "十二号登机口，往前走左手边就是。",
+   "大约六点起飞。",
+   "是的，我去年飞过芝加哥。"
+  ],
+  "a": 0,
+  "ex": "问的是哪个登机口，回答登机口位置才对。第二项回答的是时间，第三项只抓住了 Chicago 和 fly。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "基础",
+  "intro": "",
+  "lines": [
+   [
+    "M",
+    "Can I leave my bags here until check-in time?",
+    "入住时间之前我能把行李寄存在这儿吗？"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Sure, we'll keep them behind the desk.",
+   "Check-in is at the front.",
+   "No, I didn't bring any bags."
+  ],
+  "cz": [
+   "当然，我们帮您放在前台后面。",
+   "入住手续在前面办理。",
+   "不，我没带包。"
+  ],
+  "a": 0,
+  "ex": "客人请求寄存行李，前台答应并说明放哪里最自然。第二项只重复了 check-in，第三项把说话人弄反了。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "基础",
+  "intro": "",
+  "lines": [
+   [
+    "F",
+    "Have you sent the email to the new client yet?",
+    "你给新客户发邮件了吗？"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Yes, the client is very new.",
+   "I'll buy you a new one.",
+   "Not yet. I'll do it right after lunch."
+  ],
+  "cz": [
+   "是的，那个客户很新。",
+   "我给你买个新的。",
+   "还没有，午饭后马上发。"
+  ],
+  "a": 2,
+  "ex": "问事情做了没有，回答“还没，午饭后发”最自然。另外两项只是重复了 new 和 client。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "基础",
+  "intro": "",
+  "lines": [
+   [
+    "M",
+    "How much is a round-trip ticket to the airport?",
+    "去机场的往返票多少钱？"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "It takes about forty minutes.",
+   "Platform three, I think.",
+   "It's fifteen dollars."
+  ],
+  "cz": [
+   "大约要四十分钟。",
+   "我想是三号站台。",
+   "十五美元。"
+  ],
+  "a": 2,
+  "ex": "How much 问价钱，只有第一项回答了价格；第二项答的是时间，第三项答的是站台。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "基础",
+  "intro": "",
+  "lines": [
+   [
+    "F",
+    "Is the meeting room free this afternoon?",
+    "今天下午会议室空着吗？"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Yes, the coffee is free.",
+   "It was a long meeting.",
+   "Let me check the booking list."
+  ],
+  "cz": [
+   "是的，咖啡免费。",
+   "那个会开了很久。",
+   "我查一下预约表。"
+  ],
+  "a": 2,
+  "ex": "free 在这里是“空闲、没人用”，查一下预约表是合理回应。第二项把 free 理解成“免费”，第三项答非所问。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "四级",
+  "intro": "",
+  "lines": [
+   [
+    "M",
+    "I'm afraid your flight has been delayed by two hours.",
+    "很抱歉，您的航班延误了两个小时。"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Great, I'll board right away.",
+   "I booked it two hours ago.",
+   "Oh no. Is there somewhere I can wait?"
+  ],
+  "cz": [
+   "太好了，我马上登机。",
+   "我两小时前订的票。",
+   "哎呀。有地方可以等吗？"
+  ],
+  "a": 2,
+  "ex": "航班延误，问哪里可以等候最自然。第二项与“延误”矛盾，第三项只是重复了 two hours。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "四级",
+  "intro": "",
+  "lines": [
+   [
+    "F",
+    "Would you mind proofreading my presentation slides before Friday?",
+    "你介意在周五前帮我校对一下演示文稿吗？"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Yes, I'd love to present on Friday.",
+   "Not at all. Send them over.",
+   "Sorry, I didn't see your presentation."
+  ],
+  "cz": [
+   "是的，我很想周五做报告。",
+   "一点也不介意，发过来吧。",
+   "抱歉，我没看你的报告。"
+  ],
+  "a": 1,
+  "ex": "Would you mind…? 表示同意要说 Not at all。第二项误以为是请他做报告，第三项把“校对”听成了“看报告”。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "四级",
+  "intro": "",
+  "lines": [
+   [
+    "M",
+    "Did you catch the weather report this morning?",
+    "今天早上的天气预报你听了吗？"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "No, I didn't catch the train.",
+   "Yeah, they said a storm is coming tonight.",
+   "The report is on my desk."
+  ],
+  "cz": [
+   "没有，我没赶上火车。",
+   "听了，说今晚有暴风雨。",
+   "报告在我桌上。"
+  ],
+  "a": 1,
+  "ex": "catch the weather report 意思是“听到/看到天气预报”。第二项把 catch 理解成“赶上（车）”，第三项把 report 当成了书面报告。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "四级",
+  "intro": "",
+  "lines": [
+   [
+    "F",
+    "The manager wants us to work late again tonight.",
+    "经理又要我们今晚加班。"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Good, I'll leave early then.",
+   "Seriously? That's the third time this week.",
+   "Yes, I'm the new manager."
+  ],
+  "cz": [
+   "好啊，那我早点走。",
+   "真的假的？这周都第三次了。",
+   "是的，我是新来的经理。"
+  ],
+  "a": 1,
+  "ex": "听到又要加班，抱怨“这周第三次了”最自然。第二项与加班矛盾，第三项只抓住了 manager。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "四级",
+  "intro": "",
+  "lines": [
+   [
+    "M",
+    "Make sure you are back at the bus by four thirty.",
+    "务必四点半之前回到大巴上。"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Got it. Four thirty sharp.",
+   "Thanks, I've already bought four.",
+   "The bus was really comfortable."
+  ],
+  "cz": [
+   "明白，四点半整。",
+   "谢谢，我已经买了四个。",
+   "那辆大巴真舒服。"
+  ],
+  "a": 0,
+  "ex": "导游提醒集合时间，确认时间是正确回应。第二项把 four 当成数量，第三项只是谈论大巴。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "六级",
+  "intro": "",
+  "lines": [
+   [
+    "F",
+    "I'd have applied for the position if I'd known it involved so much travel.",
+    "要是早知道这个职位要经常出差，我就申请了。"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Good thing you didn't get the job, then.",
+   "Yes, the trip was far too long.",
+   "So you'd actually enjoy being on the road?"
+  ],
+  "cz": [
+   "那幸好你没得到这份工作。",
+   "是啊，那趟旅行太长了。",
+   "这么说你其实喜欢到处跑？"
+  ],
+  "a": 2,
+  "ex": "虚拟语气说明她其实喜欢出差、后悔没申请，追问“你喜欢在外奔波？”最贴切。第二项误以为她讨厌出差，第三项把 travel 当成一次旅行。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "六级",
+  "intro": "",
+  "lines": [
+   [
+    "M",
+    "The board is unlikely to approve the budget unless we cut marketing costs.",
+    "除非我们削减营销费用，否则董事会不太可能批准预算。"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Then let's see where we can trim spending.",
+   "Great, so the budget's already approved.",
+   "Marketing has never been my strong point."
+  ],
+  "cz": [
+   "那我们看看哪里能压缩开支。",
+   "太好了，预算已经批了。",
+   "营销从来不是我的强项。"
+  ],
+  "a": 0,
+  "ex": "unless 表示条件：要先削减费用，所以“看看哪里能压缩开支”是合理回应。第二项误解了 unlikely to approve，第三项偏离话题。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "六级",
+  "intro": "",
+  "lines": [
+   [
+    "F",
+    "Hardly had I landed when the airline called to say my suitcase was in Paris.",
+    "我刚一落地，航空公司就打电话说我的箱子在巴黎。"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "What a nightmare! Did they say when it would arrive?",
+   "So you flew to Paris after all?",
+   "You should have landed earlier."
+  ],
+  "cz": [
+   "真够糟的！他们说什么时候能送到吗？",
+   "所以你最后还是飞去巴黎了？",
+   "你应该早点落地。"
+  ],
+  "a": 0,
+  "ex": "Hardly…when 表示“一……就”，行李被送错了地方，表示同情并询问何时送到最自然。第二项误以为是她本人去了巴黎，第三项不合逻辑。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "六级",
+  "intro": "",
+  "lines": [
+   [
+    "M",
+    "That lecture on climate policy was a bit over my head, to be honest.",
+    "说实话，那场关于气候政策的讲座我有点听不懂。"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Then you must have found it far too easy.",
+   "Same here. The economics part completely lost me.",
+   "I know, the speaker was really tall."
+  ],
+  "cz": [
+   "那你一定觉得太简单了。",
+   "我也是，经济学那部分我完全听晕了。",
+   "我知道，那个讲者个子很高。"
+  ],
+  "a": 1,
+  "ex": "over my head 意为“太难、听不懂”，附和“我也是”最自然。第二项意思正好相反，第三项按字面理解成“高”。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "六级",
+  "intro": "",
+  "lines": [
+   [
+    "F",
+    "You couldn't have picked a worse time to ask for a raise.",
+    "你挑这个时候要求加薪，真是再糟糕不过了。"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Thanks, I thought it was perfect timing.",
+   "I know, with all the layoffs going on.",
+   "I'll pick a better gift next time."
+  ],
+  "cz": [
+   "谢谢，我也觉得时机正好。",
+   "我知道，正赶上公司在裁员。",
+   "下次我挑个更好的礼物。"
+  ],
+  "a": 1,
+  "ex": "couldn't have picked a worse time 是说时机最糟，承认“正赶上裁员”最合理。第二项误以为是夸奖，第三项只抓住了 pick。"
+ },
+ {
+  "t": "sokuji",
+  "lv": "六级",
+  "intro": "",
+  "lines": [
+   [
+    "M",
+    "Apparently, the new subway extension won't open until the end of next year at the earliest.",
+    "听说新地铁延长线最早也要到明年年底才开通。"
+   ]
+  ],
+  "q": "",
+  "c": [
+   "Another delay? They promised it would be done this spring.",
+   "Great, so I can start using it next week.",
+   "I'll extend my stay until next year, then."
+  ],
+  "cz": [
+   "又推迟了？他们承诺今年春天完工的。",
+   "太好了，那我下周就能坐了。",
+   "那我就把逗留时间延长到明年。"
+  ],
+  "a": 0,
+  "ex": "not…until…at the earliest 表示还要很久，抱怨又延期最自然。第二项理解反了，第三项只抓住了 extension 和 next year。"
+ },
+ {
+  "t": "kadai",
+  "lv": "基础",
+  "intro": "Listen to the conversation at a train station. Which ticket will the woman buy?",
+  "lines": [
+   [
+    "F",
+    "Hello, I'd like a ticket to Oxford, please.",
+    "你好，我要一张去牛津的票。"
+   ],
+   [
+    "M",
+    "Single or return?",
+    "单程还是往返？"
+   ],
+   [
+    "F",
+    "Return, please. I'm coming back tonight.",
+    "往返，我今晚就回来。"
+   ],
+   [
+    "M",
+    "The next train leaves at nine fifteen. A return ticket is twenty-four pounds.",
+    "下一班九点十五分开，往返票二十四英镑。"
+   ],
+   [
+    "F",
+    "Hmm, is there a cheaper one?",
+    "嗯，有便宜点的吗？"
+   ],
+   [
+    "M",
+    "If you take the ten o'clock train, it's only eighteen pounds.",
+    "如果坐十点那班，只要十八英镑。"
+   ],
+   [
+    "F",
+    "OK, I'll take that one, then.",
+    "好，那我就买那班的。"
+   ]
+  ],
+  "q": "Which ticket will the woman buy?",
+  "c": [
+   "A return ticket for the nine fifteen train",
+   "A single ticket for the ten o'clock train",
+   "A single ticket for the nine fifteen train",
+   "A return ticket for the ten o'clock train"
+  ],
+  "cz": [
+   "九点十五那班的往返票",
+   "十点那班的单程票",
+   "九点十五那班的单程票",
+   "十点那班的往返票"
+  ],
+  "a": 3,
+  "ex": "她今晚要回来，所以买往返票；嫌九点十五那班贵，改坐十点那班。"
+ },
+ {
+  "t": "kadai",
+  "lv": "基础",
+  "intro": "Listen to the conversation in an office. What will the man do first?",
+  "lines": [
+   [
+    "F",
+    "Mike, can you help me get ready for the meeting this afternoon?",
+    "迈克，你能帮我准备一下今天下午的会吗？"
+   ],
+   [
+    "M",
+    "Sure. What do you need?",
+    "当然，需要做什么？"
+   ],
+   [
+    "F",
+    "Please make twenty copies of this report.",
+    "请把这份报告复印二十份。"
+   ],
+   [
+    "M",
+    "OK. Should I also set up the projector?",
+    "好的。我要不要也把投影仪装好？"
+   ],
+   [
+    "F",
+    "Tom will do that. But could you buy some water for the guests first? We don't have any.",
+    "汤姆会弄的。不过你能先给客人买点水吗？我们一瓶都没有了。"
+   ],
+   [
+    "M",
+    "No problem. I'll go to the shop now and make the copies when I get back.",
+    "没问题，我现在就去商店，回来再复印。"
+   ]
+  ],
+  "q": "What will the man do first?",
+  "c": [
+   "Make copies of the report",
+   "Buy some water",
+   "Set up the projector",
+   "Call Tom"
+  ],
+  "cz": [
+   "复印报告",
+   "买水",
+   "安装投影仪",
+   "给汤姆打电话"
+  ],
+  "a": 1,
+  "ex": "女士请他先买水，他说现在去商店、回来再复印。投影仪由汤姆负责。"
+ },
+ {
+  "t": "kadai",
+  "lv": "基础",
+  "intro": "Listen to the conversation at a hotel. What will the woman do next?",
+  "lines": [
+   [
+    "F",
+    "Hi, the air conditioner in my room isn't working. It's really hot.",
+    "你好，我房间的空调坏了，太热了。"
+   ],
+   [
+    "M",
+    "I'm sorry about that. I'll send someone to fix it, but it will take about an hour.",
+    "很抱歉。我会派人去修，不过大约要一个小时。"
+   ],
+   [
+    "F",
+    "An hour? I'm very tired. I want to go to sleep.",
+    "一个小时？我很累，想睡觉了。"
+   ],
+   [
+    "M",
+    "Then we can move you to another room right now. Room five-oh-eight is ready.",
+    "那我们现在就给您换个房间，五零八号房已经准备好了。"
+   ],
+   [
+    "F",
+    "That's great. Do I need to pack my things?",
+    "太好了。我需要收拾东西吗？"
+   ],
+   [
+    "M",
+    "Yes, please. A staff member will come and carry your bags for you.",
+    "是的，麻烦您了。会有工作人员来帮您搬行李。"
+   ]
+  ],
+  "q": "What will the woman do next?",
+  "c": [
+   "Wait for the air conditioner to be fixed",
+   "Pack her things",
+   "Go to sleep in her room",
+   "Carry her bags to the front desk"
+  ],
+  "cz": [
+   "等空调修好",
+   "收拾自己的东西",
+   "在自己房间睡觉",
+   "把行李搬到前台"
+  ],
+  "a": 1,
+  "ex": "她决定换房，前台让她先收拾东西，行李由工作人员来搬。她不愿意等一小时修空调。"
+ },
+ {
+  "t": "kadai",
+  "lv": "基础",
+  "intro": "Listen to the conversation at a tourist information center. Where will the man go first?",
+  "lines": [
+   [
+    "M",
+    "Excuse me. I only have one day in town. What should I see?",
+    "打扰一下，我在这儿只待一天，该去看什么？"
+   ],
+   [
+    "F",
+    "The castle is very popular. But it's crowded in the afternoon, so go there in the morning.",
+    "城堡很受欢迎，不过下午人多，最好上午去。"
+   ],
+   [
+    "M",
+    "OK. What about the art museum?",
+    "好的。美术馆呢？"
+   ],
+   [
+    "F",
+    "It's closed on Mondays, and today is Monday.",
+    "美术馆周一闭馆，今天正好是周一。"
+   ],
+   [
+    "M",
+    "Oh no. And the market?",
+    "哎呀。那市场呢？"
+   ],
+   [
+    "F",
+    "The market opens at noon. You can have lunch at a restaurant there after the castle.",
+    "市场中午开门。看完城堡你可以去那里的餐馆吃午饭。"
+   ]
+  ],
+  "q": "Where will the man go first?",
+  "c": [
+   "The art museum",
+   "The castle",
+   "The market",
+   "A restaurant"
+  ],
+  "cz": [
+   "美术馆",
+   "城堡",
+   "市场",
+   "餐馆"
+  ],
+  "a": 1,
+  "ex": "城堡下午人多，建议上午先去；美术馆今天闭馆，市场中午才开，午饭在城堡之后。"
+ },
+ {
+  "t": "kadai",
+  "lv": "基础",
+  "intro": "Listen to the conversation at an airport check-in counter. What will the woman do?",
+  "lines": [
+   [
+    "M",
+    "Good morning. Where are you flying today?",
+    "早上好，您今天飞哪里？"
+   ],
+   [
+    "F",
+    "To Tokyo. Here's my passport.",
+    "东京，这是我的护照。"
+   ],
+   [
+    "M",
+    "Thank you. Are you checking this suitcase?",
+    "谢谢。这个箱子要托运吗？"
+   ],
+   [
+    "F",
+    "Yes. And I want to take this small bag on the plane.",
+    "是的。这个小包我想带上飞机。"
+   ],
+   [
+    "M",
+    "That's fine. But your suitcase is twenty-five kilos. The limit is twenty-three. You can pay fifty dollars extra, or take something out.",
+    "可以。不过您的箱子二十五公斤，限重二十三公斤。您可以多付五十美元，或者拿出一些东西。"
+   ],
+   [
+    "F",
+    "Fifty dollars? That's too much. I'll take out these books and put them in my small bag.",
+    "五十美元？太贵了。我把这些书拿出来放进小包里。"
+   ]
+  ],
+  "q": "What will the woman do?",
+  "c": [
+   "Move some books into her small bag",
+   "Pay fifty dollars extra",
+   "Check in her small bag too",
+   "Put some books into her suitcase"
+  ],
+  "cz": [
+   "把一些书放进小包",
+   "多付五十美元",
+   "把小包也托运",
+   "把一些书放进行李箱"
+  ],
+  "a": 0,
+  "ex": "箱子超重，她嫌五十美元太贵，决定把书从箱子里拿出来放进随身小包。方向不要听反。"
+ },
+ {
+  "t": "kadai",
+  "lv": "四级",
+  "intro": "Listen to the conversation between two coworkers. What will the woman do this afternoon?",
+  "lines": [
+   [
+    "M",
+    "Rachel, have you finished the sales figures for the quarterly report?",
+    "雷切尔，季度报告的销售数据你做完了吗？"
+   ],
+   [
+    "F",
+    "Almost. I was planning to finish them this afternoon.",
+    "差不多了，我打算今天下午做完。"
+   ],
+   [
+    "M",
+    "Actually, something more urgent has come up. The client in Singapore wants a video call at three.",
+    "其实有件更急的事。新加坡的客户想在三点开视频会议。"
+   ],
+   [
+    "F",
+    "Today? I thought it was scheduled for Thursday.",
+    "今天？我以为定在周四。"
+   ],
+   [
+    "M",
+    "They moved it. Could you prepare a short summary of our proposal for the call?",
+    "他们改时间了。你能为这次通话准备一份我们方案的简要说明吗？"
+   ],
+   [
+    "F",
+    "Sure. Then I'll do the sales figures tomorrow morning.",
+    "好的。那销售数据我明天上午再做。"
+   ],
+   [
+    "M",
+    "That's fine. And don't worry about booking a meeting room. I've already done it.",
+    "没问题。会议室不用你订，我已经订好了。"
+   ]
+  ],
+  "q": "What will the woman do this afternoon?",
+  "c": [
+   "Prepare a summary of the proposal",
+   "Finish the sales figures",
+   "Book a meeting room",
+   "Fly to Singapore"
+  ],
+  "cz": [
+   "准备方案的简要说明",
+   "做完销售数据",
+   "预订会议室",
+   "飞往新加坡"
+  ],
+  "a": 0,
+  "ex": "视频会议提前到今天三点，她下午要准备方案说明；销售数据推到明天上午，会议室男士已订好。"
+ },
+ {
+  "t": "kadai",
+  "lv": "四级",
+  "intro": "Listen to the conversation at a car rental office. Which car will the man rent?",
+  "lines": [
+   [
+    "M",
+    "Hi, I'd like to rent a car for the weekend. Something small and cheap.",
+    "你好，我想租一辆车过周末，要小一点、便宜点的。"
+   ],
+   [
+    "F",
+    "Our compact cars are thirty-five dollars a day, but they're all booked this weekend.",
+    "我们的紧凑型车每天三十五美元，不过这个周末都被订完了。"
+   ],
+   [
+    "M",
+    "Oh. What else do you have?",
+    "哦，那还有什么车？"
+   ],
+   [
+    "F",
+    "There's a mid-size sedan for fifty dollars, or an SUV for seventy.",
+    "有一辆五十美元的中型轿车，或者七十美元的越野车。"
+   ],
+   [
+    "M",
+    "I'm driving up into the mountains, and they say it might snow.",
+    "我要开车上山，听说可能会下雪。"
+   ],
+   [
+    "F",
+    "In that case, I'd really recommend the SUV. It has four-wheel drive.",
+    "那样的话，我很推荐越野车，它是四轮驱动的。"
+   ],
+   [
+    "M",
+    "Seventy is more than I planned, but I'd rather be safe. I'll take it.",
+    "七十美元超出预算了，不过还是安全第一，就租它吧。"
+   ]
+  ],
+  "q": "Which car will the man rent?",
+  "c": [
+   "The thirty-five-dollar compact car",
+   "The seventy-dollar SUV",
+   "The fifty-dollar sedan",
+   "The fifty-dollar SUV"
+  ],
+  "cz": [
+   "三十五美元的紧凑型车",
+   "七十美元的越野车",
+   "五十美元的轿车",
+   "五十美元的越野车"
+  ],
+  "a": 1,
+  "ex": "紧凑型车已订完；因为山里可能下雪，他选了七十美元、四轮驱动的越野车。"
+ },
+ {
+  "t": "kadai",
+  "lv": "四级",
+  "intro": "Listen to the conversation between a new employee and an office manager. What will the man do first on Monday?",
+  "lines": [
+   [
+    "F",
+    "Welcome aboard, Daniel. Before you start on Monday, let me go over a few things.",
+    "欢迎加入，丹尼尔。你周一上班前，我先跟你说几件事。"
+   ],
+   [
+    "M",
+    "Great, thanks.",
+    "好的，谢谢。"
+   ],
+   [
+    "F",
+    "First thing on Monday, go to the IT office on the second floor to pick up your laptop.",
+    "周一一到就先去二楼的IT办公室领笔记本电脑。"
+   ],
+   [
+    "M",
+    "Should I go to HR to sign my contract first?",
+    "我是不是应该先去人事部签合同？"
+   ],
+   [
+    "F",
+    "You signed it online, so there's no need. After IT, there's a safety training session at ten.",
+    "你已经在网上签过了，不用去。去完IT，十点有安全培训。"
+   ],
+   [
+    "M",
+    "And when do I meet my team?",
+    "那我什么时候见团队？"
+   ],
+   [
+    "F",
+    "At lunch. Your manager is taking everyone out.",
+    "午饭时，你的经理请大家出去吃。"
+   ]
+  ],
+  "q": "What will the man do first on Monday?",
+  "c": [
+   "Sign his contract at HR",
+   "Attend a safety training session",
+   "Pick up his laptop",
+   "Have lunch with his team"
+  ],
+  "cz": [
+   "去人事部签合同",
+   "参加安全培训",
+   "领笔记本电脑",
+   "和团队吃午饭"
+  ],
+  "a": 2,
+  "ex": "周一第一件事是去IT办公室领电脑；合同已在网上签了，安全培训和午饭都在之后。"
+ },
+ {
+  "t": "kadai",
+  "lv": "四级",
+  "intro": "Listen to the conversation at a lost-and-found office in a train station. What will the woman do first?",
+  "lines": [
+   [
+    "F",
+    "Hello, I left my jacket on the train from Boston about an hour ago.",
+    "你好，我大约一小时前把夹克落在从波士顿来的火车上了。"
+   ],
+   [
+    "M",
+    "Which train was it?",
+    "是哪一班车？"
+   ],
+   [
+    "F",
+    "The two fifteen. It's a black jacket with my keys in the pocket.",
+    "两点十五分那班。是件黑夹克，口袋里有我的钥匙。"
+   ],
+   [
+    "M",
+    "Let me check. Nothing has been handed in yet. Trains are cleaned at the last stop, so it may turn up later.",
+    "我查一下……还没有人交过来。火车到终点站会打扫，可能晚点会找到。"
+   ],
+   [
+    "F",
+    "Should I wait here?",
+    "我要在这里等吗？"
+   ],
+   [
+    "M",
+    "It could take hours. Fill in this form with your phone number, and we'll call you if it's found.",
+    "可能要好几个小时。填一下这张表，写上电话，找到了我们通知您。"
+   ],
+   [
+    "F",
+    "OK. I'll do that, and then I'll call my landlord about a spare key.",
+    "好的，我先填表，然后给房东打电话要备用钥匙。"
+   ]
+  ],
+  "q": "What will the woman do first?",
+  "c": [
+   "Wait at the station",
+   "Take the train back to Boston",
+   "Call her landlord",
+   "Fill in a form"
+  ],
+  "cz": [
+   "在车站等",
+   "坐火车回波士顿",
+   "给房东打电话",
+   "填一张表"
+  ],
+  "a": 3,
+  "ex": "工作人员说等可能要几小时，让她填表；她说先填表，然后再给房东打电话。"
+ },
+ {
+  "t": "kadai",
+  "lv": "四级",
+  "intro": "Listen to the conversation in an office. What will the man order?",
+  "lines": [
+   [
+    "F",
+    "Ken, we're running low on supplies. Can you place an order today?",
+    "肯，办公用品快用完了，你今天能下个订单吗？"
+   ],
+   [
+    "M",
+    "Sure. Paper, right?",
+    "好的，是纸吧？"
+   ],
+   [
+    "F",
+    "Actually, a box of paper arrived yesterday. It's printer ink we need. Black ink.",
+    "其实昨天刚到了一箱纸。我们缺的是打印机墨盒，黑色的。"
+   ],
+   [
+    "M",
+    "How many cartridges?",
+    "要几个墨盒？"
+   ],
+   [
+    "F",
+    "Three should be enough. Oh, and the colored ink is fine for now.",
+    "三个应该够了。哦，彩色墨盒暂时还够用。"
+   ],
+   [
+    "M",
+    "Got it. What about pens? The drawer looked empty.",
+    "明白。笔呢？抽屉好像空了。"
+   ],
+   [
+    "F",
+    "The company is switching to tablets next month, so don't bother.",
+    "公司下个月要改用平板电脑了，不用买了。"
+   ]
+  ],
+  "q": "What will the man order?",
+  "c": [
+   "Black ink cartridges",
+   "A box of paper",
+   "Colored ink cartridges",
+   "Pens"
+  ],
+  "cz": [
+   "黑色墨盒",
+   "一箱纸",
+   "彩色墨盒",
+   "笔"
+  ],
+  "a": 0,
+  "ex": "纸昨天刚到，彩色墨盒够用，笔也不用买，只需要订三个黑色墨盒。"
+ },
+ {
+  "t": "kadai",
+  "lv": "六级",
+  "intro": "Listen to the conversation between two colleagues. What will the woman do next?",
+  "lines": [
+   [
+    "M",
+    "Have you sorted out your trip to the trade fair in Berlin yet?",
+    "你去柏林展会的行程安排好了吗？"
+   ],
+   [
+    "F",
+    "Sort of. The direct flight on Monday is fully booked, so I was going to fly via Amsterdam.",
+    "算是吧。周一的直飞航班满了，所以我打算经阿姆斯特丹转机。"
+   ],
+   [
+    "M",
+    "That's a four-hour layover, isn't it? You'd miss the opening reception.",
+    "那要转机四个小时吧？你会错过开幕招待会的。"
+   ],
+   [
+    "F",
+    "I know. The other option is going on Sunday, but then I'd need an extra night at the hotel, and finance is strict about that.",
+    "我知道。另一个办法是周日走，但那样就得多住一晚酒店，财务部对这个卡得很严。"
+   ],
+   [
+    "M",
+    "Actually, finance approved extra nights for the fair this year, since hotels in Berlin fill up so quickly. Check the memo.",
+    "其实今年财务部已经批准展会可以多住，因为柏林的酒店订得特别快。你看看那份通知。"
+   ],
+   [
+    "F",
+    "Really? Then I'll go on Sunday and save myself the hassle. I'll email the hotel to add a night.",
+    "真的？那我周日走，省得麻烦。我这就给酒店发邮件加订一晚。"
+   ]
+  ],
+  "q": "What will the woman do next?",
+  "c": [
+   "Book the flight via Amsterdam",
+   "Ask finance to approve an extra night",
+   "Skip the opening reception",
+   "Email the hotel to extend her booking"
+  ],
+  "cz": [
+   "预订经阿姆斯特丹转机的航班",
+   "请财务部批准多住一晚",
+   "不参加开幕招待会",
+   "给酒店发邮件延长预订"
+  ],
+  "a": 3,
+  "ex": "得知财务部已批准多住，她决定周日出发，接下来给酒店发邮件加订一晚；不需要再向财务申请。"
+ },
+ {
+  "t": "kadai",
+  "lv": "六级",
+  "intro": "Listen to two organizers planning a charity run. What will the woman do?",
+  "lines": [
+   [
+    "F",
+    "We need to finalize the route for the charity run. The riverside path is beautiful, but it's narrow.",
+    "慈善跑的路线得定下来了。河边小路很美，但太窄。"
+   ],
+   [
+    "M",
+    "With eight hundred runners registered, it'd be a real bottleneck at the start.",
+    "报名的有八百人，起跑时肯定会堵住。"
+   ],
+   [
+    "F",
+    "What about the park loop? It's wide, but people would have to run it three times.",
+    "公园环线呢？够宽，但要跑三圈。"
+   ],
+   [
+    "M",
+    "Runners hate laps, though. What if we start in the park and join the river path once the crowd has spread out?",
+    "可跑者最讨厌绕圈。要不从公园起跑，等人群拉开后再接上河边小路？"
+   ],
+   [
+    "F",
+    "That could work. We'd need extra volunteers where the two routes meet.",
+    "这个可行。两条路交汇的地方得多安排志愿者。"
+   ],
+   [
+    "M",
+    "I'll contact the volunteer group tonight. Could you check with the city whether we need a separate permit for the path?",
+    "我今晚联系志愿者团队。你能问问市政府河边小路是否需要单独的许可吗？"
+   ],
+   [
+    "F",
+    "Will do.",
+    "好的。"
+   ]
+  ],
+  "q": "What will the woman do?",
+  "c": [
+   "Contact the volunteer group",
+   "Change the route to the park loop only",
+   "Check whether a permit is needed",
+   "Register more runners"
+  ],
+  "cz": [
+   "联系志愿者团队",
+   "把路线改成只跑公园环线",
+   "确认是否需要许可",
+   "招募更多跑者"
+  ],
+  "a": 2,
+  "ex": "男士负责联系志愿者，请女士向市政府确认是否需要许可。路线是公园加河边，不只是公园环线。"
+ },
+ {
+  "t": "kadai",
+  "lv": "六级",
+  "intro": "Listen to the conversation between a scientist and her research assistant. What will the man do?",
+  "lines": [
+   [
+    "M",
+    "Dr. Patel, the lake samples came back. Two of them show unusually high nitrate levels.",
+    "帕特尔博士，湖水样本结果出来了，有两个硝酸盐含量异常高。"
+   ],
+   [
+    "F",
+    "Which sites?",
+    "哪两个采样点？"
+   ],
+   [
+    "M",
+    "Sites four and seven, both near the farmland.",
+    "四号和七号，都在农田附近。"
+   ],
+   [
+    "F",
+    "Before we draw any conclusions, I want those two retested. They may have been contaminated during transport.",
+    "下结论之前，我要这两个重新检测，可能是运输过程中被污染了。"
+   ],
+   [
+    "M",
+    "Should I send them back to the same lab?",
+    "要送回同一个实验室吗？"
+   ],
+   [
+    "F",
+    "No, use the university lab this time, so we have an independent result. And hold off on drafting the report until then.",
+    "不，这次用大学的实验室，这样结果更独立。在那之前先别写报告。"
+   ],
+   [
+    "M",
+    "Understood. I'll arrange the retest today.",
+    "明白，我今天就安排复检。"
+   ]
+  ],
+  "q": "What will the man do?",
+  "c": [
+   "Send the samples to the university lab",
+   "Send the samples back to the same lab",
+   "Start drafting the report",
+   "Collect new samples near the farmland"
+  ],
+  "cz": [
+   "把样本送到大学实验室",
+   "把样本送回原实验室",
+   "开始起草报告",
+   "在农田附近采集新样本"
+  ],
+  "a": 0,
+  "ex": "博士要求换大学实验室复检以获得独立结果，并暂缓写报告。"
+ },
+ {
+  "t": "kadai",
+  "lv": "六级",
+  "intro": "Listen to the conversation between two coworkers. What will the man do next?",
+  "lines": [
+   [
+    "F",
+    "Did you hear? The rail workers are going on strike tomorrow, so your train to Edinburgh is cancelled.",
+    "你听说了吗？铁路工人明天罢工，你去爱丁堡的火车取消了。"
+   ],
+   [
+    "M",
+    "You're kidding. My presentation is at two.",
+    "开玩笑吧，我两点要做报告。"
+   ],
+   [
+    "F",
+    "You could fly. There's a seven a.m. flight, but it's nearly three hundred pounds.",
+    "你可以坐飞机。早上七点有一班，但要将近三百英镑。"
+   ],
+   [
+    "M",
+    "Ouch. What about the coach?",
+    "好贵。那长途大巴呢？"
+   ],
+   [
+    "F",
+    "It takes nine hours. You'd have to leave tonight.",
+    "要九个小时，你今晚就得出发。"
+   ],
+   [
+    "M",
+    "Hmm. Actually, the client did say they'd be happy to do it by video. That's probably the most sensible option.",
+    "嗯……其实客户说过可以用视频做。这可能是最明智的办法。"
+   ],
+   [
+    "F",
+    "I'd confirm with them first, then.",
+    "那你最好先跟他们确认一下。"
+   ],
+   [
+    "M",
+    "I'll call them right now.",
+    "我现在就给他们打电话。"
+   ]
+  ],
+  "q": "What will the man do next?",
+  "c": [
+   "Book the morning flight",
+   "Take an overnight coach",
+   "Call the client",
+   "Go to Edinburgh by train"
+  ],
+  "cz": [
+   "订早上的航班",
+   "坐夜间大巴",
+   "给客户打电话",
+   "坐火车去爱丁堡"
+  ],
+  "a": 2,
+  "ex": "机票太贵、大巴太慢，他想改成视频报告，接下来先打电话跟客户确认。火车因罢工取消。"
+ },
+ {
+  "t": "point",
+  "lv": "基础",
+  "intro": "Listen to the announcement at an airport. Why is the flight delayed?",
+  "lines": [
+   [
+    "F",
+    "Attention, please. This is an announcement for passengers on Flight two-oh-six to Seattle.",
+    "请注意，这是给飞往西雅图的二零六号航班旅客的广播。"
+   ],
+   [
+    "F",
+    "Your flight is delayed by forty minutes.",
+    "您的航班将延误四十分钟。"
+   ],
+   [
+    "F",
+    "The weather in Seattle is fine, and the plane is already here.",
+    "西雅图天气良好，飞机也已经到达。"
+   ],
+   [
+    "F",
+    "But the pilots are still on another flight that landed late.",
+    "但机长们还在另一架晚点降落的航班上。"
+   ],
+   [
+    "F",
+    "The new boarding time is three twenty. Please wait near Gate eight.",
+    "新的登机时间是三点二十分，请在八号登机口附近等候。"
+   ],
+   [
+    "F",
+    "Thank you for your patience.",
+    "感谢您的耐心等待。"
+   ]
+  ],
+  "q": "Why is the flight delayed?",
+  "c": [
+   "The pilots are arriving late",
+   "The weather in Seattle is bad",
+   "The plane has not arrived yet",
+   "The gate has been changed"
+  ],
+  "cz": [
+   "机长晚到",
+   "西雅图天气不好",
+   "飞机还没到",
+   "登机口变更了"
+  ],
+  "a": 0,
+  "ex": "广播说天气良好、飞机已到，延误是因为机长乘坐的另一航班晚点。登机口只是提醒在八号口等候。"
+ },
+ {
+  "t": "point",
+  "lv": "基础",
+  "intro": "Listen to the conversation in an office. When is the team meeting today?",
+  "lines": [
+   [
+    "M",
+    "Lisa, is the team meeting at ten today?",
+    "丽莎，今天团队会议是十点吗？"
+   ],
+   [
+    "F",
+    "It usually is, but the boss has a doctor's appointment this morning.",
+    "平时是，但老板今天上午要去看医生。"
+   ],
+   [
+    "M",
+    "So is it at eleven?",
+    "那是十一点？"
+   ],
+   [
+    "F",
+    "No, she said one thirty, after lunch.",
+    "不，她说是午饭后一点半。"
+   ],
+   [
+    "M",
+    "OK. I have a call at three, so that's fine.",
+    "好，我三点有个电话，那没问题。"
+   ],
+   [
+    "F",
+    "Good. It's in the same room as always.",
+    "好，还是老会议室。"
+   ]
+  ],
+  "q": "When is the team meeting today?",
+  "c": [
+   "At one thirty",
+   "At ten",
+   "At eleven",
+   "At three"
+  ],
+  "cz": [
+   "一点半",
+   "十点",
+   "十一点",
+   "三点"
+  ],
+  "a": 0,
+  "ex": "平时是十点，今天老板上午看医生，改到午饭后一点半。三点是男士自己的电话。"
+ },
+ {
+  "t": "point",
+  "lv": "基础",
+  "intro": "Listen to the conversation at a hotel front desk. Why does the woman want to change rooms?",
+  "lines": [
+   [
+    "F",
+    "Excuse me, can I change my room?",
+    "打扰一下，我能换个房间吗？"
+   ],
+   [
+    "M",
+    "Of course. Is it too small?",
+    "当然可以。是房间太小吗？"
+   ],
+   [
+    "F",
+    "No, the size is fine, and the view is nice.",
+    "不是，大小可以，景色也不错。"
+   ],
+   [
+    "M",
+    "Is it noisy, then?",
+    "那是太吵？"
+   ],
+   [
+    "F",
+    "Not really. But the shower doesn't have any hot water.",
+    "也不算。是淋浴没有热水。"
+   ],
+   [
+    "M",
+    "I'm so sorry. Let me give you room three-oh-two.",
+    "非常抱歉，给您换到三零二号房。"
+   ]
+  ],
+  "q": "Why does the woman want to change rooms?",
+  "c": [
+   "The room is too small",
+   "The view is bad",
+   "There is no hot water",
+   "The room is noisy"
+  ],
+  "cz": [
+   "房间太小",
+   "景色不好",
+   "没有热水",
+   "房间太吵"
+  ],
+  "a": 2,
+  "ex": "她否定了房间小、太吵，还说景色不错，真正原因是淋浴没有热水。"
+ },
+ {
+  "t": "point",
+  "lv": "基础",
+  "intro": "Listen to the weather report. What will the weather be like on Saturday?",
+  "lines": [
+   [
+    "M",
+    "Here's the weather for the weekend.",
+    "下面是周末天气。"
+   ],
+   [
+    "M",
+    "Friday will be cloudy, with some rain in the evening.",
+    "周五多云，傍晚有雨。"
+   ],
+   [
+    "M",
+    "On Saturday, the rain will stop. It will be sunny, but very windy.",
+    "周六雨停，晴天，但风很大。"
+   ],
+   [
+    "M",
+    "Sunday will be warm and sunny, a great day for a picnic.",
+    "周日温暖晴朗，很适合野餐。"
+   ],
+   [
+    "M",
+    "Don't forget your umbrella on Friday night.",
+    "周五晚上别忘了带伞。"
+   ]
+  ],
+  "q": "What will the weather be like on Saturday?",
+  "c": [
+   "Cloudy",
+   "Rainy in the evening",
+   "Warm and sunny",
+   "Sunny and windy"
+  ],
+  "cz": [
+   "多云",
+   "傍晚有雨",
+   "温暖晴朗",
+   "晴天，风大"
+  ],
+  "a": 3,
+  "ex": "周六雨停、晴天但风大。多云和傍晚有雨是周五，温暖晴朗是周日。"
+ },
+ {
+  "t": "point",
+  "lv": "四级",
+  "intro": "Listen to the conversation between two coworkers. Why is the woman worried?",
+  "lines": [
+   [
+    "M",
+    "You look nervous. Is it the presentation tomorrow?",
+    "你看起来很紧张，是因为明天的报告吗？"
+   ],
+   [
+    "F",
+    "Yes. It's to the regional directors.",
+    "是的，是给各区域总监做的。"
+   ],
+   [
+    "M",
+    "But you've presented to them before. And your slides look great.",
+    "可你以前给他们做过报告啊，你的幻灯片也很棒。"
+   ],
+   [
+    "F",
+    "The slides aren't the problem. Mark was supposed to present the budget section, but he's off sick, so I have to cover it.",
+    "幻灯片不是问题。本来马克负责讲预算部分，可他病了，只能我来讲。"
+   ],
+   [
+    "M",
+    "Ah, and you haven't worked on the budget at all.",
+    "啊，而你完全没接触过预算。"
+   ],
+   [
+    "F",
+    "Exactly. I barely know the numbers.",
+    "没错，那些数字我几乎不了解。"
+   ],
+   [
+    "M",
+    "I can go through them with you after lunch if you like.",
+    "你愿意的话，午饭后我可以陪你过一遍。"
+   ]
+  ],
+  "q": "Why is the woman worried?",
+  "c": [
+   "Her slides are not ready",
+   "She has to present a part she doesn't know well",
+   "She has never presented to the directors",
+   "Mark criticized her work"
+  ],
+  "cz": [
+   "她的幻灯片还没准备好",
+   "她得讲自己不熟悉的部分",
+   "她从没给总监们做过报告",
+   "马克批评了她的工作"
+  ],
+  "a": 1,
+  "ex": "马克病了，她得替他讲自己完全不熟的预算部分。幻灯片没问题，她以前也给总监做过报告。"
+ },
+ {
+  "t": "point",
+  "lv": "四级",
+  "intro": "Listen to the news report. Why will the bridge be closed?",
+  "lines": [
+   [
+    "F",
+    "The Harbor Bridge will be closed to traffic for three weeks starting next Monday.",
+    "港湾大桥将从下周一起封闭交通三周。"
+   ],
+   [
+    "F",
+    "City officials say the closure is not due to safety concerns. Recent inspections found the bridge to be in good condition.",
+    "市政官员表示，封闭并非出于安全考虑，近期检查显示大桥状况良好。"
+   ],
+   [
+    "F",
+    "Instead, workers will be adding a protected bike lane and wider sidewalks.",
+    "而是工人们将修建一条有隔离的自行车道并拓宽人行道。"
+   ],
+   [
+    "F",
+    "Drivers are advised to use the Elm Street tunnel, and extra buses will run during rush hour.",
+    "建议司机改走榆树街隧道，高峰时段将加开公交车。"
+   ],
+   [
+    "F",
+    "Officials admit the timing is inconvenient, coming right before the holiday shopping season.",
+    "官员承认时机不太方便，正好赶在节日购物季之前。"
+   ]
+  ],
+  "q": "Why will the bridge be closed?",
+  "c": [
+   "To add a bike lane and wider sidewalks",
+   "It failed a safety inspection",
+   "To build a new tunnel",
+   "To reduce holiday traffic"
+  ],
+  "cz": [
+   "增建自行车道并拓宽人行道",
+   "没通过安全检查",
+   "修建新隧道",
+   "减少节日期间的交通"
+  ],
+  "a": 0,
+  "ex": "报道明确说不是安全问题，而是要修自行车道和拓宽人行道。隧道是绕行路线，节日购物季只是时间上的不便。"
+ },
+ {
+  "t": "point",
+  "lv": "四级",
+  "intro": "Listen to a tour guide speaking to a group. What does the guide say about visiting the cathedral?",
+  "lines": [
+   [
+    "M",
+    "OK, everyone, here we are at the cathedral. Before we go in, a few things.",
+    "好，各位，我们到大教堂了。进去之前说几件事。"
+   ],
+   [
+    "M",
+    "Photos are allowed inside, but please turn off your flash.",
+    "里面可以拍照，但请关掉闪光灯。"
+   ],
+   [
+    "M",
+    "Shoulders must be covered, so if you're wearing a sleeveless top, you can borrow a scarf at the entrance for free.",
+    "必须遮住肩膀，穿无袖上衣的可以在入口免费借围巾。"
+   ],
+   [
+    "M",
+    "The tower is closed today for repairs, so unfortunately we won't be climbing it.",
+    "塔楼今天在维修关闭，很遗憾我们不能登塔了。"
+   ],
+   [
+    "M",
+    "We'll meet back here at the fountain in forty-five minutes.",
+    "四十五分钟后在这里的喷泉集合。"
+   ]
+  ],
+  "q": "What does the guide say about visiting the cathedral?",
+  "c": [
+   "Photos are not allowed inside",
+   "Visitors can borrow scarves for free",
+   "Visitors can climb the tower today",
+   "The group will meet inside the cathedral"
+  ],
+  "cz": [
+   "里面不能拍照",
+   "游客可以免费借围巾",
+   "今天可以登塔",
+   "大家在教堂里面集合"
+  ],
+  "a": 1,
+  "ex": "导游说入口可免费借围巾。里面可以拍照（不开闪光灯），塔楼今天关闭，集合地点是外面的喷泉。"
+ },
+ {
+  "t": "point",
+  "lv": "四级",
+  "intro": "Listen to the phone call to an internet company. Why did the woman call?",
+  "lines": [
+   [
+    "M",
+    "Brightline Internet, this is Sam speaking.",
+    "这里是明线网络，我是萨姆。"
+   ],
+   [
+    "F",
+    "Hi, I'm calling about my bill. I was charged twice this month.",
+    "你好，我打电话是关于账单的，我这个月被扣了两次费。"
+   ],
+   [
+    "M",
+    "Let me take a look. Yes, I see two payments of forty dollars. Has your connection been working OK?",
+    "我看一下……是的，有两笔四十美元的付款。您的网络正常吗？"
+   ],
+   [
+    "F",
+    "The connection's fine. It's just the double charge.",
+    "网络没问题，就是重复扣费。"
+   ],
+   [
+    "M",
+    "I'm sorry about that. I'll refund the extra payment. It'll take three to five days.",
+    "很抱歉，我会退还多扣的钱，需要三到五天。"
+   ],
+   [
+    "F",
+    "Thanks. Oh, and while I have you, could I ask about faster plans?",
+    "谢谢。对了，趁这个机会，我能问问更快的套餐吗？"
+   ],
+   [
+    "M",
+    "Sure, I'll transfer you to our sales team after this.",
+    "当然，说完这个我帮您转给销售部。"
+   ]
+  ],
+  "q": "Why did the woman call?",
+  "c": [
+   "Her connection was slow",
+   "She wanted to cancel her plan",
+   "She hadn't received her bill",
+   "She was charged twice"
+  ],
+  "cz": [
+   "她的网速慢",
+   "她想取消套餐",
+   "她没收到账单",
+   "她被重复扣费"
+  ],
+  "a": 3,
+  "ex": "她开头就说打电话是因为这个月被扣了两次费。网络正常；问更快的套餐只是顺便，并不是取消。"
+ },
+ {
+  "t": "point",
+  "lv": "四级",
+  "intro": "Listen to part of a science talk. According to the speaker, what is the main reason geese fly in a V shape?",
+  "lines": [
+   [
+    "M",
+    "Have you ever wondered why geese fly in a V shape?",
+    "你有没有想过大雁为什么排成V字形飞？"
+   ],
+   [
+    "M",
+    "Some people think it helps the birds see the leader, or that it's simply a way to avoid crashing into each other.",
+    "有人认为这样便于看见领头的鸟，或者只是为了避免相撞。"
+   ],
+   [
+    "M",
+    "Those may play a small part, but the main reason is energy.",
+    "这些可能有一点作用，但主要原因是能量。"
+   ],
+   [
+    "M",
+    "Each bird flies slightly behind and to the side of the one in front, catching the rising air created by its wings.",
+    "每只鸟都飞在前一只的侧后方，借助它翅膀带起的上升气流。"
+   ],
+   [
+    "M",
+    "This lets the birds save a lot of energy on long journeys.",
+    "这让鸟在长途飞行中节省大量体力。"
+   ],
+   [
+    "M",
+    "They also take turns at the front, because the leader works the hardest.",
+    "它们还会轮流领飞，因为领头的最累。"
+   ]
+  ],
+  "q": "According to the speaker, what is the main reason geese fly in a V shape?",
+  "c": [
+   "It helps them see the leader",
+   "It keeps them from crashing into each other",
+   "It helps them save energy",
+   "It lets the leader rest"
+  ],
+  "cz": [
+   "便于看见领头的鸟",
+   "避免互相碰撞",
+   "能帮它们节省体力",
+   "让领头的鸟休息"
+  ],
+  "a": 2,
+  "ex": "讲者说看见领头鸟、避免相撞只起很小作用，主要原因是节省能量。领头的鸟反而最累。"
+ },
+ {
+  "t": "point",
+  "lv": "六级",
+  "intro": "Listen to the news report. According to the report, why is the factory closing?",
+  "lines": [
+   [
+    "F",
+    "The electronics maker Norvel announced on Tuesday that it will close its factory in the town of Brayford by the end of next year.",
+    "电子产品制造商诺维尔周二宣布，将于明年年底前关闭其位于布雷福德镇的工厂。"
+   ],
+   [
+    "F",
+    "The company blamed rising energy costs rather than falling demand, noting that orders actually rose last quarter.",
+    "公司将原因归于能源成本上涨而非需求下降，并指出上季度订单其实有所增加。"
+   ],
+   [
+    "F",
+    "About six hundred workers will be affected. Norvel says it will offer them transfers to its plant in the north, though union leaders doubt many will accept, given the distance.",
+    "约六百名工人将受到影响。诺维尔表示会让他们调往北部的工厂，但工会领导人认为距离太远，接受的人恐怕不多。"
+   ],
+   [
+    "F",
+    "The town's mayor called the decision a heavy blow and said she would meet company executives next week to discuss alternatives.",
+    "镇长称这一决定是沉重打击，并表示下周将与公司高管会面商讨其他方案。"
+   ]
+  ],
+  "q": "According to the report, why is the factory closing?",
+  "c": [
+   "Demand for its products has fallen",
+   "Its workers went on strike",
+   "Energy costs have gone up",
+   "The town refused to support it"
+  ],
+  "cz": [
+   "产品需求下降",
+   "工人罢工",
+   "能源成本上涨",
+   "镇政府拒绝支持"
+  ],
+  "a": 2,
+  "ex": "公司称原因是能源成本上涨“而不是”需求下降，订单反而增加了。工会只是质疑调岗，镇长打算协商，并未拒绝支持。"
+ },
+ {
+  "t": "point",
+  "lv": "六级",
+  "intro": "Listen to part of a lecture. What was surprising about the results of the study?",
+  "lines": [
+   [
+    "M",
+    "A few years ago, researchers in dozens of countries tested whether people would return lost wallets.",
+    "几年前，研究人员在几十个国家测试人们是否会归还捡到的钱包。"
+   ],
+   [
+    "M",
+    "They handed in thousands of \"lost\" wallets, some with no money inside and some with a fairly large amount.",
+    "他们上交了数千个“丢失”的钱包，有的没装钱，有的装了不少钱。"
+   ],
+   [
+    "M",
+    "Most economists predicted that the more money a wallet held, the less likely it would be returned.",
+    "大多数经济学家预测，钱包里钱越多，被归还的可能性越小。"
+   ],
+   [
+    "M",
+    "In fact, the opposite happened: wallets with more cash were returned more often.",
+    "事实恰恰相反：钱越多的钱包被归还的比例越高。"
+   ],
+   [
+    "M",
+    "The researchers suggest that keeping a large sum feels more clearly like stealing, and people don't want to see themselves as thieves.",
+    "研究者认为，私吞一大笔钱更明显像偷窃，而人们不愿把自己看成小偷。"
+   ]
+  ],
+  "q": "What was surprising about the results of the study?",
+  "c": [
+   "Most wallets were never returned",
+   "Wallets with more money were returned more often",
+   "Empty wallets were returned most often",
+   "The economists' predictions were correct"
+  ],
+  "cz": [
+   "大多数钱包都没被归还",
+   "钱越多的钱包越常被归还",
+   "空钱包被归还得最多",
+   "经济学家的预测是对的"
+  ],
+  "a": 1,
+  "ex": "经济学家预测钱越多越不会归还，结果正好相反，这正是令人意外之处。"
+ },
+ {
+  "t": "point",
+  "lv": "六级",
+  "intro": "Listen to the conversation between two coworkers. What is the man's main concern about the open-plan office?",
+  "lines": [
+   [
+    "F",
+    "So management wants to knock down the walls and make the whole floor open-plan. They say it'll boost collaboration.",
+    "管理层想拆掉隔墙，把整层改成开放式办公，说是能促进协作。"
+   ],
+   [
+    "M",
+    "I'm not against collaboration, but the research on open offices is pretty mixed. Some studies found people actually talk face to face less.",
+    "我不反对协作，但关于开放式办公的研究结论很不一致。有研究发现人们当面交流反而更少了。"
+   ],
+   [
+    "F",
+    "Really? Why is that?",
+    "真的？为什么？"
+   ],
+   [
+    "M",
+    "People put on headphones and send messages instead, so they don't disturb everyone around them.",
+    "大家戴上耳机改发消息，免得打扰周围的人。"
+   ],
+   [
+    "F",
+    "Interesting. I suppose cost is a factor too. It's cheaper.",
+    "有意思。我想成本也是原因之一，这样更省钱。"
+   ],
+   [
+    "M",
+    "Sure, but my main worry is that our team spends half the day on calls with clients. Where would we take them?",
+    "是啊，但我最担心的是我们组一半时间都在和客户打电话，到时候去哪儿打？"
+   ],
+   [
+    "F",
+    "Fair point. You should raise that at Friday's meeting.",
+    "有道理，你应该在周五的会上提出来。"
+   ]
+  ],
+  "q": "What is the man's main concern about the open-plan office?",
+  "c": [
+   "There would be nowhere to take client calls",
+   "It would cost too much",
+   "People would talk to each other too much",
+   "Workers would have to wear headphones"
+  ],
+  "cz": [
+   "没有地方接打客户电话",
+   "花费太高",
+   "人们会互相聊得太多",
+   "员工必须戴耳机"
+  ],
+  "a": 0,
+  "ex": "他明确说 my main worry 是没地方和客户通话。开放式办公其实更省钱；研究说当面交流反而更少；戴耳机是员工自己的做法。"
+ },
+ {
+  "t": "point",
+  "lv": "六级",
+  "intro": "Listen to part of a radio interview. According to the woman, what can ordinary people do to help bees?",
+  "lines": [
+   [
+    "M",
+    "Dr. Ruiz, many people blame pesticides for the decline in bees. Is that the whole story?",
+    "鲁伊斯博士，很多人把蜜蜂减少归咎于农药。事情就是这样吗？"
+   ],
+   [
+    "F",
+    "Pesticides matter, but they're only one piece. In many regions, the bigger problem is a lack of food.",
+    "农药有影响，但只是一方面。在很多地区，更大的问题是缺乏食物。"
+   ],
+   [
+    "M",
+    "Food? You mean flowers?",
+    "食物？你是说花？"
+   ],
+   [
+    "F",
+    "Exactly. Huge single-crop farms bloom for just a few weeks, and after that there's nothing for bees to eat.",
+    "没错。大面积单一作物的农田只开几周花，之后蜜蜂就没东西吃了。"
+   ],
+   [
+    "M",
+    "So what can ordinary people do?",
+    "那普通人能做些什么？"
+   ],
+   [
+    "F",
+    "Plant a variety of flowers that bloom at different times of year. Even a window box helps. Buying local honey or keeping a hive yourself does surprisingly little for wild bees.",
+    "种各种在不同季节开花的植物，哪怕一个窗台花箱也有帮助。买本地蜂蜜或者自己养蜂，对野生蜜蜂的帮助其实小得出奇。"
+   ]
+  ],
+  "q": "According to the woman, what can ordinary people do to help bees?",
+  "c": [
+   "Stop using pesticides",
+   "Buy more local honey",
+   "Keep a beehive at home",
+   "Plant flowers that bloom at different times"
+  ],
+  "cz": [
+   "停止使用农药",
+   "多买本地蜂蜜",
+   "在家养一箱蜜蜂",
+   "种植不同时节开花的花"
+  ],
+  "a": 3,
+  "ex": "她建议普通人种不同季节开花的植物。农药只是原因之一，买蜂蜜和自己养蜂她认为帮助很小。"
+ },
+ {
+  "t": "point",
+  "lv": "六级",
+  "intro": "Listen to the conversation at an airline service desk. Why is the woman not entitled to compensation?",
+  "lines": [
+   [
+    "F",
+    "My flight was cancelled yesterday, and I'd like to claim compensation. I read that passengers can get up to six hundred euros.",
+    "我的航班昨天被取消了，我想申请赔偿。我看到说乘客最多能拿到六百欧元。"
+   ],
+   [
+    "M",
+    "That's true when the cancellation is the airline's fault, for example a technical problem or a shortage of staff.",
+    "那是在航班取消属于航空公司责任的情况下，比如技术故障或人手不足。"
+   ],
+   [
+    "F",
+    "Well, the email only said it was for operational reasons.",
+    "可邮件里只说是“运营原因”。"
+   ],
+   [
+    "M",
+    "Let me check your booking. I see the airport closed its runway yesterday because of a thunderstorm. That counts as an extraordinary circumstance, so compensation doesn't apply.",
+    "我查一下您的预订……昨天机场因雷暴关闭了跑道，这属于特殊情况，所以不适用赔偿。"
+   ],
+   [
+    "F",
+    "So I get nothing?",
+    "那我什么都拿不到？"
+   ],
+   [
+    "M",
+    "You're still entitled to a full refund, or we can rebook you free of charge. And if you send us the receipt, we'll cover the hotel night you paid for.",
+    "您仍然可以全额退票，或者免费改签。如果您把收据寄给我们，您付的那晚酒店费用我们也会承担。"
+   ]
+  ],
+  "q": "Why is the woman not entitled to compensation?",
+  "c": [
+   "There was a technical problem with the plane",
+   "The cancellation was caused by bad weather",
+   "The airline was short of staff",
+   "She did not keep her hotel receipt"
+  ],
+  "cz": [
+   "飞机出了技术故障",
+   "航班取消是天气造成的",
+   "航空公司人手不足",
+   "她没有保留酒店收据"
+  ],
+  "a": 1,
+  "ex": "工作人员说跑道因雷暴关闭，属于特殊情况，所以没有赔偿。技术故障和人手不足是可以赔偿的例子；酒店收据是报销住宿用的。"
+ },
+ {
+  "t": "gaiyou",
+  "lv": "基础",
+  "intro": "Listen to an announcement at a train station.",
+  "lines": [
+   [
+    "F",
+    "Good morning, passengers.",
+    "各位旅客早上好。"
+   ],
+   [
+    "F",
+    "From next Monday, there will be some building work at the east entrance of this station.",
+    "从下周一开始，本站东入口将进行施工。"
+   ],
+   [
+    "F",
+    "The east entrance will be closed for two weeks.",
+    "东入口将关闭两周。"
+   ],
+   [
+    "F",
+    "Please use the west entrance during this time.",
+    "这段时间请走西入口。"
+   ],
+   [
+    "F",
+    "The ticket office and the shops will stay open as usual.",
+    "售票处和商店照常营业。"
+   ],
+   [
+    "F",
+    "We are sorry for the trouble.",
+    "给您带来不便，敬请谅解。"
+   ]
+  ],
+  "q": "What is the announcement mainly about?",
+  "c": [
+   "The ticket office will close",
+   "A new shop is opening",
+   "Trains will start running later",
+   "An entrance will be closed for a while"
+  ],
+  "cz": [
+   "售票处要关闭",
+   "有新商店开业",
+   "列车将推迟运行",
+   "一个入口将关闭一段时间"
+  ],
+  "a": 3,
+  "ex": "广播的主要内容是东入口施工关闭两周、请走西入口。售票处和商店照常营业。"
+ },
+ {
+  "t": "gaiyou",
+  "lv": "基础",
+  "intro": "A man is talking about his job.",
+  "lines": [
+   [
+    "M",
+    "I'm a flight attendant, and I've been doing this job for six years.",
+    "我是一名空乘，干这行六年了。"
+   ],
+   [
+    "M",
+    "People think my job is all about serving food and drinks.",
+    "人们以为我的工作就是送餐送饮料。"
+   ],
+   [
+    "M",
+    "But the most important part is keeping passengers safe.",
+    "但最重要的部分是保障乘客安全。"
+   ],
+   [
+    "M",
+    "Every year we train for fires, emergency landings and passengers who get sick.",
+    "我们每年都要训练应对火灾、紧急降落和乘客生病。"
+   ],
+   [
+    "M",
+    "I hope I never need to use these skills, but I am always ready.",
+    "我希望永远用不上这些技能，但我时刻准备着。"
+   ]
+  ],
+  "q": "What is the man mainly talking about?",
+  "c": [
+   "Safety is the most important part of his job",
+   "He serves food and drinks all day",
+   "He wants to become a pilot",
+   "He once got sick on a plane"
+  ],
+  "cz": [
+   "安全是他工作中最重要的部分",
+   "他整天送餐送饮料",
+   "他想当飞行员",
+   "他曾经在飞机上生病"
+  ],
+  "a": 0,
+  "ex": "他强调空乘工作最重要的是保障安全，并介绍了相关训练。送餐只是别人以为的工作内容。"
+ },
+ {
+  "t": "gaiyou",
+  "lv": "基础",
+  "intro": "Listen to a news report.",
+  "lines": [
+   [
+    "F",
+    "The city zoo has a new member.",
+    "市动物园迎来了一位新成员。"
+   ],
+   [
+    "F",
+    "Last week, a baby elephant was born there.",
+    "上周，一头小象在这里出生。"
+   ],
+   [
+    "F",
+    "She is healthy and already walks with her mother.",
+    "她很健康，已经能跟着妈妈走路了。"
+   ],
+   [
+    "F",
+    "The zoo will show her to visitors from next Saturday.",
+    "动物园将从下周六起向游客展出她。"
+   ],
+   [
+    "F",
+    "Visitors can also help choose her name on the zoo's website.",
+    "游客还可以在动物园网站上帮她选名字。"
+   ]
+  ],
+  "q": "What is the news mainly about?",
+  "c": [
+   "A baby elephant was born at the zoo",
+   "The zoo will close on Saturday",
+   "The zoo has a new website",
+   "A mother elephant is sick"
+  ],
+  "cz": [
+   "动物园出生了一头小象",
+   "动物园周六闭园",
+   "动物园有了新网站",
+   "一头母象生病了"
+  ],
+  "a": 0,
+  "ex": "新闻讲的是动物园出生了一头小象。周六是开始展出，网站只是用来征名。"
+ },
+ {
+  "t": "gaiyou",
+  "lv": "基础",
+  "intro": "A manager is speaking to his staff.",
+  "lines": [
+   [
+    "M",
+    "Good morning, everyone. I have some news about our office.",
+    "大家早上好，我要说一下办公室的事。"
+   ],
+   [
+    "M",
+    "From this month, we're going to recycle more.",
+    "从这个月开始，我们要加强垃圾回收。"
+   ],
+   [
+    "M",
+    "There are now three bins in the kitchen: one for paper, one for plastic and one for food.",
+    "现在茶水间有三个垃圾桶：纸类、塑料和食物。"
+   ],
+   [
+    "M",
+    "Please don't put coffee cups in the paper bin. They go in the plastic bin.",
+    "咖啡杯请不要扔进纸类桶，要扔进塑料桶。"
+   ],
+   [
+    "M",
+    "Also, please print only when you really need to.",
+    "另外，请只在真正需要时才打印。"
+   ]
+  ],
+  "q": "What is the man mainly talking about?",
+  "c": [
+   "A new kitchen in the office",
+   "How to make good coffee",
+   "New recycling rules in the office",
+   "A new printer in the office"
+  ],
+  "cz": [
+   "办公室的新茶水间",
+   "怎样泡好咖啡",
+   "办公室新的回收规定",
+   "办公室的新打印机"
+  ],
+  "a": 2,
+  "ex": "经理讲的是加强回收：三个分类垃圾桶、咖啡杯怎么扔、少打印。茶水间、咖啡和打印只是细节。"
+ },
+ {
+  "t": "gaiyou",
+  "lv": "四级",
+  "intro": "Listen to part of a talk on psychology.",
+  "lines": [
+   [
+    "F",
+    "If you want to remember something for a long time, how you study matters as much as how long you study.",
+    "想要长期记住一样东西，怎么学和学多久同样重要。"
+   ],
+   [
+    "F",
+    "Many people cram the night before a test, going over the same material for hours.",
+    "很多人考前一晚突击，连续几小时反复看同样的内容。"
+   ],
+   [
+    "F",
+    "This may get them through the next day, but most of what they learn is forgotten within a week.",
+    "这也许能应付第二天，但学到的东西一周内大多就忘了。"
+   ],
+   [
+    "F",
+    "Psychologists have found that reviewing material several times, with gaps of a few days in between, leads to much stronger memories.",
+    "心理学家发现，间隔几天、分几次复习，记忆会牢固得多。"
+   ],
+   [
+    "F",
+    "Each time we nearly forget something and then recall it, the memory becomes more firmly fixed.",
+    "每次快要忘记时再想起来，记忆就会更加牢固。"
+   ],
+   [
+    "F",
+    "So instead of one long session, try several short ones spread out over time.",
+    "所以与其一次学很久，不如分几次短时间学习。"
+   ]
+  ],
+  "q": "What is the speaker mainly talking about?",
+  "c": [
+   "People should study for longer hours",
+   "Cramming is the best way to pass a test",
+   "Forgetting is a sign of a poor memory",
+   "Spreading study over time helps memory"
+  ],
+  "cz": [
+   "人们应该学习更长时间",
+   "突击是通过考试的最好办法",
+   "遗忘说明记性差",
+   "分散时间学习有助于记忆"
+  ],
+  "a": 3,
+  "ex": "讲者的核心观点是间隔复习比集中突击记得更牢。她并不主张学得更久，也没有说遗忘代表记性差。"
+ },
+ {
+  "t": "gaiyou",
+  "lv": "四级",
+  "intro": "Listen to a news report.",
+  "lines": [
+   [
+    "M",
+    "Starting this weekend, the historic center of Greenford will be closed to private cars every Sunday.",
+    "从本周末开始，格林福德的历史城区每逢周日将禁止私家车进入。"
+   ],
+   [
+    "M",
+    "The city council says the aim is to cut air pollution and give the streets back to people.",
+    "市议会表示，目的是减少空气污染，把街道还给行人。"
+   ],
+   [
+    "M",
+    "Buses and taxis will still be allowed, and residents can apply for special permits.",
+    "公交车和出租车仍可通行，居民可以申请特别许可。"
+   ],
+   [
+    "M",
+    "Some shop owners worry they'll lose customers, but similar schemes in other cities have often brought more people in on foot.",
+    "一些店主担心会流失顾客，但其他城市的类似做法往往吸引了更多步行的人。"
+   ],
+   [
+    "M",
+    "The council will review the plan after six months.",
+    "市议会将在六个月后对该计划进行评估。"
+   ]
+  ],
+  "q": "What is the news mainly about?",
+  "c": [
+   "Shop owners losing customers",
+   "New bus routes in Greenford",
+   "A city's plan to keep cars out of its center on Sundays",
+   "Air pollution in other cities"
+  ],
+  "cz": [
+   "店主流失顾客",
+   "格林福德的新公交线路",
+   "一座城市周日禁止汽车进入市中心的计划",
+   "其他城市的空气污染"
+  ],
+  "a": 2,
+  "ex": "新闻主体是格林福德周日禁止私家车进入历史城区。店主担忧、公交通行都只是细节。"
+ },
+ {
+  "t": "gaiyou",
+  "lv": "四级",
+  "intro": "Listen to part of a radio program.",
+  "lines": [
+   [
+    "F",
+    "Many office workers are proud of eating lunch at their desks and working for hours without a break.",
+    "很多上班族以在工位上吃午饭、连续工作几小时不休息为荣。"
+   ],
+   [
+    "F",
+    "They believe it shows they are hardworking and helps them get more done.",
+    "他们认为这显得勤奋，也能做更多事。"
+   ],
+   [
+    "F",
+    "But studies suggest the opposite. Our ability to focus drops after about ninety minutes of continuous work.",
+    "但研究表明恰恰相反。连续工作约九十分钟后，我们的专注力就会下降。"
+   ],
+   [
+    "F",
+    "Even a ten-minute walk or a short chat with a colleague can restore attention and reduce mistakes.",
+    "哪怕散步十分钟或和同事聊几句，也能恢复注意力、减少差错。"
+   ],
+   [
+    "F",
+    "So taking regular breaks isn't laziness. It's a smart way to work.",
+    "所以定时休息不是偷懒，而是聪明的工作方式。"
+   ]
+  ],
+  "q": "What is the speaker's main point?",
+  "c": [
+   "Office workers should eat lunch at their desks",
+   "Taking regular breaks helps people work better",
+   "People can only work ninety minutes a day",
+   "Chatting with colleagues causes mistakes"
+  ],
+  "cz": [
+   "上班族应该在工位上吃午饭",
+   "定时休息能让人工作得更好",
+   "人一天只能工作九十分钟",
+   "和同事聊天会导致出错"
+  ],
+  "a": 1,
+  "ex": "讲者反驳“不休息才高效”的看法，主张定时休息是聪明的工作方式。九十分钟是专注力下降的时间点，不是每天的工作时长。"
+ },
+ {
+  "t": "gaiyou",
+  "lv": "六级",
+  "intro": "Listen to part of a lecture.",
+  "lines": [
+   [
+    "M",
+    "We tend to think of the placebo effect as a kind of trick: a patient feels better only because they have been fooled into thinking they received real medicine.",
+    "我们往往把安慰剂效应看作一种把戏：病人感觉好转，只是因为被骗以为吃了真药。"
+   ],
+   [
+    "M",
+    "But a growing body of research challenges that view.",
+    "但越来越多的研究对这种看法提出了挑战。"
+   ],
+   [
+    "M",
+    "In several trials, patients with long-term back pain were told openly that they were taking sugar pills with no active ingredients, and yet many still reported real relief.",
+    "在几项试验中，长期腰痛的患者被明确告知吃的是不含有效成分的糖丸，但很多人仍表示疼痛明显减轻。"
+   ],
+   [
+    "M",
+    "Researchers think the ritual of treatment itself, taking a pill and being cared for by a doctor, may trigger the body's own pain-relieving responses.",
+    "研究者认为，治疗这一仪式本身——吃药、受到医生照料——可能会激发身体自身的止痛反应。"
+   ],
+   [
+    "M",
+    "This doesn't mean placebos can cure serious diseases, but it suggests that the experience of being cared for is a more powerful part of medicine than we once believed.",
+    "这并不意味着安慰剂能治愈重病，但说明被照料的体验在医疗中的作用比我们以前想的更大。"
+   ]
+  ],
+  "q": "What is the speaker mainly saying?",
+  "c": [
+   "Placebos can cure serious diseases",
+   "Placebos can work even when patients know they are placebos",
+   "Doctors should stop giving patients sugar pills",
+   "Patients with back pain are easily fooled"
+  ],
+  "cz": [
+   "安慰剂能治愈重病",
+   "即使病人知道是安慰剂，安慰剂也能起作用",
+   "医生应停止给病人开糖丸",
+   "腰痛患者很容易被骗"
+  ],
+  "a": 1,
+  "ex": "讲者用公开告知的安慰剂试验说明，安慰剂不靠欺骗也能起效，治疗体验本身很重要。他明确说安慰剂不能治愈重病。"
+ },
+ {
+  "t": "gaiyou",
+  "lv": "六级",
+  "intro": "Listen to part of a talk.",
+  "lines": [
+   [
+    "F",
+    "For decades, cities measured the success of tourism simply by counting visitors: the more, the better.",
+    "几十年来，城市衡量旅游业成功与否的办法就是数游客人数：越多越好。"
+   ],
+   [
+    "F",
+    "But in places like Venice and Barcelona, residents have begun to push back, complaining about crowded streets, rising rents and neighborhoods that feel like theme parks.",
+    "但在威尼斯、巴塞罗那等地，居民开始反对，抱怨街道拥挤、房租上涨，街区像主题公园一样。"
+   ],
+   [
+    "F",
+    "In response, some destinations are changing their goals. Rather than chasing record numbers, they're trying to attract visitors who stay longer, spend more locally and travel outside the peak season.",
+    "作为回应，一些旅游地正在改变目标：不再追求创纪录的人数，而是吸引停留更久、在当地消费更多、错峰出行的游客。"
+   ],
+   [
+    "F",
+    "Amsterdam, for example, has run campaigns telling certain short-stay party tourists to stay away.",
+    "例如，阿姆斯特丹就曾发起宣传，劝某些短期来狂欢的游客别来。"
+   ],
+   [
+    "F",
+    "The idea is that tourism should serve the people who live there, not just the people passing through.",
+    "其理念是，旅游业应该服务于当地居民，而不只是过客。"
+   ]
+  ],
+  "q": "What is the talk mainly about?",
+  "c": [
+   "Venice has stopped welcoming tourists",
+   "Cities are rethinking what successful tourism means",
+   "Tourists are spending less money than before",
+   "Rents are rising because of new hotels"
+  ],
+  "cz": [
+   "威尼斯已不再欢迎游客",
+   "城市正在重新思考什么是成功的旅游业",
+   "游客的花费比以前少了",
+   "新酒店导致房租上涨"
+  ],
+  "a": 1,
+  "ex": "讲话主旨是城市从“游客越多越好”转向重视质量、服务当地居民。威尼斯和房租只是居民不满的例子。"
+ },
+ {
+  "t": "gaiyou",
+  "lv": "六级",
+  "intro": "Listen to part of a business report.",
+  "lines": [
+   [
+    "M",
+    "For a long time, a university degree was the basic ticket into a well-paid job.",
+    "长期以来，大学文凭是进入高薪工作的基本门票。"
+   ],
+   [
+    "M",
+    "Recently, however, a number of large employers have dropped degree requirements for many positions, focusing instead on what candidates can actually do.",
+    "但最近，不少大型雇主取消了许多职位的学历要求，转而看重应聘者的实际能力。"
+   ],
+   [
+    "M",
+    "Applicants may be asked to complete practical tasks or show a portfolio rather than list their qualifications.",
+    "应聘者可能需要完成实际任务或展示作品集，而不是罗列学历证书。"
+   ],
+   [
+    "M",
+    "Supporters say this widens the talent pool and gives a fair chance to people who couldn't afford college.",
+    "支持者说这扩大了人才来源，也给上不起大学的人一个公平机会。"
+   ],
+   [
+    "M",
+    "Critics point out that, in practice, many hiring managers still favor graduates, so the change may exist more on paper than in reality.",
+    "批评者指出，实际上很多招聘经理仍偏爱大学毕业生，所以这种变化可能更多停留在纸面上。"
+   ]
+  ],
+  "q": "What is the report mainly about?",
+  "c": [
+   "Why university fees keep rising",
+   "How to build a strong portfolio",
+   "A shift toward hiring based on skills rather than degrees",
+   "Employers refusing to hire graduates"
+  ],
+  "cz": [
+   "大学学费为何持续上涨",
+   "如何做出出色的作品集",
+   "招聘从看学历转向看技能",
+   "雇主拒绝招聘大学毕业生"
+  ],
+  "a": 2,
+  "ex": "报道围绕企业取消学历要求、改为看实际能力这一趋势及其争议展开。作品集只是举例，招聘经理反而仍偏爱毕业生。"
+ },
+ {
+  "t": "gaiyou",
+  "lv": "六级",
+  "intro": "Listen to part of a lecture on language.",
+  "lines": [
+   [
+    "F",
+    "Of the roughly seven thousand languages spoken today, linguists estimate that nearly half could disappear by the end of this century.",
+    "在现存的约七千种语言中，语言学家估计近一半可能在本世纪末消失。"
+   ],
+   [
+    "F",
+    "A language rarely dies because its speakers suddenly stop using it. More often, parents decide their children will have better chances in a dominant language, and the old one simply isn't passed on.",
+    "语言很少因为使用者突然不说而消亡。更常见的是，父母觉得孩子学主流语言更有前途，于是老语言就没有传下去。"
+   ],
+   [
+    "F",
+    "When that happens, more is lost than words. Languages hold knowledge about local plants, history and ways of seeing the world.",
+    "一旦如此，失去的不只是词语。语言承载着关于当地植物、历史以及看待世界方式的知识。"
+   ],
+   [
+    "F",
+    "The encouraging news is that decline can be reversed. In places like Wales and New Zealand, schools that teach in the traditional language have helped the number of young speakers grow.",
+    "令人鼓舞的是，衰落是可以逆转的。在威尔士和新西兰等地，用传统语言授课的学校让年轻使用者的人数有所增加。"
+   ]
+  ],
+  "q": "What is the speaker mainly talking about?",
+  "c": [
+   "Why languages disappear and how they can be revived",
+   "How many languages exist in the world",
+   "Why parents prefer dominant languages",
+   "The history of the Welsh language"
+  ],
+  "cz": [
+   "语言为何消失以及如何复兴",
+   "世界上有多少种语言",
+   "父母为何偏爱主流语言",
+   "威尔士语的历史"
+  ],
+  "a": 0,
+  "ex": "讲者先讲语言消亡的原因和损失，再讲可以通过学校教育复兴。语言数量、父母的选择和威尔士都只是其中的细节。"
+ }
+]
