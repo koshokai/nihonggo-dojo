@@ -125,14 +125,18 @@ def main(lang):
             if not t:
                 continue
             src = Path(tmp) / ('x' + Path(t).suffix)
+            file = f'{lang}-h/{hashlib.sha1(w.encode()).hexdigest()[:16]}.mp3'
             try:
+                if (OUT / file).exists():  # 上次中断前已经转好的文件，直接收录
+                    raise FileExistsError
                 src.write_bytes(get(meta[t]['url'], raw=True))
-                file = f'{lang}-h/{hashlib.sha1(w.encode()).hexdigest()[:16]}.mp3'
                 (OUT / file).parent.mkdir(parents=True, exist_ok=True)
                 # 去掉开头结尾的静音，单声道 32k
                 subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', str(src), '-af',
                                 'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse',
                                 '-ac', '1', '-b:a', '32k', str(OUT / file)], check=True)
+            except FileExistsError:
+                pass
             except Exception as e:
                 print('  failed', w, e, flush=True)
                 continue
