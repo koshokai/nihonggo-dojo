@@ -13,8 +13,15 @@ PHOTOS = json.loads((ROOT / 'photos' / 'index.json').read_text(encoding='utf-8')
 
 
 def load(lang, kind):
-    f = SRC / f'{lang}_{kind}.json'
-    return json.loads(f.read_text(encoding='utf-8')) if f.exists() else None
+    """<lang>_<kind>.json 加上后续扩充的 <lang>_<kind>2.json、<kind>3.json……（按文件名顺序拼起来）"""
+    fs = sorted(SRC.glob(f'{lang}_{kind}.json')) + sorted(SRC.glob(f'{lang}_{kind}[0-9].json'))
+    if not fs:
+        return None
+    out = None
+    for f in fs:
+        d = json.loads(f.read_text(encoding='utf-8'))
+        out = d if out is None else (out + d if isinstance(d, list) else out)
+    return out
 
 
 def write(lang, kind, data):

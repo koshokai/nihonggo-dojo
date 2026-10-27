@@ -6,20 +6,20 @@ bad = 0
 def err(*a):
     global bad; bad += 1; print(*a)
 for lang in ('ko', 'en'):
-    f = D / f'{lang}_grammar.json'
-    if f.exists():
+  for f in sorted(D.glob(f'{lang}_grammar*.json')):
+    if True:
         d = json.loads(f.read_text(encoding='utf-8'))
         for i, g in enumerate(d):
             if g.get('lv') not in LV[lang] or not g.get('p') or len(g.get('eg', [])) < 2 or len(g['q'][1]) != 4 or len(set(g['q'][1])) != 4: err(f.name, i)
         print(f.name, len(d))
-    f = D / f'{lang}_reading.json'
-    if f.exists():
+  for f in sorted(D.glob(f'{lang}_reading*.json')):
+    if True:
         d = json.loads(f.read_text(encoding='utf-8'))
         for i, a in enumerate(d):
             if a.get('lv') not in LV[lang] or not a.get('p') or any(len(s) != 2 for p in a['p'] for s in p) or any(len(w) != 3 for w in a['w']) or any(len(q) != 5 for q in a['q']): err(f.name, i)
         print(f.name, len(d))
-    f = D / f'{lang}_listen.json'
-    if f.exists():
+  for f in sorted(D.glob(f'{lang}_listen*.json')):
+    if True:
         d = json.loads(f.read_text(encoding='utf-8'))
         NC = {'sokuji': 3, 'kadai': 4, 'point': 4, 'gaiyou': 4}
         for i, x in enumerate(d):

@@ -3,7 +3,10 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+# topik1.json + topik1_2.json、topik1_3.json…… 合并成一个题库
+banks = {}
 for f in sorted((ROOT / 'tools' / 'lexam').glob('*.json')):
-    d = json.loads(f.read_text(encoding='utf-8'))
-    (ROOT / 'lang' / f'exam-{f.stem}.json').write_text(json.dumps(d, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
-    print(f.stem, len(d))
+    banks.setdefault(f.stem.split('_')[0], []).extend(json.loads(f.read_text(encoding='utf-8')))
+for name, d in banks.items():
+    (ROOT / 'lang' / f'exam-{name}.json').write_text(json.dumps(d, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    print(name, len(d))

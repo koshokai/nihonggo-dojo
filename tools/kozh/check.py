@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 D = Path(__file__).parent
 bad = 0
-for f in sorted(D.glob('in_*.tsv')):
+for f in sorted(D.glob("in_*.tsv")):
     o = D / f.name.replace('in_', 'zh_')
     if not o.exists():
         print(o.name, 'missing'); continue

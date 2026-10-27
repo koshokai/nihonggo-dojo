@@ -1,0 +1,84 @@
+# 英语发音：Kokoro（Apache 2.0）。分 4 片并行生成，最后合并提交。在 Actions 页面手动运行。
+name: Kokoro English audio
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kokoro
+  cancel-in-progress: false
+
+jobs:
+  text:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: |
+          sudo apt-get update -q && sudo apt-get install -yq espeak-ng ffmpeg
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q "kokoro>=0.9" soundfile numpy
+      - name: Generate
+        run: python3 tools/gen_audio_kokoro.py text --shard ${{ matrix.shard }} --shards 4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: en-${{ matrix.shard }}
+          path: |
+            audio/en-k
+            audio/index-en.${{ matrix.shard }}.json
+          retention-days: 2
+
+  listen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: |
+          sudo apt-get update -q && sudo apt-get install -yq espeak-ng ffmpeg
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q "kokoro>=0.9" soundfile numpy
+      - name: Generate
+        run: python3 tools/gen_audio_kokoro.py listen
+      - uses: actions/upload-artifact@v4
+        with:
+          name: en-listen
+          path: |
+            audio/en-listen
+            audio/index-en-listen.json
+          retention-days: 2
+
+  commit:
+    needs: [text, listen]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: /tmp/art
+      - name: Merge and commit
+        run: |
+          for d in /tmp/art/*; do cp -r "$d"/. audio/ 2>/dev/null || true; done
+          ls audio | head
+          python3 tools/gen_audio_kokoro.py merge
+          git config user.name "kokoro-bot"
+          git config user.email "kokoro-bot@users.noreply.github.com"
+          git add -A audio
+          git diff --cached --quiet && exit 0
+          git commit -qm "audio: English voices regenerated with Kokoro"
+          for i in 1 2 3; do git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main && break; sleep 5; done
