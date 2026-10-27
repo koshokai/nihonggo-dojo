@@ -207,7 +207,7 @@ zh: 自动售货机之国
 # id: life-008
 level: N4
 cat: 日本生活
-photo: Sento public bath Japan Mount Fuji mural / Sento Tokyo entrance noren / Japanese public bath interior
+photo: Sento bathhouse Japan -slippers / Sento Tokyo noren / Japanese public bath
 title: 銭湯に行こう
 zh: 去钱汤泡澡吧
 ---
@@ -266,7 +266,7 @@ zh: 早高峰
 # id: life-010
 level: N2
 cat: 日本生活
-photo: Japanese apartment building exterior / Real estate agency window Japan / Japanese apartment empty room tatami
+photo: Real estate agency Japan / Japanese apartment building / Fudosan Japan
 title: 部屋探しと「礼金」「敷金」
 zh: 找房子与“礼金”“押金”
 ---
@@ -324,7 +324,7 @@ zh: 百元店真有趣
 # id: life-012
 level: N4
 cat: 日本生活
-photo: Japanese red post box / Japan Post office exterior / Japan post mailbox street
+photo: Japan Post office building / Japan Post post office / Japanese red post box
 title: 郵便局へ行こう
 zh: 去邮局吧
 ---

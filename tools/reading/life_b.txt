@@ -88,7 +88,7 @@ zh: 秋田的米棒火锅
 # id: life-024
 level: N4
 cat: 地方美食
-photo: Utsunomiya gyoza / Utsunomiya gyoza statue station / Yaki gyoza Japanese dumplings
+photo: Utsunomiya gyoza -burger / Yaki gyoza plate / Gyoza Utsunomiya restaurant -burger
 title: 餃子の町・宇都宮
 zh: 饺子之城·宇都宫
 ---
