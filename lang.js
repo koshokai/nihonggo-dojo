@@ -227,7 +227,7 @@ function langLevels(tr) {
     const name = meta.find(m => m[0] === cur)[1];
     p.innerHTML = `<div class="row between"><h2>${T.title}分级词库</h2><span class="small muted">${esc(name)}：已学 ${known} / ${items.length}</span></div>
       <div class="chips-row">${meta.map(([k, n, c]) => `<button type="button" class="chip-btn ${k === cur ? 'on' : ''}" data-lv="${k}">${esc(n)} <span class="small">${c}</span></button>`).join('')}</div>
-      <p class="small muted">${tr === 'en' ? '按中国的英语考试分级：每个词只放在它第一次出现的级别（例如四级里只有四级新增、高考没有的词），同一级里常用词在前。' : '按国立国语院《韩国语基础词典》的等级：初级≈TOPIK 1–2 级，中级≈3–4 级，高级≈5–6 级。括号里是汉字词的汉字，学过汉语的人一看就懂。'}</p>
+      <p class="small muted">${tr === 'en' ? '按中国的英语考试分级：每个词只放在它第一次出现的级别（例如四级里只有四级新增、高考没有的词），同一级里常用词在前。' : '按国立国语院《韩国语基础词典》的等级：初级≈TOPIK 1–2 级，中级≈3–4 级，高级≈5–6 级。单词下面标出了汉字词对应的汉字（繁体），学过汉语的人一看就懂。'}</p>
       <div class="row"><button class="btn pri" type="button" data-cards>闪卡：${due.length ? `复习 ${due.length} + ` : ''}新词 15</button><button class="btn" type="button" data-quiz>小测验 10 题</button></div>
       <input type="search" class="lv-q" placeholder="在这一级里查找：${tr === 'en' ? '英文' : '韩语'} / 中文" value="${esc(lvQuery[tr] || '')}">
       <div class="list-wrap"><table class="list"><tbody>${list.slice(0, lvShown).map(x => `<tr><td style="width:40px">${sayBtn(x.t, T.tts)}</td><td><b lang="${tr}">${esc(x.t)}</b>${x.pr ? `<div class="small muted">${tr === 'ko' ? '汉字 ' : ''}${esc(x.pr)}</div>` : ''}</td><td>${esc(x.zh)}</td><td>${S.srs[x.id] && S.srs[x.id].r > 0 ? '<span class="tag done">已学</span>' : ''}</td></tr>`).join('')}</tbody></table></div>
