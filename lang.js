@@ -368,7 +368,8 @@ function langReady(tr) {
     langLoading[tr] = true;
     const s = document.createElement('script');
     s.src = TRACKS[tr].file;
-    s.onload = () => { if (trackOf((location.hash || '').slice(1).split('/')[0]) === tr) render(); };
+    // 不带 # 打开（从主屏幕图标启动、重新登录）时 hash 为空，所以按当前显示的语言判断
+    s.onload = () => { if (document.body.dataset.track === tr) render(); };
     s.onerror = () => { langLoading[tr] = false; toast('加载失败，请检查网络'); };
     document.body.append(s);
   }
