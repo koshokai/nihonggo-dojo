@@ -7,7 +7,9 @@ const TRACKS = {
   ko: { name: '한국어', home: 'ko', title: '韩语', tts: 'ko-KR', file: 'lang-ko.js', data: () => typeof LANG_KO !== 'undefined' && LANG_KO },
   en: { name: 'English', home: 'en', title: '英语', tts: 'en-US', file: 'lang-en.js', data: () => typeof LANG_EN !== 'undefined' && LANG_EN }
 };
-const trackOf = view => view === 'ko' || view === 'en' ? view : 'ja';
+// 「我的」这类公共页面不属于某一门语言：留在当前正在学的语言里（导航栏不跳回日语）
+const TRACK_NEUTRAL = ['me', 'welcome'];
+const trackOf = view => view === 'ko' || view === 'en' ? view : TRACK_NEUTRAL.includes(view) ? (S.track || 'ja') : 'ja';
 
 // 浏览器朗读（韩语、英语还没有预生成的音频）
 function speakLang(text, lang) {
@@ -312,6 +314,7 @@ function initTrackSwitch() {
 function applyTrack(view) {
   const tr = trackOf(view);
   document.body.dataset.track = tr;
+  const lv = document.getElementById('chip-lv'); if (lv) lv.hidden = tr !== 'ja';   // JLPT 级别只对日语有意义
   document.querySelectorAll('.track-seg [data-track]').forEach(b => b.classList.toggle('on', b.dataset.track === tr));
   const input = document.getElementById('gs-q');
   if (input) input.placeholder = tr === 'ja' ? '查词：日语 / 假名 / 中文 / 英文' : `查${TRACKS[tr].title}：${TRACKS[tr].title} / 中文`;
@@ -333,4 +336,9 @@ function langSearch(q, drop) {
 document.addEventListener('click', e => {
   const a = e.target.closest('.tabs a[data-trk]');
   if (a && a.getAttribute('href') === location.hash) { e.preventDefault(); render(); }
+});
+// 左上角的站名：回到当前语言的首页
+document.addEventListener('click', e => {
+  const a = e.target.closest('a.brand');
+  if (a && S.track && S.track !== 'ja') { e.preventDefault(); location.hash = TRACKS[S.track].home; }
 });

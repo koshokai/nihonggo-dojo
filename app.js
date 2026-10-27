@@ -665,7 +665,8 @@ const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, di
 function render() {
   const [v, ...rest] = (location.hash || '#home').slice(1).split('/');
   const arg = rest.join('/');
-  let view = VIEWS[v] ? v : (!location.hash && S.track && S.track !== 'ja' ? S.track : 'home');
+  // 不带 # 打开（例如从主屏幕图标启动）时，回到上次在学的语言
+  let view = !location.hash && S.track && S.track !== 'ja' ? S.track : VIEWS[v] ? v : 'home';
   if (!S.onboarded && view !== 'me') view = 'welcome';
   if (S.onboarded && view === 'welcome') view = 'home';
   clearInterval(examTimer); keyHandler = null;
@@ -1198,7 +1199,8 @@ function viewExam() {
 function viewMe() {
   const opt = (arr, cur, attr) => arr.map(([v, t]) => `<button type="button" ${attr}="${v}" class="${String(cur) === String(v) ? 'on' : ''}">${t}</button>`).join('');
   const p = h(`<section class="panel"><h2>学习设置</h2>
-    <div class="row between"><span>目标级别</span>${levelSeg(S.level)}</div>
+    <div class="row between"><span>正在学</span><div class="seg">${Object.entries(TRACKS).map(([k, t]) => `<button type="button" data-trk-set="${k}" class="${(S.track || 'ja') === k ? 'on' : ''}">${t.name}</button>`).join('')}</div></div>
+    ${(S.track || 'ja') === 'ja' ? `<div class="row between"><span>日语目标级别</span>${levelSeg(S.level)}</div>` : ''}
     <div class="row between"><span>每日经验目标</span><div class="seg">${opt([[30, '30 轻松'], [50, '50 标准'], [100, '100 认真'], [200, '200 冲刺']], S.goal, 'data-goal')}</div></div>
     <div class="row between"><span>每天新单词</span><div class="seg">${opt([[5, '5'], [10, '10'], [20, '20'], [30, '30']], S.newPerDay, 'data-new')}</div></div>
     <div class="row between"><span>外观</span><div class="seg">${opt([['', '跟随系统'], ['light', '浅色'], ['dark', '深色']], S.theme, 'data-theme-set')}</div></div>
@@ -1206,6 +1208,7 @@ function viewMe() {
     <p class="small muted">经验怎么来：测验答对 10（假名 5），单词卡每张 5，模拟考每题 10，合格再加 50，每 5 连对额外 5。</p>
   </section>`);
   bindLevel(p);
+  p.querySelectorAll('[data-trk-set]').forEach(b => { b.onclick = () => { S.track = b.dataset.trkSet; save(); render(); }; });
   p.querySelectorAll('[data-goal]').forEach(b => { b.onclick = () => { S.goal = +b.dataset.goal; save(); render(); }; });
   p.querySelectorAll('[data-new]').forEach(b => { b.onclick = () => { S.newPerDay = +b.dataset.new; save(); render(); }; });
   p.querySelectorAll('[data-petals]').forEach(b => { b.onclick = () => { S.petals = b.dataset.petals === '1'; save(); startPetals(); render(); }; });
@@ -1374,7 +1377,7 @@ checkBadges();
 render();
 initGlobalSearch();
 initTrackSwitch();
-applyTrack((location.hash || '#home').slice(1).split('/')[0]);
+applyTrack(document.body.dataset.track || 'ja');
 cloudInit();
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   // 新版本的离线缓存接管页面时刷新一次，保证看到的是最新代码（第一次安装不刷新）

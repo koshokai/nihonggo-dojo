@@ -18,7 +18,7 @@ LEVELS = [('zk', '中考'), ('gk', '高考'), ('cet4', '四级'), ('cet6', '六�
 
 def gloss(tr):
     lines = []
-    for l in tr.replace('\\n', '\n').replace('\r', '').split('\n'):
+    for l in tr.replace('\\r', '').replace('\\n', '\n').replace('\r', '').split('\n'):
         l = re.sub(r'\[[^\]]{1,4}\][^；;]*', '', l).strip(' ；;,，')   # 去掉 [计] [医] 这类专业义项
         if l and not l.startswith('[网络]'):
             lines.append(l)
