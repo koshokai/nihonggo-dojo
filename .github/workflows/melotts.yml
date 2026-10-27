@@ -9,7 +9,7 @@ on:
         required: true
         default: ko
       which:
-        description: basic（入门单词和常用句）/ levels（分级词库）
+        description: basic（入门单词和常用句）/ levels（分级词库）/ daily（今日一句、例句、阅读、商务）/ listen（听力对话）
         required: true
         default: basic
       limit:
