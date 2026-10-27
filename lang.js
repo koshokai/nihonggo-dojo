@@ -401,35 +401,58 @@ function viewLangTrack(tr, sub) {
   if (sub === 'dict') return l2Dict(tr);
   if (!langReady(tr)) return;
   if (sub === 'words' || sub === 'phrases') return main.append(langList(tr, sub));
-  // 首页
-  const T = TRACKS[tr], words = langItems(tr, 'words'), phrases = langItems(tr, 'phrases');
-  const known = l2AllCards(tr).filter(x => S.srs[x.id] && S.srs[x.id].r > 0).length;
-  const due = l2AllCards(tr).filter(x => S.srs[x.id] && S.srs[x.id].due <= Date.now());
-  const p = h(`<section class="panel">
-    <h2>${T.title}入门 · ${T.name}</h2>
-    <p>${tr === 'ko' ? '韩语和日语语法很像（主宾谓语序、助词、敬语），又有大量和汉语相近的汉字词——学过日语的人学韩语特别快。先花一两天学会韩文字母，就能自己读出所有单词。' : '从字母和音标开始，掌握最常用的 500 个单词和 150 句日常会话，够应付旅行、点餐、问路和简单聊天。'}</p>
-    <div class="stat-row"><div><b>${known}</b><span class="small muted">已学</span></div><div><b>${due.length}</b><span class="small muted">今天要复习</span></div><div><b>${words.length + phrases.length}</b><span class="small muted">全部</span></div></div>
-    ${due.length ? `<div class="row"><button class="btn pri" type="button" data-due>复习到期的 ${due.length} 张卡</button></div>` : ''}
-    <div class="lang-menu">
-      <a class="lang-tile" href="#${tr}/game"><b>闯关</b><span class="small muted">入门单词每 10 个一关，3 条命</span></a>
-      <a class="lang-tile" href="#${tr}/grammar"><b>语法</b><span class="small muted">${tr === 'ko' ? '初级 / 中级 / 高级' : '基础 / 四级 / 六级'}，用法 + 例句 + 练习</span></a>
-      <a class="lang-tile" href="#${tr}/read"><b>阅读</b><span class="small muted">生活短文，配真实照片，点句朗读</span></a>
-      <a class="lang-tile" href="#${tr}/listen"><b>听力</b><span class="small muted">${tr === 'ko' ? 'TOPIK' : '四六级'}听力题型，男女声对话</span></a>
-      <a class="lang-tile" href="#${tr}/biz"><b>商务${T.title}</b><span class="small muted">职场表达 + 邮件模板</span></a>
-      <a class="lang-tile" href="#${tr}/dict"><b>词典</b><span class="small muted">入门词、常用句、分级词库一起查</span></a>
-      <a class="lang-tile" href="#${tr}/abc"><b>${tr === 'ko' ? '한글 字母' : 'Aa 字母音标'}</b><span class="small muted">${tr === 'ko' ? '40 个字母 + 拼读表 + 测验' : '26 个字母 + 美式音标'}</span></a>
-      <a class="lang-tile" href="#${tr}/words"><b>单词 ${words.length}</b><span class="small muted">按主题分类，闪卡 + 测验</span></a>
-      <a class="lang-tile" href="#${tr}/phrases"><b>常用句 ${phrases.length}</b><span class="small muted">按场景分类，点击朗读</span></a>
-      <a class="lang-tile" href="#${tr}/exam"><b>模拟考 ${tr === 'ko' ? 'TOPIK' : '四六级'}</b><span class="small muted">${tr === 'ko' ? 'TOPIK I / II 题型，限时考试 + 专项练习' : '四级 / 六级题型，限时考试 + 专项练习'}</span></a>
-      <a class="lang-tile" href="#${tr}/levels"><b>${tr === 'ko' ? '分级词库 TOPIK' : '分级词库 中考→GRE'}</b><span class="small muted">${tr === 'ko' ? '初级 / 中级 / 高级，约 1.1 万词' : '中考、高考、四六级、考研、雅思、托福、GRE，约 1.5 万词'}</span></a>
-    </div>
-    <p class="small muted">发音：真人感语音由开源的 MeloTTS 生成（陆续补全中），还没有音频的词用手机或浏览器自带的${T.title}语音。「我的 → 发音来源」可以切换。</p>
-  </section>`);
-  const b = p.querySelector('[data-due]'); if (b) b.onclick = () => langCards(due.slice(0, 30), `${T.title}复习`, tr);
-  main.append(p);
-  // 今日一句（数据还没加载好时先占位，到了再插到最前面）
-  l2Fetch(tr, 'daily').then(list => { if (p.isConnected && list.length) p.before(l2Daily(tr, list)); }).catch(() => {});
+  if (sub === 'study' || sub === 'ri') return main.append(hubPage(tr, sub));
+  // 首页：一行问候 → 今日任务 → 今日一句 → 入口（和日语首页同一结构）
+  const T = TRACKS[tr], words = langItems(tr, 'words');
+  const all = l2AllCards(tr), known = all.filter(x => S.srs[x.id] && S.srs[x.id].r > 0).length;
+  const due = all.filter(x => S.srs[x.id] && S.srs[x.id].due <= Date.now());
+  const day = ((S.l2task = S.l2task || {})[dkey()] = S.l2task[dkey()] || {});
+  const td = (day[tr] = day[tr] || {});
+  // 只保留最近两周的任务记录
+  Object.keys(S.l2task).filter(k => k < dkey(new Date(Date.now() - 14 * DAY))).forEach(k => delete S.l2task[k]);
+  const fresh = words.filter(x => !S.srs[x.id]).slice(0, 5);
+  const stages = (S.l2game || {})[tr] || {}, nextStage = Array.from({ length: Math.ceil(words.length / 10) }, (_, i) => i).find(i => !stages[i]);
+  const hr = new Date().getHours();
+  const hello = tr === 'ko' ? (hr < 11 ? '좋은 아침이에요' : '안녕하세요') : (hr < 11 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening');
+  main.append(homeHi(hello, '每天十分钟：完成下面的今日任务就好。', todayXP(), streak(), `已学 ${known} · 待复习 ${due.length}`));
+  const mark = k => { td[k] = 1; save(); };
+  const tasks = [
+    { ic: '復', t: '复习到期的卡片', d: due.length ? `${due.length} 张卡片到了复习时间` : '没有到期的卡片', done: !due.length, go: () => langCards(due.slice(0, 50), `${T.title}复习`, tr) },
+    { ic: '新', t: '学 5 个新词', d: td.new ? '今天的新词学过了' : fresh.length ? fresh.map(x => x.t).join('、') : '入门单词都学过了，去分级词库继续', done: !!td.new || !fresh.length, go: () => { mark('new'); langCards(fresh, '今天的新词', tr); } },
+    { ic: '跟', t: '今日一句 · 跟读一遍', d: '听原音，再自己说一遍，自动打分', done: !!td.shadow, go: () => l2Fetch(tr, 'daily').then(list => { const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / DAY) - 1; const [s0, pr, zh] = list[doy % list.length]; mark('shadow'); shadowSheet(s0, pr, zh, tr); }) },
+    { ic: '听', t: '听力 1 题', d: `${tr === 'ko' ? 'TOPIK' : '四六级'}题型，听一段对话选答案`, done: !!td.listen, go: () => l2Fetch(tr, 'listen').then(list => { mark('listen'); const lv = LV_NAMES[tr][0], pool = list.filter(x => x.lv === (l2Sel[tr + 'l'] || lv)); runListen(sample(pool.length ? pool : list, 1), lv, { title: '今日听力', again: () => { location.hash = tr; } }); }) },
+    nextStage != null ? { ic: '関', t: `闯关 · 第 ${nextStage + 1} 关`, d: `${words[nextStage * 10].cat}，10 个词，3 条命`, go: () => { location.hash = `${tr}/game`; } } : null
+  ].filter(Boolean);
+  const tp = taskPanel('今日任务', tasks, T.name);
+  main.append(tp);
+  l2Fetch(tr, 'daily').then(list => { if (tp.isConnected && list.length) tp.after(l2Daily(tr, list)); }).catch(() => {});
+  main.append(h(`<h3 class="sec-h">全部内容</h3>`), tileGrid(trackTiles(tr)));
 }
+// 各语言的栏目（学习 / 阅读听力 两个分组页和首页都用）
+function trackTiles(tr, group) {
+  const ko = tr === 'ko';
+  const study = [[`#${tr}/game`, '🎮', '闯关', '每关 10 个词'], [`#${tr}/abc`, ko ? '한' : 'Aa', ko ? '字母' : '字母音标', ko ? '40 个字母 + 拼读表' : '26 个字母 + 音标'], [`#${tr}/words`, '🃏', '单词', '入门 500 词'],
+    [`#${tr}/phrases`, '💬', '常用句', '150 句'], [`#${tr}/grammar`, '📐', '语法', '90 个语法点'], [`#${tr}/levels`, '📚', '分级词库', ko ? 'TOPIK 约 1.1 万词' : '中考→GRE 约 1.5 万词'],
+    [`#${tr}/biz`, '💼', '商务', '职场表达 + 邮件'], [`#${tr}/dict`, '🔎', '词典', '一起查']];
+  const ri = [[`#${tr}/read`, '📖', '阅读', '生活短文，配照片'], [`#${tr}/listen`, '🎧', '听力', '对话 + 题目']];
+  const exam = [[`#${tr}/exam`, '📝', '模拟考', ko ? 'TOPIK I / II' : '四级 / 六级']];
+  return group === 'study' ? study : group === 'ri' ? ri : [...study, ...ri, ...exam];
+}
+const JA_TILES = {
+  study: [['#game', '🎮', '闯关', '每关 10 个词'], ['#kana', 'あ', '假名', '五十音'], ['#vocab', '🃏', '单词', 'N5–N1 约 8000 词'], ['#kanji', '漢', '汉字', '2211 个'],
+    ['#grammar', '📐', '语法', '176 个句型'], ['#biz', '💼', '商务', '场景、敬语、邮件'], ['#dict', '🔎', '词典', '日中英']],
+  ri: [['#read', '📖', '阅读', '每天上新，配照片'], ['#listen', '🎧', '听力', 'JLPT 题型']]
+};
+// 「学习」「阅读听力」分组页
+function hubPage(tr, group) {
+  const title = group === 'study' ? '学习' : '阅读 · 听力';
+  const tiles = tr === 'ja' ? JA_TILES[group] : trackTiles(tr, group);
+  const p = h(`<section class="panel"><h2>${title}</h2></section>`);
+  p.append(tileGrid(tiles));
+  return p;
+}
+const viewStudy = () => main.append(hubPage('ja', 'study'));
+const viewRI = () => main.append(hubPage('ja', 'ri'));
 const viewKo = sub => viewLangTrack('ko', sub);
 const viewEn = sub => viewLangTrack('en', sub);
 
@@ -449,8 +472,38 @@ function applyTrack(view) {
   document.querySelectorAll('.track-seg [data-track]').forEach(b => b.classList.toggle('on', b.dataset.track === tr));
   const input = document.getElementById('gs-q');
   if (input) input.placeholder = tr === 'ja' ? '查词：日语 / 假名 / 中文 / 英文' : `查${TRACKS[tr].title}：${TRACKS[tr].title} / 中文`;
-  const h0 = location.hash || '#home';
-  document.querySelectorAll('.tabs a[data-trk]').forEach(a => a.classList.toggle('on', a.getAttribute('href') === h0 || (h0 === '#' + tr && a.getAttribute('href') === '#' + tr)));
+  // 站名随语言变化
+  const name = { ja: '日语道场', ko: '韩语道场', en: '英语道场' }[tr];
+  const bn = document.querySelector('.brand span'); if (bn) bn.textContent = name;
+  document.title = name + ' · 免费学' + { ja: '日语', ko: '韩语', en: '英语' }[tr];
+  buildNav(tr, view);
+}
+// 导航只有 5 个主栏目：今天 / 学习 / 阅读听力 / 考试 / 我的（手机上固定在底部）。其余栏目在「学习」「阅读听力」分组页里
+const NAV_ICON = {
+  home: '<path d="M12 3 2 11h3v9h5v-6h4v6h5v-9h3z"/>',
+  study: '<path d="M4 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4zM20 4h-5a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h6z"/>',
+  ri: '<path d="M12 3a9 9 0 0 0-9 9v6a3 3 0 0 0 3 3h2v-8H5v-1a7 7 0 0 1 14 0v1h-3v8h2a3 3 0 0 0 3-3v-6a9 9 0 0 0-9-9z"/>',
+  exam: '<path d="M6 2h9l5 5v15H6zM14 3v5h5M9 12h8M9 16h8M9 20h5"/>',
+  me: '<path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/>'
+};
+const NAV_GROUP = { home: 'home', study: 'study', game: 'study', kana: 'study', vocab: 'study', kanji: 'study', grammar: 'study', dict: 'study', biz: 'study',
+  abc: 'study', words: 'study', phrases: 'study', levels: 'study', ri: 'ri', read: 'ri', listen: 'ri', exam: 'exam', me: 'me' };
+const NAV_MOBILE = matchMedia('(max-width: 800px)');
+// 顶栏有毛玻璃效果（backdrop-filter），里面的 position: fixed 不会贴到屏幕底部，所以手机上把导航移到 body 末尾
+function placeNav() {
+  const nav = document.querySelector('.tabs'), top = document.querySelector('.top'); if (!nav || !top) return;
+  if (NAV_MOBILE.matches) { if (nav.parentElement !== document.body) document.body.append(nav); }
+  else if (nav.parentElement !== top) top.append(nav);
+}
+NAV_MOBILE.addEventListener('change', placeNav);
+function buildNav(tr, view) {
+  const nav = document.querySelector('.tabs'); if (!nav) return;
+  placeNav();
+  const sub = (location.hash.slice(1).split('/')[1]) || '';
+  const cur = view === 'me' ? 'me' : tr === 'ja' ? NAV_GROUP[view] || 'home' : NAV_GROUP[sub || 'home'] || 'home';
+  const base = tr === 'ja' ? '#' : `#${tr}/`;
+  const items = [['home', '今天', tr === 'ja' ? '#home' : `#${tr}`], ['study', '学习', base + 'study'], ['ri', '阅读听力', base + 'ri'], ['exam', '考试', base + 'exam'], ['me', '我的', '#me']];
+  nav.innerHTML = items.map(([k, label, href]) => `<a href="${href}" class="${k === cur ? 'on' : ''}"${k === cur ? ' aria-current="page"' : ''}><svg viewBox="0 0 24 24" aria-hidden="true">${NAV_ICON[k]}</svg><span>${label}</span></a>`).join('');
 }
 // 查词框在韩语、英语模式下搜这门语言的单词和句子
 function langSearch(q, drop) {
@@ -465,7 +518,7 @@ function langSearch(q, drop) {
 }
 // 点当前所在的栏目（例如闪卡做到一半点「单词」）也要回到列表
 document.addEventListener('click', e => {
-  const a = e.target.closest('.tabs a[data-trk]');
+  const a = e.target.closest('.tabs a');
   if (a && a.getAttribute('href') === location.hash) { e.preventDefault(); render(); }
 });
 // 左上角的站名：回到当前语言的首页
@@ -473,3 +526,28 @@ document.addEventListener('click', e => {
   const a = e.target.closest('a.brand');
   if (a && S.track && S.track !== 'ja') { e.preventDefault(); location.hash = TRACKS[S.track].home; }
 });
+
+/* ---------- 首页公共部分（日语、韩语、英语首页同一结构） ---------- */
+// 一行问候 + 一行进度（连续天数、今天的经验、学习量），代替原来的大卡片和一排数字方块
+function homeHi(title, text, tx, streakN, extra) {
+  const pct = Math.min(100, Math.round(tx / S.goal * 100));
+  return h(`<section class="hi-line">
+    <div class="hi-top">${neko('happy', 'mini')}<div><b>${esc(title)}</b><div class="small muted">${esc(text)}</div></div></div>
+    <div class="hi-stats small"><span>🔥 连续 <b>${streakN}</b> 天</span><span>今天 <b>${tx}</b>/${S.goal} 经验</span><span class="muted">${esc(extra)}</span></div>
+    <div class="bar hi-bar"><i style="width:${pct}%"></i></div>
+  </section>`);
+}
+// 今日任务面板：[{ic, t, d, done, go}]
+function taskPanel(title, tasks, note = '') {
+  const tp = h(`<section class="panel today-tasks"><div class="row between"><h2>${esc(title)}</h2><span class="small muted">${esc(note)}</span></div><div class="tasks"></div></section>`);
+  const left = tasks.filter(t => !t.done).length;
+  if (!left) tp.querySelector('h2').insertAdjacentHTML('afterend', '<span class="tag done">今天的任务完成了</span>');
+  tasks.forEach(t => {
+    const el = h(`<div class="task ${t.done ? 'done' : ''}"><span class="task-ic">${t.done ? '✓' : t.ic}</span><div class="task-t"><b>${esc(t.t)}</b><div class="small muted">${esc(t.d)}</div></div>${t.done ? '' : '<button class="btn pri" type="button">开始</button>'}</div>`);
+    const b = el.querySelector('button'); if (b) b.onclick = e => { e.stopPropagation(); t.go(); };
+    tp.querySelector('.tasks').append(el);
+  });
+  return tp;
+}
+// 入口方块（两列，带图标）
+const tileGrid = items => h(`<div class="tile-grid">${items.map(([href, ic, name, desc]) => `<a class="tile" href="${href}"><span class="tile-ic">${ic}</span><b>${esc(name)}</b><span class="small muted">${esc(desc)}</span></a>`).join('')}</div>`);

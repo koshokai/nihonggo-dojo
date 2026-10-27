@@ -616,9 +616,6 @@ body.gated { overflow: hidden; }
 .track-seg { order: 10; flex: 1 0 100%; display: flex; gap: 6px; justify-content: center; }
 .track-seg button { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 2px 14px; font: inherit; font-size: .85rem; cursor: pointer; }
 .track-seg button.on { background: var(--ai); border-color: var(--ai); color: var(--ai-ink); }
-.tabs a[data-trk=ko], .tabs a[data-trk=en] { display: none; }
-body[data-track=ko] .tabs a[data-trk=ko], body[data-track=en] .tabs a[data-trk=en] { display: inline-flex; }
-body[data-track=ko] .tabs a:not([data-trk]), body[data-track=en] .tabs a:not([data-trk]) { display: none; }
 .hg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(96px, 100%), 1fr)); gap: 8px; }
 .hg-grid.abc { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); }
 .hg-cell { display: grid; gap: 2px; text-align: center; padding: 8px 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); cursor: pointer; font: inherit; color: inherit; }
@@ -659,3 +656,36 @@ body[data-track=ko] .tabs a:not([data-trk]), body[data-track=en] .tabs a:not([da
 .stage .stars { color: #e6a700; letter-spacing: 1px; }
 .daily-s { font-size: 1.25rem; line-height: 1.5; }
 .mail-body .ex { border-top: 0; padding: 2px 0; }
+
+/* ---------- 导航：5 个主栏目。电脑上在顶部，手机上固定在底部 ---------- */
+.tabs a { display: inline-flex; align-items: center; gap: 6px; }
+.tabs svg { width: 18px; height: 18px; fill: currentColor; flex: none; }
+.tabs a[href$="exam"] svg path { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+@media (max-width: 800px) {
+  .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; max-width: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 0;
+    padding: 4px 0 calc(4px + env(safe-area-inset-bottom, 0px)); background: color-mix(in srgb, var(--surface) 94%, transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
+  .tabs a { flex-direction: column; gap: 2px; padding: 6px 2px 4px; font-size: .72rem; justify-content: center; }
+  .tabs svg { width: 22px; height: 22px; }
+  .tabs a.on::after { display: none; }
+  .tabs a.on { color: var(--ai); }
+  body { padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---------- 首页：一行问候、今日任务、入口方块 ---------- */
+.hi-line { margin: 14px 0; }
+.hi-top { display: flex; gap: 10px; align-items: center; }
+.hi-top .neko { width: 44px; height: 44px; flex: none; }
+.hi-stats { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 8px 0 6px; }
+.hi-stats b { color: var(--ai); }
+.hi-bar { height: 6px; }
+.tile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 46%), 1fr)); gap: 10px; margin: 10px 0; }
+.tile { display: grid; gap: 2px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); text-decoration: none; color: inherit; }
+.tile:hover { border-color: var(--ai); }
+.tile-ic { font-size: 1.4rem; line-height: 1.3; }
+.sec-h { margin: 18px 4px 4px; }
+.more-stamps summary { cursor: pointer; color: var(--ai); margin-top: 8px; }
+.daily-l2 .row { flex-wrap: nowrap; }
+.daily-l2 .daily-s { flex: 1; min-width: 0; }
+.daily-l2 [data-d], .daily-card .btn.small { min-width: 40px; min-height: 40px; }
+@media (max-width: 800px) { #toast { bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important; } }

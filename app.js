@@ -110,13 +110,15 @@ function migrateIds() {
     }
   }
 }
-const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: true, autoSpeak: true, lastBackup: 0, lastBackupXp: 0, stages: {}, games: {}, read: {}, biz: {}, voiceSrc: 'vv' });
+const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: false, autoSpeak: true, lastBackup: 0, lastBackupXp: 0, stages: {}, games: {}, read: {}, biz: {}, voiceSrc: 'vv' });
 function load() {
   try { const t = localStorage.getItem(KEY); if (t) return Object.assign(blank(), JSON.parse(t)); } catch (e) { /* 浏览器禁用存储时从空进度开始 */ }
   return blank();
 }
 let S = load();
 if (S.xp > 0) S.onboarded = true;
+// 新版界面：樱花飘落默认关闭（会分散注意力），想要的人在「我的」里打开
+if (!S.uiV2) { S.uiV2 = 1; S.petals = false; }
 migrateIds();
 let storageOk = true;
 function save() {
@@ -688,7 +690,7 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, ko: viewKo, en: viewEn, me: viewMe, welcome: viewWelcome };
+const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, study: viewStudy, ri: viewRI, ko: viewKo, en: viewEn, me: viewMe, welcome: viewWelcome };
 function render() {
   const [v, ...rest] = (location.hash || '#home').slice(1).split('/');
   const arg = rest.join('/');
@@ -698,10 +700,8 @@ function render() {
   if (S.onboarded && view === 'welcome') view = 'home';
   clearInterval(examTimer); keyHandler = null;
   if (lsStop) lsStop();
-  document.querySelectorAll('.tabs a').forEach(a => a.classList.toggle('on', a.dataset.go === view));
-  const on = document.querySelector('.tabs a.on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   main.innerHTML = '';
-  if (trackOf(view) === 'ja' && ['home', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
+  if (trackOf(view) === 'ja' && ['home', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict', 'study', 'ri'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
   applyTrack(view);
   VIEWS[view](arg ? decodeURIComponent(arg) : undefined);
   updateTop();
@@ -856,22 +856,26 @@ function viewHome() {
   const greet = (() => { const hr = new Date().getHours(); return hr < 11 ? 'おはようございます' : hr < 18 ? 'こんにちは' : 'こんばんは'; })();
 
   const mood = pct >= 1 ? ['wow', 'すごい！今日の目標達成！', '今天的目标完成啦，给你盖个小红花。'] : tx > 0 ? ['happy', 'いい調子！', `再拿 ${S.goal - tx} 经验就完成今天的目标。`] : s > 0 ? ['happy', `${s}日連続！`, '今天也来学一点，别让连续打卡断掉哦。'] : ['happy', greet, '每天十分钟，从今天开始吧。'];
-  main.append(h(`<div class="welcome-hi">${neko(mood[0], 'wave')}<div class="bubble"><b lang="ja">${mood[1]}</b><span>${mood[2]}</span></div></div>`));
+  // 首页顺序：一行问候 → 今日任务 → 今日上新 → 今日一句 → 进度 → 印章 → 提示横幅（三种语言同一结构，见 lang.js 的 homeHi）
+  main.append(homeHi(mood[1], mood[2], tx, s, `${learnedN} 词 · 掌握 ${masteredN} · 错题 ${wrongN}`));
+  const after = [];
   const ta = typeof todayArticle === 'function' && todayArticle();
-  if (ta && !(S.read || {})[ta.id]) main.append(h(`<a class="today-art" href="#read/${ta.id}"><div class="ta-img">${artImg(ta)}</div><div><span class="tag done">今日上新</span> <span class="tag lv">${ta.L}</span><div class="rc-title" lang="ja">${esc(ta.title)}</div><div class="small muted">${esc(ta.zh)} · 日本生活阅读，每天一篇</div></div></a>`));
+  if (ta && !(S.read || {})[ta.id]) after.push(h(`<a class="today-art" href="#read/${ta.id}"><div class="ta-img">${artImg(ta)}</div><div><span class="tag done">今日上新</span> <span class="tag lv">${ta.L}</span><div class="rc-title" lang="ja">${esc(ta.title)}</div><div class="small muted">${esc(ta.zh)} · 日本生活阅读，每天一篇</div></div></a>`));
+  after.push(dailyCard());
+  const banners = [];
   if (!isStandalone() && S.xp >= 30 && !S.installHint) {
     const ib = h(`<section class="banner"><div><b>把日语道场装到手机上</b><div class="small">像 App 一样从主屏幕打开，没有网络也能学。</div></div><div class="row"><button class="btn pri" type="button" data-i>安装</button><button class="btn ghost" type="button" data-x>不用了</button></div></section>`);
     ib.querySelector('[data-i]').onclick = e => { e.stopPropagation(); doInstall(); };
     ib.querySelector('[data-x]').onclick = () => { S.installHint = 1; save(); ib.remove(); };
-    main.append(ib);
+    banners.push(ib);
   }
   if (needBackup()) {
     const bn = h(`<section class="banner"><div><b>记得备份一下</b><div class="small">你已经攒了 ${S.xp} 经验、学过 ${learnedN} 个单词。进度存在这个浏览器里，清理浏览器数据或换设备前先备份，就不怕丢。</div></div><div class="row"><button class="btn pri" type="button" data-bk>下载备份</button><button class="btn ghost" type="button" data-later>过几天再说</button></div></section>`);
     bn.querySelector('[data-bk]').onclick = () => { downloadBackup(); bn.remove(); };
     bn.querySelector('[data-later]').onclick = () => { S.snooze = Date.now(); save(); bn.remove(); };
-    main.append(bn);
+    banners.push(bn);
   }
-  main.append(h(`<section class="panel">
+  const progress = h(`<section class="panel">
     <div class="hero">
       <div class="ring ${pct >= 1 ? 'full' : ''}"><svg viewBox="0 0 120 120"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--sakura)"/><stop offset="1" style="stop-color:var(--ai)"/></linearGradient></defs><circle class="trk" cx="60" cy="60" r="52"/><circle class="val" cx="60" cy="60" r="52" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}"/></svg>
         <div class="ring-c"><b>${tx}</b><span class="small muted">/ ${S.goal} 经验</span></div></div>
@@ -882,14 +886,7 @@ function viewHome() {
         <p class="small muted">${nx ? `累计 ${S.xp} 经验，距离「${nx[2]}」还差 ${nx[0] - S.xp}` : `累计 ${S.xp} 经验，已是最高段位`}</p>
       </div>
     </div>
-    <div class="stats">
-      <div class="stat"><span class="small muted">连续天数</span><b>${s}</b></div>
-      <div class="stat"><span class="small muted">最长连续</span><b>${S.best}</b></div>
-      <div class="stat"><span class="small muted">学过的单词</span><b>${learnedN}</b></div>
-      <div class="stat"><span class="small muted">已掌握</span><b>${masteredN}</b></div>
-      <div class="stat"><span class="small muted">错题本</span><b>${wrongN}</b></div>
-    </div>
-  </section>`));
+  </section>`);
 
   const ns = nextStage(S.level);
   const tasks = [
@@ -906,9 +903,7 @@ function viewHome() {
     const b = el.querySelector('button'); if (b) b.onclick = t.go;
     tp.querySelector('.tasks').append(el);
   });
-  main.append(tp);
-
-  main.append(dailyCard());
+  main.append(tp, ...after, progress);
 
   // 学习热力图：最近 20 周
   const end = new Date(); end.setHours(0, 0, 0, 0);
@@ -926,8 +921,12 @@ function viewHome() {
     <section class="panel"><h2>单词进度</h2><div class="lv-list">${lvRows}</div></section>
   </div>`));
 
-  main.append(h(`<section class="panel"><div class="row between"><h2>成就印章</h2><span class="small muted">${Object.keys(S.badges).length} / ${BADGES.length}</span></div>
-    <div class="stamps">${BADGES.map(b => `<div class="stamp ${S.badges[b.id] ? 'got' : ''}" title="${esc(b.desc)}"><div class="stamp-in" lang="ja">${b.ch}</div><b>${esc(b.name)}</b><span>${esc(b.desc)}</span></div>`).join('')}</div></section>`));
+  // 印章：只显示已获得的和接下来 3 个，其余收起
+  const stamp = b => `<div class="stamp ${S.badges[b.id] ? 'got' : ''}" title="${esc(b.desc)}"><div class="stamp-in" lang="ja">${b.ch}</div><b>${esc(b.name)}</b><span>${esc(b.desc)}</span></div>`;
+  const got = BADGES.filter(b => S.badges[b.id]), next = BADGES.filter(b => !S.badges[b.id]);
+  main.append(h(`<section class="panel"><div class="row between"><h2>成就印章</h2><span class="small muted">${got.length} / ${BADGES.length}</span></div>
+    <div class="stamps">${[...got, ...next.slice(0, 3)].map(stamp).join('')}</div>
+    ${next.length > 3 ? `<details class="more-stamps"><summary class="small">查看全部 ${BADGES.length} 枚</summary><div class="stamps">${next.slice(3).map(stamp).join('')}</div></details>` : ''}</section>`), ...banners);
 }
 
 function wrongReview() {
