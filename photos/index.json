@@ -641,23 +641,11 @@
   "license": "CC BY 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Lascar_Tokyo_skyline_-_Rainbow_bridge_and_Tokyo_tower_(from_the_Giant_Sky_Wheel)_(1299696620).jpg"
  },
- "n1-02": {
-  "file": "photos/n1-02.jpg",
-  "by": "PekePON (talk)",
-  "license": "CC BY-SA 3.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Sumo_electric_scoreboard,Ryogoku_Kokugikan.jpg"
- },
  "n1-05": {
   "file": "photos/n1-05.jpg",
   "by": "TKdows 2026",
   "license": "CC0",
   "page": "https://commons.wikimedia.org/wiki/File:JP_%E6%97%A5%E6%9C%AC_Japan_%E4%BA%AC%E9%83%BD_Kyoto_rain_n_river_brown_water_June_2026_N13P_01.jpg"
- },
- "n1-10": {
-  "file": "photos/n1-10.jpg",
-  "by": "掬茶",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Around_the_Koshien_Stadium_20250901c.jpg"
  },
  "n1-11": {
   "file": "photos/n1-11.jpg",
@@ -676,12 +664,6 @@
   "by": "Psjk2106",
   "license": "CC BY-SA 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Nagoya_City_Sakura_Elementary_School.jpg"
- },
- "n3-03": {
-  "file": "photos/n3-03.jpg",
-  "by": "Solomon203",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Jun_Fukuyama%27s_signature_board,_Assassination_Classroom_20180101.jpg"
  },
  "n3-04": {
   "file": "photos/n3-04.jpg",
@@ -725,12 +707,6 @@
   "license": "CC BY-SA 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Mount_Fuji_at_night,_Kawaguchiko.jpg"
  },
- "n4-12": {
-  "file": "photos/n4-12.jpg",
-  "by": "RuinDig/Yuki Uchida",
-  "license": "CC BY 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Momiji_Nishiya_2023.jpg"
- },
  "n5-01": {
   "file": "photos/n5-01.jpg",
   "by": "Romain Guy",
@@ -743,47 +719,17 @@
   "license": "CC BY-SA 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Yomiuri_Giants_Baseball_-_Tokyo_Dome_(17382444161).jpg"
  },
- "n5-05": {
-  "file": "photos/n5-05.jpg",
-  "by": "MWM",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:O%27Shaughnessy%27s_Bowling_Alley_%26_Service_Station,_Metairie_Louisiana_postcard_-_interior.jpg"
- },
- "n5-09": {
-  "file": "photos/n5-09.jpg",
-  "by": "JasmineGoforth",
-  "license": "CC BY 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Gabaldon_School_Building_of_Arorogan_Elementary_School.jpg"
- },
  "s-a1": {
   "file": "photos/s-a1.jpg",
   "by": "Wiiii",
   "license": "CC BY-SA 3.0",
   "page": "https://commons.wikimedia.org/wiki/File:Tokyo_Chuo_Post_Office_200812.jpg"
  },
- "s-a2": {
-  "file": "photos/s-a2.jpg",
-  "by": "Calistemon",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Former_Cottesloe_Post_Office_%26_Telephone_Exchange,_December_2021_01.jpg"
- },
- "s-a3": {
-  "file": "photos/s-a3.jpg",
-  "by": "Calistemon",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Former_Cottesloe_Post_Office_%26_Telephone_Exchange,_December_2021_03.jpg"
- },
  "s-a4": {
   "file": "photos/s-a4.jpg",
   "by": "Wpcpey",
   "license": "CC BY-SA 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Chater_House_Office_lobby_2015.jpg"
- },
- "s-a5": {
-  "file": "photos/s-a5.jpg",
-  "by": "Justin Mathews",
-  "license": "CC BY 3.0",
-  "page": "https://commons.wikimedia.org/wiki/File:It_S_Raining_Business_Cards_(51141842).jpeg"
  },
  "s-a6": {
   "file": "photos/s-a6.jpg",
@@ -796,30 +742,6 @@
   "by": "San Diego Air & Space Museum Archives",
   "license": "Public domain",
   "page": "https://commons.wikimedia.org/wiki/File:23_0066261_Convair_Negative_Image_-_Desks_and_chairs_in_office_(54137833983).jpg"
- },
- "s-a8": {
-  "file": "photos/s-a8.jpg",
-  "by": "Department of State. Office of the Undersecretary for Management. Bureau of Overseas Buildings Operations. (2001 - )  (M",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Tokyo_-_Chancery_Office_Building_-_1969.jpg"
- },
- "s-b1": {
-  "file": "photos/s-b1.jpg",
-  "by": "PtrQs",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:20170903_bowing_onStage_openDay2017_StaatstheaterBraunschweig_DSC05623_PtrQs.jpg"
- },
- "s-b2": {
-  "file": "photos/s-b2.jpg",
-  "by": "SurfacesRx",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Large-Conference-Room-Table-Refinishing-Dallas-TX-7.jpg"
- },
- "s-b5": {
-  "file": "photos/s-b5.jpg",
-  "by": "U.S. Navy photo by Mass Communication Specialist Seaman Joe Painter",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:US_Navy_070209-N-4009P-160_Explosive_Ordnance_Disposal_Technicians_(EOD)_dress_Aircrew_Survival_Equipmentman_3rd_Class_Dusty_Rather_from_Houston,_Texas,_in_a_bomb_suit_during_an_EOD_recruitment_session.jpg"
  },
  "s-b6": {
   "file": "photos/s-b6.jpg",
@@ -839,23 +761,11 @@
   "license": "CC BY-SA 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Ajay_Piramal_at_Horasis_Global_India_Business_Meeting_2014.jpg"
  },
- "m-6": {
-  "file": "photos/m-6.jpg",
-  "by": "Jim Evans",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Blue_Bell_Creameries_Early_Delivery_Truck.jpg"
- },
  "m-7": {
   "file": "photos/m-7.jpg",
   "by": "perpetual.fostering",
   "license": "CC BY 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Fostering_Paperwork_-_49533805007.jpg"
- },
- "m-9": {
-  "file": "photos/m-9.jpg",
-  "by": "wfmillar",
-  "license": "CC BY-SA 2.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Office_Block,_Team_Valley_Trading_Estate_-_geograph.org.uk_-_2665655.jpg"
  },
  "en-r-01": {
   "file": "photos/en-r-01.jpg",
