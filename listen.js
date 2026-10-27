@@ -215,7 +215,7 @@ function runListen(qs, L, { exam = false, title, again }) {
     const score = res.filter(r => r.ok).length, total = res.length, pct = Math.round(score / total * 100);
     if (exam) {
       S.listenHist = S.listenHist || [];
-      S.listenHist.push({ L, score, total, date: dkey() });
+      S.listenHist.push({ L, score, total, date: dkey(), lang: qs[0].lang || 'ja' });
       addXP(score * 10 + (pct >= 60 ? 30 : 0));
       if (pct >= 60) celebrate();
     }
@@ -224,7 +224,7 @@ function runListen(qs, L, { exam = false, title, again }) {
     const by = {};
     res.forEach(r => { by[r.x.t] = by[r.x.t] || [0, 0]; by[r.x.t][1]++; if (r.ok) by[r.x.t][0]++; });
     const p = h(`<section class="panel">
-      <div class="result"><div class="seal pop ${pct >= 60 ? '' : 'fail'}">${exam ? (pct >= 60 ? '合格' : '再挑戦') : pct >= 90 ? '優' : pct >= 60 ? '良' : '可'}</div>
+      <div class="result"><div class="seal pop ${pct >= 60 ? '' : 'fail'}">${exam ? (pct >= 60 ? '合格' : ({ ko: '재도전', en: 'Retry' }[qs[0].lang] || '再挑戦')) : pct >= 90 ? '優' : pct >= 60 ? '良' : '可'}</div>
       <div class="rank"><div class="eyebrow">${esc(title)}</div><div class="rank-name">${score} / ${total}</div>
       <p class="muted">${pct >= 60 ? 'いいね！耳朵越来越灵了。' : '听力靠多听：点开下面的原文，跟着音频再听几遍。'}</p></div></div>
       <div class="breakdown">${Object.entries(by).map(([t, [a, n]]) => `<div class="bd-row"><span>${ltype(t, res[0].x.lang)[0]}</span><div class="bar"><i style="width:${a / n * 100}%"></i></div><span class="small">${a}/${n}</span></div>`).join('')}</div>
