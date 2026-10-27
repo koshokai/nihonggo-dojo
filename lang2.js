@@ -94,12 +94,16 @@ function l2Article(tr, a) {
     <div class="ra-tools"><button class="btn pri" type="button" data-play>${SPEAK_SVG}<span>全文朗读</span></button><label class="switch"><input type="checkbox" data-zh> 全部中文</label></div>
     <p class="small muted">点一句话：朗读并显示中文；🎙 跟读打分。</p>
     <div class="ra-text">${a.p.map(para => `<p>${para.map(([s, zh]) => `<span class="ra-s" data-i="${idx++}" tabindex="0" role="button"><span class="ra-jp" lang="${tr}">${esc(s)}</span> ${shadowBtn(s, '', zh, tr)}<span class="ra-zh">${esc(zh)}</span></span>`).join(' ')}</p>`).join('')}</div>
-    <h3>生词</h3><div class="list-wrap"><table class="list"><tbody>${a.w.map(([w, pr, zh]) => `<tr><td style="width:40px">${sayBtn(w, T.tts)}</td><td><b lang="${tr}">${esc(w)}</b><div class="small muted">${esc(pr)}</div></td><td>${esc(zh)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="row between"><h3>生词</h3><button type="button" class="btn small" data-addall>全部加入闪卡</button></div><div class="list-wrap"><table class="list"><tbody>${a.w.map(([w, pr, zh]) => `<tr><td style="width:40px">${sayBtn(w, T.tts)}</td><td><b lang="${tr}">${esc(w)}</b><div class="small muted">${esc(pr)}</div></td><td>${esc(zh)}</td></tr>`).join('')}</tbody></table></div>
     <div class="row"><button class="btn pri" type="button" data-quiz>读后小测验（${a.q.length} 题）</button></div>
   </article>`);
   const text = p.querySelector('.ra-text');
   const sayS = i => { text.querySelectorAll('.ra-s').forEach(x => x.classList.toggle('on', +x.dataset.i === i)); speakLang(sents[i][0], T.tts); };
   text.addEventListener('click', e => { const s = e.target.closest('.ra-s'); if (s && !e.target.closest('[data-shadow]')) { s.classList.toggle('open'); sayS(+s.dataset.i); } });
+  p.querySelector('[data-addall]').onclick = e => {
+    a.w.forEach(([w, pr, zh]) => l2AddCard(tr, { id: `${tr}|r|${w}`, t: w, pr, zh }));
+    save(); e.target.disabled = true; e.target.textContent = '已加入'; toast(`${a.w.length} 个生词已加入闪卡，今天就会复习`);
+  };
   p.querySelector('[data-zh]').onchange = e => text.classList.toggle('show-zh', e.target.checked);
   p.querySelector('[data-play]').onclick = () => {
     // 逐句朗读：一句读完再读下一句（有音频用音频，没有用设备语音）

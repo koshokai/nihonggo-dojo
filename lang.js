@@ -149,7 +149,7 @@ function langList(tr, kind) {
       const opts = [x, ...sample(pool.filter(y => y.cat === x.cat && y.zh !== x.zh && y.t !== x.t), 3)];
       while (opts.length < 4) { const y = sample(pool, 1)[0]; if (!opts.includes(y)) opts.push(y); }
       const options = shuffle(opts.map(y => toZh ? y.zh : y.t));
-      return { kind: 'meaning', options, optLang: toZh ? '' : tr, answer: options.indexOf(toZh ? x.zh : x.t), lsay: x.t,
+      return { kind: 'meaning', options, optLang: toZh ? '' : tr, answer: options.indexOf(toZh ? x.zh : x.t), lsay: x.t, item: x,
         prompt: toZh ? `<div class="eyebrow">选出中文意思</div><div class="q-big" lang="${tr}">${esc(x.t)}</div>${x.pr ? `<div class="small muted">${esc(x.pr)}</div>` : ''}` : `<div class="eyebrow">用${T.title}怎么说？</div><div class="q-big">${esc(x.zh)}</div>`,
         explain: `<b lang="${tr}">${esc(x.t)}</b> ${x.pr ? `<span class="muted">${esc(x.pr)}</span> ` : ''}= ${esc(x.zh)}` };
     });
@@ -158,11 +158,23 @@ function langList(tr, kind) {
   return p;
 }
 
+// 韩语、英语闪卡：入门单词和常用句以外的卡（分级词库、阅读生词、做错的题）把内容记在 S.l2cards，首页复习时用
+function l2AddCard(tr, x, dueNow) {
+  S.l2cards = S.l2cards || {};
+  if (!x.id.includes('|w|') && !x.id.includes('|p|')) S.l2cards[x.id] = { tr, t: x.t, pr: x.pr || '', zh: x.zh };
+  if (dueNow || !S.srs[x.id]) S.srs[x.id] = Object.assign({ i: 0, e: 2.5, r: 0 }, S.srs[x.id], { due: Date.now() });
+}
+const l2AllCards = tr => [...langItems(tr, 'words'), ...langItems(tr, 'phrases'),
+  ...Object.entries(S.l2cards || {}).filter(([, c]) => c.tr === tr).map(([id, c]) => ({ id, t: c.t, pr: c.pr, zh: c.zh }))];
 function langQuiz(qs, title, tts, back) {
   main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
   qs.forEach(q => { if (q.lsay) { q.say = q.lsay; q.sayLang = tts; } });
   runQuiz(host, qs, { title, noRecord: true, xpEach: 5, onDone: r => {
     if (!r) { main.innerHTML = ''; const b = back(); if (b) main.append(b); return; }
+    // 答错的词进闪卡，今天就复习
+    const tr = tts.slice(0, 2);
+    r.res.forEach(x => { if (!x.ok && x.q.item) l2AddCard(tr, x.q.item, true); });
+    save();
     quizSummary(host, r, { title, again: () => langQuiz(qs.map(q => Object.assign({}, q, { options: q.options })), title, tts, back) });
   } });
 }
@@ -213,6 +225,7 @@ function langCards(items, title, tr) {
   }
   function rate(g) {
     const x = queue.shift();
+    l2AddCard(tr, x);
     grade(x.id, g);
     if (g === 0) queue.splice(Math.min(queue.length, 3), 0, x); else done++;
     addXP(g === 0 ? 2 : 5);
@@ -266,7 +279,7 @@ function langLevels(tr) {
       const qs = sample(src, 10).map(x => {
         const opts = [x.zh, ...sample(items.filter(y => y.zh !== x.zh), 3).map(y => y.zh)];
         const options = shuffle(opts);
-        return { kind: 'meaning', options, answer: options.indexOf(x.zh), lsay: x.t,
+        return { kind: 'meaning', options, answer: options.indexOf(x.zh), lsay: x.t, item: x,
           prompt: `<div class="eyebrow">选出中文意思</div><div class="q-big" lang="${tr}">${esc(x.t)}</div>${x.pr ? `<div class="small muted">${esc(x.pr)}</div>` : ''}`,
           explain: `<b lang="${tr}">${esc(x.t)}</b> = ${esc(x.zh)}` };
       });
@@ -390,8 +403,8 @@ function viewLangTrack(tr, sub) {
   if (sub === 'words' || sub === 'phrases') return main.append(langList(tr, sub));
   // 首页
   const T = TRACKS[tr], words = langItems(tr, 'words'), phrases = langItems(tr, 'phrases');
-  const known = [...words, ...phrases].filter(x => S.srs[x.id] && S.srs[x.id].r > 0).length;
-  const due = [...words, ...phrases].filter(x => S.srs[x.id] && S.srs[x.id].due <= Date.now());
+  const known = l2AllCards(tr).filter(x => S.srs[x.id] && S.srs[x.id].r > 0).length;
+  const due = l2AllCards(tr).filter(x => S.srs[x.id] && S.srs[x.id].due <= Date.now());
   const p = h(`<section class="panel">
     <h2>${T.title}入门 · ${T.name}</h2>
     <p>${tr === 'ko' ? '韩语和日语语法很像（主宾谓语序、助词、敬语），又有大量和汉语相近的汉字词——学过日语的人学韩语特别快。先花一两天学会韩文字母，就能自己读出所有单词。' : '从字母和音标开始，掌握最常用的 500 个单词和 150 句日常会话，够应付旅行、点餐、问路和简单聊天。'}</p>

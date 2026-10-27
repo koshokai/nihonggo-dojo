@@ -378,26 +378,51 @@ document.addEventListener('keydown', e => {
 });
 let examTimer = null;
 
-/* ---------- SRS（间隔重复） ---------- */
-function preview(c, g) {
-  c = c || { i: 0, e: 2.5 };
-  if (g === 0) return 0;
-  if (g === 1) return c.i ? Math.max(1, Math.round(c.i * 1.2)) : 1;
-  if (g === 2) return c.i === 0 ? 1 : c.i === 1 ? 3 : Math.round(c.i * c.e);
-  return c.i === 0 ? 3 : Math.round(c.i * c.e * 1.3);
+/* ---------- SRS（间隔重复）：FSRS 算法 ----------
+   和 Anki 新版同一套算法（FSRS-4.5，默认参数，目标记住率 90%）。每张卡记：
+   s 稳定度（天，记忆能保持多久）、d 难度（1–10）、lr 上次复习时间；另外保留 i（间隔天数）、r（答对次数）、due（下次复习时间）。
+   旧版（SM-2）的卡第一次复习时按原来的间隔和难度系数换算，不丢进度。 */
+const FSRS_W = [0.4872, 1.4003, 3.7145, 13.8206, 5.1618, 1.2298, 0.8975, 0.031, 1.6474, 0.1367, 1.0461, 2.1072, 0.0793, 0.3246, 1.587, 0.2272, 2.8755];
+const FSRS_RETAIN = 0.9, FSRS_DECAY = -0.5, FSRS_FACTOR = 19 / 81;
+const clampD = d => Math.min(10, Math.max(1, d));
+const fsrsD0 = G => clampD(FSRS_W[4] - (G - 3) * FSRS_W[5]);
+const fsrsIvl = s => Math.max(1, Math.round(s / FSRS_FACTOR * (Math.pow(FSRS_RETAIN, 1 / FSRS_DECAY) - 1)));
+// 把旧卡（只有 i、e）换算成 FSRS 的状态
+function fsrsState(c) {
+  if (!c || !c.r) return null;
+  if (c.s) return c;
+  return Object.assign({}, c, { s: Math.max(.5, c.i || 1), d: clampD(5 + (2.5 - (c.e || 2.5)) * 3.3), lr: (c.due || Date.now()) - (c.i || 1) * DAY });
 }
+// g：0 重来、1 困难、2 记得、3 简单 → FSRS 评分 1–4。返回 {s, d, ivl}（ivl 为 0 表示马上再来一次）
+function fsrsNext(c, g, now = Date.now()) {
+  const G = g + 1, W = FSRS_W, st = fsrsState(c);
+  if (!st) {
+    const s = W[G - 1];
+    return { s, d: fsrsD0(G), ivl: G === 1 ? 0 : fsrsIvl(s) };
+  }
+  const t = Math.max(0, (now - st.lr) / DAY), R = Math.pow(1 + FSRS_FACTOR * t / st.s, FSRS_DECAY);
+  const d = clampD(W[7] * fsrsD0(3) + (1 - W[7]) * (st.d - W[6] * (G - 3)));
+  if (G === 1) {
+    const s = Math.min(st.s, W[11] * Math.pow(st.d, -W[12]) * (Math.pow(st.s + 1, W[13]) - 1) * Math.exp(W[14] * (1 - R)));
+    return { s, d, ivl: 0 };
+  }
+  const s = st.s * (Math.exp(W[8]) * (11 - st.d) * Math.pow(st.s, -W[9]) * (Math.exp(W[10] * (1 - R)) - 1) * (G === 2 ? W[15] : 1) * (G === 4 ? W[16] : 1) + 1);
+  return { s, d, ivl: fsrsIvl(s) };
+}
+function preview(c, g) { return fsrsNext(c, g).ivl; }
 function grade(id, g) {
   const isNew = !S.srs[id];
-  const c = Object.assign({ i: 0, e: 2.5, r: 0, due: 0 }, S.srs[id]);
-  const next = preview(c, g);
-  if (g === 0) { c.e = Math.max(1.3, c.e - .2); c.i = 0; c.due = Date.now(); }
-  else {
-    if (g === 1) c.e = Math.max(1.3, c.e - .15);
-    if (g === 3) c.e += .15;
-    c.i = next; c.r += 1; c.due = startOfToday() + next * DAY;
-  }
+  const c = Object.assign({ i: 0, e: 2.5, r: 0, due: 0 }, fsrsState(S.srs[id]) || S.srs[id]);
+  const n = fsrsNext(S.srs[id] && S.srs[id].r ? c : null, g);
+  c.s = n.s; c.d = n.d; c.lr = Date.now(); c.i = n.ivl;
+  if (g === 0) c.due = Date.now();
+  else { c.r += 1; c.due = startOfToday() + n.ivl * DAY; }
   S.srs[id] = c;
   if (isNew) S.newLog[dkey()] = (S.newLog[dkey()] || 0) + 1;
+  // 复习记录：每天复习了多少张、记住多少张（周报用）
+  const k = dkey(), lg = (S.revLog = S.revLog || {})[k] || [0, 0];
+  lg[0]++; if (g > 0) lg[1]++;
+  S.revLog[k] = lg;
 }
 const fmtDays = d => d === 0 ? '马上' : d === 1 ? '明天' : d < 30 ? `${d} 天` : d < 365 ? `${Math.round(d / 30)} 个月` : `${(d / 365).toFixed(1)} 年`;
 const dueList = levels => levels.flatMap(L => VOCAB[L]).filter(v => S.srs[v.id] && S.srs[v.id].due <= Date.now());
@@ -609,6 +634,8 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
     if (answered) return; answered = true;
     const q = qs[i], ok = j === q.answer;
     res.push({ q, pick: j, ok });
+    // 答错的单词：进单词卡并安排马上复习（已经在卡里的提前到今天）
+    if (!ok && q.id && q.id.startsWith('v|')) S.srs[q.id] = Object.assign({ i: 0, e: 2.5, r: 0 }, S.srs[q.id], { due: Date.now() });
     if (q.id && !noRecord) {
       if (!ok) S.wrong[q.id] = { n: ((S.wrong[q.id] || {}).n || 0) + 1, t: Date.now() };
       else if (fromWrong && S.wrong[q.id]) { delete S.wrong[q.id]; S.fixed++; }

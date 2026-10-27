@@ -182,7 +182,7 @@ function readArticle(a) {
     </div>
     <p class="small muted">点一句话：朗读并显示中文。</p>
     <div class="ra-text">${a.p.map(para => `<p>${para.map(([jp, kana, zh, toks]) => `<span class="ra-s" data-i="${idx++}" tabindex="0" role="button"><span class="ra-jp" lang="ja">${tokHTML(toks, keyset)}</span><span class="ra-kana" lang="ja">${esc(kana)}</span><span class="ra-zh">${esc(zh)}</span></span>`).join('')}</p>`).join('')}</div>
-    <h3>生词</h3>
+    <div class="row between"><h3>生词</h3><button type="button" class="btn small" data-addall>全部加入单词卡</button></div>
     <div class="ra-words">${a.w.map(([w, r, zh]) => { const v = vocabOf(w); return `<div class="ra-word"><span lang="ja" class="rw-w">${esc(w)}</span><span lang="ja" class="rw-r">${esc(r)}</span>${speakBtn(r)}<span class="rw-m">${esc(zh)}</span>${v && v.q ? `<button type="button" class="chip-btn" data-add="${esc(v.id)}">${S.srs[v.id] ? '已在单词卡' : '+ 单词卡'}</button>` : ''}</div>`; }).join('')}</div>
     <h3>读后小测验</h3>
     <div class="ra-quiz"></div>
@@ -209,6 +209,11 @@ function readArticle(a) {
     speak(sents[i][1], { onend: () => setTimeout(() => playFrom(i + 1), 250) });
   };
   playBtn.onclick = () => { if (playing) return stopPlay(); playing = true; playBtn.querySelector('span').textContent = '停止'; playFrom(0); };
+  p.querySelector('[data-addall]').onclick = e => {
+    let n = 0;
+    p.querySelectorAll('[data-add]').forEach(b => { const id = b.dataset.add; if (!S.srs[id]) { S.srs[id] = { i: 0, e: 2.5, r: 0, due: Date.now() }; n++; } b.textContent = '已在单词卡'; });
+    save(); e.target.disabled = true; toast(n ? `${n} 个生词已加入单词卡，今天就会复习` : '这些词都已经在单词卡里了');
+  };
   p.querySelectorAll('[data-add]').forEach(b => {
     b.onclick = () => { const id = b.dataset.add; if (S.srs[id]) return; S.srs[id] = { i: 0, e: 2.5, r: 0, due: Date.now() }; save(); b.textContent = '已加入'; toast('已加入单词卡，今天就会复习'); };
   });
