@@ -1323,7 +1323,7 @@ function viewMe() {
     <p class="small muted">分级词库的词表、汉字和等级来自国立国语院《<a href="https://krdict.korean.go.kr" target="_blank" rel="noopener">한국어기초사전</a>》（<a href="https://creativecommons.org/licenses/by-sa/2.0/kr/" target="_blank" rel="noopener">CC BY-SA 2.0 KR</a>），中文释义为本站编写，同样以 CC BY-SA 2.0 KR 发布。</p>
     <h3>英语</h3>
     <p class="small">26 个字母和美式音标；入门单词 500 个、常用句 150 句（本站编写）；分级词库约 1.5 万词（中考、高考、四级、六级、考研、雅思、托福、GRE）。</p>
-    <p class="small muted">分级词库的词表、音标和中文释义来自 <a href="https://github.com/skywind3000/ECDICT" target="_blank" rel="noopener">ECDICT</a>（MIT 许可）。</p>
+    <p class="small muted">分级词库的词表、音标和中文释义来自 <a href="https://github.com/skywind3000/ECDICT" target="_blank" rel="noopener">ECDICT</a>（MIT 许可）。例句来自 <a href="https://tatoeba.org" target="_blank" rel="noopener">Tatoeba</a>（CC BY 2.0 FR），中文已转为简体。</p>
     <p class="small muted">韩语、英语发音由 <a href="https://github.com/myshell-ai/MeloTTS" target="_blank" rel="noopener">MeloTTS</a>（MIT 许可）生成，还没有音频的词用设备自带的语音。常用词优先使用母语者的真人录音（来自 Wikimedia Commons 的维基词典和 Lingua Libre，<a href="credits.html">录音者与授权</a>）。英语合成语音由 <a href="https://huggingface.co/hexgrad/Kokoro-82M" target="_blank" rel="noopener">Kokoro</a>（Apache 2.0）生成。</p>
   </section>`);
   const ps = bk.querySelector('[data-persist]');

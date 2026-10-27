@@ -76,7 +76,8 @@ def main():
             ids = [sid for sid in index.get(w.split()[0].lower(), []) if w.lower() in eng[sid].lower()]
         else:
             ids = sorted({sid for f in forms(w) for sid in index.get(f, [])})
-        ids.sort(key=lambda i: (len(eng[i]), i))
+        # 4–12 个词的句子最适合当例句；太短的（「Hello!」「The farm!」）放到最后
+        ids.sort(key=lambda i: (not 4 <= len(eng[i].split()) <= 12, len(eng[i]), i))
         out, seen = [], set()
         for sid in ids:
             zh = t2s.convert(cmn[pairs[sid][0]])
