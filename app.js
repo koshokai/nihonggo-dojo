@@ -703,6 +703,7 @@ function render() {
   main.innerHTML = '';
   if (trackOf(view) === 'ja' && ['home', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict', 'study', 'ri'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
   applyTrack(view);
+  if (S.onboarded && view !== 'welcome') logUsage(document.body.dataset.track || 'ja');
   VIEWS[view](arg ? decodeURIComponent(arg) : undefined);
   updateTop();
 }
@@ -1328,7 +1329,12 @@ function viewMe() {
   const ps = bk.querySelector('[data-persist]');
   requestPersist().then(ok => { ps.innerHTML = ok ? '<span class="tag done">已开启</span> 浏览器已同意持久保存，空间不足时也不会自动清理这里的数据。' : '<span class="tag">未开启</span> 这个浏览器没有同意持久保存，建议添加到主屏幕并定期备份。'; });
   const acc = accountPanel();
-  main.append(...[p, installPanel(), acc, voiceP, bk, about].filter(Boolean));
+  // 匿名使用统计开关（见 stats.js）
+  const st = h(`<section class="panel"><h2>匿名使用统计</h2>
+    <div class="row between"><span>帮助改进日语道场</span><div class="seg">${opt([[0, '开'], [1, '关']], S.noStats ? 1 : 0, 'data-nostats')}</div></div>
+    <p class="small muted">每天最多发送一次「这台设备今天打开过、在学哪种语言」，用一个和账号无关的随机编号，不包含学习内容、邮箱或账号。只用来统计每天有多少人在学、一周后还有多少人在用。</p></section>`);
+  st.querySelectorAll('[data-nostats]').forEach(b => { b.onclick = () => { S.noStats = b.dataset.nostats === '1'; save(); render(); }; });
+  main.append(...[weeklyPanel(), p, installPanel(), acc, voiceP, bk, st, about].filter(Boolean));
 }
 
 /* ---------- 安装到手机（PWA）---------- */

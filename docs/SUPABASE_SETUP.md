@@ -169,3 +169,38 @@ Google 后台现在叫 **Google Auth Platform**，直接用下面的链接打开
 
 - 项目 **一周没有任何访问会被暂停**，在 Supabase 后台点一下就能恢复，数据不会丢。网站有人用就不会暂停。
 - 500 MB 数据库：一个用户的进度大约 50–200 KB，几千个活跃用户没问题；超出后再考虑付费版（每月 25 美元）。
+
+## 8. 匿名使用统计（可选，用来看留存）
+
+网页每台设备每天最多发一条记录：一个只存在这台设备上的随机编号（和账号无关）、日期、在学哪种语言（ja / ko / en）。
+不含学习内容、邮箱或账号；用户可以在「我的 → 匿名使用统计」关闭。没有建这张表时网页照常使用，只是记录发不出去。
+
+在 **SQL Editor** 运行：
+
+```sql
+create table public.daily_usage (
+  anon_id uuid not null,
+  day date not null,
+  track text not null check (track in ('ja', 'ko', 'en')),
+  primary key (anon_id, day, track)
+);
+alter table public.daily_usage enable row level security;
+-- 只能写入当天前后的记录，谁都不能读（只有你在后台能看）
+create policy "log usage" on public.daily_usage for insert to anon, authenticated
+  with check (day between current_date - 1 and current_date + 1);
+```
+
+查看数据（在 SQL Editor 运行）：
+
+```sql
+-- 最近 14 天每天有多少台设备在学（按语言）
+select day, track, count(*) from public.daily_usage
+where day > current_date - 14 group by day, track order by day desc, track;
+
+-- 7 日留存：第一次出现后的第 7–13 天里又出现过的设备比例（按第一次出现的那一周分组）
+with first as (select anon_id, min(day) d0 from public.daily_usage group by anon_id)
+select date_trunc('week', d0)::date as cohort, count(*) as new_devices,
+  round(100.0 * count(*) filter (where exists (
+    select 1 from public.daily_usage u where u.anon_id = first.anon_id and u.day between d0 + 7 and d0 + 13)) / count(*), 1) as retention_7d
+from first group by 1 order by 1 desc;
+```

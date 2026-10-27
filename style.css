@@ -689,3 +689,10 @@ body.gated { overflow: hidden; }
 .daily-l2 .daily-s { flex: 1; min-width: 0; }
 .daily-l2 [data-d], .daily-card .btn.small { min-width: 40px; min-height: 40px; }
 @media (max-width: 800px) { #toast { bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important; } }
+
+/* 本周小结 */
+.wk-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 8px 0; }
+.wk-grid > div { display: grid; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.wk-grid b { font-size: 1.4rem; }
+.wk-grid .up { color: var(--ok); } .wk-grid .down { color: var(--bad); }
+.wk-tips { margin: 6px 0; padding-left: 20px; }
