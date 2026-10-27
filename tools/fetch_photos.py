@@ -70,6 +70,11 @@ def articles():
     if q.exists():
         for aid, s in json.loads(q.read_text(encoding='utf-8')).items():
             yield aid, [x.strip() for x in s.split(' / ') if x.strip()]
+    # 韩语、英语阅读文章（tools/lang2/*_reading.json 的 photo 字段）
+    import sys
+    sys.path.insert(0, str(ROOT / 'tools'))
+    from build_lang2 import photo_queries
+    yield from photo_queries().items()
     for f in sorted((ROOT / 'tools' / 'reading').glob('life_*.txt')):
         for block in re.split(r'\n(?=# id:)', f.read_text(encoding='utf-8').strip()):
             head = block.split('\n---\n', 1)[0]

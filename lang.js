@@ -379,6 +379,12 @@ function viewLangTrack(tr, sub) {
   if (sub === 'abc') return main.append(tr === 'ko' ? koHangul() : enAbc());
   if (sub === 'levels') return langLevels(tr);
   if (sub === 'exam') return langExam(tr);
+  if (sub === 'grammar') return l2Grammar(tr);
+  if (sub && sub.startsWith('read')) return l2Reading(tr, sub.split('/')[1]);
+  if (sub === 'listen') return l2Listen(tr);
+  if (sub === 'biz') return l2Biz(tr);
+  if (sub === 'game') return l2Game(tr);
+  if (sub === 'dict') return l2Dict(tr);
   if (!langReady(tr)) return;
   if (sub === 'words' || sub === 'phrases') return main.append(langList(tr, sub));
   // 首页
@@ -391,6 +397,12 @@ function viewLangTrack(tr, sub) {
     <div class="stat-row"><div><b>${known}</b><span class="small muted">已学</span></div><div><b>${due.length}</b><span class="small muted">今天要复习</span></div><div><b>${words.length + phrases.length}</b><span class="small muted">全部</span></div></div>
     ${due.length ? `<div class="row"><button class="btn pri" type="button" data-due>复习到期的 ${due.length} 张卡</button></div>` : ''}
     <div class="lang-menu">
+      <a class="lang-tile" href="#${tr}/game"><b>闯关</b><span class="small muted">入门单词每 10 个一关，3 条命</span></a>
+      <a class="lang-tile" href="#${tr}/grammar"><b>语法</b><span class="small muted">${tr === 'ko' ? '初级 / 中级 / 高级' : '基础 / 四级 / 六级'}，用法 + 例句 + 练习</span></a>
+      <a class="lang-tile" href="#${tr}/read"><b>阅读</b><span class="small muted">生活短文，配真实照片，点句朗读</span></a>
+      <a class="lang-tile" href="#${tr}/listen"><b>听力</b><span class="small muted">${tr === 'ko' ? 'TOPIK' : '四六级'}听力题型，男女声对话</span></a>
+      <a class="lang-tile" href="#${tr}/biz"><b>商务${T.title}</b><span class="small muted">职场表达 + 邮件模板</span></a>
+      <a class="lang-tile" href="#${tr}/dict"><b>词典</b><span class="small muted">入门词、常用句、分级词库一起查</span></a>
       <a class="lang-tile" href="#${tr}/abc"><b>${tr === 'ko' ? '한글 字母' : 'Aa 字母音标'}</b><span class="small muted">${tr === 'ko' ? '40 个字母 + 拼读表 + 测验' : '26 个字母 + 美式音标'}</span></a>
       <a class="lang-tile" href="#${tr}/words"><b>单词 ${words.length}</b><span class="small muted">按主题分类，闪卡 + 测验</span></a>
       <a class="lang-tile" href="#${tr}/phrases"><b>常用句 ${phrases.length}</b><span class="small muted">按场景分类，点击朗读</span></a>
@@ -401,6 +413,8 @@ function viewLangTrack(tr, sub) {
   </section>`);
   const b = p.querySelector('[data-due]'); if (b) b.onclick = () => langCards(due.slice(0, 30), `${T.title}复习`, tr);
   main.append(p);
+  // 今日一句（数据还没加载好时先占位，到了再插到最前面）
+  l2Fetch(tr, 'daily').then(list => { if (p.isConnected && list.length) p.before(l2Daily(tr, list)); }).catch(() => {});
 }
 const viewKo = sub => viewLangTrack('ko', sub);
 const viewEn = sub => viewLangTrack('en', sub);

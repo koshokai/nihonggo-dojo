@@ -2,7 +2,8 @@
 // 入口：任何带 data-shadow 的按钮（例句旁的麦克风），以及阅读 / 商务会话里的「跟读模式」。
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const MIC_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>';
-const shadowBtn = (jp, kana, zh) => `<button class="speak mic" type="button" data-shadow data-jp="${esc(jp)}" data-kana="${esc(kana)}" data-zh="${esc(zh || '')}" aria-label="跟读">${MIC_SVG}</button>`;
+// lang：'ko' / 'en' 时用韩语、英语的朗读和语音识别（默认日语）
+const shadowBtn = (jp, kana, zh, lang) => `<button class="speak mic" type="button" data-shadow data-jp="${esc(jp)}" data-kana="${esc(kana)}" data-zh="${esc(zh || '')}"${lang ? ` data-lang="${lang}"` : ''} aria-label="跟读">${MIC_SVG}</button>`;
 
 // 比对用：去掉标点空格，片假名转平假名
 const normJa = s => toHira(String(s).replace(/[\s、。，．・「」『』（）()！？!?…ー〜～,.]/g, ''));
@@ -32,13 +33,15 @@ function markMissing(orig, heard) {
 }
 
 let shadowRec = null;
-function shadowSheet(jp, kana, zh) {
+function shadowSheet(jp, kana, zh, lang) {
+  const norm = !lang || lang === 'ja' ? normJa : s => String(s).toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+  const tag = { ko: 'ko-KR', en: 'en-US' }[lang] || 'ja-JP', ll = lang || 'ja';
   closeSheet();
   const sh = h(`<div class="word-sheet shadow-sheet" role="dialog" aria-label="跟读">
     <button class="ws-x" type="button" aria-label="关闭">×</button>
     <div class="eyebrow">跟读练习</div>
-    <div class="sh-jp" lang="ja">${esc(jp)}</div>
-    <div class="small muted" lang="ja">${esc(kana)}</div>
+    <div class="sh-jp" lang="${ll}">${esc(jp)}</div>
+    ${kana && kana !== jp ? `<div class="small muted" lang="${ll}">${esc(kana)}</div>` : ''}
     ${zh ? `<div class="small">${esc(zh)}</div>` : ''}
     <div class="row sh-ctl">
       <button class="btn" type="button" data-orig>${SPEAK_SVG}<span>原音</span></button>
@@ -50,7 +53,7 @@ function shadowSheet(jp, kana, zh) {
   document.body.append(sh);
   const res = sh.querySelector('.sh-res'), recBtn = sh.querySelector('[data-rec]'), mineBtn = sh.querySelector('[data-mine]');
   let audioURL = null, stream = null, mr = null, rec = null, heard = '', active = false;
-  const say = () => speak(kana || jp);
+  const say = () => ll === 'ja' ? speak(kana || jp) : speakLang(jp, tag);
   const stopAll = () => {
     active = false;
     try { rec && rec.stop(); } catch (e) { /* 忽略 */ }
@@ -60,12 +63,12 @@ function shadowSheet(jp, kana, zh) {
   const finish = () => {
     if (!SR) return;
     if (!heard) { res.innerHTML = '没有听清楚，请靠近麦克风再说一遍。'; return; }
-    const target = normJa(jp), targetK = normJa(kana || jp), got = normJa(heard);
+    const target = norm(jp), targetK = ll === 'ja' ? norm(kana || jp) : target, got = norm(heard);
     const score = Math.round(Math.max(similarity(target, got), similarity(targetK, got)) * 100);
     const msg = score >= 90 ? 'すごい！发音很清楚。' : score >= 70 ? '不错！再注意一下标红的部分。' : '多听几遍原音，跟着节奏再试一次。';
     res.innerHTML = `<div class="sh-score ${score >= 70 ? 'good' : ''}">${score}<small> 分</small></div>
-      <div>识别到：<span lang="ja">${esc(heard)}</span></div>
-      <div>原句：<span lang="ja">${markMissing(jp, heard)}</span></div>
+      <div>识别到：<span lang="${ll}">${esc(heard)}</span></div>
+      <div>原句：<span lang="${ll}">${ll === 'ja' ? markMissing(jp, heard) : esc(jp)}</span></div>
       <div class="muted">${msg}</div>`;
     if (score >= 70) addXP(3);
   };
@@ -92,11 +95,11 @@ function shadowSheet(jp, kana, zh) {
     }
     if (SR) {
       rec = new SR();
-      rec.lang = 'ja-JP'; rec.interimResults = false; rec.maxAlternatives = 3;
+      rec.lang = tag; rec.interimResults = false; rec.maxAlternatives = 3;
       rec.onresult = e => {
         // 几个候选里取和原句最接近的
         const alts = [...e.results[0]].map(r => r.transcript);
-        heard = alts.sort((a, b) => similarity(normJa(jp), normJa(b)) - similarity(normJa(jp), normJa(a)))[0] || '';
+        heard = alts.sort((a, b) => similarity(norm(jp), norm(b)) - similarity(norm(jp), norm(a)))[0] || '';
       };
       rec.onerror = e => { if (e.error === 'not-allowed') res.innerHTML = '没有麦克风权限。请在浏览器地址栏旁允许使用麦克风。'; };
       rec.onend = () => { if (active) stopAll(); finish(); };
@@ -114,7 +117,7 @@ function shadowSheet(jp, kana, zh) {
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-shadow]');
-  if (b) { e.stopPropagation(); shadowSheet(b.dataset.jp, b.dataset.kana, b.dataset.zh); }
+  if (b) { e.stopPropagation(); shadowSheet(b.dataset.jp, b.dataset.kana, b.dataset.zh, b.dataset.lang); }
 }, true);
 // 关掉面板或换页时释放麦克风
 const _closeSheet = closeSheet;

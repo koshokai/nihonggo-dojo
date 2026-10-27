@@ -646,3 +646,16 @@ body[data-track=ko] .tabs a:not([data-trk]), body[data-track=en] .tabs a:not([da
 .today-art .ta-img { height: 80px; border-radius: 8px; overflow: hidden; }
 .today-art:hover { border-color: var(--ai); }
 .lv-q { width: 100%; min-height: 40px; border-radius: 999px; border: 1.5px solid var(--line); padding: 0 14px; margin: 10px 0; background: var(--surface); }
+
+/* 韩语、英语：语法、闯关、今日一句 */
+.gram-item { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin: 8px 0; background: var(--surface); }
+.gram-item summary { cursor: pointer; }
+.gram-item .ex { display: flex; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px dashed var(--line); }
+.stage-map { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(110px, 100%), 1fr)); gap: 10px; }
+.stage { display: grid; gap: 2px; padding: 10px 6px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); cursor: pointer; font: inherit; color: inherit; text-align: center; }
+.stage b { font-size: 1.3rem; }
+.stage.done { border-color: var(--ai); background: var(--ai-soft); }
+.stage:disabled { opacity: .45; cursor: not-allowed; }
+.stage .stars { color: #e6a700; letter-spacing: 1px; }
+.daily-s { font-size: 1.25rem; line-height: 1.5; }
+.mail-body .ex { border-top: 0; padding: 2px 0; }

@@ -11,6 +11,14 @@ const LTYPE = {
   tougou: ['統合理解', '听几个人比较几个方案，选出最后的决定。']
 };
 const LSPOKEN = { gaiyou: 1, hatsuwa: 1, sokuji: 1 };
+// 韩语、英语听力（x.lang = 'ko' / 'en'）用同一个播放器，题型名称按考试习惯
+const LTYPE_LANG = {
+  ko: { sokuji: ['알맞은 대답', '听一句话，选出最合适的回应。选项只读不显示。'], kadai: ['이어서 할 행동', '听对话，选出接下来要做的事。'], point: ['세부 내용', '听对话或独白，抓住原因、细节。'], gaiyou: ['중심 생각', '听一段话，选出主旨。选项只读不显示。'] },
+  en: { sokuji: ['Responses 回应', '听一句话，选出最合适的回应。选项只读不显示。'], kadai: ['Short Conversations 短对话', '听对话，选出接下来要做的事。'], point: ['Long Conversations 长对话', '听对话或独白，抓住原因、细节。'], gaiyou: ['Passages 短文', '听一段讲座、广播或新闻，选出主旨。选项只读不显示。'] }
+};
+const ltype = (t, lang) => (lang && LTYPE_LANG[lang] && LTYPE_LANG[lang][t]) || LTYPE[t];
+const LNUM_LANG = { ko: ['일 번', '이 번', '삼 번', '사 번'], en: ['One.', 'Two.', 'Three.', 'Four.'] };
+const LTTS = { ja: 'ja-JP', ko: 'ko-KR', en: 'en-US' };
 // 听力测验每种题型出几题（按 JLPT 听解的顺序）
 const LPLAN = {
   N5: { kadai: 4, point: 3, hatsuwa: 3, sokuji: 4 },
@@ -22,8 +30,8 @@ const LPLAN = {
 const LNUM = ['いち', 'に', 'さん', 'よん'], LOTHER = { M: 'F', F: 'M', M2: 'F', F2: 'M' };
 const LRATE = { N5: .9, N4: .95, N3: 1, N2: 1.05, N1: 1.1 };
 
-let LISTEN_IDX = null;
-const listenIdx = () => LISTEN_IDX || (LISTEN_IDX = fetch('audio/index-listen.json').then(r => r.ok ? r.json() : {}).catch(() => ({})));
+const LISTEN_IDXS = {};
+const listenIdx = (lang = 'ja') => LISTEN_IDXS[lang] || (LISTEN_IDXS[lang] = fetch(lang === 'ja' ? 'audio/index-listen.json' : `audio/index-${lang}-listen.json`).then(r => r.ok ? r.json() : {}).catch(() => ({})));
 
 // 与 tools/build_listen.py 的 segs() 相同：[说话人, 文本, 之后停顿秒数]
 function lsSegs(x) {
@@ -34,7 +42,7 @@ function lsSegs(x) {
   if (x.q && x.t !== 'hatsuwa' && x.t !== 'sokuji') s.push(['N', x.q, 1]);
   if (LSPOKEN[x.t]) {
     const v = x.t === 'sokuji' ? LOTHER[x.lines[0][0]] : x.t === 'hatsuwa' ? 'F' : 'N';
-    x.c.forEach((c, i) => { s.push(['N', LNUM[i], .3]); s.push([v, c, .9]); });
+    x.c.forEach((c, i) => { s.push(['N', (LNUM_LANG[x.lang] || LNUM)[i], .3]); s.push([v, c, .9]); });
   }
   return s;
 }
@@ -51,17 +59,19 @@ function lsPlay(x, L, { slow = false, onend, onTTS } = {}) {
   const viaTTS = () => {
     if (!hasTTS) { toast('这个浏览器不支持朗读'); return done(); }
     if (onTTS) onTTS();
-    const vs = jaVoices(), male = vs.find(v => /ichiro|otoya|keita|hattori|male|男/i.test(v.name));
+    const lang = x.lang || 'ja', tag = LTTS[lang];
+    const vs = lang === 'ja' ? jaVoices() : speechSynthesis.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase().startsWith(lang));
+    const male = vs.find(v => /ichiro|otoya|keita|hattori|injoon|daniel|alex|fred|guy|male|男/i.test(v.name));
     const segs = lsSegs(x);
     const next = k => {
       if (dead) return;
       if (k >= segs.length) return done();
       const [spk, text, pause] = segs[k];
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'ja-JP';
-      u.rate = (spk === 'N' ? 1 : LRATE[L]) * (slow ? .8 : 1);
+      u.lang = tag;
+      u.rate = (spk === 'N' ? 1 : LRATE[L] || 1) * (slow ? .8 : 1);
       const isM = spk[0] === 'M';
-      u.voice = (isM && male) || currentVoice() || null;
+      u.voice = (isM && male) || (lang === 'ja' ? currentVoice() : vs[0]) || null;
       // 音调只轻微区分：压得太低或抬得太高，设备语音会变得很怪
       u.pitch = spk === 'N' || (isM && male) ? 1 : isM ? (spk === 'M2' ? .8 : .88) : spk === 'F2' ? 1.12 : 1.04;
       u.onend = u.onerror = () => { if (!dead) timer = setTimeout(() => next(k + 1), pause * 1000); };
@@ -69,7 +79,7 @@ function lsPlay(x, L, { slow = false, onend, onTTS } = {}) {
     };
     speechSynthesis.cancel(); setTimeout(() => next(0), 80);
   };
-  listenIdx().then(idx => {
+  listenIdx(x.lang).then(idx => {
     if (dead) return;
     const file = S.voiceSrc !== 'tts' && idx[x.id];
     if (!file) return viaTTS();
@@ -83,9 +93,9 @@ function lsPlay(x, L, { slow = false, onend, onTTS } = {}) {
 }
 
 function lsTranscript(x) {
-  return `<div class="ls-script">${x.intro ? `<p class="small muted" lang="ja">${esc(x.intro)}</p>` : ''}
-    ${x.lines.map(([spk, ja, zh]) => `<p><span class="ls-spk ${spk[0]}">${{ M: '男', F: '女', M2: '男2', F2: '女2' }[spk]}</span><span lang="ja">${esc(ja)}</span><span class="small muted ls-zh">${esc(zh)}</span></p>`).join('')}
-    ${x.q && x.t !== 'hatsuwa' ? `<p class="small muted" lang="ja">${esc(x.q)}</p>` : ''}</div>`;
+  return `<div class="ls-script">${x.intro ? `<p class="small muted" lang="${x.lang || 'ja'}">${esc(x.intro)}</p>` : ''}
+    ${x.lines.map(([spk, ja, zh]) => `<p><span class="ls-spk ${spk[0]}">${{ M: '男', F: '女', M2: '男2', F2: '女2' }[spk]}</span><span lang="${x.lang || 'ja'}">${esc(ja)}</span><span class="small muted ls-zh">${esc(zh)}</span></p>`).join('')}
+    ${x.q && x.t !== 'hatsuwa' ? `<p class="small muted" lang="${x.lang || 'ja'}">${esc(x.q)}</p>` : ''}</div>`;
 }
 
 let listenLoading = false;
@@ -105,7 +115,7 @@ function viewListen() {
   }
   const L = S.level, all = LISTEN[L] || [];
   S.listenHist = S.listenHist || [];
-  const hist = S.listenHist.slice(-6).reverse();
+  const hist = S.listenHist.filter(e => LEVELS.includes(e.L)).slice(-6).reverse();
   const types = Object.keys(LTYPE).filter(t => all.some(x => x.t === t));
   const p = h(`<section class="panel">
     <div class="row between"><h2>听力 · ${L}</h2>${levelSeg(L)}</div>
@@ -150,11 +160,11 @@ function runListen(qs, L, { exam = false, title, again }) {
     box.querySelector('[data-count]').textContent = `${i + 1} / ${qs.length}`;
     box.querySelector('[data-bar]').style.width = (i / qs.length * 100) + '%';
     const spoken = LSPOKEN[x.t];
-    stage.innerHTML = `<div class="q-prompt pop"><div class="eyebrow">${LTYPE[x.t][0]}</div><div class="small muted">${LTYPE[x.t][1]}</div>
+    stage.innerHTML = `<div class="q-prompt pop"><div class="eyebrow">${ltype(x.t, x.lang)[0]}</div><div class="small muted">${ltype(x.t, x.lang)[1]}</div>
       <div class="ls-player"><button class="btn pri ls-play" type="button" data-play>▶ 播放</button>
       ${exam ? '<span class="small muted">考试模式：只能听一遍</span>' : '<label class="small"><input type="checkbox" data-slow> 慢速</label>'}</div>
       <div class="small muted" data-ttsnote hidden>这道题的真人语音还在制作中，暂时用手机自带的朗读，声音会比较生硬。</div></div>
-      <div class="opts">${x.c.map((c, j) => `<button class="opt" type="button" data-o="${j}"><span class="k">${j + 1}</span><span lang="ja">${spoken ? '' : esc(c)}</span></button>`).join('')}</div>
+      <div class="opts">${x.c.map((c, j) => `<button class="opt" type="button" data-o="${j}"><span class="k">${j + 1}</span><span lang="${x.lang || 'ja'}">${spoken ? '' : esc(c)}</span></button>`).join('')}</div>
       <div data-fb></div>`;
     const btn = stage.querySelector('[data-play]');
     const setBtn = () => {
@@ -217,14 +227,14 @@ function runListen(qs, L, { exam = false, title, again }) {
       <div class="result"><div class="seal pop ${pct >= 60 ? '' : 'fail'}">${exam ? (pct >= 60 ? '合格' : '再挑戦') : pct >= 90 ? '優' : pct >= 60 ? '良' : '可'}</div>
       <div class="rank"><div class="eyebrow">${esc(title)}</div><div class="rank-name">${score} / ${total}</div>
       <p class="muted">${pct >= 60 ? 'いいね！耳朵越来越灵了。' : '听力靠多听：点开下面的原文，跟着音频再听几遍。'}</p></div></div>
-      <div class="breakdown">${Object.entries(by).map(([t, [a, n]]) => `<div class="bd-row"><span>${LTYPE[t][0]}</span><div class="bar"><i style="width:${a / n * 100}%"></i></div><span class="small">${a}/${n}</span></div>`).join('')}</div>
+      <div class="breakdown">${Object.entries(by).map(([t, [a, n]]) => `<div class="bd-row"><span>${ltype(t, res[0].x.lang)[0]}</span><div class="bar"><i style="width:${a / n * 100}%"></i></div><span class="small">${a}/${n}</span></div>`).join('')}</div>
       <h3>逐题回顾</h3>
-      ${res.map((r, k) => `<details class="ls-details"><summary>${r.ok ? '<span class="tag done">对</span>' : '<span class="tag">错</span>'} ${k + 1}. ${LTYPE[r.x.t][0]}　<span lang="ja">${esc(r.x.c[r.x.a])}</span></summary>
+      ${res.map((r, k) => `<details class="ls-details"><summary>${r.ok ? '<span class="tag done">对</span>' : '<span class="tag">错</span>'} ${k + 1}. ${ltype(r.x.t, r.x.lang)[0]}　<span lang="${r.x.lang || 'ja'}">${esc(r.x.c[r.x.a])}</span></summary>
         <div class="row"><button class="btn" type="button" data-replay="${k}">▶ 再听一次</button></div>
-        <p class="small">正确答案：<b lang="ja">${r.x.a + 1}. ${esc(r.x.c[r.x.a])}</b>（${esc(r.x.cz[r.x.a])}）${r.ok ? '' : `　你的答案：<span lang="ja">${r.pick < 0 ? '未作答' : `${r.pick + 1}. ${esc(r.x.c[r.pick])}`}</span>`}</p>
-        <ol class="small">${r.x.c.map((c, j) => `<li lang="ja">${esc(c)} <span class="muted">${esc(r.x.cz[j])}</span></li>`).join('')}</ol>
+        <p class="small">正确答案：<b lang="${r.x.lang || 'ja'}">${r.x.a + 1}. ${esc(r.x.c[r.x.a])}</b>（${esc(r.x.cz[r.x.a])}）${r.ok ? '' : `　你的答案：<span lang="${r.x.lang || 'ja'}">${r.pick < 0 ? '未作答' : `${r.pick + 1}. ${esc(r.x.c[r.pick])}`}</span>`}</p>
+        <ol class="small">${r.x.c.map((c, j) => `<li lang="${r.x.lang || 'ja'}">${esc(c)} <span class="muted">${esc(r.x.cz[j])}</span></li>`).join('')}</ol>
         <p class="small">${esc(r.x.ex)}</p>${lsTranscript(r.x)}</details>`).join('')}
-      <div class="row"><button class="btn pri" type="button" data-again>再来一组</button><a class="btn" href="#listen">返回听力</a></div>
+      <div class="row"><button class="btn pri" type="button" data-again>再来一组</button><a class="btn" href="#${qs[0].lang ? qs[0].lang + '/listen' : 'listen'}">返回听力</a></div>
     </section>`);
     main.append(p);
     p.querySelectorAll('[data-replay]').forEach(b => { b.onclick = () => lsPlay(res[+b.dataset.replay].x, L); });

@@ -1,0 +1,838 @@
+{
+ "phrases": [
+  {
+   "scene": "自我介绍",
+   "items": [
+    [
+     "Hi, I'm Li Wei. I just joined the marketing team.",
+     "你好，我是李伟，刚加入市场部。",
+     "新同事初次见面最常用的开场；说 just joined 比 am a new staff 自然得多。"
+    ],
+    [
+     "I'm in charge of our accounts in Southeast Asia.",
+     "我负责东南亚地区的客户。",
+     "be in charge of / be responsible for 说明职责；口语里 I look after... 也很常见。"
+    ],
+    [
+     "I've been with the company for about three years.",
+     "我在公司工作大约三年了。",
+     "be with + 公司名 表示“在某公司任职”，比 work in the company 地道。"
+    ],
+    [
+     "Before that, I worked in product design at a startup.",
+     "在那之前，我在一家初创公司做产品设计。",
+     "介绍背景时用 Before that 衔接，简洁自然。"
+    ],
+    [
+     "It's great to finally meet you in person.",
+     "终于见到您本人了，很高兴。",
+     "之前只邮件或视频联系过的人第一次见面时用。"
+    ],
+    [
+     "I've heard a lot about your work.",
+     "久仰您的工作成果。",
+     "客气的恭维，相当于“久仰大名”，语气真诚即可，不要过度。"
+    ],
+    [
+     "Let me introduce my colleague, Sarah Chen.",
+     "我来介绍一下我的同事陈莎拉。",
+     "介绍他人时先说 Let me introduce...，再补一句对方的职务。"
+    ],
+    [
+     "Here's my card. Feel free to reach out anytime.",
+     "这是我的名片，随时联系我。",
+     "交换名片时说；reach out 是商务场合常用的“联系”。"
+    ],
+    [
+     "Please, call me Tom.",
+     "叫我汤姆就行。",
+     "英美职场习惯直呼名字，对方称你 Mr. Wang 时可以这样回应，拉近距离。"
+    ],
+    [
+     "What brings you to the conference?",
+     "您是为什么来参加这次会议的？",
+     "活动、展会上主动打开话题的好问题，比直接问 What do you do? 柔和。"
+    ]
+   ]
+  },
+  {
+   "scene": "电话",
+   "items": [
+    [
+     "Hello, this is Wang Fang from ABC Trading.",
+     "您好，我是 ABC 贸易的王芳。",
+     "电话里自报姓名用 This is...，不说 I am...。"
+    ],
+    [
+     "Could I speak to Mr. Johnson, please?",
+     "请问约翰逊先生在吗？",
+     "转接时的标准说法；May I speak to... 更正式。"
+    ],
+    [
+     "May I ask who's calling?",
+     "请问您是哪位？",
+     "接电话时礼貌询问对方身份，比 Who are you? 礼貌得多。"
+    ],
+    [
+     "I'm afraid he's in a meeting right now.",
+     "不好意思，他现在正在开会。",
+     "I'm afraid... 用来委婉传达不好的消息。"
+    ],
+    [
+     "Would you like to leave a message?",
+     "您要留言吗？",
+     "对方要找的人不在时的固定问法。"
+    ],
+    [
+     "I'll have her call you back as soon as she's free.",
+     "她一有空我就让她给您回电话。",
+     "have sb do sth 表示“让某人做某事”；call back 回电。"
+    ],
+    [
+     "Sorry, could you speak up a little? The line is bad.",
+     "抱歉，您能大声一点吗？信号不太好。",
+     "信号差时用；speak up 是“大点声说”。"
+    ],
+    [
+     "Could you spell that for me, please?",
+     "能帮我拼一下吗？",
+     "记录人名、邮箱时非常实用，不必不好意思。"
+    ],
+    [
+     "Let me put you through.",
+     "我帮您转接。",
+     "put sb through 表示“接通电话”；也可说 I'll transfer you.。"
+    ],
+    [
+     "Thanks for calling. Have a good day.",
+     "感谢来电，祝您愉快。",
+     "结束通话的礼貌用语。"
+    ],
+    [
+     "I'm calling about the order we placed last week.",
+     "我打电话是想问一下我们上周下的订单。",
+     "开门见山说明来意：I'm calling about / to...。"
+    ]
+   ]
+  },
+  {
+   "scene": "会议",
+   "items": [
+    [
+     "Shall we get started?",
+     "我们开始吧？",
+     "主持人开场常用，比 Let's begin. 更柔和。"
+    ],
+    [
+     "The purpose of today's meeting is to finalize the budget.",
+     "今天会议的目的是确定预算。",
+     "开场时说明议题，让会议更聚焦。"
+    ],
+    [
+     "Let's go around the table and give quick updates.",
+     "我们轮流简单汇报一下进展吧。",
+     "go around the table 指按顺序每人发言，线上会议也可以这么说。"
+    ],
+    [
+     "Can I just add something here?",
+     "我能补充一点吗？",
+     "礼貌地插话；just 让语气更委婉。"
+    ],
+    [
+     "Sorry to interrupt, but I think we're running out of time.",
+     "抱歉打断一下，我们时间快不够了。",
+     "先道歉再打断，是英语会议中的基本礼貌。"
+    ],
+    [
+     "I see your point, but I have a slightly different view.",
+     "我明白你的意思，不过我的看法略有不同。",
+     "表达不同意见时先肯定对方，再用 slightly 软化语气。"
+    ],
+    [
+     "Could you clarify what you mean by \"phase two\"?",
+     "你说的“第二阶段”具体指什么？",
+     "要求对方澄清时用 clarify，显得专业而不冒犯。"
+    ],
+    [
+     "Let's take this offline.",
+     "这个我们会后再单独聊。",
+     "某个话题偏离主题或太细时用，意思是会后单独讨论，不是“下线”。"
+    ],
+    [
+     "To sum up, we've agreed on three action items.",
+     "总结一下，我们确定了三项待办事项。",
+     "会议结尾总结；action items 指会后具体要做的事。"
+    ],
+    [
+     "Who's going to follow up on this?",
+     "这件事谁来跟进？",
+     "确认负责人；follow up on 是职场高频词。"
+    ],
+    [
+     "Let's circle back to this next week.",
+     "这个问题我们下周再回过头来讨论。",
+     "circle back 是美国职场常见说法，表示稍后再讨论。"
+    ]
+   ]
+  },
+  {
+   "scene": "邮件常用句",
+   "items": [
+    [
+     "I hope this email finds you well.",
+     "希望您一切安好。",
+     "邮件开头的客套话，较正式；熟人之间可用 Hope you're doing well.。"
+    ],
+    [
+     "I'm writing to inquire about your training services.",
+     "来信是想咨询贵公司的培训服务。",
+     "第一次联系时说明来意的标准句式：I'm writing to + 动词。"
+    ],
+    [
+     "Please find attached the revised proposal.",
+     "附件是修改后的方案，请查收。",
+     "附件的固定说法；也可写 I've attached...，更口语。"
+    ],
+    [
+     "Just a quick reminder that the deadline is this Friday.",
+     "温馨提醒一下，截止日期是本周五。",
+     "Just a quick reminder 让催促显得友好，不带压力。"
+    ],
+    [
+     "Thank you for your prompt reply.",
+     "感谢您的及时回复。",
+     "回复对方邮件时开头致谢。"
+    ],
+    [
+     "Could you please confirm receipt of this email?",
+     "收到邮件后请回复确认一下。",
+     "重要文件需要对方确认收到时使用。"
+    ],
+    [
+     "I've copied Lisa on this email for her reference.",
+     "我把丽莎抄送进来了，供她参考。",
+     "说明抄送原因；copy sb on 或 cc sb 都可以。"
+    ],
+    [
+     "Please let me know if you have any questions.",
+     "如有任何问题请告诉我。",
+     "邮件结尾最常用的一句，万能但略显套路。"
+    ],
+    [
+     "I look forward to hearing from you.",
+     "期待您的回复。",
+     "正式邮件结尾；不要写成 look forward to hear。"
+    ],
+    [
+     "Apologies for the delayed response.",
+     "抱歉回复晚了。",
+     "回信迟了时放在开头；比 Sorry for late reply 更规范。"
+    ]
+   ]
+  },
+  {
+   "scene": "请求",
+   "items": [
+    [
+     "Would you mind sending me the latest figures?",
+     "能麻烦您把最新的数据发给我吗？",
+     "Would you mind + doing 非常礼貌；同意时回答 Not at all.（不介意）。"
+    ],
+    [
+     "Could you possibly take a look at this by Thursday?",
+     "您能否在周四之前看一下这个？",
+     "possibly 让请求更客气，适合对上级或客户。"
+    ],
+    [
+     "I was wondering if you could help me with the report.",
+     "不知道您能不能帮我弄一下这份报告。",
+     "过去进行时 I was wondering 是英语里最委婉的请求方式之一。"
+    ],
+    [
+     "Would it be possible to move the meeting to 3 p.m.?",
+     "能把会议改到下午三点吗？",
+     "请求变更安排时用，语气客气、不强迫对方。"
+    ],
+    [
+     "I'd really appreciate it if you could get back to me today.",
+     "如果您今天能回复我，我将非常感激。",
+     "带一点紧迫感但不失礼貌。"
+    ],
+    [
+     "Do you have a minute?",
+     "您现在有空吗？",
+     "找同事或上司简短交流前先问一句。"
+    ],
+    [
+     "Can I ask you a favor?",
+     "能请你帮个忙吗？",
+     "同事之间的口语说法，对方通常会说 Sure, what is it?。"
+    ],
+    [
+     "When would be a good time for you?",
+     "您什么时候方便？",
+     "约时间时把选择权交给对方，显得体贴。"
+    ],
+    [
+     "Could you walk me through the process?",
+     "您能给我讲一遍这个流程吗？",
+     "walk sb through 指一步一步讲解，新人常用。"
+    ],
+    [
+     "If it's not too much trouble, could you send a sample?",
+     "如果不太麻烦的话，能寄一份样品吗？",
+     "对外部客户或供应商提出额外请求时用。"
+    ]
+   ]
+  },
+  {
+   "scene": "拒绝与道歉",
+   "items": [
+    [
+     "I'm sorry, but I won't be able to make it on Friday.",
+     "抱歉，周五我去不了。",
+     "make it 指“赶得上、能到场”；拒绝时先道歉再说明。"
+    ],
+    [
+     "I'd love to help, but I'm swamped this week.",
+     "我很想帮忙，但这周实在忙不过来。",
+     "swamped 表示忙得不可开交；先表达意愿再拒绝，不伤关系。"
+    ],
+    [
+     "Unfortunately, we're unable to accept your proposal at this time.",
+     "很遗憾，我们目前无法接受您的提案。",
+     "正式拒绝常用 Unfortunately...；at this time 暗示以后仍有可能。"
+    ],
+    [
+     "I'm afraid that's not something I can decide on my own.",
+     "这恐怕不是我一个人能决定的。",
+     "需要请示上级时的委婉拒绝。"
+    ],
+    [
+     "Please accept our apologies for the inconvenience.",
+     "给您带来不便，敬请谅解。",
+     "正式书面道歉的标准句。"
+    ],
+    [
+     "That was my mistake. I'll fix it right away.",
+     "这是我的失误，我马上改。",
+     "坦率承认错误并给出行动，英美职场很看重这一点。"
+    ],
+    [
+     "I apologize for the confusion.",
+     "抱歉造成了误会。",
+     "信息不清导致误解时使用，语气正式但不沉重。"
+    ],
+    [
+     "Let me look into it and get back to you.",
+     "我先查一下，再回复您。",
+     "遇到投诉或问题时先表态处理，避免当场给出不确定的答复。"
+    ],
+    [
+     "Thank you for your patience while we sort this out.",
+     "在我们处理期间，感谢您的耐心等待。",
+     "用“感谢耐心”代替反复道歉，更积极。"
+    ],
+    [
+     "I can't commit to that deadline, but I can do next Wednesday.",
+     "那个截止日期我不能保证，但下周三可以。",
+     "拒绝的同时给出替代方案，是最专业的拒绝方式。"
+    ]
+   ]
+  },
+  {
+   "scene": "谈判",
+   "items": [
+    [
+     "What kind of volume are we talking about?",
+     "大概是多大的量？",
+     "谈价格前先确认订购量，量大才好谈折扣。"
+    ],
+    [
+     "Is there any flexibility on the price?",
+     "价格上还有商量的余地吗？",
+     "委婉地讨价还价，比直接说 Too expensive 好得多。"
+    ],
+    [
+     "If you can increase the order, we can offer a 5% discount.",
+     "如果您能增加订单量，我们可以给 5% 的折扣。",
+     "If you..., we can... 是谈判中“有条件让步”的经典句型。"
+    ],
+    [
+     "That's a bit higher than we budgeted for.",
+     "这比我们的预算稍微高了一点。",
+     "用 a bit 软化拒绝，给双方留余地。"
+    ],
+    [
+     "Let's see if we can find some middle ground.",
+     "我们看看能不能找到一个折中方案。",
+     "middle ground 指双方都能接受的折中点。"
+    ],
+    [
+     "We'd need to check with our head office before agreeing to that.",
+     "同意之前我们需要跟总部确认一下。",
+     "争取时间、避免当场让步的常用说法。"
+    ],
+    [
+     "What if we split the shipping costs?",
+     "运费我们双方各担一半怎么样？",
+     "What if... 用来提出建议性方案，语气开放。"
+    ],
+    [
+     "That sounds reasonable. I think we have a deal.",
+     "听起来很合理，我想我们可以成交了。",
+     "表示达成一致；have a deal 是谈判成功的标志。"
+    ],
+    [
+     "Could you put that in writing?",
+     "能以书面形式确认一下吗？",
+     "口头达成的条件要求书面确认，保护双方。"
+    ],
+    [
+     "This is our best offer.",
+     "这是我们能给出的最优报价了。",
+     "表明底线，一般用在谈判后期，不要过早使用。"
+    ]
+   ]
+  },
+  {
+   "scene": "面试",
+   "items": [
+    [
+     "Thank you for having me today.",
+     "感谢今天给我面试的机会。",
+     "面试开始时的礼貌问候，比 Thank you for interviewing me 自然。"
+    ],
+    [
+     "I have five years of experience in supply chain management.",
+     "我在供应链管理方面有五年经验。",
+     "开门见山说明经验，experience in + 领域。"
+    ],
+    [
+     "In my previous role, I led a team of eight people.",
+     "在上一份工作中，我带领一个八人团队。",
+     "用 previous role 指上一份工作；led 突出领导力。"
+    ],
+    [
+     "One of my strengths is that I stay calm under pressure.",
+     "我的优点之一是在压力下能保持冷静。",
+     "回答优点时要具体，最好再接一个实际例子。"
+    ],
+    [
+     "I'm working on improving my public speaking skills.",
+     "我正在努力提升公开演讲能力。",
+     "回答缺点时说明正在改进，展示成长意识。"
+    ],
+    [
+     "For example, I reduced delivery times by 20% last year.",
+     "比如，去年我把交货时间缩短了 20%。",
+     "用数字说话最有说服力，面试官很看重具体成果。"
+    ],
+    [
+     "I'm looking for a role where I can grow and take on more responsibility.",
+     "我希望找一份能成长、承担更多责任的工作。",
+     "回答“为什么换工作”时积极正面，不抱怨前公司。"
+    ],
+    [
+     "What does a typical day look like in this position?",
+     "这个职位一天的工作大概是什么样的？",
+     "面试结尾反问环节的好问题，显示你对工作内容真正感兴趣。"
+    ],
+    [
+     "What are the next steps in the process?",
+     "接下来的流程是怎样的？",
+     "面试最后确认后续安排，自然又得体。"
+    ],
+    [
+     "I'm very excited about the opportunity to join your team.",
+     "我非常期待有机会加入你们的团队。",
+     "结尾表达热情；excited 在英语面试中很常见，不显夸张。"
+    ]
+   ]
+  },
+  {
+   "scene": "出差",
+   "items": [
+    [
+     "I'd like to check in. I have a reservation under the name Zhang.",
+     "我要办理入住，用张的名字预订的。",
+     "under the name... 表示以某名字预订，酒店、餐厅通用。"
+    ],
+    [
+     "Could I get a receipt for this, please?",
+     "能给我开张收据吗？",
+     "出差报销必备的一句；也可问 an itemized receipt（明细收据）。"
+    ],
+    [
+     "My flight was delayed, so I'll be about an hour late.",
+     "我的航班延误了，大概会晚到一个小时。",
+     "提前告知对方迟到原因和时间，是基本商务礼仪。"
+    ],
+    [
+     "Is there a quiet place where I can take a call?",
+     "有没有安静的地方可以打个电话？",
+     "在客户公司或酒店大堂需要打电话时用。"
+    ],
+    [
+     "What's the best way to get to your office from the airport?",
+     "从机场到贵公司怎么走最方便？",
+     "出发前向对方询问交通，对方通常会给出很实用的建议。"
+    ],
+    [
+     "Thank you for showing me around the factory.",
+     "谢谢您带我参观工厂。",
+     "show sb around 表示带人参观，参观后道谢用。"
+    ],
+    [
+     "Could you recommend a good place for dinner nearby?",
+     "附近有什么好的餐厅推荐吗？",
+     "向当地同事或酒店前台询问，也是不错的闲聊话题。"
+    ],
+    [
+     "I'll be in Chicago from the 10th to the 14th.",
+     "我 10 号到 14 号在芝加哥。",
+     "告知行程，日期用序数词；美式也常说 the 10th through the 14th。"
+    ],
+    [
+     "Do you have Wi-Fi in the rooms?",
+     "房间里有无线网吗？",
+     "Wi-Fi 在英语里读作 /ˈwaɪfaɪ/。"
+    ],
+    [
+     "I'm here for a meeting with Ms. Davis at ten.",
+     "我十点跟戴维斯女士有个会。",
+     "到访客户公司时向前台说明来意。"
+    ]
+   ]
+  },
+  {
+   "scene": "职场闲聊",
+   "items": [
+    [
+     "How was your weekend?",
+     "周末过得怎么样？",
+     "周一早上最常见的寒暄，回答简短即可，再反问一句 How about you?。"
+    ],
+    [
+     "Any plans for the holidays?",
+     "假期有什么安排吗？",
+     "节假日前的轻松话题，不涉及隐私。"
+    ],
+    [
+     "Did you catch the game last night?",
+     "你看昨晚的比赛了吗？",
+     "catch 在这里是“看到、赶上看”；体育是英美职场闲聊的高频话题。"
+    ],
+    [
+     "It's been a crazy week, hasn't it?",
+     "这周真是忙疯了，是吧？",
+     "用反意疑问句引起共鸣，周五特别常用。"
+    ],
+    [
+     "Are you settling in okay?",
+     "你适应得怎么样？",
+     "关心新同事；settle in 指适应新环境。"
+    ],
+    [
+     "Let's grab lunch sometime.",
+     "改天一起吃个午饭吧。",
+     "友好的邀约，但未必真的会定时间；想真约就说 How about Thursday?。"
+    ],
+    [
+     "Congratulations on your promotion! Well deserved.",
+     "恭喜升职！实至名归。",
+     "祝贺同事时加一句 Well deserved，显得真诚。"
+    ],
+    [
+     "I love what you've done with your desk.",
+     "你的桌子布置得真不错。",
+     "轻松的称赞，打开话题；英美同事之间常这样夸。"
+    ],
+    [
+     "Have a great weekend. See you Monday.",
+     "周末愉快，周一见。",
+     "周五下班道别的标准说法。"
+    ],
+    [
+     "How's the new project coming along?",
+     "新项目进展得怎么样？",
+     "come along 表示进展；既是闲聊也表示关心对方工作。"
+    ]
+   ]
+  }
+ ],
+ "emails": [
+  {
+   "title": "询价",
+   "zh": "向供应商询问产品价格和条件",
+   "body": [
+    "Subject: Price Inquiry – Bamboo Storage Boxes",
+    "Dear Ms. Taylor,",
+    "I came across your company at the Canton Fair and was impressed by your range of bamboo products.",
+    "We are interested in ordering your storage boxes (model BX-200) for our online store.",
+    "Could you please send us a quotation for 2,000 units, including shipping to Shanghai?",
+    "We would also appreciate information on your minimum order quantity, lead time, and payment terms.",
+    "If possible, we would like to receive a few samples before placing a larger order.",
+    "I look forward to hearing from you.",
+    "Best regards,",
+    "Chen Jing",
+    "Purchasing Manager, Greenleaf Home Co."
+   ],
+   "bodyZh": [
+    "主题：询价——竹制收纳盒",
+    "尊敬的泰勒女士：",
+    "我在广交会上了解到贵公司，对贵公司的竹制产品系列印象深刻。",
+    "我们有意为我们的网店订购贵公司的收纳盒（型号 BX-200）。",
+    "能否请您提供 2,000 件的报价，包括运至上海的运费？",
+    "也烦请告知最低起订量、交货周期和付款条件。",
+    "如有可能，我们希望在大批量下单前先收到几件样品。",
+    "期待您的回复。",
+    "此致",
+    "陈静",
+    "绿叶家居公司 采购经理"
+   ]
+  },
+  {
+   "title": "预约会议",
+   "zh": "邀请对方约时间开会",
+   "body": [
+    "Subject: Meeting Request – Q3 Marketing Plan",
+    "Hi David,",
+    "I hope you're doing well.",
+    "I'd like to set up a meeting to go over the Q3 marketing plan before we present it to the client.",
+    "Would you be available for 30 minutes on Tuesday or Wednesday afternoon?",
+    "I'm happy to meet in person or over video, whichever works best for you.",
+    "I'll send a calendar invite once we've settled on a time.",
+    "Thanks,",
+    "Emily"
+   ],
+   "bodyZh": [
+    "主题：会议邀请——第三季度营销计划",
+    "大卫你好：",
+    "希望你一切都好。",
+    "在向客户提交第三季度营销计划之前，我想约个会一起过一遍。",
+    "你周二或周三下午能抽出 30 分钟吗？",
+    "当面或视频都可以，看你哪个方便。",
+    "时间定下来后我会发日历邀请。",
+    "谢谢，",
+    "艾米丽"
+   ]
+  },
+  {
+   "title": "会后致谢",
+   "zh": "会面或拜访后表示感谢并确认后续",
+   "body": [
+    "Subject: Thank You for Your Time",
+    "Dear Mr. Brown,",
+    "Thank you for taking the time to meet with us yesterday.",
+    "We really enjoyed learning more about your plans for the new stores.",
+    "As discussed, I've attached our product catalog and a draft timeline.",
+    "We'll send a detailed proposal by the end of next week.",
+    "Please don't hesitate to contact me if you have any questions in the meantime.",
+    "Kind regards,",
+    "Liu Yang"
+   ],
+   "bodyZh": [
+    "主题：感谢您抽出时间",
+    "尊敬的布朗先生：",
+    "感谢您昨天抽出时间与我们会面。",
+    "能更多地了解贵公司新门店的计划，我们感到很有收获。",
+    "按照会上所谈，附件是我们的产品目录和初步时间表。",
+    "我们会在下周末之前发送详细方案。",
+    "在此期间如有任何问题，请随时与我联系。",
+    "此致",
+    "刘洋"
+   ]
+  },
+  {
+   "title": "催促回复 / 付款",
+   "zh": "礼貌地提醒对方尚未处理的事项",
+   "body": [
+    "Subject: Friendly Reminder – Invoice #4521",
+    "Dear Accounts Team,",
+    "I hope all is well.",
+    "This is a friendly reminder that Invoice #4521, dated May 3, was due for payment on June 2.",
+    "According to our records, we have not yet received the payment.",
+    "If you have already sent it, please disregard this message and accept our thanks.",
+    "If there is any issue with the invoice, please let me know so we can resolve it quickly.",
+    "I've attached a copy of the invoice for your convenience.",
+    "Best regards,",
+    "Zhao Min"
+   ],
+   "bodyZh": [
+    "主题：温馨提醒——第 4521 号发票",
+    "财务部各位同事：",
+    "希望一切顺利。",
+    "温馨提醒：5 月 3 日开具的第 4521 号发票，付款截止日期为 6 月 2 日。",
+    "根据我们的记录，目前尚未收到该款项。",
+    "如您已经付款，请忽略本邮件，并接受我们的感谢。",
+    "如果发票有任何问题，请告诉我，以便我们尽快解决。",
+    "为方便您查阅，附上发票副本。",
+    "此致",
+    "赵敏"
+   ]
+  },
+  {
+   "title": "道歉（发货延误）",
+   "zh": "因己方原因造成问题时向客户道歉",
+   "body": [
+    "Subject: Apology for the Delay in Your Order",
+    "Dear Ms. Wilson,",
+    "Please accept our sincere apologies for the delay in shipping your order (#78302).",
+    "Due to an unexpected problem at our warehouse, the shipment was held up for three days.",
+    "Your order was dispatched this morning and should arrive by Friday.",
+    "To make up for the inconvenience, we will refund your shipping fee in full.",
+    "We have also taken steps to prevent this from happening again.",
+    "Thank you for your patience and understanding.",
+    "Sincerely,",
+    "Huang Lei, Customer Service Manager"
+   ],
+   "bodyZh": [
+    "主题：关于您订单延误的致歉",
+    "尊敬的威尔逊女士：",
+    "对于您的订单（第 78302 号）发货延误，我们深表歉意。",
+    "由于我们仓库出现突发问题，货物延误了三天。",
+    "您的订单已于今天上午发出，预计周五前送达。",
+    "为弥补给您带来的不便，我们将全额退还运费。",
+    "我们也已采取措施，防止此类情况再次发生。",
+    "感谢您的耐心与理解。",
+    "谨上",
+    "客户服务经理 黄磊"
+   ]
+  },
+  {
+   "title": "婉拒合作",
+   "zh": "礼貌拒绝对方的提案或邀请",
+   "body": [
+    "Subject: Re: Partnership Proposal",
+    "Dear Mr. Garcia,",
+    "Thank you for your proposal and for thinking of us.",
+    "We have reviewed it carefully with our team.",
+    "Unfortunately, we have decided not to move forward at this time, as our resources are fully committed to other projects this year.",
+    "This is in no way a reflection on the quality of your proposal.",
+    "We would be glad to stay in touch and revisit the idea in the future.",
+    "Best wishes,",
+    "Sun Hao"
+   ],
+   "bodyZh": [
+    "主题：回复：合作提案",
+    "尊敬的加西亚先生：",
+    "感谢您的提案，也感谢您想到了我们。",
+    "我们团队已经认真研究过了。",
+    "很遗憾，由于今年的资源已全部投入到其他项目中，我们决定暂不推进此次合作。",
+    "这绝不代表您的提案质量有任何问题。",
+    "我们很乐意保持联系，将来再重新探讨这个想法。",
+    "祝好，",
+    "孙浩"
+   ]
+  },
+  {
+   "title": "求职申请",
+   "zh": "投递简历时的求职信",
+   "body": [
+    "Subject: Application for Data Analyst Position – Wang Xue",
+    "Dear Hiring Manager,",
+    "I am writing to apply for the Data Analyst position advertised on your website.",
+    "I have three years of experience analyzing sales data at a retail company, where I built dashboards used by over 50 store managers.",
+    "I am proficient in SQL and Python, and I enjoy turning complex data into clear recommendations.",
+    "I am particularly drawn to your company's focus on sustainable products.",
+    "My résumé is attached for your review.",
+    "I would welcome the opportunity to discuss how I can contribute to your team.",
+    "Thank you for your consideration.",
+    "Sincerely,",
+    "Wang Xue"
+   ],
+   "bodyZh": [
+    "主题：应聘数据分析师职位——王雪",
+    "尊敬的招聘负责人：",
+    "我写信应聘贵公司官网上发布的数据分析师职位。",
+    "我在一家零售公司有三年销售数据分析经验，搭建的数据看板被 50 多位门店经理使用。",
+    "我熟练掌握 SQL 和 Python，并且喜欢把复杂的数据转化为清晰的建议。",
+    "贵公司对可持续产品的重视尤其吸引我。",
+    "附上我的简历，请您审阅。",
+    "期待有机会与您探讨我能为团队带来的贡献。",
+    "感谢您的考虑。",
+    "谨上",
+    "王雪"
+   ]
+  },
+  {
+   "title": "面试后感谢",
+   "zh": "面试结束后 24 小时内发送的感谢信",
+   "body": [
+    "Subject: Thank You – Project Coordinator Interview",
+    "Dear Ms. Lee,",
+    "Thank you for meeting with me today to discuss the Project Coordinator role.",
+    "I enjoyed learning more about the team and the upcoming product launch.",
+    "Our conversation confirmed my strong interest in the position.",
+    "I believe my experience managing cross-border projects would allow me to contribute quickly.",
+    "Please let me know if you need any further information from me.",
+    "Best regards,",
+    "Zhou Ting"
+   ],
+   "bodyZh": [
+    "主题：感谢——项目协调员面试",
+    "尊敬的李女士：",
+    "感谢您今天与我面谈项目协调员一职。",
+    "很高兴能更多地了解团队以及即将到来的产品发布。",
+    "这次交流让我更加确定了对这个职位的强烈兴趣。",
+    "我相信自己管理跨境项目的经验能让我很快做出贡献。",
+    "如需我提供任何其他信息，请告诉我。",
+    "此致",
+    "周婷"
+   ]
+  },
+  {
+   "title": "请假通知",
+   "zh": "向上司申请休假并说明工作安排",
+   "body": [
+    "Subject: Leave Request – July 15 to 19",
+    "Hi Mark,",
+    "I'd like to request annual leave from Monday, July 15 to Friday, July 19.",
+    "I'll make sure the monthly report is finished before I leave.",
+    "Anna has kindly agreed to cover any urgent client requests while I'm away.",
+    "I'll also set up an out-of-office reply with her contact details.",
+    "Please let me know if these dates work for you.",
+    "Thanks,",
+    "Xu Jie"
+   ],
+   "bodyZh": [
+    "主题：请假申请——7 月 15 日至 19 日",
+    "马克你好：",
+    "我想申请 7 月 15 日（周一）至 7 月 19 日（周五）的年假。",
+    "我会确保在休假前完成月度报告。",
+    "安娜已经答应在我休假期间处理客户的紧急需求。",
+    "我也会设置自动回复，附上她的联系方式。",
+    "请告诉我这些日期是否可行。",
+    "谢谢，",
+    "徐杰"
+   ]
+  },
+  {
+   "title": "会议改期",
+   "zh": "因故需要更改已定好的会议时间",
+   "body": [
+    "Subject: Request to Reschedule Our Meeting on Thursday",
+    "Dear Professor Adams,",
+    "I'm very sorry, but something urgent has come up and I won't be able to attend our meeting on Thursday at 2 p.m.",
+    "Would it be possible to reschedule for early next week?",
+    "I'm available Monday morning or any time on Tuesday.",
+    "I apologize for any inconvenience this may cause.",
+    "Thank you for your understanding.",
+    "Best regards,",
+    "Lin Yu"
+   ],
+   "bodyZh": [
+    "主题：关于周四会议改期的请求",
+    "尊敬的亚当斯教授：",
+    "非常抱歉，我临时有急事，无法参加周四下午两点的会议。",
+    "能否改到下周初？",
+    "我周一上午或周二全天都有空。",
+    "如因此给您带来不便，敬请谅解。",
+    "感谢您的理解。",
+    "此致",
+    "林宇"
+   ]
+  }
+ ]
+}
