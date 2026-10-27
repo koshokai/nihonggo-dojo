@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'photos'
 API = 'https://commons.wikimedia.org/w/api.php'
 UA = 'NihongoDojo/1.0 (https://koshokai.github.io/nihonggo-dojo/; photo credits shown on site)'
+STOP = {'japan', 'japanese', 'tokyo', 'with', 'from', 'interior', 'exterior', 'street', 'food'}
 OK_LICENSE = re.compile(r'^(CC0|Public domain|PD|CC BY(-SA)? [0-9.]+)', re.I)
 
 
@@ -41,9 +42,15 @@ def plain(s):
 def search(q):
     d = json.loads(get(API, {
         'action': 'query', 'format': 'json', 'generator': 'search', 'gsrnamespace': 6,
-        'gsrsearch': q + ' filetype:bitmap', 'gsrlimit': 15, 'prop': 'imageinfo',
+        'gsrsearch': q + ' filetype:bitmap', 'gsrlimit': 40, 'prop': 'imageinfo',
         'iiprop': 'url|extmetadata|mime|size', 'iiurlwidth': 960}))
     pages = sorted((d.get('query') or {}).get('pages', {}).values(), key=lambda p: p.get('index', 99))
+    # 全文搜索会匹配到说明文字里顺带提到的照片（搜「宇都宫饺子」出来汉堡），所以按文件名里含有几个搜索词重新排序，
+    # 一个都不含的不要
+    words = [w for w in re.findall(r'[a-z]+', q.lower()) if len(w) > 3 and w not in STOP]
+    title = lambda p: re.sub(r'[^a-z]+', ' ', p.get('title', '').lower())
+    score = lambda p: sum(w in title(p) for w in words)
+    pages = sorted([p for p in pages if score(p) > 0], key=lambda p: (-score(p), p.get('index', 99)))
     for p in pages:
         ii = (p.get('imageinfo') or [{}])[0]
         meta = ii.get('extmetadata', {})
