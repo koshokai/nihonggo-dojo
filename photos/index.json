@@ -1115,18 +1115,6 @@
   "license": "Public domain",
   "page": "https://commons.wikimedia.org/wiki/File:Cafe_Pascucci,_Apgujeong-dong,_Seoul,_South_Korea.jpg"
  },
- "ko-r-09": {
-  "file": "photos/ko-r-09.jpg",
-  "by": "한국교육방송공사",
-  "license": "CC BY 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Tteokguk_(rice_cake_soup)_01.jpg"
- },
- "ko-r-13": {
-  "file": "photos/ko-r-13.jpg",
-  "by": "G41rn8",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Ondol_Chimneys_in_the_Amisan_Garden_of_Gyeongbokgung_IMG_2062.jpg"
- },
  "ko-r-14": {
   "file": "photos/ko-r-14.jpg",
   "by": "J. Patrick Fischer",
@@ -1157,52 +1145,16 @@
   "license": "CC BY-SA 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Haenyeo_at_Seongsan_Ilchulbong.jpg"
  },
- "ko-r-28": {
-  "file": "photos/ko-r-28.jpg",
-  "by": "보통사람 (seokay85)",
-  "license": "CC BY 2.0 kr",
-  "page": "https://commons.wikimedia.org/wiki/File:19%E7%A6%81_Webtoon_Writer_Talk_concert_in_Hyunseo_Park_4.jpg"
- },
  "ko-r-29": {
   "file": "photos/ko-r-29.jpg",
   "by": "Jon Platek",
   "license": "CC BY-SA 3.0",
   "page": "https://commons.wikimedia.org/wiki/File:Studio_Apartment_Minneapolis_1.jpg"
  },
- "en-r-06": {
-  "file": "photos/en-r-06.jpg",
-  "by": "Leonid LogvynenkoIf you have any questions please contact with me. Other photos see here.Якщо у Вас є якісь запитання бу",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Mail_carrier_Valentyna_in_Mysailivka.jpg"
- },
- "en-r-19": {
-  "file": "photos/en-r-19.jpg",
-  "by": "Amqui",
-  "license": "CC BY-SA 3.0",
-  "page": "https://commons.wikimedia.org/wiki/File:St_Boniface_Hospital_Nurse_Residence.jpg"
- },
- "en-r-20": {
-  "file": "photos/en-r-20.jpg",
-  "by": "Press Information Department",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Finance_Minister_Abul_Maal_Abdul_Muhith_VAT_Online_Project_Review_Meeting_Dhaka_2016-03-29_(PID-0055151).jpg"
- },
- "en-r-28": {
-  "file": "photos/en-r-28.jpg",
-  "by": "User:Mattes",
-  "license": "CC BY-SA 3.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Expiration_date_of_pills_-_Thai_calendar.JPG"
- },
  "en-r-29": {
   "file": "photos/en-r-29.jpg",
   "by": "Backpacker-Dude.com",
   "license": "CC BY-SA 3.0 de",
   "page": "https://commons.wikimedia.org/wiki/File:Backpacker-Travel-Uluda%C4%9F-Turkey.jpg"
- },
- "en-r-30": {
-  "file": "photos/en-r-30.jpg",
-  "by": "2C2KPhotography",
-  "license": "CC BY 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Galveston_Juneteenth_Parade_and_Celebration_6-19-25_-_45.jpg"
  }
 }

@@ -83,7 +83,7 @@ def articles():
     q = ROOT / 'tools' / 'photo_queries.json'
     if q.exists():
         for aid, s in json.loads(q.read_text(encoding='utf-8')).items():
-            yield aid, [x.strip() for x in s.split(' / ') if x.strip()]
+            yield aid, [x.strip() for x in s.split(" / ") if x.strip()]   # 空字符串 = 不要照片（没有贴切的）
     # 韩语、英语阅读文章（tools/lang2/*_reading.json 的 photo 字段）
     import sys
     sys.path.insert(0, str(ROOT / 'tools'))
