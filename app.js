@@ -691,32 +691,52 @@ const START_OPTS = [
   ['N2', 'N2', '中高级', '能读文章、看新闻'],
   ['N1', 'N1', '高级', '冲刺最高级别 N1']
 ];
+// 新用户引导：先选要学的语言，再选水平和每天的量
+let welcomeLang = null;
+const LANG_START = {
+  ko: [['abc', '한', '零基础', '从韩文字母（40 个）开始'], ['words', '안녕', '会字母', '从入门单词和常用句开始'], ['levels', 'TOPIK', '有基础', '按初级 / 中级 / 高级背分级词库']],
+  en: [['abc', 'Aa', '零基础', '从字母和音标开始'], ['words', 'Hi', '会一点', '从入门单词和常用句开始'], ['levels', 'CET', '有基础', '按中考→四六级→雅思托福背分级词库']]
+};
 function viewWelcome() {
-  let pick = S.level, goal = S.goal;
+  let pick = null, goal = S.goal;
+  const L = welcomeLang;
+  const langCards = [['ja', '日本語', '日语', '五十音、JLPT N5–N1、阅读、听力、商务日语'], ['ko', '한국어', '韩语', '韩文字母、入门会话、TOPIK 分级词库'], ['en', 'English', '英语', '字母音标、入门会话、四六级到 GRE 分级词库']];
   const p = h(`<section class="panel welcome">
-    <div class="welcome-hi">${neko('happy', 'big wave')}<div class="bubble"><b lang="ja">ようこそ！</b><span>欢迎来到日语道场。先告诉我你的水平，我帮你安排今天学什么。</span></div></div>
-    <h2>你现在的日语水平？</h2>
+    <div class="welcome-hi">${neko('happy', 'big wave')}<div class="bubble"><b>ようこそ！ 환영해요！ Welcome!</b><span>${L ? '再告诉我你的水平，我帮你安排今天学什么。' : '欢迎！先选一门你想学的语言，以后随时可以在顶部切换，三门都能学。'}</span></div></div>
+    <h2>想学哪种语言？</h2>
+    <div class="lvl-opts">${langCards.map(([k, n, zh, d]) => `<button type="button" class="lvl-opt ${L === k ? 'on' : ''}" data-lang-pick="${k}"><span class="lvl-badge">${n}</span><b>${zh}</b><span class="small muted">${d}</span></button>`).join('')}</div>
+    ${!L ? '' : L === 'ja' ? `<h2>你现在的日语水平？</h2>
     <div class="lvl-opts">${START_OPTS.map(o => `<button type="button" class="lvl-opt" data-pick="${o[0]}"><span class="lvl-badge" lang="ja">${o[1]}</span><b>${o[2]}</b><span class="small muted">${o[3]}</span></button>`).join('')}</div>
-    <button type="button" class="btn soft" data-place>不确定？做个 2 分钟分级小测试</button>
-    <h2>每天想学多少？</h2>
+    <button type="button" class="btn soft" data-place>不确定？做个 2 分钟分级小测试</button>`
+    : `<h2>你现在的${L === 'ko' ? '韩语' : '英语'}水平？</h2>
+    <div class="lvl-opts">${LANG_START[L].map(o => `<button type="button" class="lvl-opt" data-pick="${o[0]}"><span class="lvl-badge">${o[1]}</span><b>${o[2]}</b><span class="small muted">${o[3]}</span></button>`).join('')}</div>`}
+    ${L ? `<h2>每天想学多少？</h2>
     <div class="seg" data-goals>${[[30, '轻松 · 约 5 分钟'], [50, '标准 · 约 10 分钟'], [100, '认真 · 约 20 分钟']].map(([v, t]) => `<button type="button" data-goal="${v}">${t}</button>`).join('')}</div>
-    <div class="row"><button type="button" class="btn pri big" data-start disabled>开始学习</button><a class="btn ghost" href="#me">我有备份，去恢复进度</a></div>
+    <div class="row"><button type="button" class="btn pri big" data-start disabled>开始学习</button><a class="btn ghost" href="#me">我有账号或备份，去恢复进度</a></div>` : ''}
   </section>`);
+  p.querySelectorAll('[data-lang-pick]').forEach(b => { b.onclick = () => { welcomeLang = b.dataset.langPick; render(); }; });
+  if (!L) return main.append(p);
   const sync = () => {
     p.querySelectorAll('[data-pick]').forEach(b => b.classList.toggle('on', b.dataset.pick === pick));
     p.querySelectorAll('[data-goal]').forEach(b => b.classList.toggle('on', +b.dataset.goal === goal));
     p.querySelector('[data-start]').disabled = !pick;
   };
-  pick = null;
   p.querySelectorAll('[data-pick]').forEach(b => { b.onclick = () => { pick = b.dataset.pick; sync(); }; });
   p.querySelectorAll('[data-goal]').forEach(b => { b.onclick = () => { goal = +b.dataset.goal; sync(); }; });
-  p.querySelector('[data-place]').onclick = placementTest;
-  p.querySelector('[data-start]').onclick = () => finishOnboarding(pick, goal);
+  const pl = p.querySelector('[data-place]'); if (pl) pl.onclick = placementTest;
+  p.querySelector('[data-start]').onclick = () => L === 'ja' ? finishOnboarding(pick, goal) : finishLangOnboarding(L, pick, goal);
   sync();
   main.append(p);
+  p.querySelector('h2:nth-of-type(2)').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function finishLangOnboarding(tr, pick, goal) {
+  S.onboarded = true; S.goal = goal || S.goal; S.track = tr;
+  save(); requestPersist(); celebrate();
+  toast(pick === 'abc' ? '先从字母开始，一天学几个就很好' : '开始吧！可以随时在顶部切换语言');
+  location.hash = pick === 'words' ? tr : `${tr}/${pick}`;
 }
 function finishOnboarding(pick, goal) {
-  S.onboarded = true; S.goal = goal || S.goal;
+  S.onboarded = true; S.goal = goal || S.goal; S.track = 'ja';
   S.level = pick === 'zero' ? 'N5' : pick;
   save(); requestPersist(); celebrate();
   if (pick === 'zero') { toast('先从五十音开始，一天认一行就很好'); go('kana'); }
