@@ -1,1 +1,7 @@
 __pycache__/
+# 助手正在写的内容文件：写完、检查过后再用 git add -f 提交
+tools/kozh/ex_zh_*.tsv
+tools/lang2/*_listen[0-9].json
+tools/lang2/ko_grammar[0-9].json
+tools/lang2/*_reading[0-9].json
+tools/lexam/*_[0-9].json
