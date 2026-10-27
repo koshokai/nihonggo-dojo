@@ -3,6 +3,11 @@ name: Kokoro English audio
 
 on:
   workflow_dispatch:
+    inputs:
+      which:
+        description: all（全部）/ listen（只生成听力对话）
+        required: false
+        default: all
 
 permissions:
   contents: write
@@ -13,6 +18,7 @@ concurrency:
 
 jobs:
   text:
+    if: github.event.inputs.which != 'listen'
     runs-on: ubuntu-latest
     timeout-minutes: 340
     strategy:
@@ -64,7 +70,7 @@ jobs:
 
   commit:
     needs: [text, listen]
-    if: always()
+    if: always() && needs.listen.result != 'cancelled'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

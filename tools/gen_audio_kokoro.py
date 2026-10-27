@@ -98,8 +98,12 @@ def run_listen():
 
 
 def merge():
+    shards = sorted(OUT.glob('index-en.*.json'))
+    if not shards:  # 只跑了听力，单词索引保持不变
+        print('no text shards; index-en.json unchanged')
+        return
     idx = {}
-    for f in sorted(OUT.glob('index-en.*.json')):
+    for f in shards:
         idx.update(json.loads(f.read_text(encoding='utf-8')))
         f.unlink()
     (OUT / 'index-en.json').write_text(json.dumps(idx, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
