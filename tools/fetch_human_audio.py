@@ -9,6 +9,7 @@
 import hashlib
 import html
 import json
+import os
 import re
 import subprocess
 import sys
@@ -105,11 +106,21 @@ def main(lang):
     idx = json.loads(idx_path.read_text(encoding='utf-8')) if idx_path.exists() else {}
     cred_path = OUT / 'human-credits.json'
     credits = json.loads(cred_path.read_text(encoding='utf-8')) if cred_path.exists() else {}
+    def save():
+        idx_path.write_text(json.dumps(idx, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        cred_path.write_text(json.dumps(credits, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        write_credits(credits)
+
+    # 每次运行有时间预算，到点就保存退出；再运行一次会从上次停下的地方继续
+    deadline = time.time() + 60 * float(os.environ.get('HUMAN_BUDGET_MIN', '100'))
     n = 0
     with tempfile.TemporaryDirectory() as tmp:
         for w, ts in cand.items():
             if w in idx:
                 continue
+            if time.time() > deadline:
+                print('  time budget used up; run again to continue', flush=True)
+                break
             t = next((t for t in ts if t in meta), None)
             if not t:
                 continue
@@ -130,9 +141,8 @@ def main(lang):
             n += 1
             if n % 200 == 0:
                 print(' ', n, flush=True)
-    idx_path.write_text(json.dumps(idx, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
-    cred_path.write_text(json.dumps(credits, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
-    write_credits(credits)
+                save()
+    save()
     print(lang, 'human recordings', len(idx), 'new', n)
 
 

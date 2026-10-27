@@ -20,8 +20,8 @@ jobs:
       - name: Fetch
         run: |
           which ffmpeg || (sudo apt-get update -q && sudo apt-get install -yq ffmpeg)
-          python3 tools/fetch_human_audio.py ko
-          python3 tools/fetch_human_audio.py en
+          HUMAN_BUDGET_MIN=80 python3 tools/fetch_human_audio.py ko
+          HUMAN_BUDGET_MIN=120 python3 tools/fetch_human_audio.py en
       - name: Commit
         if: always()
         run: |
