@@ -202,6 +202,60 @@ function langCards(items, title, tr) {
   show();
 }
 
+/* ---------- 分级词库（英语：ECDICT 考试标签；韩语：国立国语院《한국어기초사전》等级） ---------- */
+const LV_DATA = {};      // 'en' → [[key, 名称, 词数]]；'en-cet4' → [[词, 发音, 中文]]
+const lvFetch = name => LV_DATA[name] ? Promise.resolve(LV_DATA[name])
+  : fetch(`lang/${name}.json`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => (LV_DATA[name] = d));
+let lvSel = {}, lvQuery = {}, lvShown = 100;
+function langLevels(tr) {
+  const T = TRACKS[tr];
+  const p = h(`<section class="panel"><h2>${T.title}分级词库</h2><p class="muted">加载中……</p></section>`);
+  main.append(p);
+  lvFetch(`${tr}-levels`).then(meta => {
+    const cur = lvSel[tr] && meta.some(m => m[0] === lvSel[tr]) ? lvSel[tr] : meta[0][0];
+    lvSel[tr] = cur;
+    return lvFetch(`${tr}-${cur}`).then(rows => ({ meta, cur, rows }));
+  }).then(({ meta, cur, rows }) => {
+    if (!p.isConnected) return;
+    const items = rows.map(([t, pr, zh]) => ({ id: `${tr}|L|${cur}|${t}|${pr}`, t, pr, zh }));
+    const q = (lvQuery[tr] || '').trim().toLowerCase();
+    const list = q ? items.filter(x => x.t.toLowerCase().includes(q) || x.zh.includes(q)) : items;
+    const known = items.filter(x => S.srs[x.id] && S.srs[x.id].r > 0).length;
+    const due = items.filter(x => S.srs[x.id] && S.srs[x.id].due <= Date.now());
+    const name = meta.find(m => m[0] === cur)[1];
+    p.innerHTML = `<div class="row between"><h2>${T.title}分级词库</h2><span class="small muted">${esc(name)}：已学 ${known} / ${items.length}</span></div>
+      <div class="chips-row">${meta.map(([k, n, c]) => `<button type="button" class="chip-btn ${k === cur ? 'on' : ''}" data-lv="${k}">${esc(n)} <span class="small">${c}</span></button>`).join('')}</div>
+      <p class="small muted">${tr === 'en' ? '按中国的英语考试分级：每个词只放在它第一次出现的级别（例如四级里只有四级新增、高考没有的词），同一级里常用词在前。' : '按国立国语院《韩国语基础词典》的等级：初级≈TOPIK 1–2 级，中级≈3–4 级，高级≈5–6 级。括号里是汉字词的汉字，学过汉语的人一看就懂。'}</p>
+      <div class="row"><button class="btn pri" type="button" data-cards>闪卡：${due.length ? `复习 ${due.length} + ` : ''}新词 15</button><button class="btn" type="button" data-quiz>小测验 10 题</button></div>
+      <input type="search" class="lv-q" placeholder="在这一级里查找：${tr === 'en' ? '英文' : '韩语'} / 中文" value="${esc(lvQuery[tr] || '')}">
+      <div class="list-wrap"><table class="list"><tbody>${list.slice(0, lvShown).map(x => `<tr><td style="width:40px">${sayBtn(x.t, T.tts)}</td><td><b lang="${tr}">${esc(x.t)}</b>${x.pr ? `<div class="small muted">${tr === 'ko' ? '汉字 ' : ''}${esc(x.pr)}</div>` : ''}</td><td>${esc(x.zh)}</td><td>${S.srs[x.id] && S.srs[x.id].r > 0 ? '<span class="tag done">已学</span>' : ''}</td></tr>`).join('')}</tbody></table></div>
+      ${list.length > lvShown ? `<div class="row" style="justify-content:center"><button class="btn" type="button" data-more>再显示 100 个（共 ${list.length}）</button></div>` : ''}
+      <p class="small muted">${tr === 'en' ? '词表和中文释义来自 <a href="https://github.com/skywind3000/ECDICT" target="_blank" rel="noopener">ECDICT</a>（MIT 许可）。' : '词表、汉字和等级来自国立国语院《<a href="https://krdict.korean.go.kr" target="_blank" rel="noopener">한국어기초사전</a>》（CC BY-SA 2.0 KR），中文释义为本站编写，同样以 CC BY-SA 2.0 KR 发布。'}</p>`;
+    p.querySelectorAll('[data-lv]').forEach(b => { b.onclick = () => { lvSel[tr] = b.dataset.lv; lvShown = 100; render(); }; });
+    const qi = p.querySelector('.lv-q');
+    let tm; qi.oninput = () => { clearTimeout(tm); tm = setTimeout(() => { lvQuery[tr] = qi.value; lvShown = 100; render(); setTimeout(() => { const n = document.querySelector('.lv-q'); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 0); }, 300); };
+    const more = p.querySelector('[data-more]'); if (more) more.onclick = () => { lvShown += 100; render(); };
+    p.querySelector('[data-cards]').onclick = () => {
+      const fresh = items.filter(x => !S.srs[x.id]).slice(0, 15);
+      const deck = [...due.slice(0, 50), ...fresh];
+      if (!deck.length) return toast('这一级全部学完了！');
+      langCards(deck, `${name} 闪卡`, tr);
+    };
+    p.querySelector('[data-quiz]').onclick = () => {
+      const studied = items.filter(x => S.srs[x.id]);
+      const src = studied.length >= 10 ? studied : items.slice(0, Math.max(40, studied.length));
+      const qs = sample(src, 10).map(x => {
+        const opts = [x.zh, ...sample(items.filter(y => y.zh !== x.zh), 3).map(y => y.zh)];
+        const options = shuffle(opts);
+        return { kind: 'meaning', options, answer: options.indexOf(x.zh), lsay: x.t,
+          prompt: `<div class="eyebrow">选出中文意思</div><div class="q-big" lang="${tr}">${esc(x.t)}</div>${x.pr ? `<div class="small muted">${esc(x.pr)}</div>` : ''}`,
+          explain: `<b lang="${tr}">${esc(x.t)}</b> = ${esc(x.zh)}` };
+      });
+      langQuiz(qs, `${name} 测验`, T.tts, () => { render(); });
+    };
+  }).catch(() => { if (p.isConnected) p.innerHTML = '<h2>分级词库</h2><p>加载失败：这部分词库可能还在准备中，或者网络有问题，请稍后再试。</p>'; });
+}
+
 /* ---------- 页面 ---------- */
 let langLoading = {};
 function langReady(tr) {
@@ -220,6 +274,7 @@ function langReady(tr) {
 function viewLangTrack(tr, sub) {
   if (S.track !== tr) { S.track = tr; save(); }
   if (sub === 'abc') return main.append(tr === 'ko' ? koHangul() : enAbc());
+  if (sub === 'levels') return langLevels(tr);
   if (!langReady(tr)) return;
   if (sub === 'words' || sub === 'phrases') return main.append(langList(tr, sub));
   // 首页
@@ -235,6 +290,7 @@ function viewLangTrack(tr, sub) {
       <a class="lang-tile" href="#${tr}/abc"><b>${tr === 'ko' ? '한글 字母' : 'Aa 字母音标'}</b><span class="small muted">${tr === 'ko' ? '40 个字母 + 拼读表 + 测验' : '26 个字母 + 美式音标'}</span></a>
       <a class="lang-tile" href="#${tr}/words"><b>单词 ${words.length}</b><span class="small muted">按主题分类，闪卡 + 测验</span></a>
       <a class="lang-tile" href="#${tr}/phrases"><b>常用句 ${phrases.length}</b><span class="small muted">按场景分类，点击朗读</span></a>
+      <a class="lang-tile" href="#${tr}/levels"><b>${tr === 'ko' ? '分级词库 TOPIK' : '分级词库 中考→GRE'}</b><span class="small muted">${tr === 'ko' ? '初级 / 中级 / 高级，约 1.1 万词' : '中考、高考、四六级、考研、雅思、托福、GRE，约 1.5 万词'}</span></a>
     </div>
     <p class="small muted">发音使用手机或浏览器自带的${T.title}语音；没有声音的话，在系统设置的「文字转语音」里添加${T.title}。</p>
   </section>`);

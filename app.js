@@ -1262,10 +1262,18 @@ function viewMe() {
 
   const counts = LEVELS.map(L => `<tr><td>${L}</td><td>${VOCAB[L].length}</td><td>${KANJI[L].length}</td><td>${GRAM[L].length}</td></tr>`).join('');
   const about = h(`<section class="panel"><h2>关于内容</h2>
-    <p class="small">单词约 8,000 个、汉字 2,211 个、语法 176 个句型，覆盖 JLPT N5–N1。中文释义和例句由本站编写，未经专业审核，备考时请配合官方真题和教材。发音使用浏览器自带的日语语音。</p>
+    <h3>日语</h3>
+    <p class="small">单词约 8,000 个、汉字 2,211 个、语法 176 个句型，覆盖 JLPT N5–N1；另有阅读文章（「日本生活」每天上新一篇）、商务日语、150 道听力题和模拟考。中文释义、例句、文章和题目由本站编写，未经专业审核，备考时请配合官方真题和教材。</p>
     <p class="small muted">数据来源：单词表 <a href="https://github.com/jamsinclair/open-anki-jlpt-decks" target="_blank" rel="noopener">open-anki-jlpt-decks</a>（MIT），基于 <a href="http://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller 的 JLPT 资料</a>（CC BY）；汉字 <a href="https://github.com/davidluzgouveia/kanji-data" target="_blank" rel="noopener">kanji-data</a>（MIT）与 KANJIDIC；词典英文释义 <a href="https://www.edrdg.org/jmdict/j_jmdict.html" target="_blank" rel="noopener">JMdict</a>（EDRDG，CC BY-SA 4.0）。</p>
     <p class="small muted">音声：<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>:冥鳴ひまり（<a href="https://meimeihimari.wixsite.com/himari/terms-of-use" target="_blank" rel="noopener">利用規約</a>）、VOICEVOX:玄野武宏、VOICEVOX:九州そら、VOICEVOX:春日部つむぎ、VOICEVOX:雀松朱司（听力）。</p>
     <div class="list-wrap"><table class="list"><thead><tr><th>级别</th><th>单词</th><th>汉字</th><th>语法</th></tr></thead><tbody>${counts}</tbody></table></div>
+    <p class="small muted">阅读文章的照片来自 <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a>，均为可自由使用的授权（CC0 / 公有领域 / CC BY / CC BY-SA），每张照片下方注明作者和授权。</p>
+    <h3>韩语</h3>
+    <p class="small">韩文字母 40 个和拼读表；入门单词 500 个、常用句 150 句（本站编写）；分级词库约 1.1 万词（初级 / 中级 / 高级，对应 TOPIK 1–6 级）。</p>
+    <p class="small muted">分级词库的词表、汉字和等级来自国立国语院《<a href="https://krdict.korean.go.kr" target="_blank" rel="noopener">한국어기초사전</a>》（<a href="https://creativecommons.org/licenses/by-sa/2.0/kr/" target="_blank" rel="noopener">CC BY-SA 2.0 KR</a>），中文释义为本站编写，同样以 CC BY-SA 2.0 KR 发布。</p>
+    <h3>英语</h3>
+    <p class="small">26 个字母和美式音标；入门单词 500 个、常用句 150 句（本站编写）；分级词库约 1.5 万词（中考、高考、四级、六级、考研、雅思、托福、GRE）。</p>
+    <p class="small muted">分级词库的词表、音标和中文释义来自 <a href="https://github.com/skywind3000/ECDICT" target="_blank" rel="noopener">ECDICT</a>（MIT 许可）。韩语和英语目前使用手机或浏览器自带的语音朗读。</p>
   </section>`);
   const ps = bk.querySelector('[data-persist]');
   requestPersist().then(ok => { ps.innerHTML = ok ? '<span class="tag done">已开启</span> 浏览器已同意持久保存，空间不足时也不会自动清理这里的数据。' : '<span class="tag">未开启</span> 这个浏览器没有同意持久保存，建议添加到主屏幕并定期备份。'; });
