@@ -29,7 +29,7 @@ function bizScenes() {
   const grid = h('<div class="read-grid"></div>');
   for (const sc of BIZ.scenes.filter(x => !bizCat || x.cat === bizCat)) {
     grid.append(h(`<a class="read-card" href="#biz/s/${sc.id}">
-      <div class="rc-img">${scene(sc.img)}<span class="tag lv">${sc.L}</span>${st.s[sc.id] != null ? '<span class="rc-done">済</span>' : ''}</div>
+      <div class="rc-img">${artImg(sc)}<span class="tag lv">${sc.L}</span>${st.s[sc.id] != null ? '<span class="rc-done">済</span>' : ''}</div>
       <div class="rc-body"><div class="rc-cat">${BIZ_CAT_IC[sc.cat] || ''} ${sc.cat}</div><div class="rc-title" lang="ja">${esc(sc.title)}</div><div class="rc-zh">${esc(sc.zh)}</div>
       <div class="rc-first" lang="ja">${esc(sc.lines[0][1])}</div></div>
     </a>`));
@@ -88,7 +88,7 @@ function bizScene(sc) {
   const side = spk => speakers.indexOf(spk) % 2 ? 'r' : 'l';
   let i = 0;
   const p = h(`<article class="panel read-art">
-    <div class="ra-hero">${scene(sc.img)}</div>
+    <div class="ra-hero">${artImg(sc)}</div>${photoCredit(sc)}
     <div class="row between"><a class="small" href="#biz">← 返回商务日语</a><span class="row"><span class="tag lv">${sc.L}</span><span class="tag">${BIZ_CAT_IC[sc.cat] || ''} ${sc.cat}</span>${st.s[sc.id] != null ? '<span class="tag done">已学</span>' : ''}</span></div>
     <h2 class="ra-title" lang="ja">${esc(sc.title)}</h2>
     <div class="muted">${esc(sc.zh)}</div>
@@ -193,7 +193,7 @@ function bizMails() {
   const grid = h('<div class="read-grid"></div>');
   for (const m of BIZ.mails) {
     grid.append(h(`<a class="read-card" href="#biz/m/${m.id}">
-      <div class="rc-img">${scene(m.img)}<span class="tag lv">${m.L}</span>${st.m[m.id] != null ? '<span class="rc-done">済</span>' : ''}</div>
+      <div class="rc-img">${artImg(m)}<span class="tag lv">${m.L}</span>${st.m[m.id] != null ? '<span class="rc-done">済</span>' : ''}</div>
       <div class="rc-body"><div class="rc-cat">✉️ 商务邮件</div><div class="rc-title" lang="ja">${esc(m.title)}</div><div class="rc-zh">${esc(m.zh)}</div><div class="rc-first">${esc(m.situation)}</div></div>
     </a>`));
   }

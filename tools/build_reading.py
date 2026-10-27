@@ -104,6 +104,9 @@ def parse(path):
                 ph = PHOTOS[a['id']]
                 a['ph'] = [ph['file'], ph['by'], ph['license'], ph['page']]
         elif a['img'] not in IMGS: errs.append('img ' + a['img'])
+        elif a['id'] in PHOTOS:                       # 旧文章：有实拍照片就用照片（搜索词在 tools/photo_queries.json）
+            ph = PHOTOS[a['id']]
+            a['ph'] = [ph['file'], ph['by'], ph['license'], ph['page']]
         if any(len(w) != 3 for w in a['w']): errs.append('words')
         if any(len(q) != 5 for q in a['q']): errs.append('quiz')
         if errs:

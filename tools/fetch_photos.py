@@ -65,6 +65,11 @@ def search(q):
 
 
 def articles():
+    # 旧阅读文章和商务日语：搜索词集中写在 tools/photo_queries.json
+    q = ROOT / 'tools' / 'photo_queries.json'
+    if q.exists():
+        for aid, s in json.loads(q.read_text(encoding='utf-8')).items():
+            yield aid, [x.strip() for x in s.split(' / ') if x.strip()]
     for f in sorted((ROOT / 'tools' / 'reading').glob('life_*.txt')):
         for block in re.split(r'\n(?=# id:)', f.read_text(encoding='utf-8').strip()):
             head = block.split('\n---\n', 1)[0]

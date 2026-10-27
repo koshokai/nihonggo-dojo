@@ -8,7 +8,7 @@ import json
 import re
 import sys
 
-from build_reading import ROOT, IMGS, reading, tokens
+from build_reading import ROOT, IMGS, PHOTOS, reading, tokens
 
 SRC = ROOT / 'tools/business'
 SCENE_CATS = ['职场基础', '电话', '拜访接待', '会议', '报联商', '道歉拒绝', '谈判销售', '求职面试', '应酬', '出差']
@@ -134,6 +134,10 @@ def vocab():
 
 def main():
     data = {'scenes': scenes(), 'keigo': keigo(), 'mails': mails(), 'vocab': vocab()}
+    for it in data['scenes'] + data['mails']:        # 实拍照片（tools/fetch_photos.py 下载，搜索词在 tools/photo_queries.json）
+        if it['id'] in PHOTOS:
+            ph = PHOTOS[it['id']]
+            it['ph'] = [ph['file'], ph['by'], ph['license'], ph['page']]
     js = ('// 自动生成：python3 tools/build_business.py（请编辑 tools/business/*.txt）\n'
           'const BIZ = ' + json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('},{', '},\n{') + ';\n')
     (ROOT / 'business.js').write_text(js, encoding='utf-8')
