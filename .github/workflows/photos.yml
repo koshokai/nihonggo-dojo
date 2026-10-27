@@ -17,7 +17,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Fetch photos
-        run: python3 tools/fetch_photos.py
+        run: |
+          pip install -q pillow
+          python3 tools/fetch_photos.py
       - name: Rebuild reading.js
         run: |
           pip install -q fugashi unidic-lite

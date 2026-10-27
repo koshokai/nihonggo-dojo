@@ -50,7 +50,9 @@ def search(q):
     words = [w for w in re.findall(r'(?<![-a-z])[a-z]+', q.lower()) if len(w) > 3 and w not in STOP]   # 「-burger」是排除词，不算
     title = lambda p: re.sub(r'[^a-z]+', ' ', p.get('title', '').lower())
     score = lambda p: sum(w in title(p) for w in words)
-    pages = sorted([p for p in pages if score(p) > 0], key=lambda p: (-score(p), p.get('index', 99)))
+    # 文件名要包含全部关键词（只含一个词的常常是不相干的照片）
+    pages = sorted([p for p in pages if score(p) == len(words) > 0], key=lambda p: p.get('index', 99))
+    out = []
     for p in pages:
         ii = (p.get('imageinfo') or [{}])[0]
         meta = ii.get('extmetadata', {})
@@ -60,8 +62,20 @@ def search(q):
         if not OK_LICENSE.match(lic) or 'NC' in lic or 'ND' in lic:
             continue
         by = plain(meta.get('Artist', {}).get('value')) or 'Unknown'
-        return {'thumb': ii.get('thumburl') or ii['url'], 'by': by[:120], 'license': lic, 'page': ii.get('descriptionurl', '')}
-    return None
+        out.append({'thumb': ii.get('thumburl') or ii['url'], 'by': by[:120], 'license': lic, 'page': ii.get('descriptionurl', '')})
+    return out
+
+
+def colorful(data):
+    """黑白老照片、扫描的文字不要：平均饱和度太低就跳过。没装 Pillow 时不检查。"""
+    try:
+        from io import BytesIO
+        from PIL import Image
+        im = Image.open(BytesIO(data)).convert('HSV').resize((64, 40))
+        s = [px[1] for px in im.getdata()]
+        return sum(s) / len(s) > 40
+    except ImportError:
+        return True
 
 
 def articles():
@@ -91,21 +105,27 @@ def main():
     for aid, queries in articles():
         if aid in idx:
             continue
-        hit = None
+        hit = data = None
         for q in queries:
             try:
-                hit = search(q)
+                cands = search(q)
             except Exception as e:
-                print('  search failed', aid, q, e)
-            if hit and hit['page'] not in used:
+                print('  search failed', aid, q, e); cands = []
+            for c in cands[:6]:
+                if c['page'] in used:
+                    continue
+                d = get(c['thumb'])
+                if colorful(d):
+                    hit, data = c, d
+                    break
+            if hit:
                 break
-            hit = None
             time.sleep(1)
         if not hit:
             print('no photo', aid, queries)
             continue
         file = f'{aid}.jpg'
-        (OUT / file).write_bytes(get(hit['thumb']))
+        (OUT / file).write_bytes(data)
         idx[aid] = {'file': f'photos/{file}', 'by': hit['by'], 'license': hit['license'], 'page': hit['page']}
         used.add(hit['page'])
         print(aid, hit['license'], hit['by'][:40], hit['page'])

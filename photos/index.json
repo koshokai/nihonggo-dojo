@@ -335,12 +335,6 @@
   "license": "CC BY-SA 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Acer_Palmatum_Japanese_Maple_Tree_Leaves_Autumn_Newton_Massachusetts.jpg"
  },
- "n1-02": {
-  "file": "photos/n1-02.jpg",
-  "by": "KQuhen",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Tsurumi_Okinawa_Sumo_Tournament_2026_01.jpg"
- },
  "n1-03": {
   "file": "photos/n1-03.jpg",
   "by": "spinachdip from Minamikiso, Nagano",
@@ -352,12 +346,6 @@
   "by": "Ermell",
   "license": "CC BY-SA 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Japan_tea_ceremony_1165.jpg"
- },
- "n1-05": {
-  "file": "photos/n1-05.jpg",
-  "by": "Franck Michel from Antibes, France",
-  "license": "CC BY 2.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Umbrella_and_smartphone_-_Flickr_-_Franck_Michel.jpg"
  },
  "n1-06": {
   "file": "photos/n1-06.jpg",
@@ -383,18 +371,6 @@
   "license": "CC BY 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Shinkansen_N700.jpg"
  },
- "n1-10": {
-  "file": "photos/n1-10.jpg",
-  "by": "Unknown authorUnknown author",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Koshien_Stadium_1947.jpg"
- },
- "n1-11": {
-  "file": "photos/n1-11.jpg",
-  "by": "Utagawa Hiroshige",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Hiroshige_Full_moon_over_a_mountain_landscape.jpg"
- },
  "n1-12": {
   "file": "photos/n1-12.jpg",
   "by": "Joli Rumi",
@@ -412,12 +388,6 @@
   "by": "Ogiyoshisan",
   "license": "CC BY-SA 3.0",
   "page": "https://commons.wikimedia.org/wiki/File:91th_High_School_Baseball_Final2_DSCN7452_20090824.JPG"
- },
- "n2-03": {
-  "file": "photos/n2-03.jpg",
-  "by": "Swampyank",
-  "license": "CC BY 3.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Menlo_Park_Laboratory_of_Thomas_Edison_site_of_the_Invention_of_the_light_bulb.JPG"
  },
  "n2-04": {
   "file": "photos/n2-04.jpg",
@@ -467,12 +437,6 @@
   "license": "CC BY 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Tsukimi_dango_by_yomi955.jpg"
  },
- "n2-12": {
-  "file": "photos/n2-12.jpg",
-  "by": "Mhidehiro",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Takamori-mach_Elementary_school_and_cherry_blossoms_Aerial_Shoot.jpg"
- },
  "n3-01": {
   "file": "photos/n3-01.jpg",
   "by": "FairlieGood",
@@ -484,18 +448,6 @@
   "by": "Gregg Tavares",
   "license": "CC BY 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Inside_the_Ryogoku_Kokugikan_at_the_2014_January_Sumo_Tournament.jpg"
- },
- "n3-03": {
-  "file": "photos/n3-03.jpg",
-  "by": "Solomon203",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Jun_Fukuyama%27s_signature_board,_Assassination_Classroom_20180101.jpg"
- },
- "n3-04": {
-  "file": "photos/n3-04.jpg",
-  "by": "Original:  Liming Huang\nDerivative work:  Radomianin",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Slow_Life_in_A_Tea_House_01_edited.jpg"
  },
  "n3-05": {
   "file": "photos/n3-05.jpg",
@@ -533,29 +485,11 @@
   "license": "CC BY-SA 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Cream_shiba_inu_dllu.jpg"
  },
- "n3-12": {
-  "file": "photos/n3-12.jpg",
-  "by": "Zairon",
-  "license": "CC BY 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Okayama_Asahi_River_Tsukimi-bashi_06.jpg"
- },
- "n4-01": {
-  "file": "photos/n4-01.jpg",
-  "by": "Yamabato",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:JR_East_Shinkansen_E5_series_builder%27s_sticker.jpg"
- },
  "n4-02": {
   "file": "photos/n4-02.jpg",
   "by": "Like tears in rain",
   "license": "CC BY-SA 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:2026_Paris_sumo_tournament_(698).jpg"
- },
- "n4-04": {
-  "file": "photos/n4-04.jpg",
-  "by": "Ella Olsson from Stockholm, Sweden",
-  "license": "CC BY 2.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Matcha_breakfast_bowl_(43779468972).jpg"
  },
  "n4-05": {
   "file": "photos/n4-05.jpg",
@@ -581,12 +515,6 @@
   "license": "CC BY-SA 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Magoroku_Onsen_Outdoor_Bath_Winter.jpg"
  },
- "n4-09": {
-  "file": "photos/n4-09.jpg",
-  "by": "U.S. Navy photo by Lt. j.g. Andrew Leatherwood",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Grumman_E-2C_Hawkeyes_of_VAW-115_fly_past_Mount_Fuji_on_15_February_2007_(070215-N-2604L-024).jpg"
- },
  "n4-10": {
   "file": "photos/n4-10.jpg",
   "by": "Roger W from Sarasota, Florida, U.S.A.",
@@ -599,24 +527,6 @@
   "license": "CC BY 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:SAKURAKO_-_Summer_festival._(6036918278).jpg"
  },
- "n4-12": {
-  "file": "photos/n4-12.jpg",
-  "by": "Sheba_Also 43,000 photos",
-  "license": "CC BY-SA 2.0",
-  "page": "https://commons.wikimedia.org/wiki/File:DALEK_letter_box_by_New_England_Highway-1_(13985968887).jpg"
- },
- "n5-01": {
-  "file": "photos/n5-01.jpg",
-  "by": "Nihon Meisho Zuesha (日本名所圖繪)",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:%E5%AF%8C%E5%A3%AB%E7%99%BB%E5%B1%B1%E3%81%A8%E4%BA%94%E6%B9%96%E3%82%81%E3%81%90%E3%82%8A%E5%9C%96%E7%B9%AA_-_Map_for_Climbing_Mt._Fuji_and_Visiting_the_Five_Lakes,_1927_(obverse).jpg"
- },
- "n5-02": {
-  "file": "photos/n5-02.jpg",
-  "by": "U.S. Forces Japan (@USForcesJapan)",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:United_States_Forces_Japan_watching_2023_World_Baseball_Classic_championship_game_(1).jpg"
- },
  "n5-03": {
   "file": "photos/n5-03.jpg",
   "by": "Cheng-en Cheng",
@@ -628,12 +538,6 @@
   "by": "Dick Thomas Johnson from Tokyo, Japan",
   "license": "CC BY 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Hatsumode_at_Meiji_Shrine_(51875528488).jpg"
- },
- "n5-05": {
-  "file": "photos/n5-05.jpg",
-  "by": "Peters, Victor Wellington, 1902-; Hess, Margaret",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:V.W._Peters,_letter,_1935.10.7,_Songdo,_Korea,_to_Father,_Rosemead,_California,_USA_(Peters_351007_letter~2).jpg"
  },
  "n5-06": {
   "file": "photos/n5-06.jpg",
@@ -653,12 +557,6 @@
   "license": "CC BY-SA 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Kyoto_Station_Shinkansen_East_Entrance.jpg"
  },
- "n5-09": {
-  "file": "photos/n5-09.jpg",
-  "by": "Sgt Simpson",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Taipei_Japanese_School_building.JPG"
- },
  "n5-10": {
   "file": "photos/n5-10.jpg",
   "by": "davidgsteadman",
@@ -677,54 +575,6 @@
   "license": "CC BY-SA 3.0",
   "page": "https://commons.wikimedia.org/wiki/File:FullMoon2010.jpg"
  },
- "s-a1": {
-  "file": "photos/s-a1.jpg",
-  "by": "Presidential Communications Office",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:2024-04-13_%E2%80%93_PBBM_concludes_successful_PH-US-Japan_trilateral_meeting;_secures_US-Japan_support_for_PH_development_(02).jpg"
- },
- "s-a2": {
-  "file": "photos/s-a2.jpg",
-  "by": "Suzuki Umako",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Plate_of_Senju_Postoffice_Telephone_Branch.jpg"
- },
- "s-a3": {
-  "file": "photos/s-a3.jpg",
-  "by": "Nixon Presidential Library",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:The_phone_call_from_the_Oval_Office_to_Apollo_11.jpg"
- },
- "s-a5": {
-  "file": "photos/s-a5.jpg",
-  "by": "Donald Trung Quoc Don (Chữ Hán: 徵國單) - Wikimedia Commons - © CC BY-SA 4.0 International.(Want to use this image?)Origina",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:%27t_Japans_Cultureel_Centrum_business_cards,_Amsterdam_(2023)_02.jpg"
- },
- "s-a6": {
-  "file": "photos/s-a6.jpg",
-  "by": "Press Information Department",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Japanese_business_delegation_meeting_with_Minister_of_Civil_Aviation_and_Tourism_at_ministry_conference_room,_2026-10-18.jpg"
- },
- "s-a7": {
-  "file": "photos/s-a7.jpg",
-  "by": "Tom Parker",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Jerome_Relocation_Center,_Denson,_Arkansas._W.C._Love,_Placement_Officer,_showing_assignment_desks._-_NARA_-_538852.jpg"
- },
- "s-a8": {
-  "file": "photos/s-a8.jpg",
-  "by": "Department of State. Office of the Undersecretary for Management. Bureau of Overseas Buildings Operations. (2001 - )  (M",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Tokyo_-_Chancery_Office_Building_-_1969.jpg"
- },
- "s-b2": {
-  "file": "photos/s-b2.jpg",
-  "by": "Администрация Президента России",
-  "license": "CC BY 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:2016-04-11_Vladimir_Putin_at_the_meeting_with_German_business_community_representatives.jpg"
- },
  "s-b3": {
   "file": "photos/s-b3.jpg",
   "by": "Richter Frank-Jurgen",
@@ -736,12 +586,6 @@
   "by": "MarkJaysonAranda",
   "license": "CC BY-SA 3.0",
   "page": "https://commons.wikimedia.org/wiki/File:Gulf_Worldwide_DPI_Product_Presentation.jpg"
- },
- "s-b6": {
-  "file": "photos/s-b6.jpg",
-  "by": "Cpl. Royce Dorman",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Business_as_Usual,_the_English_Networking_Dinner_150327-M-AO893-029.jpg"
  },
  "s-b7": {
   "file": "photos/s-b7.jpg",
@@ -755,23 +599,11 @@
   "license": "CC BY-SA 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Train_delay_certificate.jpg"
  },
- "m-1": {
-  "file": "photos/m-1.jpg",
-  "by": "Michael Coghlan",
-  "license": "CC BY-SA 2.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Laptop_Lady_in_the_Sun_(9914070915).jpg"
- },
  "m-2": {
   "file": "photos/m-2.jpg",
   "by": "Nesnad",
   "license": "CC BY 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Desk_calendar_2022_July_11_-_03-53PM.jpeg"
- },
- "m-3": {
-  "file": "photos/m-3.jpg",
-  "by": "EU2018BG Bulgarian Presidency",
-  "license": "CC BY 2.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Informal_Meeting_of_Ministers_Responsible_for_Competitiveness_(Industry)_Handshake_(39119244335).jpg"
  },
  "m-4": {
   "file": "photos/m-4.jpg",
@@ -785,29 +617,11 @@
   "license": "Public domain",
   "page": "https://commons.wikimedia.org/wiki/File:EFTA00002465_-_Cluttered_desk_with_a_closed_Toshiba_laptop_papers_books_and_office_supplies.jpg"
  },
- "m-6": {
-  "file": "photos/m-6.jpg",
-  "by": "Department of Defense. American Forces Information Service. Defense Visual Information Center. 1994",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Warehouse_workers_prepare_packages_for_shipment_at_Sharpe_Army_Depot_-_DPLA_-_414220df83b823977c05c01a4b6b4106.jpeg"
- },
- "m-7": {
-  "file": "photos/m-7.jpg",
-  "by": "USPS",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Burbank_California_United_States_1937_post_office_paperwork_02.jpg"
- },
  "m-8": {
   "file": "photos/m-8.jpg",
   "by": "Press Information Department",
   "license": "Public domain",
   "page": "https://commons.wikimedia.org/wiki/File:2026-03-03_Afroza_Khanam_(Rita),_Minister_of_Civil_Aviation_and_Tourism,_chairs_inter-ministerial_meeting_in_Dhaka_on_flight_schedule_management_amidst_Middle_East_disruptions.jpg"
- },
- "m-9": {
-  "file": "photos/m-9.jpg",
-  "by": "掬茶",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Team_office_and_facility_of_Hanshin_Tigers.jpg"
  },
  "m-10": {
   "file": "photos/m-10.jpg",
