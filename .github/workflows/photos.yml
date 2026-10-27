@@ -1,0 +1,32 @@
+# 从 Wikimedia Commons 给「日本生活」文章下载照片，然后重新生成 reading.js。在 Actions 页面手动运行。
+name: Article photos
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch photos
+        run: python3 tools/fetch_photos.py
+      - name: Rebuild reading.js
+        run: |
+          pip install -q fugashi unidic-lite
+          python3 tools/build_reading.py
+      - name: Commit
+        run: |
+          git config user.name "photo-bot"
+          git config user.email "photo-bot@users.noreply.github.com"
+          git add photos reading.js
+          git diff --cached --quiet && exit 0
+          git commit -qm "photos: Wikimedia Commons images for life articles"
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 5; done

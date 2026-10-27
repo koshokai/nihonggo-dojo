@@ -1,6 +1,13 @@
 // 阅读：按级别和题材排成图片卡片，点进去读全文（逐句朗读、假名、中文、生词、小测验）。
 // 数据在 reading.js（tools/build_reading.py 生成），插图在 scenes.js。
-const READ_CATS = { 常识: '💡', 运动: '⚽', 笑话: '😂', 传统文化: '⛩️', 人文情感: '💗', 感人故事: '🌸', 美食: '🍜', 旅行: '🧳' };
+const READ_CATS = { 日本生活: '🏪', 地方美食: '🍢', 职业日常: '👷', 节日季节: '🎆', 常识: '💡', 运动: '⚽', 笑话: '😂', 传统文化: '⛩️', 人文情感: '💗', 感人故事: '🌸', 美食: '🍜', 旅行: '🧳' };
+// 带日期的「日本生活」文章每天上新一篇：日期没到的先不显示
+const readList = () => READING.filter(a => !a.date || a.date <= dkey()).sort((x, y) => (y.date || '').localeCompare(x.date || ''));
+const todayArticle = () => readList().find(a => a.date === dkey());
+// 实拍照片（Wikimedia Commons，注明作者和授权）；没有照片的旧文章用插画
+const artImg = (a, big) => a.ph ? `<img class="rc-photo" src="${esc(a.ph[0])}" alt="${esc(a.zh)}" loading="lazy" decoding="async">`
+  : a.img ? scene(a.img) : `<div class="rc-ph-none">${READ_CATS[a.cat] || '📖'}</div>`;
+const photoCredit = a => a.ph ? `<div class="ph-credit small muted">照片：${esc(a.ph[1])} · ${esc(a.ph[2])} · <a href="${esc(a.ph[3])}" target="_blank" rel="noopener">Wikimedia Commons</a></div>` : '';
 let readFilter = { L: null, cat: '' };
 let readReturn = null;   // 从文章点「查看详情」去词典时记下位置，回来接着读
 
@@ -117,14 +124,16 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet()
 addEventListener('hashchange', closeSheet);
 
 function viewRead(id) {
-  if (id) { const a = READING.find(x => x.id === id); if (a) return readArticle(a); }
+  if (id) { const a = readList().find(x => x.id === id); if (a) return readArticle(a); }
   if (!readFilter.L) readFilter.L = S.level;
   const done = S.read || {};
-  const list = READING.filter(a => (readFilter.L === 'all' || a.L === readFilter.L) && (!readFilter.cat || a.cat === readFilter.cat));
-  const lvCount = L => { const all = READING.filter(a => a.L === L); return `${all.filter(a => done[a.id]).length}/${all.length}`; };
+  const all = readList(), today = todayArticle();
+  const list = all.filter(a => (readFilter.L === 'all' || a.L === readFilter.L) && (!readFilter.cat || a.cat === readFilter.cat));
+  const lvCount = L => { const lv = all.filter(a => a.L === L); return `${lv.filter(a => done[a.id]).length}/${lv.length}`; };
   const p = h(`<section class="panel">
-    <div class="row between"><h2>阅读</h2><span class="small muted">已读 ${Object.keys(done).length} / ${READING.length} 篇</span></div>
-    <p class="small muted">常识、运动、笑话、传统文化、感人故事……点开卡片就能读。每句都能点读、看中文；读完做个小测验拿经验。</p>
+    <div class="row between"><h2>阅读</h2><span class="small muted">已读 ${all.filter(a => done[a.id]).length} / ${all.length} 篇</span></div>
+    ${today ? `<a class="today-art" href="#read/${today.id}"><div class="ta-img">${artImg(today)}</div><div><span class="tag done">今日上新</span> <span class="tag lv">${today.L}</span><div class="rc-title" lang="ja">${esc(today.title)}</div><div class="small muted">${esc(today.zh)} · ${READ_CATS[today.cat]} ${today.cat}</div></div></a>` : ''}
+    <p class="small muted">「日本生活」每天上新一篇：便利店、地方美食、各行各业的一天、节日季节……配真实照片。点开卡片就能读。每句都能点读、看中文；读完做个小测验拿经验。</p>
     <div class="seg read-lv" role="group" aria-label="级别">
       ${LEVELS.map(L => `<button type="button" data-lv="${L}" class="${readFilter.L === L ? 'on' : ''}">${L}<span class="lv-n">${lvCount(L)}</span></button>`).join('')}
       <button type="button" data-lv="all" class="${readFilter.L === 'all' ? 'on' : ''}">全部</button>
@@ -139,7 +148,7 @@ function viewRead(id) {
   for (const a of list) {
     const first = a.p[0][0][0];
     grid.append(h(`<a class="read-card" href="#read/${a.id}">
-      <div class="rc-img">${scene(a.img)}<span class="tag lv">${a.L}</span>${done[a.id] ? `<span class="rc-done" title="已读">読了</span>` : ''}</div>
+      <div class="rc-img">${artImg(a)}<span class="tag lv">${a.L}</span>${a.date === dkey() ? '<span class="tag done rc-new">今日</span>' : ''}${done[a.id] ? `<span class="rc-done" title="已读">読了</span>` : ''}</div>
       <div class="rc-body">
         <div class="rc-cat">${READ_CATS[a.cat] || ''} ${a.cat}</div>
         <div class="rc-title" lang="ja">${esc(a.title)}</div>
@@ -160,7 +169,7 @@ function readArticle(a) {
   const vocabOf = w => wordIndex().get(w);
   const keyset = new Map(a.w.map(x => [x[0], x]));
   const p = h(`<article class="panel read-art">
-    <div class="ra-hero">${scene(a.img)}</div>
+    <div class="ra-hero">${artImg(a, true)}</div>${photoCredit(a)}
     <div class="row between"><a class="small" href="#read">← 返回阅读</a><span class="row"><span class="tag lv">${a.L}</span><span class="tag">${READ_CATS[a.cat] || ''} ${a.cat}</span>${done ? '<span class="tag done">已读</span>' : ''}</span></div>
     <h2 class="ra-title" lang="ja">${esc(a.title)}</h2>
     <div class="muted">${esc(a.zh)}</div>
@@ -227,7 +236,7 @@ function readArticle(a) {
     const xp = first ? 15 + right * 5 : right * 2;
     addXP(xp); save();
     if (right === a.q.length) celebrate();
-    const next = READING.filter(x => x.L === a.L && !S.read[x.id] && x.id !== a.id)[0] || READING.find(x => !S.read[x.id] && x.id !== a.id);
+    const next = readList().filter(x => x.L === a.L && !S.read[x.id] && x.id !== a.id)[0] || readList().find(x => !S.read[x.id] && x.id !== a.id);
     qbox.append(h(`<div class="ra-done"><b>${right === a.q.length ? '全对！' : `答对 ${right}/${a.q.length}`}</b> 获得 ${xp} 经验${first ? '（首次读完）' : ''}。
       <div class="row">${next ? `<a class="btn pri" href="#read/${next.id}">下一篇：<span lang="ja">${esc(next.title)}</span></a>` : ''}<a class="btn" href="#read">回到列表</a></div></div>`));
   };

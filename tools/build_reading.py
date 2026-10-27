@@ -3,7 +3,9 @@
 每篇文章的格式见 tools/reading/N5.txt。朗读用的假名由 build_examples.reading() 生成。
 用法：python3 tools/build_reading.py
 """
+import datetime
 import json
+from itertools import zip_longest
 import re
 import sys
 
@@ -64,7 +66,11 @@ def tokens(sentence, extra):
 
 SRC = ROOT / 'tools/reading'
 LEVELS = ['N5', 'N4', 'N3', 'N2', 'N1']
-CATS = ['常识', '运动', '笑话', '传统文化', '人文情感', '感人故事', '美食', '旅行']
+CATS = ['常识', '运动', '笑话', '传统文化', '人文情感', '感人故事', '美食', '旅行', '日本生活', '地方美食', '职业日常', '节日季节']
+# 「日本生活」文章（tools/reading/life_*.txt）每天上新一篇：从 LIFE_START 起，按 a、b、c 三个文件轮流排日期。
+# 网页只显示日期不晚于今天的文章。照片由 tools/fetch_photos.py（GitHub Actions）从 Wikimedia Commons 下载，见 photos/index.json。
+LIFE_START = '2026-10-21'
+PHOTOS = json.loads((ROOT / 'photos' / 'index.json').read_text(encoding='utf-8')) if (ROOT / 'photos' / 'index.json').exists() else {}
 IMGS = set(re.findall(r'^  (\w+): u =>', (ROOT / 'scenes.js').read_text(encoding='utf-8'), re.M))
 
 
@@ -85,14 +91,19 @@ def parse(path):
                 sents.append([jp, reading(jp), zh, tokens(jp, keys)])
             paras.append(sents)
         a = {
-            'id': meta['id'], 'L': meta['level'], 'cat': meta['cat'], 'img': meta['img'],
+            'id': meta['id'], 'L': meta['level'], 'cat': meta['cat'], 'img': meta.get('img', ''),
             'title': meta['title'], 'zh': meta['zh'], 'p': paras,
             'w': [[x.strip() for x in l.split('|')] for l in words.strip().splitlines() if l.strip()],
             'q': [[x.strip() for x in l.split('|')] for l in quiz.strip().splitlines() if l.strip()],
         }
         errs = []
         if a['cat'] not in CATS: errs.append('cat ' + a['cat'])
-        if a['img'] not in IMGS: errs.append('img ' + a['img'])
+        if 'photo' in meta:
+            a['pq'] = [q.strip() for q in meta['photo'].split(' / ') if q.strip()]
+            if a['id'] in PHOTOS:
+                ph = PHOTOS[a['id']]
+                a['ph'] = [ph['file'], ph['by'], ph['license'], ph['page']]
+        elif a['img'] not in IMGS: errs.append('img ' + a['img'])
         if any(len(w) != 3 for w in a['w']): errs.append('words')
         if any(len(q) != 5 for q in a['q']): errs.append('quiz')
         if errs:
@@ -107,6 +118,13 @@ def main():
         f = SRC / f'{L}.txt'
         if f.exists():
             arts += parse(f)
+    life = [parse(f) for f in sorted(SRC.glob('life_*.txt'))]
+    start = datetime.date.fromisoformat(LIFE_START)
+    order = [a for group in zip_longest(*life) for a in group if a]
+    for i, a in enumerate(order):
+        a['date'] = (start + datetime.timedelta(days=i)).isoformat()
+        a.pop('pq', None)
+    arts += order
     js = ('// 自动生成：python3 tools/build_reading.py（请编辑 tools/reading/N*.txt）\n'
           '// 每篇：{id, L, cat, img, title, zh, p:[[ [日语, 朗读假名, 中文, 分词], … ] 段落…], w:[[词, 读音, 中文]], q:[[问题, 正确, 错1, 错2, 错3]]}\n'
           'const READING = ' + json.dumps(arts, ensure_ascii=False, separators=(',', ':')).replace('},{', '},\n{') + ';\n')

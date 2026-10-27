@@ -626,9 +626,9 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
     combo = ok ? combo + 1 : 0;
     if (hearts) extra.innerHTML = (combo >= 3 ? `<span class="combo">${combo} 连对</span> ` : '') + heartsHTML();
     if (ok) addXP(xpEach + (combo && combo % 5 === 0 ? 5 : 0)); else save();
-    if (q.say && S.autoSpeak) speak(q.say);
+    if (q.say && S.autoSpeak) (q.sayLang ? speakLang(q.say, q.sayLang) : speak(q.say));
     const cheer = ok ? sample(['やった！', 'すごい！', 'いいね！', '正解！'], 1)[0] : sample(['ドンマイ！', '大丈夫！', '次は行ける！'], 1)[0];
-    stage.querySelector('[data-fb]').innerHTML = `<div class="feedback ${ok ? 'ok' : 'no'}">${neko(ok ? 'happy' : 'sad', 'mini')}<div class="fb-t"><div class="row"><b lang="ja" class="cheer">${cheer}</b>${q.say ? speakBtn(q.say) : ''}</div><b>${ok ? (combo >= 5 && combo % 5 === 0 ? `答对了！${combo} 连对，额外 +5` : '答对了') : (noRecord ? '答错了' : '答错了，已记入错题本')}</b><div>${q.explain || ''}</div></div></div>
+    stage.querySelector('[data-fb]').innerHTML = `<div class="feedback ${ok ? 'ok' : 'no'}">${neko(ok ? 'happy' : 'sad', 'mini')}<div class="fb-t"><div class="row"><b lang="ja" class="cheer">${cheer}</b>${q.say ? (q.sayLang ? sayBtn(q.say, q.sayLang) : speakBtn(q.say)) : ''}</div><b>${ok ? (combo >= 5 && combo % 5 === 0 ? `答对了！${combo} 连对，额外 +5` : '答对了') : (noRecord ? '答错了' : '答错了，已记入错题本')}</b><div>${q.explain || ''}</div></div></div>
       <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn pri" type="button" data-next>${failed ? '生命值用完了，看结果' : i + 1 < qs.length ? '下一题' : '查看结果'}（Enter）</button></div>`;
     stage.querySelector('[data-next]').onclick = next;
     stage.querySelector('[data-next]').focus({ preventScroll: true });
@@ -661,11 +661,11 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, me: viewMe, welcome: viewWelcome };
+const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, ko: viewKo, en: viewEn, me: viewMe, welcome: viewWelcome };
 function render() {
   const [v, ...rest] = (location.hash || '#home').slice(1).split('/');
   const arg = rest.join('/');
-  let view = VIEWS[v] ? v : 'home';
+  let view = VIEWS[v] ? v : (!location.hash && S.track && S.track !== 'ja' ? S.track : 'home');
   if (!S.onboarded && view !== 'me') view = 'welcome';
   if (S.onboarded && view === 'welcome') view = 'home';
   clearInterval(examTimer); keyHandler = null;
@@ -673,6 +673,8 @@ function render() {
   document.querySelectorAll('.tabs a').forEach(a => a.classList.toggle('on', a.dataset.go === view));
   const on = document.querySelector('.tabs a.on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   main.innerHTML = '';
+  if (trackOf(view) === 'ja' && ['home', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
+  applyTrack(view);
   VIEWS[view](arg ? decodeURIComponent(arg) : undefined);
   updateTop();
 }
@@ -807,6 +809,8 @@ function viewHome() {
 
   const mood = pct >= 1 ? ['wow', 'すごい！今日の目標達成！', '今天的目标完成啦，给你盖个小红花。'] : tx > 0 ? ['happy', 'いい調子！', `再拿 ${S.goal - tx} 经验就完成今天的目标。`] : s > 0 ? ['happy', `${s}日連続！`, '今天也来学一点，别让连续打卡断掉哦。'] : ['happy', greet, '每天十分钟，从今天开始吧。'];
   main.append(h(`<div class="welcome-hi">${neko(mood[0], 'wave')}<div class="bubble"><b lang="ja">${mood[1]}</b><span>${mood[2]}</span></div></div>`));
+  const ta = typeof todayArticle === 'function' && todayArticle();
+  if (ta && !(S.read || {})[ta.id]) main.append(h(`<a class="today-art" href="#read/${ta.id}"><div class="ta-img">${artImg(ta)}</div><div><span class="tag done">今日上新</span> <span class="tag lv">${ta.L}</span><div class="rc-title" lang="ja">${esc(ta.title)}</div><div class="small muted">${esc(ta.zh)} · 日本生活阅读，每天一篇</div></div></a>`));
   if (!isStandalone() && S.xp >= 30 && !S.installHint) {
     const ib = h(`<section class="banner"><div><b>把日语道场装到手机上</b><div class="small">像 App 一样从主屏幕打开，没有网络也能学。</div></div><div class="row"><button class="btn pri" type="button" data-i>安装</button><button class="btn ghost" type="button" data-x>不用了</button></div></section>`);
     ib.querySelector('[data-i]').onclick = e => { e.stopPropagation(); doInstall(); };
@@ -933,6 +937,23 @@ function viewKana() {
 
 /* 单词 */
 let vocabFilter = 'all', vocabSearch = '';
+// 导出到 Anki：制表符分隔的文本，Anki「文件 → 导入」直接认（正面：单词；背面：读音、中文、例句；标签：级别）
+function exportAnki() {
+  const cards = allVocab().filter(v => S.srs[v.id]);
+  if (!cards.length) return toast('还没有学过或加入的单词');
+  const clean = s => String(s).replace(/[\t\n\r]+/g, ' ');
+  const lines = ['#separator:tab', '#html:true', '#notetype:Basic', '#deck:日语道场', '#tags column:3'];
+  for (const v of cards) {
+    const ex = exList(v.w)[0];
+    const back = `${clean(v.r)}<br>${clean(v.m)}${ex ? `<br><br>${clean(ex[0])}<br>${clean(ex[2])}` : ''}`;
+    lines.push([clean(v.w), back, `JLPT_${v.L}`].join('\t'));
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([lines.join('\n') + '\n'], { type: 'text/plain;charset=utf-8' }));
+  a.download = `nihongo-dojo-anki-${dkey()}.txt`;
+  document.body.append(a); a.click(); a.remove();
+  toast(`已导出 ${cards.length} 张卡片`);
+}
 function viewVocab() {
   const L = S.level, list = VOCAB[L];
   const due = dueList([L]).length, nl = Math.min(newLeft(), newList(L).length);
@@ -948,10 +969,12 @@ function viewVocab() {
     <div class="row">
       <button class="btn pri" type="button" data-study ${due + nl ? '' : 'disabled'}>背单词（复习 ${due} + 新词 ${nl}）</button>
       <button class="btn" type="button" data-quiz>单词测验 10 题</button>
+      <button class="btn ghost" type="button" data-anki>导出到 Anki</button>
     </div>
-    <p class="small muted">单词卡用间隔重复：记得越牢，下次出现越晚。看完答案后按「重来 / 困难 / 记得 / 简单」评分，键盘可用 1–4。</p>
+    <p class="small muted">单词卡和 Anki 一样用间隔重复：记得越牢，下次出现越晚。看完答案后按「重来 / 困难 / 记得 / 简单」评分，键盘可用 1–4。阅读时点生词，也能「+ 单词卡」。习惯用 Anki 的话，可以把学过和加入的单词导出，在 Anki 里「文件 → 导入」。</p>
   </section>`);
   bindLevel(top);
+  top.querySelector('[data-anki]').onclick = exportAnki;
   top.querySelector('[data-study]').onclick = () => {
     const ids = [...shuffle(dueList([L])), ...newList(L).slice(0, nl)].map(v => v.id);
     main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
@@ -1342,6 +1365,8 @@ applyTheme();
 checkBadges();
 render();
 initGlobalSearch();
+initTrackSwitch();
+applyTrack((location.hash || '#home').slice(1).split('/')[0]);
 cloudInit();
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   // 新版本的离线缓存接管页面时刷新一次，保证看到的是最新代码（第一次安装不刷新）

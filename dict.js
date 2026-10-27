@@ -211,6 +211,7 @@ function initGlobalSearch() {
   const show = () => {
     const q = input.value.trim();
     if (!q) { hide(); return; }
+    if (typeof langSearch === 'function' && langSearch(q, drop)) return;
     const r = searchAll(q);
     items = [...r.vocab.slice(0, 6), ...r.jm.slice(0, Math.max(0, 6 - r.vocab.length))];
     drop.innerHTML = items.map((x, i) => {
@@ -224,7 +225,7 @@ function initGlobalSearch() {
   input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(show, 150); });
   input.addEventListener('focus', () => { loadJmdict().then(() => { if (document.activeElement === input && input.value.trim()) show(); }).catch(() => {}); if (input.value.trim()) show(); });
   input.addEventListener('keydown', e => { if (e.key === 'Escape') { hide(); input.blur(); } });
-  form.addEventListener('submit', e => { e.preventDefault(); if (input.value.trim()) goDict(); });
+  form.addEventListener('submit', e => { e.preventDefault(); if (document.body.dataset.track && document.body.dataset.track !== 'ja') return show(); if (input.value.trim()) goDict(); });
   drop.addEventListener('mousedown', e => e.preventDefault());   // 点下拉项时输入框不要先失焦
   drop.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
