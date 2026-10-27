@@ -13,7 +13,9 @@ const trackOf = view => view === 'ko' || view === 'en' ? view : TRACK_NEUTRAL.in
 
 // MeloTTS 预生成的音频（audio/index-ko.json、index-en.json：朗读文本 → mp3），没有的再用浏览器朗读
 const LANG_AUDIO = {};
-const langAudioIdx = code => LANG_AUDIO[code] || (LANG_AUDIO[code] = fetch(`audio/index-${code}.json`).then(r => r.ok ? r.json() : {}).catch(() => ({})));
+// 单词优先用真人录音（audio/index-<语言>-human.json，来自 Wikimedia Commons），其次是合成音
+const jsonOr = url => fetch(url).then(r => r.ok ? r.json() : {}).catch(() => ({}));
+const langAudioIdx = code => LANG_AUDIO[code] || (LANG_AUDIO[code] = Promise.all([jsonOr(`audio/index-${code}.json`), jsonOr(`audio/index-${code}-human.json`)]).then(([tts, human]) => Object.assign({}, tts, human)));
 let langAudioEl = null;
 function speakLang(text, lang) {
   const code = lang.slice(0, 2);

@@ -1,0 +1,33 @@
+# 真人单词发音：从 Wikimedia Commons（维基词典、Lingua Libre）下载可商用的母语者录音。在 Actions 页面手动运行。
+name: Human pronunciation recordings
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: human-audio
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch
+        run: |
+          which ffmpeg || (sudo apt-get update -q && sudo apt-get install -yq ffmpeg)
+          python3 tools/fetch_human_audio.py ko
+          python3 tools/fetch_human_audio.py en
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "audio-bot"
+          git config user.email "audio-bot@users.noreply.github.com"
+          git add -A audio credits.html
+          git diff --cached --quiet && exit 0
+          git commit -qm "audio: native-speaker word recordings from Wikimedia Commons"
+          for i in 1 2 3; do git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main && break; sleep 5; done
