@@ -696,3 +696,4 @@ body.gated { overflow: hidden; }
 .wk-grid b { font-size: 1.4rem; }
 .wk-grid .up { color: var(--ok); } .wk-grid .down { color: var(--bad); }
 .wk-tips { margin: 6px 0; padding-left: 20px; }
+.lv-ex { margin-top: 4px; } .card-ex { margin-top: 10px; text-align: left; }

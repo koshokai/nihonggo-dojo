@@ -163,11 +163,11 @@ function langList(tr, kind) {
 // 韩语、英语闪卡：入门单词和常用句以外的卡（分级词库、阅读生词、做错的题）把内容记在 S.l2cards，首页复习时用
 function l2AddCard(tr, x, dueNow) {
   S.l2cards = S.l2cards || {};
-  if (!x.id.includes('|w|') && !x.id.includes('|p|')) S.l2cards[x.id] = { tr, t: x.t, pr: x.pr || '', zh: x.zh };
+  if (!x.id.includes('|w|') && !x.id.includes('|p|')) S.l2cards[x.id] = Object.assign({ tr, t: x.t, pr: x.pr || '', zh: x.zh }, x.ex ? { ex: x.ex.slice(0, 2) } : {});
   if (dueNow || !S.srs[x.id]) S.srs[x.id] = Object.assign({ i: 0, e: 2.5, r: 0 }, S.srs[x.id], { due: Date.now() });
 }
 const l2AllCards = tr => [...langItems(tr, 'words'), ...langItems(tr, 'phrases'),
-  ...Object.entries(S.l2cards || {}).filter(([, c]) => c.tr === tr).map(([id, c]) => ({ id, t: c.t, pr: c.pr, zh: c.zh }))];
+  ...Object.entries(S.l2cards || {}).filter(([, c]) => c.tr === tr).map(([id, c]) => ({ id, t: c.t, pr: c.pr, zh: c.zh, ex: c.ex }))];
 function langQuiz(qs, title, tts, back) {
   main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
   qs.forEach(q => { if (q.lsay) { q.say = q.lsay; q.sayLang = tts; } });
@@ -209,7 +209,7 @@ function langCards(items, title, tr) {
         <span class="corner tag ${c ? 'learn' : ''}">${c ? '复习' : '新卡'}</span>
         <span class="corner-r">${sayBtn(x.t, T.tts)}</span>
         <div class="word" lang="${tr}">${esc(x.t)}</div>
-        <div data-ans hidden>${x.pr ? `<div class="reading">${esc(x.pr)}</div>` : ''}<div class="meaning">${esc(x.zh)}</div></div>
+        <div data-ans hidden>${x.pr ? `<div class="reading">${esc(x.pr)}</div>` : ''}<div class="meaning">${esc(x.zh)}</div>${x.ex ? `<div class="small card-ex"><span lang="${tr}">${esc(x.ex[0])}</span><br><span class="muted">${esc(x.ex[1])}</span></div>` : ''}</div>
         <div class="hint" data-hint>先想一想意思，再点卡片看答案（空格键）</div></div>
       <div class="grades" data-grades hidden style="margin-top:12px">
         ${['重来', '困难', '记得', '简单'].map((t, g) => `<button class="btn g${g}" type="button" data-g="${g}">${t}<small>${fmtDays(preview(c, g))}</small></button>`).join('')}</div>`;
@@ -248,10 +248,11 @@ function langLevels(tr) {
   lvFetch(`${tr}-levels`).then(meta => {
     const cur = lvSel[tr] && meta.some(m => m[0] === lvSel[tr]) ? lvSel[tr] : meta[0][0];
     lvSel[tr] = cur;
-    return lvFetch(`${tr}-${cur}`).then(rows => ({ meta, cur, rows }));
-  }).then(({ meta, cur, rows }) => {
+    // 例句（英语来自 Tatoeba，韩语来自《한국어기초사전》）：没有例句文件时照常显示
+    return Promise.all([lvFetch(`${tr}-${cur}`), lvFetch(`${tr}-ex-${cur}`).catch(() => ({}))]).then(([rows, ex]) => ({ meta, cur, rows, ex }));
+  }).then(({ meta, cur, rows, ex }) => {
     if (!p.isConnected) return;
-    const items = rows.map(([t, pr, zh]) => ({ id: `${tr}|L|${cur}|${t}|${pr}`, t, pr, zh }));
+    const items = rows.map(([t, pr, zh]) => ({ id: `${tr}|L|${cur}|${t}|${pr}`, t, pr, zh, ex: (ex[t] || [])[0] }));
     const q = (lvQuery[tr] || '').trim().toLowerCase();
     const list = q ? items.filter(x => x.t.toLowerCase().includes(q) || x.zh.includes(q)) : items;
     const known = items.filter(x => S.srs[x.id] && S.srs[x.id].r > 0).length;
@@ -262,7 +263,7 @@ function langLevels(tr) {
       <p class="small muted">${tr === 'en' ? '按中国的英语考试分级：每个词只放在它第一次出现的级别（例如四级里只有四级新增、高考没有的词），同一级里常用词在前。' : '按国立国语院《韩国语基础词典》的等级：初级≈TOPIK 1–2 级，中级≈3–4 级，高级≈5–6 级。单词下面标出了汉字词对应的汉字（繁体），学过汉语的人一看就懂。'}</p>
       <div class="row"><button class="btn pri" type="button" data-cards>闪卡：${due.length ? `复习 ${due.length} + ` : ''}新词 15</button><button class="btn" type="button" data-quiz>小测验 10 题</button></div>
       <input type="search" class="lv-q" placeholder="在这一级里查找：${tr === 'en' ? '英文' : '韩语'} / 中文" value="${esc(lvQuery[tr] || '')}">
-      <div class="list-wrap"><table class="list"><tbody>${list.slice(0, lvShown).map(x => `<tr><td style="width:40px">${sayBtn(x.t, T.tts)}</td><td><b lang="${tr}">${esc(x.t)}</b>${x.pr ? `<div class="small muted">${tr === 'ko' ? '汉字 ' : ''}${esc(x.pr)}</div>` : ''}</td><td>${esc(x.zh)}</td><td>${S.srs[x.id] && S.srs[x.id].r > 0 ? '<span class="tag done">已学</span>' : ''}</td></tr>`).join('')}</tbody></table></div>
+      <div class="list-wrap"><table class="list"><tbody>${list.slice(0, lvShown).map(x => `<tr><td style="width:40px">${sayBtn(x.t, T.tts)}</td><td><b lang="${tr}">${esc(x.t)}</b>${x.pr ? `<div class="small muted">${tr === 'ko' ? '汉字 ' : ''}${esc(x.pr)}</div>` : ''}</td><td>${esc(x.zh)}${x.ex ? `<div class="small lv-ex"><span lang="${tr}">${esc(x.ex[0])}</span> ${sayBtn(x.ex[0], T.tts)}<br><span class="muted">${esc(x.ex[1])}</span></div>` : ''}</td><td>${S.srs[x.id] && S.srs[x.id].r > 0 ? '<span class="tag done">已学</span>' : ''}</td></tr>`).join('')}</tbody></table></div>
       ${list.length > lvShown ? `<div class="row" style="justify-content:center"><button class="btn" type="button" data-more>再显示 100 个（共 ${list.length}）</button></div>` : ''}
       <p class="small muted">${tr === 'en' ? '词表和中文释义来自 <a href="https://github.com/skywind3000/ECDICT" target="_blank" rel="noopener">ECDICT</a>（MIT 许可）。' : '词表、汉字和等级来自国立国语院《<a href="https://krdict.korean.go.kr" target="_blank" rel="noopener">한국어기초사전</a>》（CC BY-SA 2.0 KR），中文释义为本站编写，同样以 CC BY-SA 2.0 KR 发布。'}</p>`;
     p.querySelectorAll('[data-lv]').forEach(b => { b.onclick = () => { lvSel[tr] = b.dataset.lv; lvShown = 100; render(); }; });
