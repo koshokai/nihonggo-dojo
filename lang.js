@@ -11,8 +11,25 @@ const TRACKS = {
 const TRACK_NEUTRAL = ['me', 'welcome'];
 const trackOf = view => view === 'ko' || view === 'en' ? view : TRACK_NEUTRAL.includes(view) ? (S.track || 'ja') : 'ja';
 
-// 浏览器朗读（韩语、英语还没有预生成的音频）
+// MeloTTS 预生成的音频（audio/index-ko.json、index-en.json：朗读文本 → mp3），没有的再用浏览器朗读
+const LANG_AUDIO = {};
+const langAudioIdx = code => LANG_AUDIO[code] || (LANG_AUDIO[code] = fetch(`audio/index-${code}.json`).then(r => r.ok ? r.json() : {}).catch(() => ({})));
+let langAudioEl = null;
 function speakLang(text, lang) {
+  const code = lang.slice(0, 2);
+  stopSpeech();
+  if (langAudioEl) { langAudioEl.pause(); langAudioEl = null; }
+  if (S.voiceSrc === 'tts') return speakLangTTS(text, lang);
+  langAudioIdx(code).then(idx => {
+    const file = idx[text];
+    if (!file) return speakLangTTS(text, lang);
+    const a = new Audio('audio/' + file);
+    a.playbackRate = Math.min(1.3, Math.max(.6, S.rate + .2));
+    langAudioEl = a;
+    a.play().catch(() => speakLangTTS(text, lang));
+  });
+}
+function speakLangTTS(text, lang) {
   if (!hasTTS) { toast('这个浏览器不支持朗读'); return; }
   stopSpeech();
   const u = new SpeechSynthesisUtterance(text);
@@ -294,7 +311,7 @@ function viewLangTrack(tr, sub) {
       <a class="lang-tile" href="#${tr}/phrases"><b>常用句 ${phrases.length}</b><span class="small muted">按场景分类，点击朗读</span></a>
       <a class="lang-tile" href="#${tr}/levels"><b>${tr === 'ko' ? '分级词库 TOPIK' : '分级词库 中考→GRE'}</b><span class="small muted">${tr === 'ko' ? '初级 / 中级 / 高级，约 1.1 万词' : '中考、高考、四六级、考研、雅思、托福、GRE，约 1.5 万词'}</span></a>
     </div>
-    <p class="small muted">发音使用手机或浏览器自带的${T.title}语音；没有声音的话，在系统设置的「文字转语音」里添加${T.title}。</p>
+    <p class="small muted">发音：真人感语音由开源的 MeloTTS 生成（陆续补全中），还没有音频的词用手机或浏览器自带的${T.title}语音。「我的 → 发音来源」可以切换。</p>
   </section>`);
   const b = p.querySelector('[data-due]'); if (b) b.onclick = () => langCards(due.slice(0, 30), `${T.title}复习`, tr);
   main.append(p);

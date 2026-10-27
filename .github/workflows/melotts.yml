@@ -1,0 +1,55 @@
+# 用 MeloTTS（MIT）生成韩语、英语发音，提交到 audio/。在 Actions 页面手动运行。
+name: MeloTTS audio (Korean / English)
+
+on:
+  workflow_dispatch:
+    inputs:
+      lang:
+        description: ko / en
+        required: true
+        default: ko
+      which:
+        description: basic（入门单词和常用句）/ levels（分级词库）
+        required: true
+        default: basic
+      limit:
+        description: 最多生成多少个（0 = 全部）
+        required: false
+        default: '0'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: melotts-${{ github.event.inputs.lang }}
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install MeloTTS
+        run: |
+          sudo apt-get update -q && sudo apt-get install -yq ffmpeg
+          pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+          git clone -q --depth 1 https://github.com/myshell-ai/MeloTTS /tmp/MeloTTS
+          pip install -q -e /tmp/MeloTTS
+          python -m unidic download
+          python -c "import nltk; nltk.download('averaged_perceptron_tagger_eng', quiet=True); nltk.download('cmudict', quiet=True)"
+          git config user.name "melotts-bot"
+          git config user.email "melotts-bot@users.noreply.github.com"
+          git pull -q --rebase origin main
+      - name: Generate
+        run: python3 tools/gen_audio_melo.py ${{ github.event.inputs.lang }} ${{ github.event.inputs.which }} --limit ${{ github.event.inputs.limit }} --commit_every 500
+      - name: Commit
+        if: always()
+        run: |
+          git add audio
+          git diff --cached --quiet && exit 0
+          git commit -qm "audio: ${{ github.event.inputs.lang }} ${{ github.event.inputs.which }} (MeloTTS)"
+          for i in 1 2 3; do git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main && break; sleep 5; done

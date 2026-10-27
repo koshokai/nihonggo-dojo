@@ -1296,7 +1296,8 @@ function viewMe() {
     <p class="small muted">分级词库的词表、汉字和等级来自国立国语院《<a href="https://krdict.korean.go.kr" target="_blank" rel="noopener">한국어기초사전</a>》（<a href="https://creativecommons.org/licenses/by-sa/2.0/kr/" target="_blank" rel="noopener">CC BY-SA 2.0 KR</a>），中文释义为本站编写，同样以 CC BY-SA 2.0 KR 发布。</p>
     <h3>英语</h3>
     <p class="small">26 个字母和美式音标；入门单词 500 个、常用句 150 句（本站编写）；分级词库约 1.5 万词（中考、高考、四级、六级、考研、雅思、托福、GRE）。</p>
-    <p class="small muted">分级词库的词表、音标和中文释义来自 <a href="https://github.com/skywind3000/ECDICT" target="_blank" rel="noopener">ECDICT</a>（MIT 许可）。韩语和英语目前使用手机或浏览器自带的语音朗读。</p>
+    <p class="small muted">分级词库的词表、音标和中文释义来自 <a href="https://github.com/skywind3000/ECDICT" target="_blank" rel="noopener">ECDICT</a>（MIT 许可）。</p>
+    <p class="small muted">韩语、英语发音由 <a href="https://github.com/myshell-ai/MeloTTS" target="_blank" rel="noopener">MeloTTS</a>（MIT 许可）生成，还没有音频的词用设备自带的语音。</p>
   </section>`);
   const ps = bk.querySelector('[data-persist]');
   requestPersist().then(ok => { ps.innerHTML = ok ? '<span class="tag done">已开启</span> 浏览器已同意持久保存，空间不足时也不会自动清理这里的数据。' : '<span class="tag">未开启</span> 这个浏览器没有同意持久保存，建议添加到主屏幕并定期备份。'; });
