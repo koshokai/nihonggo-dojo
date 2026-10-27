@@ -88,7 +88,8 @@ def articles():
     import sys
     sys.path.insert(0, str(ROOT / 'tools'))
     from build_lang2 import photo_queries
-    yield from photo_queries().items()
+    over = json.loads(q.read_text(encoding='utf-8')) if q.exists() else {}
+    yield from ((k, v) for k, v in photo_queries().items() if k not in over)   # photo_queries.json 里有的以它为准
     for f in sorted((ROOT / 'tools' / 'reading').glob('life_*.txt')):
         for block in re.split(r'\n(?=# id:)', f.read_text(encoding='utf-8').strip()):
             head = block.split('\n---\n', 1)[0]

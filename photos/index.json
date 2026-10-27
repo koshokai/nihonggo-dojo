@@ -887,12 +887,6 @@
   "license": "CC BY-SA 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Fish_and_chips_plate_with_peas.jpg"
  },
- "en-r-06": {
-  "file": "photos/en-r-06.jpg",
-  "by": "Boevaya mashina",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:USPS_mail_truck_view_into.jpg"
- },
  "en-r-07": {
   "file": "photos/en-r-07.jpg",
   "by": "Pink Sherbet Photography from USA",
@@ -959,18 +953,6 @@
   "license": "CC BY-SA 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Olney_Pancake_Race_-_geograph.org.uk_-_2304546.jpg"
  },
- "en-r-19": {
-  "file": "photos/en-r-19.jpg",
-  "by": "Tony Hisgett from Birmingham, UK",
-  "license": "CC BY 2.0",
-  "page": "https://commons.wikimedia.org/wiki/File:NHS_Angel_Nurse_(49866011863).jpg"
- },
- "en-r-20": {
-  "file": "photos/en-r-20.jpg",
-  "by": "Press Information Department",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Finance_Minister_Abul_Maal_Abdul_Muhith_VAT_Online_Project_Review_Meeting_Dhaka_2016-03-29_(PID-0055151).jpg"
- },
  "en-r-21": {
   "file": "photos/en-r-21.jpg",
   "by": "APK",
@@ -1013,30 +995,6 @@
   "license": "CC BY 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Social_Media_App_Icons_On_The_Screen_of_A_Smartphone.jpg"
  },
- "en-r-28": {
-  "file": "photos/en-r-28.jpg",
-  "by": "Sgroey",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Jeju_community_food_waste_disposal_bins.jpg"
- },
- "en-r-29": {
-  "file": "photos/en-r-29.jpg",
-  "by": "Pakoire",
-  "license": "CC BY-SA 3.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Loft_109_Backpackers_Hostel.jpg"
- },
- "en-r-30": {
-  "file": "photos/en-r-30.jpg",
-  "by": "2C2KPhotography",
-  "license": "CC BY 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Galveston_Juneteenth_Parade_and_Celebration_6-19-25_-_71.jpg"
- },
- "ko-r-01": {
-  "file": "photos/ko-r-01.jpg",
-  "by": "Startandstar",
-  "license": "CC0",
-  "page": "https://commons.wikimedia.org/wiki/File:Korean_convenience_store_sandwiches.jpg"
- },
  "ko-r-02": {
   "file": "photos/ko-r-02.jpg",
   "by": "Thyristorchopper",
@@ -1067,12 +1025,6 @@
   "license": "CC BY-SA 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Korean.dessert-Sikhye-01.jpg"
  },
- "ko-r-09": {
-  "file": "photos/ko-r-09.jpg",
-  "by": "한국교육방송공사",
-  "license": "CC BY 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Tteokguk_(rice_cake_soup)_01.jpg"
- },
  "ko-r-10": {
   "file": "photos/ko-r-10.jpg",
   "by": "Bgag",
@@ -1091,29 +1043,11 @@
   "license": "CC BY-SA 3.0",
   "page": "https://commons.wikimedia.org/wiki/File:Korean_cuisine-Gimjang-Preparation_for_making_kimchi-01.jpg"
  },
- "ko-r-13": {
-  "file": "photos/ko-r-13.jpg",
-  "by": "G41rn8",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Ondol_Chimneys_in_the_Amisan_Garden_of_Gyeongbokgung_IMG_2062.jpg"
- },
- "ko-r-14": {
-  "file": "photos/ko-r-14.jpg",
-  "by": "HaulS",
-  "license": "CC0",
-  "page": "https://commons.wikimedia.org/wiki/File:Yancon_buchimgae_(20140830_183826).jpg"
- },
  "ko-r-15": {
   "file": "photos/ko-r-15.jpg",
   "by": "by jetohs",
   "license": "CC BY-SA 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Korea-Jeonju-Bibimbap_festival-01.jpg"
- },
- "ko-r-16": {
-  "file": "photos/ko-r-16.jpg",
-  "by": "Bill Branson, National Cancer Institute",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:Nurses_in_a_nurses%27_station,_USA_1987.jpg"
  },
  "ko-r-17": {
   "file": "photos/ko-r-17.jpg",
@@ -1133,18 +1067,6 @@
   "license": "CC BY 4.0",
   "page": "https://commons.wikimedia.org/wiki/File:Jeju-do_samgyetang_with_abalone_02.jpg"
  },
- "ko-r-21": {
-  "file": "photos/ko-r-21.jpg",
-  "by": "U.S. Navy photo by Mass Communication Specialist 3rd Class David A. Cox",
-  "license": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File:US_Navy_100809-N-7103C-004_More_than_30,000_pounds_of_mail_is_arranged_for_sorting_in_the_hangar_bay_of_the_aircraft_carrier_USS_George_Washington_(CVN_73)_after_an_extended_delay_in_the_delivery_of_parcels_while_in_South_Korea.jpg"
- },
- "ko-r-22": {
-  "file": "photos/ko-r-22.jpg",
-  "by": "Ethan Doyle White",
-  "license": "CC BY-SA 4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Hangul_Script_on_the_Dongnimmun_Gate.jpg"
- },
  "ko-r-23": {
   "file": "photos/ko-r-23.jpg",
   "by": "ZbnKhl",
@@ -1157,12 +1079,6 @@
   "license": "CC BY-SA 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Korea_College_Scholastic_Ability_Test_Day_11_(15592257588).jpg"
  },
- "ko-r-25": {
-  "file": "photos/ko-r-25.jpg",
-  "by": "by karendotcom127",
-  "license": "CC BY 2.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Korea-Jeju-Haenyeo-06.jpg"
- },
  "ko-r-26": {
   "file": "photos/ko-r-26.jpg",
   "by": "Bernard Gagnon",
@@ -1174,12 +1090,6 @@
   "by": "taylorandayumi",
   "license": "CC BY 2.0",
   "page": "https://commons.wikimedia.org/wiki/File:Korean_red_bean_porridge-Patjuk-01.jpg"
- },
- "ko-r-28": {
-  "file": "photos/ko-r-28.jpg",
-  "by": "보통사람 (seokay85)",
-  "license": "CC BY 2.0 kr",
-  "page": "https://commons.wikimedia.org/wiki/File:19%E7%A6%81_Webtoon_Writer_Talk_concert_in_Hyunseo_Park_4.jpg"
  },
  "ko-r-30": {
   "file": "photos/ko-r-30.jpg",
