@@ -63,7 +63,7 @@ def scenes():
             if m['cat'] not in SCENE_CATS or m['img'] not in IMGS:
                 sys.exit(f'{m["id"]}: cat/img 不对 {m["cat"]} {m["img"]}')
             out.append({'id': m['id'], 'cat': m['cat'], 'L': m['level'], 'img': m['img'], 'title': m['title'], 'zh': m['zh'],
-                        'note': m.get('note', ''), 'lines': lines, 'ph': ph, 'q': [cells(l, 5) for l in sec.get('quiz', [])]})
+                        'note': m.get('note', ''), 'lines': lines, 'phr': ph, 'q': [cells(l, 5) for l in sec.get('quiz', [])]})
     return out
 
 
@@ -83,7 +83,7 @@ def mails():
         if m['img'] not in IMGS:
             sys.exit(f'{m["id"]}: img 不对')
         out.append({'id': m['id'], 'title': m['title'], 'zh': m['zh'], 'L': m['level'], 'img': m['img'], 'situation': m.get('situation', ''),
-                    'subject': m.get('subject', ''), 'p': paras, 'ph': ph, 'q': [cells(l, 5) for l in sec.get('quiz', [])]})
+                    'subject': m.get('subject', ''), 'p': paras, 'phr': ph, 'q': [cells(l, 5) for l in sec.get('quiz', [])]})
     return out
 
 

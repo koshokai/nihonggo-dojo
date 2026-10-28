@@ -102,7 +102,7 @@ function bizScene(sc) {
     <div class="row small"><span class="muted">角色扮演：</span><div class="seg" role="group">${['', ...speakers].map(s => `<button type="button" data-role="${esc(s)}" class="${s ? '' : 'on'}">${s ? esc(s) : '不扮演'}</button>`).join('')}</div></div>
     <p class="small muted">点一句话朗读并显示中文；画线的词可以点开看释义。选择角色扮演后，那个角色的台词会先隐藏，试着自己说出来再点开对照。</p>
     <div class="ra-text dialog">${sc.lines.map(([spk, jp, kana, toks, zh]) => `<div class="bubble-line ${side(spk)}" data-spk="${esc(spk)}"><div class="spk">${esc(spk)}</div><div class="bubble">${bizLine(jp, kana, zh, toks, i++)}<div class="hint-zh">${esc(zh)}</div></div></div>`).join('')}</div>
-    ${phrasesHTML(sc.ph)}
+    ${phrasesHTML(sc.phr || [])}
     <h3>小测验</h3><div class="ra-quiz"></div>
   </article>`);
   main.append(p);
@@ -219,7 +219,7 @@ function bizMail(m) {
       <div class="mail-subj"><span class="muted small">件名</span> <b lang="ja">${esc(m.subject)}</b></div>
       <div class="ra-text mail-body">${m.p.map(para => `<p>${para.map(([jp, kana, toks, zh]) => bizLine(jp, kana, zh, toks, i++)).join('<br>')}</p>`).join('')}</div>
     </div>
-    ${phrasesHTML(m.ph)}
+    ${phrasesHTML(m.phr || [])}
     <h3>小测验</h3><div class="ra-quiz"></div>
   </article>`);
   main.append(p);

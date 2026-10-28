@@ -6,7 +6,7 @@ const readList = () => READING.filter(a => !a.date || a.date <= dkey()).sort((x,
 const todayArticle = () => readList().find(a => a.date === dkey());
 // 实拍照片（Wikimedia Commons，注明作者和授权）；没有照片的旧文章用插画
 const artImg = (a, big) => a.ph ? `<img class="rc-photo" src="${esc(a.ph[0])}" alt="${esc(a.zh)}" loading="lazy" decoding="async">`
-  : `<div class="rc-ph-none">${READ_CATS[a.cat] || BIZ_ICON[a.cat] || '📖'}</div>`;   // 没有贴切的照片时用图标，不用卡通插画
+  : `<div class="rc-ph-none${BIZ_ICON[a.cat] ? ' biz' : ''}"><span>${READ_CATS[a.cat] || BIZ_ICON[a.cat] || '📖'}</span><b>${esc(a.cat || '')}</b></div>`;   // 没有贴切的照片时用分类封面，不用卡通插画
 const BIZ_ICON = { 职场基础: '🏢', 电话: '📞', 拜访接待: '🤝', 会议: '📊', 报联商: '🗣️', 道歉拒绝: '🙇', 谈判销售: '💼', 求职面试: '👔', 应酬: '🍶', 出差: '🚄' };
 const photoCredit = a => a.ph ? `<div class="ph-credit small muted">照片：${esc(a.ph[1])} · ${esc(a.ph[2])} · <a href="${esc(a.ph[3])}" target="_blank" rel="noopener">Wikimedia Commons</a></div>` : '';
 let readFilter = { L: null, cat: '' };
