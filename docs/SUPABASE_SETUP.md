@@ -342,12 +342,5 @@ insert into public.admins select id from auth.users where email = '你的邮箱'
 
 ### 9.5 每小时自动提醒（推送才需要）
 
-公开的网站仓库 `koshokai/nihonggo-dojo`（不是私有的源码仓库）→ **Settings → Secrets and variables → Actions → New repository secret**：名字 `NOTIFY_CRON_SECRET`，值和上面的 `CRON_SECRET` 一样。
-之后公开仓库里的 `.github/workflows/notify.yml`（源码在 `deploy/public/`，发布时自动复制过去）每小时会调用一次 notify 函数。公开仓库的 Actions 不限时长，不占私有仓库的免费额度。没填这个 Secret 时它什么都不做。
-
-## 10. 源码私有、网站公开（两个仓库）
-
-- `koshokai/nihonggo-dojo-src`（私有）：全部源码、工具脚本、文档和提交历史。平时只改这里。
-- `koshokai/nihonggo-dojo`（公开）：只有网站成品（JS 压缩过，不含 tools/、docs/、脚本）。GitHub Pages 从这里发布，网址不变。
-- 源码仓库每次推送后，`.github/workflows/publish.yml` 运行 `deploy/build_site.sh`，把成品推到公开仓库。需要源码仓库里的 Secret `SITE_DEPLOY_TOKEN`（只对公开仓库有 Contents 读写权限的 fine-grained token，过期前记得续）。
-- 私有仓库的 Actions 每月有 2000 分钟免费额度（超出后免费账号会暂停运行，不会扣钱）。生成大量音频的任务很耗时，尽量合并着跑。
+GitHub 仓库 → **Settings → Secrets and variables → Actions → New repository secret**：名字 `NOTIFY_CRON_SECRET`，值和上面的 `CRON_SECRET` 一样。
+之后 `.github/workflows/notify.yml` 每小时会调用一次 notify 函数。没填这个 Secret 时它什么都不做。
