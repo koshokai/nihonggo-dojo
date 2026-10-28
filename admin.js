@@ -62,7 +62,7 @@ async function start() {
 }
 
 function loginView() {
-  app.innerHTML = `<div class="panel" style="max-width:420px;margin:40px auto"><h1>道场后台</h1><p class="small muted">用管理员账号登录（和网站同一个账号）。在网站上已经登录的话会自动进来。</p>
+  app.innerHTML = `<div class="panel" style="max-width:420px;margin:40px auto"><h1>道场后台</h1><p class="small muted">用管理员账号登录（和网站同一个账号）。在网站上已经登录的话会自动进来。</p><p class="small">忘记密码、或者平时用 Google / 邮箱验证码登录？<a href="./#me">先去网站登录</a>，再回到这个页面就行。</p>
     <label class="f">邮箱</label><input type="email" id="em" autocomplete="username"><label class="f">密码</label><input type="password" id="pw" autocomplete="current-password">
     <div class="row" style="margin-top:10px"><button class="btn pri" id="go">登录</button><span class="small muted" id="st"></span></div></div>`;
   document.getElementById('go').onclick = async () => {
