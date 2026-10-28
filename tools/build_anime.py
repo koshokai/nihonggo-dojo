@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / 'tools' / 'anime'
-ORDER = ['jump.json', 'classic.json', 'drama.json']
+ORDER = ['jump.json', 'classic.json', 'modern.json', 'retro.json', 'drama.json']
 
 
 def works():
