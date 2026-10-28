@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: probe / words / daily / listen
+        description: probe / words / daily / listen / anime（动漫·日剧名台词）
         required: true
         default: probe
       speaker:

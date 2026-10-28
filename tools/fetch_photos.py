@@ -90,6 +90,9 @@ def articles():
     from build_lang2 import photo_queries
     over = json.loads(q.read_text(encoding='utf-8')) if q.exists() else {}
     yield from ((k, v) for k, v in photo_queries().items() if k not in over)   # photo_queries.json 里有的以它为准
+    # 动漫·日剧名台词（tools/anime/*.json 的 photo 字段）
+    from build_anime import photo_queries as anime_queries
+    yield from ((k, v) for k, v in anime_queries().items() if k not in over)
     for f in sorted((ROOT / 'tools' / 'reading').glob('life_*.txt')):
         for block in re.split(r'\n(?=# id:)', f.read_text(encoding='utf-8').strip()):
             head = block.split('\n---\n', 1)[0]

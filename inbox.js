@@ -31,11 +31,11 @@ function msgCard(m, onDone) {
       <div class="small">${esc(m.body)}</div>
       ${m.reply ? `<div class="small muted">你的回复：${esc(m.reply)}</div>` : ''}
     </div>
-    <div class="row">${m.action ? `<button class="btn pri" type="button" data-go>${esc(m.action_label || '去看看')}</button>` : ''}
+    <div class="row">${m.action ? `<button class="btn pri" type="button" data-act>${esc(m.action_label || '去看看')}</button>` : ''}
       ${m.reply ? '' : reps.map((r, i) => `<button class="btn ghost" type="button" data-rep="${i}">${esc(r)}</button>`).join('')}
       ${m.read_at ? '' : '<button class="btn ghost" type="button" data-x aria-label="知道了">知道了</button>'}</div></section>`);
   const done = () => { if (onDone) onDone(el); };
-  const go = el.querySelector('[data-go]');
+  const go = el.querySelector('[data-act]');
   if (go) go.onclick = async e => { e.stopPropagation(); await inboxMark(m); done(); if (/^#/.test(m.action)) location.hash = m.action; else window.open(m.action, '_blank', 'noopener'); };
   el.querySelectorAll('[data-rep]').forEach(b => { b.onclick = async e => { e.stopPropagation(); await inboxMark(m, reps[+b.dataset.rep]); toast('收到，谢谢你的回复'); done(); }; });
   const x = el.querySelector('[data-x]');

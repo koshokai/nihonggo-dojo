@@ -100,6 +100,16 @@ def items_daily():
     return [(d[8], d[0], d[1]) for d in js_json('daily.js', 'DAILY = [')]
 
 
+def items_anime():
+    """动漫·日剧名台词和生活小对话：(文本, 文本, 读音)。读音里的空格只是给学习者看的分词"""
+    out = []
+    for w in json.loads((ROOT / 'lang' / 'ja-anime.json').read_text(encoding='utf-8')):
+        for l in w['lines']:
+            out.append((l['jp'], l['jp'], l['kana'].replace(' ', '')))
+            out += [(t[1], t[1], t[2].replace(' ', '')) for t in l.get('talk', [])]
+    return out
+
+
 def generate(engine, speaker, name, items, speed, commit_every=0):
     idx_path = OUT / f'index-{name}.json'
     idx = json.loads(idx_path.read_text(encoding='utf-8')) if idx_path.exists() else {}
@@ -217,7 +227,7 @@ def probe(engine):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('mode', choices=['probe', 'words', 'daily', 'listen'])
+    ap.add_argument('mode', choices=['probe', 'words', 'daily', 'listen', 'anime'])
     ap.add_argument('--engine', default='http://127.0.0.1:50021')
     ap.add_argument('--speaker', type=int, default=None)
     ap.add_argument('--level', default='')
@@ -231,6 +241,8 @@ def main():
         return listen(a.engine, min(a.commit_every, 40) if a.commit_every else 0)
     if a.speaker is None:
         sys.exit('--speaker is required')
+    if a.mode == 'anime':
+        return generate(a.engine, a.speaker, 'anime', items_anime(), a.speed, a.commit_every)
     items = items_words(a.level) if a.mode == 'words' else items_daily()
     generate(a.engine, a.speaker, 'words' if a.mode == 'words' else 'daily', items, a.speed, a.commit_every)
     (OUT / 'voice.json').write_text(json.dumps({'speaker': a.speaker}), encoding='utf-8')

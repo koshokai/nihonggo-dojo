@@ -197,7 +197,7 @@ let curUtt = null, speakSeq = 0;
 // VOICEVOX 预生成的音频（audio/index-*.json：朗读文本 → mp3）。有就优先播放，没有或加载失败退回浏览器朗读。
 const AUDIO_IDX = {};
 let curAudio = null;
-['words', 'daily'].forEach(n => fetch(`audio/index-${n}.json`).then(r => r.ok ? r.json() : {}).then(d => Object.assign(AUDIO_IDX, d)).catch(() => {}));
+['words', 'daily', 'anime'].forEach(n => fetch(`audio/index-${n}.json`).then(r => r.ok ? r.json() : {}).then(d => Object.assign(AUDIO_IDX, d)).catch(() => {}));
 function stopSpeech() {
   if (curAudio) { curAudio.onended = curAudio.onerror = null; curAudio.pause(); curAudio = null; }
   if (hasTTS) speechSynthesis.cancel();
@@ -690,7 +690,7 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, study: viewStudy, ri: viewRI, ko: viewKo, en: viewEn, me: viewMe, welcome: viewWelcome, about: viewAbout };
+const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, study: viewStudy, ri: viewRI, ko: viewKo, en: viewEn, me: viewMe, welcome: viewWelcome, about: viewAbout, anime: viewAnime, trans: viewTrans };
 function render() {
   const [v, ...rest] = (location.hash || '#home').slice(1).split('/');
   const arg = rest.join('/');
@@ -1447,8 +1447,9 @@ if (S.onboarded) requestPersist();
   s.src = 'examples.js'; s.async = true;
   s.onload = () => {
     if (typeof CORPUS !== 'undefined') CORPUS = null;
+    if (typeof TR_POOL !== 'undefined') TR_POOL = null;   // 翻译练习的句子池要算上例句
     const v = (location.hash || '#home').slice(1).split('/')[0];
-    if (['vocab', 'kanji'].includes(v)) render();
+    if (['vocab', 'kanji', 'trans'].includes(v)) render();
   };
   document.body.append(s);
 })();
