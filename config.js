@@ -6,5 +6,5 @@ const CLOUD = {
   anonKey: 'sb_publishable_R4ZXdXpCjxuTg0iH7EXTbQ_tIg1HdLm',
   requireLogin: true,   // true：必须登录才能使用（上架 App Store 前建议改成 false，见 docs/SUPABASE_SETUP.md）
   google: true,         // Google 登录（需在 Supabase 后台开通 Google provider，见 docs/SUPABASE_SETUP.md 7.3）
-  vapid: ''             // 学习提醒推送的公钥（公开的，私钥只放在 Supabase 后台），见 docs/SUPABASE_SETUP.md 第 9 节；留空则不显示提醒开关
+  vapid: 'BKR1VmkKvuTN2w395uXjWU77XeTyjmma-ioCxqutn9cqrdp9Fsmk4-Wj5hSQYe9-3h-Uj8ROU2Owd4F1UX1cJ1c',  // 学习提醒推送的公钥（公开的，私钥只放在 Supabase 后台），见 docs/SUPABASE_SETUP.md 第 9 节；留空则不显示提醒开关
 };
