@@ -64,6 +64,7 @@ def _ruby(sentence):
     if not sentence:
         return ''
     for w in tagger(sentence):
+        out.append(w.white_space)   # 形态分析会吃掉词前的空格，原样放回，位置才对得上
         surf = w.surface
         kana = getattr(w.feature, 'kana', None) or ''
         read = OVERRIDE.get(surf) or hira(kana)
@@ -86,9 +87,37 @@ def compact(markup):
     return ','.join(out)
 
 
-def furi(sentence):
-    """build_examples.py / build_grammar.py 用：句子 → 紧凑的假名位置（没有汉字时返回空字符串）"""
-    return compact(ruby(sentence)) if KANJI.search(sentence) else ''
+def furi(sentence, kana=None):
+    """句子 → 紧凑的假名位置（没有汉字时返回空字符串）。
+    给了人工写的读音 kana 时以它为准：形态分析的读法和它不一致，就按它重新对齐（汉字串对读音，假名原样对上）。"""
+    if not KANJI.search(sentence):
+        return ''
+    m = ruby(sentence)
+    if kana:
+        norm = lambda s: re.sub(r'[\s。、，！？!?「」『』…・ー〜～]', '', hira(s))
+        plain = re.sub(r'\{([^|}]*)\|([^}]*)\}', r'\2', m)
+        if norm(plain) != norm(kana):
+            fixed = realign(sentence, norm(kana))
+            if fixed:
+                m = fixed
+    return compact(m)
+
+
+def realign(sentence, kana):
+    """按人工读音给句子标注：汉字串 → (.+?)，其余字符（去掉标点后）原样匹配"""
+    parts = re.findall(r'[\u3400-\u9fff々〆ヶ]+|[^\u3400-\u9fff々〆ヶ]+', sentence)
+    pat, keep = '', []
+    for p in parts:
+        if KANJI.match(p):
+            pat += '(.+?)'
+            keep.append(True)
+        else:
+            pat += '(' + re.escape(re.sub(r'[\s。、，！？!?「」『』…・ー〜～]', '', hira(p))) + ')'
+            keep.append(False)
+    m = re.fullmatch(pat, kana)
+    if not m:
+        return None
+    return ''.join(f'{{{p}|{g}}}' if k else p for p, g, k in zip(parts, m.groups(), keep))
 
 
 def js_obj(path, name):

@@ -23,8 +23,8 @@ function animeList(list) {
     <div class="an-grid"></div></section>`);
   const grid = p.querySelector('.an-grid');
   const draw = () => {
-    grid.innerHTML = list.filter(w => !animeKind || w.kind === animeKind).map(w => `<a class="an-card" href="#anime/${esc(w.id)}">
-      <div class="an-img">${w.ph ? `<img src="${esc(w.ph[0])}" alt="" loading="lazy" decoding="async">` : `<span>${ANIME_ICON[w.kind] || '🎬'}</span>`}</div>
+    grid.innerHTML = list.filter(w => !animeKind || w.kind === animeKind).map(w => `<a class="an-card ${w.kind}" href="#anime/${esc(w.id)}" data-t="${esc(w.title)}">
+      <div class="an-img">${w.ph ? `<img src="${esc(w.ph[0])}" alt="" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'an-cover',textContent:this.closest('.an-card').dataset.t}))">` : `<span class="an-cover" lang="ja">${esc(w.title)}</span>`}</div>
       <div class="an-meta"><b lang="ja">${esc(w.title)}</b><span class="small muted">${esc(w.zh)} · ${w.lines.length} 句</span>
       <span class="small an-first" lang="ja">「${esc(w.lines[0].jp)}」</span></div></a>`).join('');
   };
@@ -36,19 +36,19 @@ function animeList(list) {
 function animeWork(w, list) {
   const vocabOf = x => wordIndex().get(x);
   const p = h(`<article class="panel an-work">
-    <a class="small" href="#anime">← 全部作品</a>
-    ${w.ph ? `<div class="ra-hero"><img class="rc-photo" src="${esc(w.ph[0])}" alt="${esc(w.place)}" decoding="async"></div>${photoCredit(w)}` : ''}
+    <a class="an-back" href="#anime">← 全部作品</a>
+    ${w.ph ? `<div class="an-hero"><img src="${esc(w.ph[0])}" alt="${esc(w.place)}" decoding="async" onerror="this.parentElement.remove()"></div>${photoCredit(w)}` : ''}
     <h2 lang="ja">${esc(w.title)} <span class="small muted">${esc(w.zh)}${w.year ? ' · ' + esc(w.year) : ''}</span></h2>
     ${w.place ? `<p class="small muted">${w.ph ? '📍 ' : ''}${esc(w.place)}</p>` : ''}
     <label class="small"><input type="checkbox" data-kana checked> 显示读音</label>
     <div class="an-lines">${w.lines.map((l, i) => `<section class="an-line">
-      <div class="an-q"><span class="an-quote" lang="ja">「${esc(l.jp)}」</span>${speakBtn(l.jp)}${shadowBtn(l.jp, l.kana, l.zh)}</div>
-      <div class="an-kana" lang="ja">${esc(l.kana)}</div>
+      <div class="an-q"><span class="an-quote furi" lang="ja">「${furiHTML(l.jp, l.furi)}」</span>${speakBtn(l.jp)}${shadowBtn(l.jp, l.kana, l.zh)}</div>
+      ${l.furi ? '' : `<div class="an-kana" lang="ja">${esc(l.kana)}</div>`}
       <div class="an-zh">${esc(l.zh)}</div>
       <div class="small muted">—— <span lang="ja">${esc(l.who || '')}</span>${l.lv ? ` <span class="tag lv">${esc(l.lv)}</span>` : ''}${l.scene ? ` · ${esc(l.scene)}` : ''}</div>
       ${l.note ? `<p class="an-note small">${esc(l.note)}</p>` : ''}
       ${(l.words || []).length ? `<div class="an-words">${l.words.map(([x, r, zh]) => { const v = vocabOf(x); return `<span class="an-w"><b lang="ja">${esc(x)}</b> <span lang="ja" class="muted">${esc(r)}</span> ${esc(zh)}${v && v.q ? ` <button type="button" class="chip-btn" data-add="${esc(v.id)}">${S.srs[v.id] ? '已在单词卡' : '+ 单词卡'}</button>` : ''}</span>`; }).join('')}</div>` : ''}
-      ${(l.talk || []).length ? `<details class="an-talk"><summary class="small">生活里这样用</summary>${l.talk.map(([who, jp, kana, zh]) => `<div class="an-t"><span class="an-who">${esc(who)}</span><div><span lang="ja">${esc(jp)}</span>${speakBtn(jp)}<div class="an-kana small" lang="ja">${esc(kana)}</div><div class="small muted">${esc(zh)}</div></div></div>`).join('')}</details>` : ''}
+      ${(l.talk || []).length ? `<details class="an-talk"><summary class="small">生活里这样用</summary>${l.talk.map(([who, jp, kana, zh, furi]) => `<div class="an-t"><span class="an-who">${esc(who)}</span><div><span lang="ja" class="furi">${furiHTML(jp, furi)}</span>${speakBtn(jp)}${furi ? '' : `<div class="an-kana small" lang="ja">${esc(kana)}</div>`}<div class="small muted">${esc(zh)}</div></div></div>`).join('')}</details>` : ''}
     </section>`).join('')}</div>
     <h3>小测验：这句台词是什么意思？</h3><div class="an-quiz"></div>
   </article>`);
@@ -73,7 +73,7 @@ function animeQuiz(box, w, list) {
       return;
     }
     const q = qs[i], opts = sample([q.zh, ...sample(others.filter(z => z !== q.zh), 3)], 4);
-    box.innerHTML = `<p><b lang="ja">「${esc(q.jp)}」</b> ${speakBtn(q.jp)}</p><div class="an-opts">${opts.map(o => `<button class="btn" type="button">${esc(o)}</button>`).join('')}</div>`;
+    box.innerHTML = `<p><b lang="ja" class="furi">「${furiHTML(q.jp, q.furi)}」</b> ${speakBtn(q.jp)}</p><div class="an-opts">${opts.map(o => `<button class="btn" type="button">${esc(o)}</button>`).join('')}</div>`;
     box.querySelectorAll('.an-opts button').forEach(b => {
       b.onclick = () => {
         const ok = b.textContent === q.zh;
