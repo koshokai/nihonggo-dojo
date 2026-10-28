@@ -5,3 +5,4 @@ tools/lang2/*_listen[0-9].json
 tools/lang2/ko_grammar[0-9].json
 tools/lang2/*_reading[0-9].json
 tools/lexam/*_[0-9].json
+_site/

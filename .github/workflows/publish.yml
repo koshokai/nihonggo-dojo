@@ -1,0 +1,45 @@
+# 把网站成品发布到公开仓库 koshokai/nihonggo-dojo（GitHub Pages 从那里发布）。
+# 这个仓库（源码）是私有的；公开仓库里只有压缩过的网页文件。需要 Secret SITE_DEPLOY_TOKEN：
+# 一个只对 koshokai/nihonggo-dojo 有 Contents 读写权限的 fine-grained token。
+name: Publish site
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['tools/**', 'docs/**', 'supabase/**', 'README.md']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build
+        run: bash deploy/build_site.sh
+      - name: Push to public repo
+        env:
+          TOKEN: ${{ secrets.SITE_DEPLOY_TOKEN }}
+        run: |
+          # 源码仓库改名（nihonggo-dojo-src）之前不能发布，否则会把成品推到源码仓库自己身上
+          if [ "$GITHUB_REPOSITORY" = "koshokai/nihonggo-dojo" ]; then echo "Rename this repo to nihonggo-dojo-src first"; exit 0; fi
+          if [ -z "$TOKEN" ]; then echo "SITE_DEPLOY_TOKEN not set"; exit 1; fi
+          git clone -q --depth 1 "https://x-access-token:${TOKEN}@github.com/koshokai/nihonggo-dojo.git" /tmp/pub || { mkdir -p /tmp/pub && git -C /tmp/pub init -q -b main && git -C /tmp/pub remote add origin "https://x-access-token:${TOKEN}@github.com/koshokai/nihonggo-dojo.git"; }
+          rsync -a --delete --exclude .git _site/ /tmp/pub/
+          cd /tmp/pub
+          git config user.name "site-bot"
+          git config user.email "site-bot@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && { echo "no changes"; exit 0; }
+          git commit -qm "Update site"
+          git push -q origin HEAD:main
