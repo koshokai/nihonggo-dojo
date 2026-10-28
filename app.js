@@ -690,7 +690,7 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, study: viewStudy, ri: viewRI, ko: viewKo, en: viewEn, me: viewMe, welcome: viewWelcome };
+const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, study: viewStudy, ri: viewRI, ko: viewKo, en: viewEn, me: viewMe, welcome: viewWelcome, about: viewAbout };
 function render() {
   const [v, ...rest] = (location.hash || '#home').slice(1).split('/');
   const arg = rest.join('/');
@@ -1310,8 +1310,16 @@ function viewMe() {
     area.querySelector('[data-no]').onclick = render;
   };
 
+  const ps = bk.querySelector('[data-persist]');
+  requestPersist().then(ok => { ps.innerHTML = ok ? '<span class="tag done">已开启</span> 浏览器已同意持久保存，空间不足时也不会自动清理这里的数据。' : '<span class="tag">未开启</span> 这个浏览器没有同意持久保存，建议添加到主屏幕并定期备份。'; });
+  const acc = accountPanel();
+  main.append(...[weeklyPanel(), typeof inboxPanel === 'function' ? inboxPanel() : null, p, installPanel(), acc, voiceP, bk].filter(Boolean));
+}
+
+// 内容来源和授权（只从页脚的小链接进入；VOICEVOX 和 CC BY / CC BY-SA 的素材要求注明出处）
+function viewAbout() {
   const counts = LEVELS.map(L => `<tr><td>${L}</td><td>${VOCAB[L].length}</td><td>${KANJI[L].length}</td><td>${GRAM[L].length}</td></tr>`).join('');
-  const about = h(`<section class="panel"><h2>关于内容</h2>
+  const about = h(`<section class="panel"><h2>内容来源</h2>
     <h3>日语</h3>
     <p class="small">单词约 8,000 个、汉字 2,211 个、语法 176 个句型，覆盖 JLPT N5–N1；另有阅读文章（「日本生活」每天上新一篇）、商务日语、150 道听力题和模拟考。中文释义、例句、文章和题目由本站编写，未经专业审核，备考时请配合官方真题和教材。</p>
     <p class="small muted">数据来源：单词表 <a href="https://github.com/jamsinclair/open-anki-jlpt-decks" target="_blank" rel="noopener">open-anki-jlpt-decks</a>（MIT），基于 <a href="http://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller 的 JLPT 资料</a>（CC BY）；汉字 <a href="https://github.com/davidluzgouveia/kanji-data" target="_blank" rel="noopener">kanji-data</a>（MIT）与 KANJIDIC；词典英文释义 <a href="https://www.edrdg.org/jmdict/j_jmdict.html" target="_blank" rel="noopener">JMdict</a>（EDRDG，CC BY-SA 4.0）。</p>
@@ -1326,15 +1334,7 @@ function viewMe() {
     <p class="small muted">分级词库的词表、音标和中文释义来自 <a href="https://github.com/skywind3000/ECDICT" target="_blank" rel="noopener">ECDICT</a>（MIT 许可）。例句来自 <a href="https://tatoeba.org" target="_blank" rel="noopener">Tatoeba</a>（CC BY 2.0 FR），中文已转为简体。</p>
     <p class="small muted">韩语、英语发音由 <a href="https://github.com/myshell-ai/MeloTTS" target="_blank" rel="noopener">MeloTTS</a>（MIT 许可）生成，还没有音频的词用设备自带的语音。常用词优先使用母语者的真人录音（来自 Wikimedia Commons 的维基词典和 Lingua Libre，<a href="credits.html">录音者与授权</a>）。英语合成语音由 <a href="https://huggingface.co/hexgrad/Kokoro-82M" target="_blank" rel="noopener">Kokoro</a>（Apache 2.0）生成。</p>
   </section>`);
-  const ps = bk.querySelector('[data-persist]');
-  requestPersist().then(ok => { ps.innerHTML = ok ? '<span class="tag done">已开启</span> 浏览器已同意持久保存，空间不足时也不会自动清理这里的数据。' : '<span class="tag">未开启</span> 这个浏览器没有同意持久保存，建议添加到主屏幕并定期备份。'; });
-  const acc = accountPanel();
-  // 匿名使用统计开关（见 stats.js）
-  const st = h(`<section class="panel"><h2>匿名使用统计</h2>
-    <div class="row between"><span>帮助改进日语道场</span><div class="seg">${opt([[0, '开'], [1, '关']], S.noStats ? 1 : 0, 'data-nostats')}</div></div>
-    <p class="small muted">每天最多发送一次「这台设备今天打开过、在学哪种语言」，用一个和账号无关的随机编号，不包含学习内容、邮箱或账号。只用来统计每天有多少人在学、一周后还有多少人在用。</p></section>`);
-  st.querySelectorAll('[data-nostats]').forEach(b => { b.onclick = () => { S.noStats = b.dataset.nostats === '1'; save(); render(); }; });
-  main.append(...[weeklyPanel(), typeof inboxPanel === 'function' ? inboxPanel() : null, p, installPanel(), acc, voiceP, bk, st, about].filter(Boolean));
+  main.append(about);
 }
 
 /* ---------- 安装到手机（PWA）---------- */

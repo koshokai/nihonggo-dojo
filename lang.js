@@ -8,7 +8,7 @@ const TRACKS = {
   en: { name: 'English', home: 'en', title: '英语', tts: 'en-US', file: 'lang-en.js', data: () => typeof LANG_EN !== 'undefined' && LANG_EN }
 };
 // 「我的」这类公共页面不属于某一门语言：留在当前正在学的语言里（导航栏不跳回日语）
-const TRACK_NEUTRAL = ['me', 'welcome'];
+const TRACK_NEUTRAL = ['me', 'welcome', 'about'];
 const trackOf = view => view === 'ko' || view === 'en' ? view : TRACK_NEUTRAL.includes(view) ? (S.track || 'ja') : 'ja';
 
 // MeloTTS 预生成的音频（audio/index-ko.json、index-en.json：朗读文本 → mp3），没有的再用浏览器朗读
