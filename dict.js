@@ -43,8 +43,8 @@ let CORPUS = null;
 function corpus() {
   if (!CORPUS) {
     CORPUS = [];
-    if (typeof EXAMPLES !== 'undefined') for (const w in EXAMPLES) for (const [jp, kana, zh] of EXAMPLES[w]) CORPUS.push({ jp, kana, zh });
-    for (const L of LEVELS) for (const g of GRAM[L]) for (const e of g.eg) CORPUS.push({ jp: e.full, kana: e.kana, zh: e.t });
+    if (typeof EXAMPLES !== 'undefined') for (const w in EXAMPLES) for (const [jp, kana, zh, furi] of EXAMPLES[w]) CORPUS.push({ jp, kana, zh, furi });
+    for (const L of LEVELS) for (const g of GRAM[L]) for (const e of g.eg) CORPUS.push({ jp: e.full, kana: e.kana, zh: e.t, furi: e.furi });
   }
   return CORPUS;
 }

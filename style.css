@@ -729,3 +729,7 @@ body.gated { overflow: hidden; }
 .tr-ans { display: grid; gap: 6px; border-top: 1px dashed var(--line); padding-top: 10px; }
 .tr-ref { font-size: 1.2rem; font-weight: 600; color: var(--ai); }
 .tr-grade .btn { flex: 1; }
+/* 例句的假名标注 */
+.furi { line-height: 2.1; }
+.furi rt { font-size: .58em; color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.furi mark rt { color: inherit; }

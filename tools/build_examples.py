@@ -74,6 +74,7 @@ def reading(sentence):
 
 
 def main():
+    from furigana import furi   # 头上标假名（furigana.py 也会读这里的 OVERRIDE，所以在函数里导入）
     alias = {}
     for line in (ROOT / 'tools/vocab/alias.txt').read_text(encoding='utf-8').splitlines():
         if line.strip() and not line.startswith('#'):
@@ -89,7 +90,7 @@ def main():
                 sys.exit(f'{src.name}:{n} 需要 3 列：{line}')
             word, jp, zh = parts
             word = alias.get(word, word)
-            out.setdefault(word, []).append([jp, reading(jp), zh])
+            out.setdefault(word, []).append([jp, reading(jp), zh] + ([f] if (f := furi(jp)) else []))
     js = '// 自动生成：python3 tools/build_examples.py（请编辑 tools/examples_*.txt）\n'
     js += '// 每个单词：[日语例句, 朗读用假名, 中文翻译]\nconst EXAMPLES = ' + json.dumps(out, ensure_ascii=False, separators=(',', ':')).replace('],"', '],\n"') + ';\n'
     (ROOT / 'examples.js').write_text(js, encoding='utf-8')

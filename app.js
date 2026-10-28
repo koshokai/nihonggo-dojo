@@ -18,15 +18,34 @@ const exList = w => {
   const own = (typeof EXAMPLES !== 'undefined' && EXAMPLES[w]) || [];
   if (own.length >= 3 || typeof sentencesWith !== 'function' || w.length < 2 && !/[\u4e00-\u9fff]/.test(w)) return own;
   const seen = new Set(own.map(x => x[0]));
-  const more = sentencesWith(w.length > 1 && /[るうくすつぬむぶぐい]$/.test(w) ? w.slice(0, -1) : w, 5).filter(x => !seen.has(x.jp)).map(x => [x.jp, x.kana, x.zh]);
+  const more = sentencesWith(w.length > 1 && /[るうくすつぬむぶぐい]$/.test(w) ? w.slice(0, -1) : w, 5).filter(x => !seen.has(x.jp)).map(x => [x.jp, x.kana, x.zh, x.furi]);
   return own.concat(more).slice(0, 5);
 };
-function markWord(jp, w) {
+function markWord(jp, w, furi) {
   const stem = w.length > 1 && /[るうくすつぬむぶぐい]$/.test(w) ? w.slice(0, -1) : w.replace(/する$/, '');
   const i = jp.indexOf(stem);
+  if (furi) return furiHTML(jp, furi, i, i < 0 ? -1 : i + stem.length);
   return i < 0 ? esc(jp) : esc(jp.slice(0, i)) + '<mark>' + esc(stem) + '</mark>' + esc(jp.slice(i + stem.length));
 }
-const exHTML = (w, n = 5) => exList(w).slice(0, n).map(([jp, kana, zh]) => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp" lang="ja">${markWord(jp, w)}</div><div class="small muted">${esc(zh)}</div></div>${speakBtn(kana, '朗读例句')}</div>`).join('');
+// 汉字头上标假名：furi 是「起点.长度读音,…」（tools/furigana.py 生成）；[a, b) 范围内的字加 <mark>
+function furiHTML(jp, furi, a = -1, b = -1) {
+  const notes = (furi || '').split(',').map(x => x.match(/^(\d+)\.(\d+)(.*)$/)).filter(Boolean).map(m => ({ s: +m[1], e: +m[1] + +m[2], r: m[3] }));
+  const units = [];
+  for (let i = 0, k = 0; i < jp.length;) {
+    const n = notes[k];
+    if (n && n.s === i) { units.push({ s: i, e: n.e, html: `<ruby>${esc(jp.slice(i, n.e))}<rt>${esc(n.r)}</rt></ruby>` }); i = n.e; k++; }
+    else { units.push({ s: i, e: i + 1, html: esc(jp[i]) }); i++; }
+  }
+  let out = '', open = false;
+  for (const u of units) {
+    const m = a >= 0 && u.s < b && u.e > a;
+    if (m && !open) { out += '<mark>'; open = true; }
+    if (!m && open) { out += '</mark>'; open = false; }
+    out += u.html;
+  }
+  return out + (open ? '</mark>' : '');
+}
+const exHTML = (w, n = 5) => exList(w).slice(0, n).map(([jp, kana, zh, furi]) => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp furi" lang="ja">${markWord(jp, w, furi)}</div><div class="small muted">${esc(zh)}</div></div>${speakBtn(kana, '朗读例句')}</div>`).join('');
 
 /* ---------- 数据 ---------- */
 const VOCAB = {}, KANJI = {}, GRAM = {}, ITEMS = {};
@@ -45,7 +64,7 @@ for (const L of LEVELS) {
   // 每个句型 3–5 句例句：eg = [{s: 带 [填空] 的句子, kana, t: 译文, frag, full, blank}]
   GRAM[L] = GRAMMAR_DATA[L].map(g => ({
     id: `g|${L}|${g.p}`, type: 'g', L, p: g.p, m: g.m, how: g.how, ex: g.ex,
-    eg: g.eg.map(([s, kana, t]) => ({ s, kana, t, frag: s.match(/\[(.+?)\]/)[1], full: s.replace(/[[\]]/g, ''), blank: s.replace(/\[.+?\]/, '＿＿＿') }))
+    eg: g.eg.map(([s, kana, t, furi]) => ({ s, kana, t, furi, at: s.indexOf('['), frag: s.match(/\[(.+?)\]/)[1], full: s.replace(/[[\]]/g, ''), blank: s.replace(/\[.+?\]/, '＿＿＿') }))
   }));
   [...VOCAB[L], ...KANJI[L], ...GRAM[L]].forEach(it => { ITEMS[it.id] = it; });
 }
@@ -578,10 +597,10 @@ function qGrammar(g, e) {
   const ok = x => !own.has(x) && !g.ex.includes(x);
   let pool = GRAM[g.L].filter(x => x !== g).map(x => sample(x.eg, 1)[0].frag).filter(ok);
   if (pool.length < 3) pool = pool.concat(LEVELS.flatMap(L => GRAM[L]).filter(x => x !== g).map(x => x.eg[0].frag).filter(ok));
-  const sent = esc(e.blank).replace('＿＿＿', '<span class="blank">　？　</span>');
+  const sent = '<span class="furi">' + furiHTML(e.full, e.furi, e.at, e.at + e.frag.length).replace(/<mark>.*?<\/mark>/, '<span class="blank">　？　</span>') + '</span>';
   return makeQ(g, 'grammar', distract(e.frag, pool), e.frag, {
     prompt: `<div class="eyebrow">选择填入空白处的内容</div><div class="q-sent" lang="ja">${sent}</div>`, optLang: 'ja', say: e.kana,
-    explain: `<b lang="ja">${esc(g.p)}</b>：${esc(g.m)}<br><span lang="ja">${esc(e.full)}</span><br><span class="muted">${esc(e.t)}</span>`
+    explain: `<b lang="ja">${esc(g.p)}</b>：${esc(g.m)}<br><span lang="ja" class="furi">${furiHTML(e.full, e.furi)}</span><br><span class="muted">${esc(e.t)}</span>`
   });
 }
 function qKana([kana, ro], reverse, pool) {
@@ -1122,7 +1141,7 @@ function viewGrammar() {
     <div class="row"><button class="btn pri" type="button" data-quiz>语法填空 8 题</button><span class="small muted">本级 ${GRAM[L].length} 个句型，每个 4 句例句，点开看接续和例句</span></div>
     <div style="display:grid;gap:8px">${GRAM[L].map(g => `<details class="gp"><summary><span class="pat" lang="ja">${esc(g.p)}</span><span class="muted">${esc(g.m)}</span></summary>
       <div class="gp-body"><div><span class="small muted">接续</span>　${esc(g.how)}</div>
-      ${g.eg.map(e => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp" lang="ja">${esc(e.s).replace(/\[(.+?)\]/, '<mark>$1</mark>')}</div><div class="small muted">${esc(e.t)}</div></div>${speakBtn(e.kana)}</div>`).join('')}</div></details>`).join('')}</div>
+      ${g.eg.map(e => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp furi" lang="ja">${furiHTML(e.full, e.furi, e.at, e.at + e.frag.length)}</div><div class="small muted">${esc(e.t)}</div></div>${speakBtn(e.kana)}</div>`).join('')}</div></details>`).join('')}</div>
   </section>`);
   bindLevel(p);
   p.querySelector('[data-quiz]').onclick = () => grammarQuiz(L, render);

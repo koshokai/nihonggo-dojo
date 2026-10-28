@@ -9,6 +9,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from build_examples import reading  # noqa: E402
+from furigana import furi  # noqa: E402  头上标假名
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LEVELS = ['N5', 'N4', 'N3', 'N2', 'N1']
@@ -37,7 +38,8 @@ def main():
             jp, zh = [x.strip() for x in line.split('|', 1)]
             if not re.search(r'\[.+?\]', jp):
                 sys.exit(f'{src.name}:{n} 例句缺少 [填空]：{jp}')
-            cur['eg'].append([jp, reading(jp.replace('[', '').replace(']', '')), zh])
+            full = jp.replace('[', '').replace(']', '')
+            cur['eg'].append([jp, reading(full), zh] + ([f] if (f := furi(full)) else []))
         for it in items:
             if len(it['eg']) < 3:
                 sys.exit(f'{L} {it["p"]}：例句少于 3 句')
