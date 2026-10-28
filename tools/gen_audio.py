@@ -239,6 +239,8 @@ def main():
         return probe(a.engine)
     if a.mode == 'listen':
         return listen(a.engine, min(a.commit_every, 40) if a.commit_every else 0)
+    if a.speaker is None and a.mode == 'anime' and (OUT / 'voice.json').exists():
+        a.speaker = json.loads((OUT / 'voice.json').read_text(encoding='utf-8'))['speaker']   # 和单词、今日一句用同一个声音
     if a.speaker is None:
         sys.exit('--speaker is required')
     if a.mode == 'anime':
