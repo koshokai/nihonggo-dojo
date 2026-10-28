@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>推送密钥生成</title>
+<style>
+body { font: 15px/1.6 system-ui, sans-serif; max-width: 720px; margin: 0 auto; padding: 16px; background: #FAF7F4; color: #2A2226; }
+@media (prefers-color-scheme: dark) { body { background: #1B1619; color: #F1E9ED; } }
+textarea { width: 100%; font: 13px/1.4 ui-monospace, monospace; padding: 8px; border-radius: 8px; border: 1px solid #ccc; background: transparent; color: inherit; }
+button { font: inherit; padding: 6px 16px; border-radius: 999px; border: 0; background: #D9578A; color: #fff; cursor: pointer; }
+.warn { color: #C8463A; }
+</style>
+</head>
+<body>
+<h1>推送密钥生成</h1>
+<p>密钥用你浏览器自带的加密功能在本机生成，<b>不会发送到任何地方</b>。生成后按 docs/SUPABASE_SETUP.md 第 9 节填写。</p>
+<p><button id="go">生成</button></p>
+<div id="out" hidden>
+  <h3>公钥（填进 config.js 的 vapid，也填进 Supabase Secret <code>VAPID_PUBLIC</code>）</h3>
+  <textarea id="pub" rows="3" readonly></textarea>
+  <h3 class="warn">私钥（只填进 Supabase Secret <code>VAPID_PRIVATE</code>，不要发给任何人）</h3>
+  <textarea id="priv" rows="2" readonly></textarea>
+  <h3 class="warn">定时口令（Supabase Secret <code>CRON_SECRET</code> 和 GitHub Secret <code>NOTIFY_CRON_SECRET</code> 填同一个）</h3>
+  <textarea id="cron" rows="2" readonly></textarea>
+  <p>关掉这个页面后密钥就没了；全部填好之前先别关。</p>
+</div>
+<script>
+const b64u = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+document.getElementById('go').onclick = async () => {
+  const k = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+  const raw = new Uint8Array(await crypto.subtle.exportKey('raw', k.publicKey));   // 65 字节未压缩公钥
+  const jwk = await crypto.subtle.exportKey('jwk', k.privateKey);
+  document.getElementById('pub').value = b64u(raw);
+  document.getElementById('priv').value = jwk.d;
+  document.getElementById('cron').value = b64u(crypto.getRandomValues(new Uint8Array(24)));
+  document.getElementById('out').hidden = false;
+};
+</script>
+</body>
+</html>

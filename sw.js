@@ -2,11 +2,11 @@
 // 页面和脚本：有网时先取最新版（最多等 3 秒），拿到就更新缓存；没网或太慢才用缓存。所以更新后打开就是新版本。
 // 发音 MP3：文件名是内容哈希，不会变，缓存了就一直用（cache-first）。
 // 账号、同步等跨域请求（Supabase、jsDelivr）不经过缓存。
-const VERSION = 'v15';
+const VERSION = 'v16';
 const SHELL = `shell-${VERSION}`, AUDIO = 'audio-v2';
 const CORE = ['./', 'index.html', 'style.css', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon.svg',
   'vocab.js', 'kanji.js', 'grammar.js', 'data.js', 'daily.js', 'jlpt.js', 'game.js', 'dict.js', 'reading.js',
-  'scenes.js', 'read.js', 'business.js', 'biz.js', 'shadow.js', 'listen.js', 'listening.js', 'lang.js', 'lang2.js', 'stats.js', 'lang-ko.js', 'lang-en.js', 'config.js', 'cloud.js', 'app.js', 'privacy.html', 'share-qr.png', 'vendor/supabase.js'];
+  'scenes.js', 'read.js', 'business.js', 'biz.js', 'shadow.js', 'listen.js', 'listening.js', 'lang.js', 'lang2.js', 'stats.js', 'lang-ko.js', 'lang-en.js', 'config.js', 'cloud.js', 'inbox.js', 'app.js', 'privacy.html', 'share-qr.png', 'vendor/supabase.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(SHELL).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -43,5 +43,23 @@ self.addEventListener('fetch', e => {
     const hit = await c.match(key, { ignoreSearch: true });
     if (hit) { e.waitUntil(fromNet.catch(() => {})); return hit; }
     return fromNet.catch(() => Response.error());
+  }));
+});
+
+// 学习提醒推送（Edge Function notify 发送），点开后打开对应页面
+self.addEventListener('push', e => {
+  let m = {};
+  try { m = e.data.json(); } catch (err) { m = { title: '日语道场', body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(m.title || '日语道场', {
+    body: m.body || '', icon: 'icon-192.png', badge: 'icon-192.png', tag: m.tag || 'dojo', data: { url: m.url || '#home' }
+  }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = new URL(e.notification.data && e.notification.data.url || '#home', self.registration.scope).href;
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+    const w = list.find(c => c.url.startsWith(self.registration.scope));
+    if (w) { w.navigate(url).catch(() => {}); return w.focus(); }
+    return self.clients.openWindow(url);
   }));
 });

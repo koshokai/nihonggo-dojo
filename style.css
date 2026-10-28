@@ -316,6 +316,10 @@ textarea { width: 100%; min-height: 90px; font: .8rem/1.4 ui-monospace, monospac
 .lvl-badge { font-family: var(--f-round); font-weight: 700; font-size: 1.05rem; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--ai-soft); color: var(--ai); margin-bottom: 4px; }
 .lvl-opt.on .lvl-badge { background: var(--ai); color: var(--ai-ink); }
 .banner { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 18px; border-radius: var(--r); background: color-mix(in srgb, var(--gold) 22%, var(--surface)); border: 1.5px dashed var(--gold); }
+.msg-card { border-style: solid; background: color-mix(in srgb, var(--ai) 10%, var(--surface)); border-color: color-mix(in srgb, var(--ai) 45%, transparent); }
+.msg-card > div:first-child { flex: 1 1 260px; }
+.msg-card.read { opacity: .75; background: var(--surface); }
+.msg-list { display: grid; gap: 10px; margin-top: 10px; }
 .banner > div:first-child { flex: 1 1 260px; min-width: 0; }
 .feedback { display: flex; gap: 10px; align-items: center; }
 .fb-t { display: grid; gap: 4px; min-width: 0; }

@@ -534,11 +534,13 @@ document.addEventListener('click', e => {
 // 一行问候 + 一行进度（连续天数、今天的经验、学习量），代替原来的大卡片和一排数字方块
 function homeHi(title, text, tx, streakN, extra) {
   const pct = Math.min(100, Math.round(tx / S.goal * 100));
-  return h(`<section class="hi-line">
+  const el = h(`<section class="hi-line">
     <div class="hi-top">${neko('happy', 'mini')}<div><b>${esc(title)}</b><div class="small muted">${esc(text)}</div></div></div>
     <div class="hi-stats small"><span>🔥 连续 <b>${streakN}</b> 天</span><span>今天 <b>${tx}</b>/${S.goal} 经验</span><span class="muted">${esc(extra)}</span></div>
     <div class="bar hi-bar"><i style="width:${pct}%"></i></div>
   </section>`);
+  if (typeof inboxFill === 'function') setTimeout(() => inboxFill(el), 0);   // 未读消息插在问候下面
+  return el;
 }
 // 今日任务面板：[{ic, t, d, done, go}]
 function taskPanel(title, tasks, note = '') {

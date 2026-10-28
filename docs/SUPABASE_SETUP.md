@@ -204,3 +204,143 @@ select date_trunc('week', d0)::date as cohort, count(*) as new_devices,
     select 1 from public.daily_usage u where u.anon_id = first.anon_id and u.day between d0 + 7 and d0 + 13)) / count(*), 1) as retention_7d
 from first group by 1 order by 1 desc;
 ```
+
+## 9. 后台发消息和学习提醒（可选）
+
+做好以后：
+
+- 打开 `https://koshokai.github.io/nihonggo-dojo/admin.html`（只有你能进），能看到每个用户最后哪天学的、连续几天、今天学没学、有几张卡片待复习。
+- 按「今天还没学」「7 天以上没来」等分组勾选用户，点模板（今日任务没做、保住连续打卡、好久不见、征求建议……），改两个字就能发。`{due}` `{streak}` 这些会按每个人自己的进度自动填。
+- 消息出现在对方网站首页最上面和「我的 → 消息」，带一个跳转按钮和几个快捷回复按钮。对方点的回复会出现在后台最下面。
+- 配置了推送（第 9.3–9.5 步）以后：开了「学习提醒」的用户手机上也会收到通知；而且每小时自动检查一次，到了用户自己选的提醒时间、当天还没学的人会自动收到一条提醒（每天最多一条，3 天、7 天、21 天没来各提醒一次，之后不再自动打扰）。
+
+### 9.1 建表（必须）
+
+在 **SQL Editor** 运行：
+
+```sql
+-- 管理员名单：只能在 SQL Editor 里改，网页读不到
+create table public.admins (user_id uuid primary key references auth.users(id) on delete cascade);
+alter table public.admins enable row level security;
+create or replace function public.is_admin() returns boolean
+language sql stable security definer set search_path = '' as $$
+  select exists (select 1 from public.admins where user_id = auth.uid());
+$$;
+
+-- 站内消息
+create table public.messages (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  kind text not null default 'manual' check (kind in ('manual', 'auto')),
+  title text not null check (char_length(title) between 1 and 80),
+  body text not null check (char_length(body) between 1 and 600),
+  action text check (char_length(action) <= 300),
+  action_label text check (char_length(action_label) <= 20),
+  replies jsonb not null default '[]',
+  read_at timestamptz,
+  reply text check (char_length(reply) <= 200),
+  pushed boolean not null default false
+);
+create index on public.messages (user_id, created_at desc);
+alter table public.messages enable row level security;
+create policy "read own messages" on public.messages for select using (auth.uid() = user_id or public.is_admin());
+
+-- 用户只能把自己的消息标成已读、点快捷回复
+create or replace function public.mark_message(mid bigint, rep text default null) returns void
+language sql security definer set search_path = '' as $$
+  update public.messages set read_at = coalesce(read_at, now()), reply = coalesce(left(rep, 200), reply)
+  where id = mid and user_id = auth.uid();
+$$;
+revoke all on function public.mark_message(bigint, text) from public, anon;
+grant execute on function public.mark_message(bigint, text) to authenticated;
+
+-- 推送订阅（每台设备一行）
+create table public.push_subs (
+  endpoint text primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  p256dh text not null,
+  auth text not null,
+  tz text not null default 'Asia/Tokyo',
+  hour int not null default 21 check (hour between 0 and 23),
+  created_at timestamptz not null default now()
+);
+alter table public.push_subs enable row level security;
+create policy "read own subs" on public.push_subs for select using (auth.uid() = user_id);
+create policy "delete own subs" on public.push_subs for delete using (auth.uid() = user_id);
+create or replace function public.save_push_sub(ep text, p256dh text, auth_key text, tzname text, hr int) returns void
+language sql security definer set search_path = '' as $$
+  insert into public.push_subs (endpoint, user_id, p256dh, auth, tz, hour)
+  values (left(ep, 1000), auth.uid(), left(p256dh, 200), left(auth_key, 100), left(tzname, 60), greatest(0, least(23, hr)))
+  on conflict (endpoint) do update set user_id = auth.uid(), p256dh = excluded.p256dh, auth = excluded.auth, tz = excluded.tz, hour = excluded.hour;
+$$;
+revoke all on function public.save_push_sub(text, text, text, text, int) from public, anon;
+grant execute on function public.save_push_sub(text, text, text, text, int) to authenticated;
+
+-- 后台用：用户列表（只有管理员能调用）
+create or replace function public.admin_users()
+returns table (user_id uuid, email text, created_at timestamptz, updated_at timestamptz, xp int, track text, days jsonb, due int, subs int, unread int)
+language plpgsql stable security definer set search_path = '' as $$
+begin
+  if not public.is_admin() then raise exception 'not admin'; end if;
+  return query
+  select u.id, u.email::text, u.created_at, p.updated_at, coalesce(p.xp, 0), coalesce(p.data->>'track', 'ja'), coalesce(p.data->'days', '{}'::jsonb),
+    (select count(*)::int from jsonb_each(coalesce(p.data->'srs', '{}'::jsonb)) s
+       where jsonb_typeof(s.value->'due') = 'number' and (s.value->>'due')::numeric <= extract(epoch from now()) * 1000),
+    (select count(*)::int from public.push_subs ps where ps.user_id = u.id),
+    (select count(*)::int from public.messages m where m.user_id = u.id and m.read_at is null)
+  from auth.users u left join public.progress p on p.user_id = u.id
+  order by p.updated_at desc nulls last;
+end; $$;
+revoke all on function public.admin_users() from public, anon;
+grant execute on function public.admin_users() to authenticated;
+
+-- 后台用：发消息（只有管理员能调用）
+create or replace function public.admin_send(msgs jsonb) returns setof bigint
+language plpgsql security definer set search_path = '' as $$
+begin
+  if not public.is_admin() then raise exception 'not admin'; end if;
+  return query
+  insert into public.messages (user_id, title, body, action, action_label, replies)
+  select (m->>'user_id')::uuid, m->>'title', m->>'body', nullif(m->>'action', ''), nullif(m->>'action_label', ''), coalesce(m->'replies', '[]'::jsonb)
+  from jsonb_array_elements(msgs) m
+  returning id;
+end; $$;
+revoke all on function public.admin_send(jsonb) from public, anon;
+grant execute on function public.admin_send(jsonb) to authenticated;
+
+-- 管理员可以在后台看意见反馈
+create policy "admin reads feedback" on public.feedback for select using (public.is_admin());
+```
+
+### 9.2 把自己设成管理员（必须）
+
+同样在 SQL Editor 运行（把邮箱换成你登录网站用的邮箱）：
+
+```sql
+insert into public.admins select id from auth.users where email = '你的邮箱';
+```
+
+到这里站内消息就能用了：打开 admin.html 试着给自己发一条，回到网站首页就能看到。
+
+### 9.3 生成推送密钥（推送才需要）
+
+1. 用电脑打开 `https://koshokai.github.io/nihonggo-dojo/tools/vapid.html`，点「生成」。密钥在你自己的浏览器里生成，不会发到任何地方。
+2. **公钥** 填到 `config.js` 的 `vapid: ''` 里（公钥本来就是公开的，也可以直接发给我帮你填）。
+3. **私钥** 和 **定时口令** 只填到下面 9.4、9.5 的后台里，不要发给任何人，也不要放进代码。
+
+### 9.4 部署推送函数（推送才需要）
+
+1. Supabase 左侧菜单 **Edge Functions** → **Deploy a new function** → **Via Editor**。
+2. 函数名填 `notify`，把仓库里 `supabase/functions/notify/index.ts` 的全部内容粘贴进去，点 **Deploy**。
+3. 部署好以后打开这个函数的 **Details**（或 Settings），把 **Verify JWT / Enforce JWT verification** 关掉（函数里自己检查管理员身份和定时口令），保存。
+4. **Edge Functions → Secrets**（或 Project Settings → Edge Functions → Secrets）添加 4 个：
+   - `VAPID_PUBLIC`：9.3 的公钥
+   - `VAPID_PRIVATE`：9.3 的私钥
+   - `VAPID_SUBJECT`：`mailto:你的邮箱`
+   - `CRON_SECRET`：9.3 生成的定时口令
+
+### 9.5 每小时自动提醒（推送才需要）
+
+GitHub 仓库 → **Settings → Secrets and variables → Actions → New repository secret**：名字 `NOTIFY_CRON_SECRET`，值和上面的 `CRON_SECRET` 一样。
+之后 `.github/workflows/notify.yml` 每小时会调用一次 notify 函数。没填这个 Secret 时它什么都不做。

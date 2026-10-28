@@ -1334,7 +1334,7 @@ function viewMe() {
     <div class="row between"><span>帮助改进日语道场</span><div class="seg">${opt([[0, '开'], [1, '关']], S.noStats ? 1 : 0, 'data-nostats')}</div></div>
     <p class="small muted">每天最多发送一次「这台设备今天打开过、在学哪种语言」，用一个和账号无关的随机编号，不包含学习内容、邮箱或账号。只用来统计每天有多少人在学、一周后还有多少人在用。</p></section>`);
   st.querySelectorAll('[data-nostats]').forEach(b => { b.onclick = () => { S.noStats = b.dataset.nostats === '1'; save(); render(); }; });
-  main.append(...[weeklyPanel(), p, installPanel(), acc, voiceP, bk, st, about].filter(Boolean));
+  main.append(...[weeklyPanel(), typeof inboxPanel === 'function' ? inboxPanel() : null, p, installPanel(), acc, voiceP, bk, st, about].filter(Boolean));
 }
 
 /* ---------- 安装到手机（PWA）---------- */
