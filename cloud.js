@@ -66,6 +66,7 @@ async function cloudPush() {
     S.syncUser = sbUser.id; S.syncedAt = now.getTime();
     try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* 忽略 */ }
     syncNote = '已同步 ' + now.toLocaleTimeString();
+    if (typeof lbSync === 'function') lbSync();   // 参加了排行榜的话顺便更新本周经验
   } catch (e) {
     syncNote = '同步失败，稍后会再试：' + (e.message || e);
   } finally { syncBusy = false; }

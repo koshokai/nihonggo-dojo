@@ -344,3 +344,32 @@ insert into public.admins select id from auth.users where email = '你的邮箱'
 
 GitHub 仓库 → **Settings → Secrets and variables → Actions → New repository secret**：名字 `NOTIFY_CRON_SECRET`，值和上面的 `CRON_SECRET` 一样。
 之后 `.github/workflows/notify.yml` 每小时会调用一次 notify 函数。没填这个 Secret 时它什么都不做。
+
+## 11. 本周排行榜（可选）
+
+用户在「我的 → 本周排行」自愿参加，用自己起的昵称显示本周经验。没运行这段 SQL 时，排行榜不显示。
+
+在 **SQL Editor** 运行：
+
+```sql
+create table public.leaderboard (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  nickname text not null check (char_length(nickname) between 1 and 16),
+  week date not null,
+  xp int not null default 0 check (xp between 0 and 50000),
+  updated_at timestamptz not null default now()
+);
+alter table public.leaderboard enable row level security;
+create policy "own row insert" on public.leaderboard for insert with check (auth.uid() = user_id);
+create policy "own row update" on public.leaderboard for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "own row delete" on public.leaderboard for delete using (auth.uid() = user_id);
+
+-- 榜单：只返回昵称和经验，不暴露用户编号
+create or replace function public.leaderboard_top(wk date) returns table (nickname text, xp int, me boolean)
+language sql stable security definer set search_path = '' as $$
+  select nickname, xp, user_id = auth.uid() from public.leaderboard
+  where week = wk order by xp desc, updated_at limit 30;
+$$;
+revoke all on function public.leaderboard_top(date) from public, anon;
+grant execute on function public.leaderboard_top(date) to authenticated;
+```
