@@ -103,6 +103,7 @@ function l2Article(tr, a) {
     <p class="small muted">点一句话：朗读并显示中文；🎙 跟读打分。</p>
     <div class="ra-text">${a.p.map(para => `<p>${para.map(([s, zh]) => `<span class="ra-s" data-i="${idx++}" tabindex="0" role="button"><span class="ra-jp" lang="${tr}">${esc(s)}</span> ${shadowBtn(s, '', zh, tr)}<span class="ra-zh">${esc(zh)}</span></span>`).join(' ')}</p>`).join('')}</div>
     <div class="row between"><h3>生词</h3><button type="button" class="btn small" data-addall>全部加入闪卡</button></div><div class="list-wrap"><table class="list"><tbody>${a.w.map(([w, pr, zh]) => `<tr><td style="width:40px">${sayBtn(w, T.tts)}</td><td><b lang="${tr}">${esc(w)}</b><div class="small muted">${esc(pr)}</div></td><td>${esc(zh)}</td></tr>`).join('')}</tbody></table></div>
+    <p class="small muted">${reportBtn(`阅读《${a.title}》`, a.zh)} 发现翻译或内容有误？点小旗子告诉我们。</p>
     <div class="row"><button class="btn pri" type="button" data-quiz>读后小测验（${a.q.length} 题）</button></div>
   </article>`);
   const text = p.querySelector('.ra-text');

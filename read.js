@@ -184,6 +184,7 @@ function readArticle(a) {
     <div class="ra-text">${a.p.map(para => `<p>${para.map(([jp, kana, zh, toks]) => `<span class="ra-s" data-i="${idx++}" tabindex="0" role="button"><span class="ra-jp" lang="ja">${tokHTML(toks, keyset)}</span><span class="ra-kana" lang="ja">${esc(kana)}</span><span class="ra-zh">${esc(zh)}</span></span>`).join('')}</p>`).join('')}</div>
     <div class="row between"><h3>生词</h3><button type="button" class="btn small" data-addall>全部加入单词卡</button></div>
     <div class="ra-words">${a.w.map(([w, r, zh]) => { const v = vocabOf(w); return `<div class="ra-word"><span lang="ja" class="rw-w">${esc(w)}</span><span lang="ja" class="rw-r">${esc(r)}</span>${speakBtn(r)}<span class="rw-m">${esc(zh)}</span>${v && v.q ? `<button type="button" class="chip-btn" data-add="${esc(v.id)}">${S.srs[v.id] ? '已在单词卡' : '+ 单词卡'}</button>` : ''}</div>`; }).join('')}</div>
+    <p class="small muted">${reportBtn(`阅读《${a.title}》`, a.zh)} 发现读音、翻译或内容有误？点小旗子告诉我们。</p>
     <h3>读后小测验</h3>
     <div class="ra-quiz"></div>
   </article>`);

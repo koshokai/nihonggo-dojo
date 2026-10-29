@@ -45,7 +45,7 @@ function furiHTML(jp, furi, a = -1, b = -1) {
   }
   return out + (open ? '</mark>' : '');
 }
-const exHTML = (w, n = 5) => exList(w).slice(0, n).map(([jp, kana, zh, furi]) => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp furi" lang="ja">${markWord(jp, w, furi)}</div><div class="small muted">${esc(zh)}</div></div>${speakBtn(kana, '朗读例句')}</div>`).join('');
+const exHTML = (w, n = 5) => exList(w).slice(0, n).map(([jp, kana, zh, furi]) => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp furi" lang="ja">${markWord(jp, w, furi)}</div><div class="small muted">${esc(zh)}</div></div>${speakBtn(kana, '朗读例句')}${reportBtn(jp, zh)}</div>`).join('');
 
 /* ---------- 数据 ---------- */
 const VOCAB = {}, KANJI = {}, GRAM = {}, ITEMS = {};

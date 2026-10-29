@@ -766,3 +766,5 @@ body.gated { overflow: hidden; }
 .link-btn { background: none; border: 0; padding: 0; font: inherit; color: var(--ai); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 .tr-ref-sheet { max-height: 75vh; overflow-y: auto; }
 .tr-ref-sheet .ws-word { font-size: 1.3rem; }
+.report-btn { background: none; border: 0; color: var(--muted); opacity: .55; cursor: pointer; font-size: .95rem; padding: 2px 6px; line-height: 1; }
+.report-btn:hover, .report-btn:focus-visible { opacity: 1; color: var(--ai); }

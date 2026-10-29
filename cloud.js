@@ -166,6 +166,12 @@ function feedbackSheet(kind = 'idea', context = '') {
   };
   setTimeout(() => sh.querySelector('textarea').focus(), 50);
 }
+// 句子旁的小旗子：一键报告内容错误（读音、翻译、例句不自然……），带上原句，进后台「用户的回复和反馈」
+const reportBtn = (text, zh) => cloudOn() ? `<button class="report-btn" type="button" data-report="${esc(text)}" data-report-zh="${esc(zh || '')}" aria-label="报告这句有错误" title="这句有错误？告诉我们">⚑</button>` : '';
+document.addEventListener('click', e => {
+  const r = e.target.closest('[data-report]');
+  if (r) { e.preventDefault(); e.stopPropagation(); feedbackSheet('content', `这句有问题：${r.dataset.report}${r.dataset.reportZh ? '（' + r.dataset.reportZh + '）' : ''}\n哪里不对：`); }
+}, true);
 document.addEventListener('click', e => {
   const a = e.target.closest('[data-feedback-link]');
   if (a) { e.preventDefault(); e.stopPropagation(); feedbackSheet(); }

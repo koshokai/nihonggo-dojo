@@ -112,7 +112,7 @@ function trSession(items, dir, tr = 'ja') {
       ans.innerHTML = `<div class="small muted">参考答案</div>
         <div class="tr-ref ${zj && ja ? 'furi' : ''}" ${zj ? `lang="${tr}"` : ''}>${zj && ja ? furiHTML(x.jp, x.furi) : esc(ref)}${zj ? say(x.jp) + shadowBtn(x.jp, '', x.zh, ja ? undefined : tr) : ''}</div>
         ${mine ? `<div class="small">和参考答案的相似度约 <b>${trSimilar(mine, ref)}%</b>（意思对就行，说法不同也可以算会）</div>` : ''}
-        <div class="small muted">出处：${x.ref ? `<button type="button" class="link-btn" data-ref>${esc(x.src)} ›</button>` : esc(x.src)}</div>
+        <div class="small muted">${reportBtn(x.jp, x.zh)} 出处：${x.ref ? `<button type="button" class="link-btn" data-ref>${esc(x.src)} ›</button>` : esc(x.src)}</div>
         <div class="row tr-grade"><button class="btn" type="button" data-g="0">不会</button><button class="btn" type="button" data-g="1">差不多</button><button class="btn pri" type="button" data-g="2">会了</button></div>`;
       box.querySelector('[data-show]').parentElement.remove();
       const rb = ans.querySelector('[data-ref]');

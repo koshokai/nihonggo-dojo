@@ -42,7 +42,7 @@ function animeWork(w, list) {
     ${w.place ? `<p class="small muted">${w.ph ? '📍 ' : ''}${esc(w.place)}</p>` : ''}
     <label class="small"><input type="checkbox" data-kana checked> 显示读音</label>
     <div class="an-lines">${w.lines.map((l, i) => `<section class="an-line">
-      <div class="an-q"><span class="an-quote furi" lang="ja">「${furiHTML(l.jp, l.furi)}」</span>${speakBtn(l.jp)}${shadowBtn(l.jp, l.kana, l.zh)}</div>
+      <div class="an-q"><span class="an-quote furi" lang="ja">「${furiHTML(l.jp, l.furi)}」</span>${speakBtn(l.jp)}${shadowBtn(l.jp, l.kana, l.zh)}${reportBtn(l.jp, l.zh)}</div>
       ${l.furi ? '' : `<div class="an-kana" lang="ja">${esc(l.kana)}</div>`}
       <div class="an-zh">${esc(l.zh)}</div>
       <div class="small muted">—— <span lang="ja">${esc(l.who || '')}</span>${l.lv ? ` <span class="tag lv">${esc(l.lv)}</span>` : ''}${l.scene ? ` · ${esc(l.scene)}` : ''}</div>
