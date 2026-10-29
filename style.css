@@ -784,3 +784,4 @@ body.gated { overflow: hidden; }
 .pitch .dn { border-right: 2px solid var(--ai); }
 .pitch .up { border-left: 2px solid var(--ai); }
 .pitch-n { font-size: .6em; color: var(--muted); margin-left: 3px; }
+.share-img { width: 100%; max-width: 360px; border-radius: 14px; margin: 10px 0; box-shadow: 0 4px 18px rgba(0,0,0,.08); }

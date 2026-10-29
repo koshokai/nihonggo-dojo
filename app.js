@@ -1371,7 +1371,7 @@ function viewMe() {
   const ps = bk.querySelector('[data-persist]');
   requestPersist().then(ok => { ps.innerHTML = ok ? '<span class="tag done">已开启</span> 浏览器已同意持久保存，空间不足时也不会自动清理这里的数据。' : '<span class="tag">未开启</span> 这个浏览器没有同意持久保存，建议添加到主屏幕并定期备份。'; });
   const acc = accountPanel();
-  main.append(...[weeklyPanel(), typeof inboxPanel === 'function' ? inboxPanel() : null, p, installPanel(), acc, voiceP, bk].filter(Boolean));
+  main.append(...[weeklyPanel(), typeof sharePanel === 'function' ? sharePanel() : null, typeof inboxPanel === 'function' ? inboxPanel() : null, p, installPanel(), acc, voiceP, bk].filter(Boolean));
 }
 
 // 内容来源和授权（只从页脚的小链接进入；VOICEVOX 和 CC BY / CC BY-SA 的素材要求注明出处）
