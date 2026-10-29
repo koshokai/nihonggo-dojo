@@ -45,7 +45,7 @@ function furiHTML(jp, furi, a = -1, b = -1) {
   }
   return out + (open ? '</mark>' : '');
 }
-const exHTML = (w, n = 5) => exList(w).slice(0, n).map(([jp, kana, zh, furi]) => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp furi" lang="ja">${markWord(jp, w, furi)}</div><div class="small muted">${esc(zh)}</div></div>${speakBtn(kana, '朗读例句')}${reportBtn(jp, zh)}</div>`).join('');
+const exHTML = (w, n = 5) => exList(w).slice(0, n).map(([jp, kana, zh, furi, src]) => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp furi" lang="ja">${markWord(jp, w, furi)}</div><div class="small muted">${esc(zh)}${src === 'T' ? ' <a class="tatoeba" href="https://tatoeba.org" target="_blank" rel="noopener" title="人工翻译例句，CC BY 2.0 FR">Tatoeba</a>' : ''}</div></div>${speakBtn(kana, '朗读例句')}${reportBtn(jp, zh)}</div>`).join('');
 
 /* ---------- 数据 ---------- */
 const VOCAB = {}, KANJI = {}, GRAM = {}, ITEMS = {};
@@ -1383,6 +1383,7 @@ function viewAbout() {
     <p class="small muted">数据来源：单词表 <a href="https://github.com/jamsinclair/open-anki-jlpt-decks" target="_blank" rel="noopener">open-anki-jlpt-decks</a>（MIT），基于 <a href="http://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller 的 JLPT 资料</a>（CC BY）；汉字 <a href="https://github.com/davidluzgouveia/kanji-data" target="_blank" rel="noopener">kanji-data</a>（MIT）与 KANJIDIC；词典英文释义 <a href="https://www.edrdg.org/jmdict/j_jmdict.html" target="_blank" rel="noopener">JMdict</a>（EDRDG，CC BY-SA 4.0）。</p>
     <p class="small muted">音声：<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>:冥鳴ひまり（<a href="https://meimeihimari.wixsite.com/himari/terms-of-use" target="_blank" rel="noopener">利用規約</a>）、VOICEVOX:玄野武宏、VOICEVOX:九州そら、VOICEVOX:春日部つむぎ、VOICEVOX:雀松朱司（听力）。</p>
     <div class="list-wrap"><table class="list"><thead><tr><th>级别</th><th>单词</th><th>汉字</th><th>语法</th></tr></thead><tbody>${counts}</tbody></table></div>
+    <p class="small muted">标着「Tatoeba」的日语例句来自 <a href="https://tatoeba.org" target="_blank" rel="noopener">Tatoeba</a>（CC BY 2.0 FR），是志愿者人工翻译的日中对照句。</p>
     <p class="small muted">汉字笔顺动画来自 <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a>（Ulrich Apel，CC BY-SA 3.0）。单词音调来自 <a href="https://github.com/mifunetoshiro/kanjium" target="_blank" rel="noopener">Kanjium</a>（CC BY-SA 4.0）：The pitch accent notation was provided by Uros O. through his free database.</p>
     <p class="small muted">阅读文章的照片来自 <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a>，均为可自由使用的授权（CC0 / 公有领域 / CC BY / CC BY-SA），每张照片下方注明作者和授权。</p>
     <h3>韩语</h3>

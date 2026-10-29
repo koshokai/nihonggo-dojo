@@ -107,7 +107,12 @@ def main():
             if f and not re.search(r'[0-9０-９〇A-Za-zＡ-Ｚａ-ｚ]', jp) and plain_reading(jp, f) != hira(re.sub(r'[\s。、，！？!?「」『』…・〜～]', '', kana)).translate(str.maketrans('わおえ', 'はをへ')):
                 kana = tts(jp, f)
                 resynced += 1
-            out.setdefault(word, []).append([jp, kana, zh] + ([f] if f else []))
+            row = [jp, kana, zh, f or '']
+            if src.name == 'examples_tatoeba.txt':
+                row.append('T')   # 人工翻译句，网页上标注来源（CC BY 2.0 FR）
+            elif not f:
+                row = row[:3]
+            out.setdefault(word, []).append(row)
     # 按级别拆成 lang/ja-ex-N5.json…（网页先加载当前级别，再在后台加载其余级别）
     # 每个单词：[日语例句, 朗读用假名, 中文翻译, 假名位置]
     level_of = {}

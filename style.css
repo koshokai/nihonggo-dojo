@@ -790,3 +790,4 @@ body.gated { overflow: hidden; }
 .lb-list li.me { border-color: var(--ai); background: var(--ai-soft); }
 .lb-rank { font-weight: 800; color: var(--ai); }
 .lb-input { flex: 1; min-width: 0; font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: inherit; }
+.tatoeba { font-size: .72rem; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 0 5px; text-decoration: none; }
