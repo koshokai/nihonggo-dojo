@@ -20,7 +20,13 @@ def load(lang, kind):
     out = None
     for f in fs:
         d = json.loads(f.read_text(encoding='utf-8'))
-        out = d if out is None else (out + d if isinstance(d, list) else out)
+        if out is None:
+            out = d
+        elif isinstance(d, list):
+            out = out + d
+        else:   # 字典（商务）：同名列表接在后面
+            for k, v in d.items():
+                out[k] = out.get(k, []) + v
     return out
 
 

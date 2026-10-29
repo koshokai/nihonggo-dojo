@@ -748,3 +748,8 @@ body.gated { overflow: hidden; }
 .furi ruby { ruby-align: center; }
 .furi rt { letter-spacing: -.03em; }
 .an-cover { font-size: 1rem; }
+/* 在线人数 */
+.chip.online { gap: 5px; }
+.chip.online .dot { width: 8px; height: 8px; border-radius: 50%; background: #2fbf71; box-shadow: 0 0 0 0 rgba(47, 191, 113, .6); animation: online-pulse 2s infinite; }
+@keyframes online-pulse { 0% { box-shadow: 0 0 0 0 rgba(47, 191, 113, .55); } 70% { box-shadow: 0 0 0 7px rgba(47, 191, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(47, 191, 113, 0); } }
+@media (prefers-reduced-motion: reduce) { .chip.online .dot { animation: none; } }
