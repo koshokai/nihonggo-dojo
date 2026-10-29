@@ -16,14 +16,14 @@ function guestLock(view, arg) {
   const sub = arg || '', tr = view === 'ko' || view === 'en' ? view : 'ja';
   const lock = (what, extra) => ({ what, tr, extra });
   if (tr === 'ja') {
-    if (['exam', 'biz', 'anime', 'trans'].includes(view)) return lock({ exam: '模拟考', biz: '商务日语', anime: '动漫·日剧名台词', trans: '翻译练习' }[view]);
+    if (['exam', 'biz', 'anime', 'trans', 'dictation'].includes(view)) return lock({ exam: '模拟考', biz: '商务日语', anime: '动漫·日剧名台词', trans: '翻译练习', dictation: '听写' }[view]);
     if (['vocab', 'kanji', 'grammar', 'conj'].includes(view) && S.level !== 'N5') return lock(`${S.level} 的内容`, { n5: true });
     if (view === 'listen') return guestDay().listen ? lock('更多听力（今天的试听题已经做过了）') : lock('完整的听力练习', { listen: true });
     if (view === 'read' && sub) return guestRead(sub, lock);
     return null;
   }
   const s = sub.split('/')[0];
-  if (['exam', 'biz', 'trans'].includes(s)) return lock({ exam: '模拟考', biz: `商务${TRACKS[tr].title}`, trans: '翻译练习' }[s]);
+  if (['exam', 'biz', 'trans', 'dictation'].includes(s)) return lock({ exam: '模拟考', biz: `商务${TRACKS[tr].title}`, trans: '翻译练习', dictation: '听写' }[s]);
   if (s === 'grammar' && l2Sel[tr + 'g'] && l2Sel[tr + 'g'] !== LV_NAMES[tr][0]) return lock(`${l2Sel[tr + 'g']}语法`, { lvReset: tr + 'g' });
   if (s === 'levels' && lvSel[tr] && lvSel[tr] !== GUEST_FIRST_LV[tr]) return lock('更高级别的词库', { lvLevels: true });
   if (s === 'listen') return guestDay().listen ? lock('更多听力（今天的试听题已经做过了）') : lock('完整的听力练习', { listen: true });
@@ -98,4 +98,4 @@ function guestBanner(anchor) {
   anchor.after(b);
 }
 // 入口方块上的小锁
-const guestLockedHref = href => isGuest() && /#((ko|en)\/)?(exam|biz|anime|trans)$/.test(href);
+const guestLockedHref = href => isGuest() && /#((ko|en)\/)?(exam|biz|anime|trans|dictation)$/.test(href);

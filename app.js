@@ -709,7 +709,7 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, study: viewStudy, ri: viewRI, ko: viewKo, en: viewEn, me: viewMe, welcome: viewWelcome, about: viewAbout, anime: viewAnime, trans: () => viewTrans('ja'), conj: viewConj };
+const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, study: viewStudy, ri: viewRI, ko: viewKo, en: viewEn, me: viewMe, welcome: viewWelcome, about: viewAbout, anime: viewAnime, trans: () => viewTrans('ja'), conj: viewConj, dictation: () => viewDictation('ja') };
 function render() {
   const [v, ...rest] = (location.hash || '#home').slice(1).split('/');
   const arg = rest.join('/');
@@ -720,7 +720,7 @@ function render() {
   clearInterval(examTimer); keyHandler = null;
   if (lsStop) lsStop();
   main.innerHTML = '';
-  if (trackOf(view) === 'ja' && ['home', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict', 'study', 'ri', 'conj', 'anime', 'trans'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
+  if (trackOf(view) === 'ja' && ['home', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict', 'study', 'ri', 'conj', 'anime', 'trans', 'dictation'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
   applyTrack(view);
   if (S.onboarded && view !== 'welcome') logUsage(document.body.dataset.track || 'ja');
   // 游客模式：没开放的内容显示注册提示（guest.js）

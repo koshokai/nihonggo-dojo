@@ -409,6 +409,7 @@ function viewLangTrack(tr, sub) {
   if (sub === 'listen') return l2Listen(tr);
   if (sub && sub.startsWith('biz')) return l2Biz(tr, sub.split('/')[1]);
   if (sub === 'trans') return viewTrans(tr);
+  if (sub === 'dictation') return viewDictation(tr);
   if (sub === 'game') return l2Game(tr);
   if (sub === 'dict') return l2Dict(tr);
   if (!langReady(tr)) return;
@@ -459,14 +460,14 @@ function trackTiles(tr, group) {
   const study = [[`#${tr}/game`, '🎮', '闯关', '每关 10 个词'], [`#${tr}/abc`, ko ? '한' : 'Aa', ko ? '字母' : '字母音标', ko ? '40 个字母 + 拼读表' : '26 个字母 + 音标'], [`#${tr}/words`, '🃏', '单词', '入门 500 词'],
     [`#${tr}/phrases`, '💬', '常用句', '150 句'], [`#${tr}/grammar`, '📐', '语法', '176 个语法点'], [`#${tr}/levels`, '📚', '分级词库', ko ? 'TOPIK 约 1.1 万词' : '中考→GRE 约 1.5 万词'],
     [`#${tr}/biz`, '💼', '商务', '场景会话、邮件、词汇'], [`#${tr}/trans`, '✍️', '翻译练习', '中外互译，自己打分']];
-  const ri = [[`#${tr}/read`, '📖', '阅读', '生活短文，配照片'], [`#${tr}/listen`, '🎧', '听力', '对话 + 题目']];
+  const ri = [[`#${tr}/read`, '📖', '阅读', '生活短文，配照片'], [`#${tr}/listen`, '🎧', '听力', '对话 + 题目'], [`#${tr}/dictation`, '✎', '听写', '听一句，写一句']];
   const exam = [[`#${tr}/exam`, '📝', '模拟考', ko ? 'TOPIK I / II' : '四级 / 六级']];
   return group === 'study' ? study : group === 'ri' ? ri : [...study, ...ri, ...exam];
 }
 const JA_TILES = {
   study: [['#game', '🎮', '闯关', '每关 10 个词'], ['#kana', 'あ', '假名', '五十音'], ['#vocab', '🃏', '单词', 'N5–N1 约 8000 词'], ['#kanji', '漢', '汉字', '2211 个'],
     ['#grammar', '📐', '语法', '176 个句型'], ['#biz', '💼', '商务', '场景、敬语、邮件'], ['#anime', '🎬', '动漫·日剧', '名台词和生活用法'], ['#trans', '✍️', '翻译练习', '中日互译，自己打分'], ['#conj', '変', '变形练习', '动词、形容词变形']],
-  ri: [['#read', '📖', '阅读', '每天上新，配照片'], ['#listen', '🎧', '听力', 'JLPT 题型']]
+  ri: [['#read', '📖', '阅读', '每天上新，配照片'], ['#listen', '🎧', '听力', 'JLPT 题型'], ['#dictation', '✎', '听写', '听一句，写一句']]
 };
 // 「学习」「阅读听力」分组页
 function hubPage(tr, group) {
