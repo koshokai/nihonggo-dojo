@@ -113,7 +113,9 @@ def items_anime():
 def items_examples(levels):
     """单词例句（按级别，逗号分隔）和全部语法例句：(网页朗读时传的假名, 原文, 假名)"""
     vocab = js_json('vocab.js', 'VOCAB_DATA = {')
-    ex = js_json('examples.js', 'EXAMPLES = {')
+    ex = {}
+    for f in sorted((ROOT / 'lang').glob('ja-ex-N*.json')):
+        ex.update(json.loads(f.read_text(encoding='utf-8')))
     out = []
     for L in levels.split(','):
         for w, *_ in vocab.get(L.strip(), []):

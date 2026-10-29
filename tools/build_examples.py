@@ -1,4 +1,4 @@
-"""把 tools/examples_*.txt 编译成 examples.js。
+"""把 tools/examples_*.txt 编译成 lang/ja-ex-N5.json … ja-ex-N1.json（按单词级别拆分）。
 
 每行格式：单词 | 日语例句 | 中文翻译
 朗读文本由形态分析（fugashi + unidic-lite）自动生成：全部转成平假名，
@@ -108,9 +108,18 @@ def main():
                 kana = tts(jp, f)
                 resynced += 1
             out.setdefault(word, []).append([jp, kana, zh] + ([f] if f else []))
-    js = '// 自动生成：python3 tools/build_examples.py（请编辑 tools/examples_*.txt）\n'
-    js += '// 每个单词：[日语例句, 朗读用假名, 中文翻译]\nconst EXAMPLES = ' + json.dumps(out, ensure_ascii=False, separators=(',', ':')).replace('],"', '],\n"') + ';\n'
-    (ROOT / 'examples.js').write_text(js, encoding='utf-8')
+    # 按级别拆成 lang/ja-ex-N5.json…（网页先加载当前级别，再在后台加载其余级别）
+    # 每个单词：[日语例句, 朗读用假名, 中文翻译, 假名位置]
+    level_of = {}
+    for L, rows in vocab.items():
+        for w, *_ in rows:
+            level_of.setdefault(w, L)
+    for L in vocab:
+        part = {w: v for w, v in out.items() if level_of.get(w, 'N1') == L}
+        (ROOT / 'lang' / f'ja-ex-{L}.json').write_text(json.dumps(part, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    old = ROOT / 'examples.js'
+    if old.exists():
+        old.unlink()
     print(f'{sum(len(v) for v in out.values())} 句，{len(out)} 个单词；按单词卡改正读音的例句 {fixed} 句，朗读读音按标注重新生成 {resynced} 句')
 
 

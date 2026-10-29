@@ -1,7 +1,7 @@
 """给日语句子标注假名（furigana）：返回「{漢字|かんじ}」形式的标记，网页渲染成 <ruby>。
 
     pip install fugashi unidic-lite
-    python3 tools/furigana.py examples     # 给 examples.js 每条例句加第 4 项：假名位置「起点.长度读音,…」
+    由 build_examples.py、build_grammar.py、build_reading.py、build_anime.py 调用（例句第 4 项：假名位置「起点.长度读音,…」）
 
 只给含汉字的词标注；送假名（高い → {高|たか}い）和词中的假名（取り扱い → {取|と}り{扱|あつか}い）会拆开对齐。
 """
@@ -257,17 +257,6 @@ def js_obj(path, name):
     return head, json.loads(body)
 
 
-def examples():
-    p = ROOT / 'examples.js'
-    head, data = js_obj(p, 'EXAMPLES')
-    n = 0
-    for w, rows in data.items():
-        for r in rows:
-            r[3:] = [compact(ruby(r[0]))] if KANJI.search(r[0]) else []
-            n += len(r) > 3
-    p.write_text(head + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';\n', encoding='utf-8')
-    print('examples with furigana:', n)
-
-
 if __name__ == '__main__':
-    {'examples': examples}[sys.argv[1]]()
+    for line in sys.argv[1:]:
+        print(ruby(line))

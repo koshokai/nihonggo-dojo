@@ -1474,16 +1474,24 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 }
 startPetals();
 if (S.onboarded) requestPersist();
-// 例句库有 3 MB 多，等页面出来以后再在后台加载；加载完后单词页、词典页刷新一下就能看到
+// 例句按级别拆成 lang/ja-ex-N5.json…：先加载当前级别，其余级别在后台依次加载，首屏不用等 4 MB 的全部例句
+var EXAMPLES;
 (() => {
-  const s = document.createElement('script');
-  s.src = 'examples.js'; s.async = true;
-  s.onload = () => {
+  const order = [S.level || 'N5', ...LEVELS.filter(L => L !== (S.level || 'N5'))];
+  let n = 0;
+  const done = last => {
     if (typeof CORPUS !== 'undefined') CORPUS = null;
     if (typeof TR_POOL !== 'undefined') TR_POOL = null;   // 翻译练习的句子池要算上例句
     const v = (location.hash || '#home').slice(1).split('/')[0];
-    if (['vocab', 'kanji', 'trans'].includes(v)) render();
+    // 只在第一份（当前级别）和最后一份加载完时刷新；正在做的练习、测验不打断
+    if ((n === 1 || last) && (['vocab', 'kanji'].includes(v) || (v === 'trans' && document.querySelector('[data-start]')))) render();
   };
-  document.body.append(s);
+  const next = () => {
+    if (n >= order.length) return;
+    const L = order[n++];
+    fetch(`lang/ja-ex-${L}.json`).then(r => r.ok ? r.json() : {}).catch(() => ({}))
+      .then(d => { EXAMPLES = Object.assign(EXAMPLES || {}, d); done(n === order.length); next(); });
+  };
+  next();
 })();
 if (hasTTS) speechSynthesis.onvoiceschanged = () => { if ((location.hash || '').slice(1) === 'me') render(); };
