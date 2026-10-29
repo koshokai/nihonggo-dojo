@@ -19,7 +19,7 @@ const BASE = `http://127.0.0.1:${server.address().port}/`;
 const MOCK = await readFile(join(ROOT, 'tests/mock-supabase.js'), 'utf8');
 
 const PAGES = ['home', 'study', 'ri', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'listen', 'exam', 'biz', 'anime', 'trans', 'conj', 'dictation', 'dict', 'me', 'about',
-  ...['ko', 'en'].flatMap(t => [t, `${t}/study`, `${t}/ri`, `${t}/game`, `${t}/abc`, `${t}/words`, `${t}/phrases`, `${t}/grammar`, `${t}/levels`, `${t}/read`, `${t}/listen`, `${t}/exam`, `${t}/biz`, `${t}/trans`, `${t}/dictation`, `${t}/dict`])];
+  ...['ko', 'en'].flatMap(t => [t, `${t}/study`, `${t}/ri`, `${t}/game`, `${t}/abc`, `${t}/words`, `${t}/phrases`, `${t}/grammar`, `${t}/levels`, `${t}/read`, `${t}/listen`, `${t}/exam`, `${t}/biz`, `${t}/trans`, `${t}/dictation`, `${t}/placement`, `${t}/dict`])];
 
 const fails = [];
 const browser = await chromium.launch();

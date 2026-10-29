@@ -319,3 +319,43 @@ function l2Dict(tr) {
       show(); input.focus();
     }).catch(() => { res.textContent = '词库加载失败，请检查网络。'; });
 }
+
+/* ---------- 分级测试：韩语、英语各级抽词，按正确率推荐起点级别 ---------- */
+const L2_PLACE_SRC = { ko: [['A', '初级'], ['B', '中级'], ['C', '高级']], en: [['zk', '基础'], ['cet4', '四级'], ['cet6', '六级']] };
+function l2Placement(tr) {
+  const T = TRACKS[tr];
+  const box = h(`<section class="panel"><h2>${T.title}分级测试</h2><p class="muted">准备题目……</p></section>`);
+  main.append(box);
+  Promise.all(L2_PLACE_SRC[tr].map(([k]) => lvFetch(`${tr}-${k}`))).then(lists => {
+    if (!box.isConnected) return;
+    const p = h(`<section class="panel"><h2>${T.title}分级测试</h2>
+      <p>15 道题，大约 3 分钟：每个级别 5 个单词，选出中文意思。不会的直接猜，不扣分。</p>
+      <p class="small muted">做完会推荐一个起点级别，单词、语法、阅读、听力都会切到这个级别。之后随时可以自己改。</p>
+      <button class="btn pri big" type="button" data-place-go>开始测试</button></section>`);
+    p.querySelector('[data-place-go]').onclick = () => {
+      // 每级从常用的前 1500 个词里抽，太偏的词测不出真实水平
+      const qs = L2_PLACE_SRC[tr].flatMap(([k, name], i) => sample(lists[i].slice(0, 1500), 5).map(([t, pr, zh]) => {
+        const pool = lists[i].filter(x => x[2] !== zh).map(x => x[2]);
+        return makeQ(null, 'meaning', distract(zh, pool), zh, { lv: name, say: t, sayLang: T.tts,
+          prompt: `<div class="eyebrow">选出中文意思 · ${esc(name)}</div><div class="q-big" lang="${tr}">${esc(t)}</div>${pr ? `<div class="muted">${esc(pr)}</div>` : ''}`,
+          explain: `<b lang="${tr}">${esc(t)}</b> = ${esc(zh)}` });
+      }));
+      main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
+      runQuiz(host, qs, { title: `${T.title}分级测试`, noRecord: true, xpEach: 2, onDone: r => {
+        if (!r) return render();
+        const per = L2_PLACE_SRC[tr].map(([, name]) => r.res.filter(x => x.q.lv === name && x.ok).length);
+        // 某一级答对 4 题以上算过关；推荐第一个没过关的级别
+        let k = per.findIndex(n => n < 4); if (k < 0) k = per.length - 1;
+        const name = L2_PLACE_SRC[tr][k][1];
+        ((S.l2place = S.l2place || {})[tr] = name); save();
+        l2Sel[tr + 'g'] = l2Sel[tr + 'r'] = l2Sel[tr + 'l'] = name; lvSel[tr] = L2_PLACE_SRC[tr][k][0];
+        host.innerHTML = '';
+        host.append(h(`<section class="panel"><h2>推荐从「${esc(name)}」开始</h2>
+          <div class="stats">${L2_PLACE_SRC[tr].map(([, n], i) => `<div class="stat"><span class="small muted">${esc(n)}</span><b>${per[i]} / 5</b></div>`).join('')}</div>
+          <p class="small muted">单词、语法、阅读和听力都已切到「${esc(name)}」。觉得太难或太简单，在各页面上方随时可以换级别。</p>
+          <div class="row"><a class="btn pri" href="#${tr}">回到首页开始学</a><a class="btn" href="#${tr}/levels">去分级词库</a></div></section>`));
+      } });
+    };
+    box.replaceWith(p);
+  }).catch(() => { box.innerHTML = `<h2>${T.title}分级测试</h2><p>题目加载失败，请检查网络。</p>`; });
+}

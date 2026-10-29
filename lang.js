@@ -410,6 +410,7 @@ function viewLangTrack(tr, sub) {
   if (sub && sub.startsWith('biz')) return l2Biz(tr, sub.split('/')[1]);
   if (sub === 'trans') return viewTrans(tr);
   if (sub === 'dictation') return viewDictation(tr);
+  if (sub === 'placement') return l2Placement(tr);
   if (sub === 'game') return l2Game(tr);
   if (sub === 'dict') return l2Dict(tr);
   if (!langReady(tr)) return;
@@ -440,6 +441,8 @@ function viewLangTrack(tr, sub) {
   // 和日语首页同样的顺序：今日任务 → 今日阅读 → 今日一句 → 进度 → 学习记录 → 成就印章
   const slot = h('<div class="home-slot"></div>');
   main.append(tp, slot);
+  // 还没做过分级测试：提示一次
+  if (!(S.l2place || {})[tr] && !known) slot.before(h(`<section class="banner"><div><b>不知道从哪一级开始？</b><div class="small">做个 3 分钟的分级测试，帮你找到合适的起点。</div></div><div class="row"><a class="btn pri" href="#${tr}/placement">开始测试</a></div></section>`));
   const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / DAY) - 1;
   Promise.all([l2Fetch(tr, 'reading').catch(() => []), l2Fetch(tr, 'daily').catch(() => [])]).then(([reads, daily]) => {
     if (!slot.isConnected) return;
