@@ -1441,10 +1441,11 @@ function installPanel() {
     ${isStandalone() ? '<p class="small"><span class="tag done">已安装</span> 你正在使用安装版。</p>'
       : `<p class="small muted">装到主屏幕后，像 App 一样全屏打开，没有网络也能学。</p>
          <div class="row"><button class="btn pri" type="button" data-install-btn>安装到手机</button></div>`}
-    <div class="share-box"><img src="share-qr.png" width="140" height="140" alt="日语道场的二维码"><div>
-      <p class="small">把这个二维码或链接发给朋友，扫码就能用：</p>
+    <div class="share-box"><div>
+      <p class="small">把网址发给朋友，用浏览器打开就能学：</p>
       <p class="small" lang="en"><a href="${SITE_URL}">${SITE_URL}</a></p>
       <div class="row"><button class="btn" type="button" data-share>${navigator.share ? '分享' : '复制链接'}</button></div>
+      <p class="small muted">提示：微信、小红书会拦截或限流带二维码、邮箱的图片和陌生网址。发朋友圈、小红书时可以只写「日语道场」，让朋友搜索或私信要网址。</p>
     </div></div>
   </section>`);
   const ib = p.querySelector('[data-install-btn]');
