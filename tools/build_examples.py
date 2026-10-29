@@ -8,6 +8,7 @@
     python3 tools/build_examples.py
 """
 import json
+import re
 import pathlib
 import sys
 
@@ -74,7 +75,15 @@ def reading(sentence):
 
 
 def main():
-    from furigana import furi   # 头上标假名（furigana.py 也会读这里的 OVERRIDE，所以在函数里导入）
+    from furigana import furi, card_fix, tts, plain_reading   # 头上标假名（furigana.py 也会读这里的 OVERRIDE，所以在函数里导入）
+    # 单词卡上的读音（例句里这个词本身按卡片读）
+    vocab_src = (ROOT / 'vocab.js').read_text(encoding='utf-8')
+    vocab = json.loads(vocab_src[vocab_src.index('{'):vocab_src.rindex(';')])
+    cards = {}
+    for rows in vocab.values():
+        for w, r, *_ in rows:
+            cards[w] = cards[w] + '/' + r if w in cards else r
+    fixed = resynced = 0
     alias = {}
     for line in (ROOT / 'tools/vocab/alias.txt').read_text(encoding='utf-8').splitlines():
         if line.strip() and not line.startswith('#'):
@@ -90,11 +99,19 @@ def main():
                 sys.exit(f'{src.name}:{n} 需要 3 列：{line}')
             word, jp, zh = parts
             word = alias.get(word, word)
-            out.setdefault(word, []).append([jp, reading(jp), zh] + ([f] if (f := furi(jp)) else []))
+            kana, f = reading(jp), furi(jp)
+            if f and word in cards:
+                kana, f, ch = card_fix(word, cards[word], jp, kana, f)
+                fixed += ch
+            # 朗读用的读音和假名标注对不上时，按标注重新生成，保证听到的和看到的一致
+            if f and not re.search(r'[0-9０-９〇A-Za-zＡ-Ｚａ-ｚ]', jp) and plain_reading(jp, f) != hira(re.sub(r'[\s。、，！？!?「」『』…・〜～]', '', kana)).translate(str.maketrans('わおえ', 'はをへ')):
+                kana = tts(jp, f)
+                resynced += 1
+            out.setdefault(word, []).append([jp, kana, zh] + ([f] if f else []))
     js = '// 自动生成：python3 tools/build_examples.py（请编辑 tools/examples_*.txt）\n'
     js += '// 每个单词：[日语例句, 朗读用假名, 中文翻译]\nconst EXAMPLES = ' + json.dumps(out, ensure_ascii=False, separators=(',', ':')).replace('],"', '],\n"') + ';\n'
     (ROOT / 'examples.js').write_text(js, encoding='utf-8')
-    print(f'{sum(len(v) for v in out.values())} 句，{len(out)} 个单词')
+    print(f'{sum(len(v) for v in out.values())} 句，{len(out)} 个单词；按单词卡改正读音的例句 {fixed} 句，朗读读音按标注重新生成 {resynced} 句')
 
 
 if __name__ == '__main__':
