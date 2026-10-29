@@ -57,7 +57,7 @@ function showSheet(text, hit, a) {
     <button class="ws-x" type="button" aria-label="关闭">×</button>
     <div class="row"><span class="ws-w" lang="ja">${esc(hit ? hit.w : text)}</span>${hit && hit.r !== hit.w ? `<span class="ws-r" lang="ja">${esc(hit.r)}</span>` : ''}${speakBtn(say)}${hit && hit.v ? `<span class="tag lv">${hit.v.L}</span>` : ''}</div>
     ${meaning || '<div class="ws-m ws-empty"></div>'}
-    ${ex ? `<div class="small"><span lang="ja">${esc(ex[0])}</span><br><span class="muted">${esc(ex[2])}</span></div>` : ''}
+    ${ex ? `<div class="small"><span lang="ja" class="furi">${furiHTML(ex[0], ex[3])}</span><br><span class="muted">${esc(ex[2])}</span></div>` : ''}
     <div class="row">
       ${hit && hit.v && hit.v.q ? `<button class="btn soft" type="button" data-add ${inDeck ? 'disabled' : ''}>${inDeck ? '已在单词卡' : '+ 单词卡'}</button>` : ''}
       <button class="btn" type="button" data-more>查看详情 →</button>

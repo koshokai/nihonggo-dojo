@@ -552,8 +552,8 @@ function qVocab(v, kind) {
 }
 function exTip(w) {
   const e = exList(w); if (!e.length) return '';
-  const [jp, , zh] = e[Math.floor(Math.random() * e.length)];
-  return `<br><span class="small"><span lang="ja">${esc(jp)}</span>　<span class="muted">${esc(zh)}</span></span>`;
+  const [jp, , zh, furi] = e[Math.floor(Math.random() * e.length)];
+  return `<br><span class="small"><span lang="ja" class="furi">${markWord(jp, w, furi)}</span>　<span class="muted">${esc(zh)}</span></span>`;
 }
 // 含某个汉字的单词（只取能出题的词，按级别从易到难）
 let kanjiWordIdx = null;
