@@ -154,23 +154,74 @@ function l2Listen(tr) {
 }
 
 /* ---------- 商务 ---------- */
-function l2Biz(tr) {
+// 商务：场景会话（照片 + 对话 + 关键表达 + 小测验）/ 场景表达 / 邮件模板 / 商务词汇，和日语「商务」同样的结构
+const L2_BIZ_IC = { 职场基础: '🏢', 电话: '📞', 拜访接待: '🤝', 会议: '📊', 汇报沟通: '🗣️', 道歉拒绝: '🙇', 谈判销售: '💼', 求职面试: '👔', 应酬: '🍻', 出差: '✈️' };
+function l2Biz(tr, sid) {
   l2Page(tr, ['biz'], `商务${TRACKS[tr].title}`, d => {
-    const tab = l2Sel[tr + 'b'] || 'phrases';
+    const scenes = d.scenes || [], vocab = d.vocab || [];
+    if (sid) { const sc = scenes.find(x => x.id === sid); if (sc) return l2BizScene(tr, sc, scenes); }
+    const tabs = [['scenes', '💬 场景会话', scenes.length], ['phrases', '🗂 场景表达', d.phrases.length], ['emails', '✉️ 邮件模板', d.emails.length], ['vocab', '📒 商务词汇', vocab.reduce((n, c) => n + c.words.length, 0)]].filter(t => t[2]);
+    const tab = tabs.some(t => t[0] === l2Sel[tr + 'b']) ? l2Sel[tr + 'b'] : tabs[0][0];
+    const done = (S.l2biz = S.l2biz || {})[tr] || {};
     const p = h(`<section class="panel">
       <h2>商务${TRACKS[tr].title}</h2>
-      <p class="small muted">${tr === 'ko' ? '职场常用表达（注意合쇼体 / 해요体的分寸）和商务邮件模板。' : '职场常用表达和商务邮件模板，说明里写了语气轻重和常见错误。'}点 🔊 听，🎙 跟读。</p>
-      <div class="seg" role="group"><button type="button" data-bt="phrases" class="${tab === 'phrases' ? 'on' : ''}">场景表达</button><button type="button" data-bt="emails" class="${tab === 'emails' ? 'on' : ''}">邮件模板</button></div>
-      ${tab === 'phrases' ? d.phrases.map(s => `<details class="gram-item"><summary><b>${esc(s.scene)}</b> <span class="small muted">${s.items.length} 句</span></summary>
+      <p class="small muted">${tr === 'ko' ? '在韩企工作、和韩国客户打交道用得上的韩语：注意합쇼体 / 해요体的分寸。' : '外企和海外客户打交道用得上的英语，说明里写了语气轻重和中式英语的常见错误。'}点 🔊 听，🎙 跟读。</p>
+      <div class="seg" role="group">${tabs.map(([k, t, n]) => `<button type="button" data-bt="${k}" class="${tab === k ? 'on' : ''}">${t} <span class="small muted">${n}</span></button>`).join('')}</div>
+      ${tab === 'scenes' ? `<div class="read-grid">${scenes.map(sc => `<a class="read-card" href="#${tr}/biz/${esc(sc.id)}">
+          <div class="rc-img">${sc.ph ? `<img class="rc-photo" src="${esc(sc.ph[0])}" alt="" loading="lazy" decoding="async">` : `<div class="rc-ph-none biz"><span>${L2_BIZ_IC[sc.cat] || '💼'}</span><b>${esc(sc.cat)}</b></div>`}<span class="tag lv">${esc(sc.lv)}</span>${done[sc.id] != null ? '<span class="rc-done">✓</span>' : ''}</div>
+          <div class="rc-body"><div class="rc-title" lang="${tr}">${esc(sc.title)}</div><div class="small muted">${esc(sc.zh)}</div></div></a>`).join('')}</div>`
+      : tab === 'phrases' ? d.phrases.map(s => `<details class="gram-item"><summary><b>${esc(s.scene)}</b> <span class="small muted">${s.items.length} 句</span></summary>
         ${s.items.map(([x, zh, note]) => `<div class="ex"><div style="flex:1;min-width:0"><div lang="${tr}">${esc(x)}</div><div class="small">${esc(zh)}</div><div class="small muted">${esc(note)}</div></div>${sayBtn(x, TRACKS[tr].tts)}${shadowBtn(x, '', zh, tr)}</div>`).join('')}</details>`).join('')
-      : d.emails.map(e => `<details class="gram-item"><summary><b>${esc(e.title)}</b> <span class="small muted">${esc(e.zh)}</span></summary>
+      : tab === 'emails' ? d.emails.map(e => `<details class="gram-item"><summary><b>${esc(e.title)}</b> <span class="small muted">${esc(e.zh)}</span></summary>
         <div class="mail-body">${e.body.map((l, i) => `<div class="ex"><div style="flex:1;min-width:0"><div lang="${tr}">${esc(l)}</div><div class="small muted">${esc(e.bodyZh[i] || '')}</div></div></div>`).join('')}</div>
-        <div class="row"><button class="btn small" type="button" data-copy="${esc(e.body.join('\n'))}">复制邮件原文</button></div></details>`).join('')}
+        <div class="row"><button class="btn small" type="button" data-copy="${esc(e.body.join('\n'))}">复制邮件原文</button></div></details>`).join('')
+      : vocab.map((c, ci) => `<details class="gram-item"><summary><b>${esc(c.cat)}</b> <span class="small muted">${c.words.length} 词</span></summary>
+        <div class="row"><button class="btn small" type="button" data-addcat="${ci}">全部加入单词卡</button></div>
+        ${c.words.map(([w, zh, ex, exZh]) => `<div class="ex"><div style="flex:1;min-width:0"><div><b lang="${tr}">${esc(w)}</b> <span class="small">${esc(zh)}</span></div>${ex ? `<div class="small" lang="${tr}">${esc(ex)}</div><div class="small muted">${esc(exZh || '')}</div>` : ''}</div>${sayBtn(w, TRACKS[tr].tts)}</div>`).join('')}</details>`).join('')}
     </section>`);
     p.querySelectorAll('[data-bt]').forEach(b => { b.onclick = () => { l2Sel[tr + 'b'] = b.dataset.bt; render(); }; });
     p.querySelectorAll('[data-copy]').forEach(b => { b.onclick = () => navigator.clipboard.writeText(b.dataset.copy).then(() => toast('已复制'), () => toast('复制失败')); });
+    p.querySelectorAll('[data-addcat]').forEach(b => { b.onclick = () => {
+      vocab[+b.dataset.addcat].words.forEach(([w, zh, ex, exZh]) => l2AddCard(tr, { id: `${tr}|b|${w}`, t: w, zh, ex: ex ? [[ex, exZh || '']] : null }));
+      save(); b.textContent = '已加入'; b.disabled = true; toast('已加入单词卡，今天就会复习');
+    }; });
     return p;
   });
+}
+function l2BizScene(tr, sc, scenes) {
+  const tts = TRACKS[tr].tts, i = scenes.indexOf(sc), next = scenes[i + 1];
+  const p = h(`<article class="panel an-work">
+    <a class="an-back" href="#${tr}/biz">← 返回商务${TRACKS[tr].title}</a>
+    ${sc.ph ? `<div class="an-hero"><img src="${esc(sc.ph[0])}" alt="" decoding="async" onerror="this.parentElement.remove()"></div>${photoCredit(sc)}` : ''}
+    <div class="row"><span class="tag lv">${esc(sc.lv)}</span><span class="tag">${L2_BIZ_IC[sc.cat] || ''} ${esc(sc.cat)}</span></div>
+    <h2 lang="${tr}">${esc(sc.title)}</h2><p class="muted">${esc(sc.zh)}</p>
+    <div class="biz-lines">${sc.lines.map(([who, x, zh]) => `<div class="an-t"><span class="an-who small">${esc(who)}</span><div><span lang="${tr}">${esc(x)}</span>${sayBtn(x, tts)}${shadowBtn(x, '', zh, tr)}<div class="small muted">${esc(zh)}</div></div></div>`).join('')}</div>
+    ${sc.note ? `<p class="an-note small">${esc(sc.note)}</p>` : ''}
+    ${(sc.phr || []).length ? `<h3>关键表达</h3><div class="ra-words">${sc.phr.map(([x, zh]) => `<div class="ra-word"><span lang="${tr}" class="rw-w">${esc(x)}</span>${sayBtn(x, tts)}<span class="rw-m">${esc(zh)}</span></div>`).join('')}</div>` : ''}
+    ${(sc.q || []).length ? '<h3>小测验</h3><div class="an-quiz"></div>' : ''}
+    ${next ? `<div class="row"><a class="btn" href="#${tr}/biz/${esc(next.id)}">下一个场景：${esc(next.zh)} →</a></div>` : ''}
+  </article>`);
+  const box = p.querySelector('.an-quiz');
+  if (box) {
+    let k = 0, right = 0;
+    const ask = () => {
+      if (k >= sc.q.length) {
+        box.innerHTML = `<p>答对 ${right} / ${sc.q.length}。</p>`;
+        ((S.l2biz = S.l2biz || {})[tr] = S.l2biz[tr] || {})[sc.id] = right; save(); if (right) addXP(right * 5);
+        return;
+      }
+      const [q, ok, ...bad] = sc.q[k], opts = shuffle([ok, ...bad]);
+      box.innerHTML = `<p><b>${esc(q)}</b></p><div class="an-opts">${opts.map(o => `<button class="btn" type="button" lang="${tr}">${esc(o)}</button>`).join('')}</div>`;
+      box.querySelectorAll('button').forEach(b => { b.onclick = () => {
+        const good = b.textContent === ok; if (good) right++;
+        box.querySelectorAll('button').forEach(x => { x.disabled = true; if (x.textContent === ok) x.classList.add('pri'); });
+        if (!good) b.classList.add('danger');
+        k++; setTimeout(ask, good ? 700 : 1500);
+      }; });
+    };
+    ask();
+  }
+  return p;
 }
 
 /* ---------- 闯关：入门单词每 10 个一关，3 条命，按正确率得星 ---------- */

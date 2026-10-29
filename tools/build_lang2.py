@@ -9,6 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / 'tools' / 'lang2'
+OVER = json.loads((ROOT / 'tools' / 'photo_queries.json').read_text(encoding='utf-8'))   # 值为 "" 的照片人工判定为不贴切
 PHOTOS = json.loads((ROOT / 'photos' / 'index.json').read_text(encoding='utf-8')) if (ROOT / 'photos' / 'index.json').exists() else {}
 
 
@@ -45,6 +46,14 @@ def main():
         for kind in ('grammar', 'daily', 'biz'):
             d = load(lang, kind)
             if d is not None:
+                if kind == 'biz':
+                    # 商务场景会话：编号 <lang>-bs-01…，照片和阅读文章一样由 fetch_photos.py 下载
+                    for i, sc in enumerate(d.get('scenes', []), 1):
+                        sc['id'] = f'{lang}-bs-{i:02d}'
+                        sc.pop('photo', None)
+                        if sc['id'] in PHOTOS and OVER.get(sc['id']) != '':
+                            ph = PHOTOS[sc['id']]
+                            sc['ph'] = [ph['file'], ph['by'], ph['license'], ph['page']]
                 write(lang, kind, d); out[kind] = len(d)
         d = load(lang, 'reading')
         if d is not None:
@@ -70,6 +79,9 @@ def photo_queries():
         for i, a in enumerate(load(lang, 'reading') or [], 1):
             if a.get('photo'):
                 out[f'{lang}-r-{i:02d}'] = [q.strip() for q in a['photo'].split(' / ') if q.strip()]
+        for i, sc in enumerate((load(lang, 'biz') or {}).get('scenes', []), 1):
+            if sc.get('photo'):
+                out[f'{lang}-bs-{i:02d}'] = [q.strip() for q in sc['photo'].split(' / ') if q.strip()]
     return out
 
 

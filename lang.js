@@ -399,7 +399,7 @@ function viewLangTrack(tr, sub) {
   if (sub === 'grammar') return l2Grammar(tr);
   if (sub && sub.startsWith('read')) return l2Reading(tr, sub.split('/')[1]);
   if (sub === 'listen') return l2Listen(tr);
-  if (sub === 'biz') return l2Biz(tr);
+  if (sub && sub.startsWith('biz')) return l2Biz(tr, sub.split('/')[1]);
   if (sub === 'game') return l2Game(tr);
   if (sub === 'dict') return l2Dict(tr);
   if (!langReady(tr)) return;
