@@ -446,7 +446,7 @@ function grade(id, g) {
   S.revLog[k] = lg;
 }
 const fmtDays = d => d === 0 ? '马上' : d === 1 ? '明天' : d < 30 ? `${d} 天` : d < 365 ? `${Math.round(d / 30)} 个月` : `${(d / 365).toFixed(1)} 年`;
-const dueList = levels => levels.flatMap(L => VOCAB[L]).filter(v => S.srs[v.id] && S.srs[v.id].due <= Date.now());
+const dueList = levels => levels.flatMap(L => [...VOCAB[L], ...GRAM[L]]).filter(v => S.srs[v.id] && S.srs[v.id].due <= Date.now());   // 单词和加入复习的语法点
 const newLeft = () => Math.max(0, S.newPerDay - (S.newLog[dkey()] || 0));
 const newList = L => LEARN[L].filter(v => !S.srs[v.id]);
 
@@ -475,6 +475,21 @@ function startCards(host, ids, title, onExit) {
     }
     const v = ITEMS[queue[0]], c = S.srs[v.id];
     revealed = false;
+    const e = v.type === 'g' ? v.eg[Math.floor(Math.random() * v.eg.length)] : null;
+    if (e) {   // 语法卡：正面是挖空的例句和中文，背面是句型、意思和完整例句
+      stage.innerHTML = `<div class="card" data-card tabindex="0" role="button" aria-label="显示答案">
+        <span class="corner tag ${c ? 'learn' : ''}">${c ? '复习' : '新'} · ${v.L} 语法</span>
+        <div class="q-sent furi" lang="ja">${furiHTML(e.full, e.furi, e.at, e.at + e.frag.length).replace(/<mark>.*?<\/mark>/, '<span class="blank">　？　</span>')}</div>
+        <div class="meaning">${esc(e.t)}</div>
+        <div data-ans hidden><div class="word" lang="ja">${esc(v.p)}</div><div class="meaning">${esc(v.m)}</div>
+          <div class="furi" lang="ja">${furiHTML(e.full, e.furi, e.at, e.at + e.frag.length)} ${speakBtn(e.kana)}</div>${v.how ? `<p class="small muted">${esc(v.how)}</p>` : ''}</div>
+        <div class="hint" data-hint>空白处应该填哪个句型？想好再点卡片看答案（空格键）</div>
+      </div>
+      <div data-exbox hidden></div>
+      <div class="grades" data-grades hidden style="margin-top:12px">
+        ${['重来', '困难', '记得', '简单'].map((t, g) => `<button class="btn g${g}" type="button" data-g="${g}">${t}<small>${fmtDays(preview(c, g))}</small></button>`).join('')}
+      </div>`;
+    } else
     stage.innerHTML = `<div class="card" data-card tabindex="0" role="button" aria-label="显示答案">
         <span class="corner tag ${c ? 'learn' : ''}">${c ? '复习' : '新词'} · ${v.L}</span>
         <span class="corner-r">${speakBtn(v.r, '朗读单词')}</span>
@@ -490,7 +505,7 @@ function startCards(host, ids, title, onExit) {
     const reveal = () => {
       if (revealed) return; revealed = true;
       stage.querySelector('[data-ans]').hidden = false; stage.querySelector('[data-hint]').hidden = true;
-      stage.querySelector('[data-grades]').hidden = false; stage.querySelector('[data-exbox]').hidden = false; if (S.autoSpeak) speak(v.r);
+      stage.querySelector('[data-grades]').hidden = false; stage.querySelector('[data-exbox]').hidden = false; if (S.autoSpeak) speak(e ? e.kana : v.r);
     };
     card.onclick = reveal;
     stage.querySelectorAll('[data-g]').forEach(b => { b.onclick = () => rate(+b.dataset.g); });
@@ -656,7 +671,7 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
     const q = qs[i], ok = j === q.answer;
     res.push({ q, pick: j, ok });
     // 答错的单词：进单词卡并安排马上复习（已经在卡里的提前到今天）
-    if (!ok && q.id && q.id.startsWith('v|')) S.srs[q.id] = Object.assign({ i: 0, e: 2.5, r: 0 }, S.srs[q.id], { due: Date.now() });
+    if (!ok && q.id && (q.id.startsWith('v|') || q.id.startsWith('g|'))) S.srs[q.id] = Object.assign({ i: 0, e: 2.5, r: 0 }, S.srs[q.id], { due: Date.now() });   // 答错的单词、语法进复习
     if (q.id && !noRecord) {
       if (!ok) S.wrong[q.id] = { n: ((S.wrong[q.id] || {}).n || 0) + 1, t: Date.now() };
       else if (fromWrong && S.wrong[q.id]) { delete S.wrong[q.id]; S.fixed++; }
@@ -902,7 +917,7 @@ function viewHome() {
   const ns = nextStage(S.level);
   const tasks = [
     { ic: '関', t: `闯关 · ${S.level} 第 ${ns} 关${isBoss(ns) ? '（头目关）' : ''}`, d: `已获得 ${totalStars(S.level)} 颗星，每关 10 个新词`, go: () => stageIntro(S.level, ns) },
-    { ic: '復', t: '复习到期单词卡', d: due ? `${due} 张卡片到了复习时间` : '没有到期的卡片', done: !due, go: () => { if (due) { const host = h('<div></div>'); main.innerHTML = ''; main.append(host); startCards(host, shuffle(dueList(LEVELS)).map(v => v.id), '复习到期卡片', () => go('home')); } } },
+    { ic: '復', t: '复习到期卡片', d: due ? `${due} 张卡片到了复习时间` : '没有到期的卡片', done: !due, go: () => { if (due) { const host = h('<div></div>'); main.innerHTML = ''; main.append(host); startCards(host, shuffle(dueList(LEVELS)).map(v => v.id), '复习到期卡片', () => go('home')); } } },
     { ic: '新', t: `学习 ${S.level} 新单词`, d: nl ? `今天还可以学 ${nl} 个新词` : newList(S.level).length ? `今天的 ${S.newPerDay} 个新词已学完` : `${S.level} 的单词都学过了，去「我的」换个级别吧`, done: !nl, go: () => { if (nl) { const host = h('<div></div>'); main.innerHTML = ''; main.append(host); startCards(host, newList(S.level).slice(0, nl).map(v => v.id), `${S.level} 新单词`, () => go('home')); } } },
     { ic: '文', t: `${S.level} 语法练习`, d: '8 道填空题，每题 10 经验', go: () => grammarQuiz(S.level, () => go('home')) },
     wrongN ? { ic: '誤', t: '订正错题', d: `错题本里有 ${wrongN} 道题，答对就会移出`, go: wrongReview } : null,
@@ -1150,15 +1165,24 @@ function grammarQuiz(L, back) {
 }
 function viewGrammar() {
   const L = S.level;
+  const gIn = GRAM[L].filter(g => S.srs[g.id]).length, gDue = GRAM[L].filter(g => S.srs[g.id] && S.srs[g.id].due <= Date.now());
   const p = h(`<section class="panel">
     <div class="row between"><h2>语法 · ${L}</h2>${levelSeg(L)}</div>
-    <div class="row"><button class="btn pri" type="button" data-quiz>语法填空 8 题</button><span class="small muted">本级 ${GRAM[L].length} 个句型，每个 4 句例句，点开看接续和例句</span></div>
+    <div class="row"><button class="btn pri" type="button" data-quiz>语法填空 8 题</button><button class="btn" type="button" data-gcards>${gIn ? `语法卡复习（到期 ${gDue.length}）` : '把本级语法加入复习卡'}</button></div>
+    <p class="small muted">本级 ${GRAM[L].length} 个句型，每个 4 句例句，点开看接续和例句。加入复习的句型会按遗忘曲线安排复习，填空答错的也会自动加入。</p>
     <div style="display:grid;gap:8px">${GRAM[L].map(g => `<details class="gp"><summary><span class="pat" lang="ja">${esc(g.p)}</span><span class="muted">${esc(g.m)}</span></summary>
-      <div class="gp-body"><div><span class="small muted">接续</span>　${esc(g.how)}</div>
+      <div class="gp-body"><div class="row between"><div><span class="small muted">接续</span>　${esc(g.how)}</div><button type="button" class="chip-btn" data-gadd="${esc(g.id)}">${S.srs[g.id] ? '已在复习' : '+ 加入复习'}</button></div>
       ${g.eg.map(e => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp furi" lang="ja">${furiHTML(e.full, e.furi, e.at, e.at + e.frag.length)}</div><div class="small muted">${esc(e.t)}</div></div>${speakBtn(e.kana)}</div>`).join('')}</div></details>`).join('')}</div>
   </section>`);
   bindLevel(p);
   p.querySelector('[data-quiz]').onclick = () => grammarQuiz(L, render);
+  p.querySelectorAll('[data-gadd]').forEach(b => { b.onclick = () => { const id = b.dataset.gadd; if (!S.srs[id]) { S.srs[id] = { i: 0, e: 2.5, r: 0, due: Date.now() }; save(); } b.textContent = '已在复习'; toast('已加入复习，今天就会出现'); }; });
+  p.querySelector('[data-gcards]').onclick = () => {
+    if (!gIn) { GRAM[L].forEach(g => { S.srs[g.id] = { i: 0, e: 2.5, r: 0, due: Date.now() }; }); save(); toast(`${GRAM[L].length} 个句型已加入复习`); }
+    const ids = gIn ? gDue.map(g => g.id) : GRAM[L].map(g => g.id);
+    if (!ids.length) return toast('现在没有到期的语法卡，明天再来');
+    const host = h('<div></div>'); main.innerHTML = ''; main.append(host); startCards(host, shuffle(ids).slice(0, 30), `${L} 语法卡`, () => render());
+  };
   main.append(p);
 }
 
