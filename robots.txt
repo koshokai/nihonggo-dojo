@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://koshokai.github.io/nihonggo-dojo/sitemap.xml
