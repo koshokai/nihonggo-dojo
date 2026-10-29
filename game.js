@@ -72,6 +72,7 @@ const fmtSec = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
 /* 关卡：先看词，再挑战 */
 function stageIntro(L, n) {
+  if (typeof guestStage === 'function' && guestStage('ja', n)) return;   // 游客只开放 N5 前 3 关
   const words = stageWords(L, n);
   let i = 0;
   main.innerHTML = '';

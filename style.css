@@ -756,3 +756,10 @@ body.gated { overflow: hidden; }
 .biz-lines { display: grid; gap: 10px; margin: 12px 0; }
 .biz-lines .an-t { grid-template-columns: 1fr; gap: 2px; }
 .biz-lines .an-who { font-size: .8rem; }
+/* 游客模式 */
+.lock-panel { text-align: center; display: grid; gap: 10px; justify-items: center; }
+.lock-panel .lock-ic { font-size: 2.6rem; }
+.lock-panel .lock-list { text-align: left; margin: 0 auto; padding-left: 1.2em; max-width: 30em; line-height: 1.9; }
+.lock-panel .row { justify-content: center; }
+.guest-btn { margin-top: 6px; width: 100%; }
+.tile-lock { font-size: .8em; }

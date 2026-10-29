@@ -80,7 +80,7 @@ function cloudQueue() {
 addEventListener('pagehide', () => { if (sbUser && (S.modAt || 0) > (S.syncedAt || 0)) cloudPush(); });
 
 const fromEmailLink = () => /access_token=|type=recovery|error_description=|[?&]code=/.test(location.hash + location.search);
-const mustLogin = () => cloudOn() && CLOUD.requireLogin;
+const mustLogin = () => cloudOn() && CLOUD.requireLogin && !(typeof guestFlag === 'function' && guestFlag());   // 选了游客模式就不挡
 async function cloudInit() {
   if (!cloudOn()) return;
   document.querySelectorAll('[data-feedback-link]').forEach(a => { a.hidden = false; });
@@ -91,11 +91,13 @@ async function cloudInit() {
     const c = await cloudClient();
     c.auth.onAuthStateChange((event, session) => {
       sbUser = session ? session.user : null;
+      if (sbUser && typeof setGuest === 'function') setGuest(false);
       if (event === 'PASSWORD_RECOVERY') setTimeout(() => authScreen('newpw'), 0);
     });
     const { data } = await c.auth.getSession();
     sbUser = data.session ? data.session.user : null;
     if (/type=recovery/.test(location.hash)) return authScreen('newpw');
+    if (sbUser && typeof guestFlag === 'function' && guestFlag()) { setGuest(false); render(); }   // 登录状态下不再是游客
     if (sbUser) { authGate(null); await cloudPull(true); if (fromEmailLink()) { history.replaceState(null, '', location.pathname + '#home'); render(); } }
     else if (mustLogin()) authScreen(/error_description=/.test(location.hash) ? 'linkerr' : 'login');
   } catch (e) {
@@ -205,6 +207,7 @@ function authMsg(m) {
 }
 async function afterLogin(user) {
   sbUser = user;
+  if (typeof setGuest === 'function') setGuest(false);   // 登录后不再是游客，游客期间的进度由 cloudPull 合并
   authGate(null); closeSheet();
   await cloudPull(true);
   toast('登录成功' + (user.email ? '：' + user.email : ''));
@@ -244,12 +247,15 @@ function authScreen(mode = 'login') {
     <p class="small auth-msg" data-msg role="status"></p>
     ${['login', 'signup', 'otp'].includes(mode) && CLOUD.google ? '<div class="auth-or"><span>或者</span></div><button class="btn big google-btn" type="button" data-google><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9h-4v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.7V6.6h-4a12 12 0 0 0 0 10.9l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"/></svg>用 Google 登录</button><p class="small muted auth-note">中国大陆网络无法使用 Google 登录，请用邮箱注册。</p>' : ''}
     ${['login', 'signup', 'otp'].includes(mode) ? '<p class="small muted auth-foot">登录后学习进度会自动同步到云端。<a href="privacy.html" target="_blank">隐私政策</a></p>' : ''}
+    ${gate && ['login', 'signup', 'otp'].includes(mode) ? '<button class="btn ghost guest-btn" type="button" data-guest>先不注册，以游客身份体验 →</button>' : ''}
   </div>`;
   const form = host.querySelector('[data-af]'), msg = host.querySelector('[data-msg]');
   const say = (t, ok) => { msg.textContent = t; msg.classList.toggle('ok', !!ok); };
   host.querySelectorAll('[data-mode]').forEach(b => { b.onclick = e => { e.stopPropagation(); authScreen(b.dataset.mode); }; });
   host.querySelectorAll('[data-eye]').forEach(b => { b.onclick = () => { const i = b.previousElementSibling; i.type = i.type === 'password' ? 'text' : 'password'; b.textContent = i.type === 'password' ? '显示' : '隐藏'; }; });
   const x = host.querySelector('[data-close]'); if (x) x.onclick = () => host.remove();
+  const gb = host.querySelector('[data-guest]');
+  if (gb) gb.onclick = () => { setGuest(true); authGate(null); render(); toast('游客模式：可以先体验入门内容，注册后解锁全部'); };
   const g = host.querySelector('[data-google]');
   if (g) g.onclick = async () => { const c = await cloudClient(); const { error } = await c.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: REDIRECT() } }); if (error) say(authMsg(error)); };
   let otpSent = false, signupEmail = '';

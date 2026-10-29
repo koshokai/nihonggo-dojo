@@ -264,6 +264,7 @@ function l2Game(tr) {
   </section>`);
   p.querySelectorAll('[data-ch]').forEach(b => { b.onclick = () => { l2Sel[tr + 'ch'] = ch + +b.dataset.ch; render(); }; });
   p.querySelectorAll('[data-stage]').forEach(b => { b.onclick = () => {
+    if (typeof guestStage === 'function' && guestStage(tr, +b.dataset.stage + 1)) return;   // 游客只开放前 3 关
     const i = +b.dataset.stage, ws = words.slice(i * size, (i + 1) * size);
     const mk = x => {
       const toZh = Math.random() < .55, opts = sample(words.filter(y => y.zh !== x.zh && y.t !== x.t), 3);

@@ -562,6 +562,7 @@ function homeHi(title, text, tx, streakN, extra) {
     <div class="bar hi-bar"><i style="width:${pct}%"></i></div>
   </section>`);
   if (typeof inboxFill === 'function') setTimeout(() => inboxFill(el), 0);   // 未读消息插在问候下面
+  if (typeof guestBanner === 'function') setTimeout(() => guestBanner(el), 0);
   return el;
 }
 // 今日任务面板：[{ic, t, d, done, go}]
@@ -577,4 +578,4 @@ function taskPanel(title, tasks, note = '') {
   return tp;
 }
 // 入口方块（两列，带图标）
-const tileGrid = items => h(`<div class="tile-grid">${items.map(([href, ic, name, desc]) => `<a class="tile" href="${href}"><span class="tile-ic">${ic}</span><b>${esc(name)}</b><span class="small muted">${esc(desc)}</span></a>`).join('')}</div>`);
+const tileGrid = items => h(`<div class="tile-grid">${items.map(([href, ic, name, desc]) => `<a class="tile" href="${href}"><span class="tile-ic">${ic}</span><b>${esc(name)}${typeof guestLockedHref === 'function' && guestLockedHref(href) ? ' <span class="tile-lock" title="注册后解锁">🔒</span>' : ''}</b><span class="small muted">${esc(desc)}</span></a>`).join('')}</div>`);

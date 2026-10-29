@@ -723,7 +723,9 @@ function render() {
   if (trackOf(view) === 'ja' && ['home', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict', 'study', 'ri'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
   applyTrack(view);
   if (S.onboarded && view !== 'welcome') logUsage(document.body.dataset.track || 'ja');
-  VIEWS[view](arg ? decodeURIComponent(arg) : undefined);
+  // 游客模式：没开放的内容显示注册提示（guest.js）
+  const lk = typeof guestLock === 'function' && guestLock(view, arg ? decodeURIComponent(arg) : '');
+  if (lk) main.append(lockPanel(lk)); else VIEWS[view](arg ? decodeURIComponent(arg) : undefined);
   updateTop();
 }
 addEventListener('hashchange', () => { render(); scrollTo(0, 0); });
