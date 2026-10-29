@@ -88,7 +88,7 @@ function stageIntro(L, n) {
     const v = words[i];
     box.querySelector('[data-card]').innerHTML = `<div class="card" style="cursor:default">
       <span class="corner tag learn">${i + 1} / ${words.length}</span><span class="corner-r">${speakBtn(v.r)}</span>
-      <div class="word" lang="ja">${esc(v.w)}</div><div class="reading" lang="ja">${esc(v.r)}</div><div class="meaning">${esc(v.m)}</div>
+      <div class="word" lang="ja">${esc(v.w)}</div><div class="reading" lang="ja">${typeof pitchHTML === 'function' ? pitchHTML(v.w, v.r) : esc(v.r)}</div><div class="meaning">${esc(v.m)}</div>
       ${exList(v.w).length ? `<div class="ex-box">${exHTML(v.w, 1)}</div>` : ''}</div>`;
     box.querySelector('[data-pos]').textContent = `${i + 1} / ${words.length}`;
     box.querySelector('[data-prev]').disabled = i === 0;

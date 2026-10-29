@@ -494,7 +494,7 @@ function startCards(host, ids, title, onExit) {
         <span class="corner tag ${c ? 'learn' : ''}">${c ? '复习' : '新词'} · ${v.L}</span>
         <span class="corner-r">${speakBtn(v.r, '朗读单词')}</span>
         <div class="word" lang="ja">${esc(v.w)}</div>
-        <div data-ans hidden><div class="reading" lang="ja">${esc(v.r)}</div><div class="meaning">${esc(v.m)}</div></div>
+        <div data-ans hidden><div class="reading" lang="ja">${typeof pitchHTML === 'function' ? pitchHTML(v.w, v.r) : esc(v.r)}</div><div class="meaning">${esc(v.m)}</div></div>
         <div class="hint" data-hint>先想一想读音和意思，再点卡片看答案（空格键）</div>
       </div>
       <div class="ex-box" data-exbox hidden>${exList(v.w).length ? `<div class="eyebrow">例句</div>${exHTML(v.w)}` : ''}</div>
@@ -1141,10 +1141,11 @@ function viewKanji() {
   const detail = () => {
     const k = kanjiSel;
     const words = wordsWith(k.k).slice(0, 8);
-    p.querySelector('[data-detail]').innerHTML = `<div class="kj-big" lang="ja">${esc(k.k)}</div>
+    p.querySelector('[data-detail]').innerHTML = `<div class="kj-big" lang="ja" data-kv title="笔顺">${esc(k.k)}</div>
       <div style="display:grid;gap:8px;min-width:0"><dl class="kv"><dt>音读</dt><dd lang="ja">${esc(k.on)}</dd><dt>训读</dt><dd lang="ja">${esc(k.kun)}</dd>${k.zh ? `<dt>意思</dt><dd>${esc(k.zh)}</dd>` : ''}<dt>英文</dt><dd>${esc(k.en)}</dd><dt>笔画</dt><dd>${k.strokes}</dd></dl>
       ${words.length ? `<div class="kj-words">${words.map(v => `<button type="button" class="kw" data-say="${esc(v.r)}"><b lang="ja">${esc(v.w)}</b><span lang="ja">${esc(v.r)}</span><small>${esc(v.m)} · ${v.L}</small></button>`).join('')}</div>` : '<span class="small muted">单词库里暂时没有含这个字的词</span>'}</div>`;
     p.querySelectorAll('.kj').forEach(b => b.classList.toggle('on', b.dataset.k === k.id));
+    if (typeof strokeInto === 'function') strokeInto(p.querySelector('[data-kv]'), k.k);   // 笔顺动画（KanjiVG）
   };
   p.querySelectorAll('[data-k]').forEach(b => { b.onclick = () => { kanjiSel = ITEMS[b.dataset.k]; detail(); }; });
   const kq = () => {
@@ -1382,6 +1383,7 @@ function viewAbout() {
     <p class="small muted">数据来源：单词表 <a href="https://github.com/jamsinclair/open-anki-jlpt-decks" target="_blank" rel="noopener">open-anki-jlpt-decks</a>（MIT），基于 <a href="http://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller 的 JLPT 资料</a>（CC BY）；汉字 <a href="https://github.com/davidluzgouveia/kanji-data" target="_blank" rel="noopener">kanji-data</a>（MIT）与 KANJIDIC；词典英文释义 <a href="https://www.edrdg.org/jmdict/j_jmdict.html" target="_blank" rel="noopener">JMdict</a>（EDRDG，CC BY-SA 4.0）。</p>
     <p class="small muted">音声：<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>:冥鳴ひまり（<a href="https://meimeihimari.wixsite.com/himari/terms-of-use" target="_blank" rel="noopener">利用規約</a>）、VOICEVOX:玄野武宏、VOICEVOX:九州そら、VOICEVOX:春日部つむぎ、VOICEVOX:雀松朱司（听力）。</p>
     <div class="list-wrap"><table class="list"><thead><tr><th>级别</th><th>单词</th><th>汉字</th><th>语法</th></tr></thead><tbody>${counts}</tbody></table></div>
+    <p class="small muted">汉字笔顺动画来自 <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a>（Ulrich Apel，CC BY-SA 3.0）。单词音调来自 <a href="https://github.com/mifunetoshiro/kanjium" target="_blank" rel="noopener">Kanjium</a>（CC BY-SA 4.0）：The pitch accent notation was provided by Uros O. through his free database.</p>
     <p class="small muted">阅读文章的照片来自 <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a>，均为可自由使用的授权（CC0 / 公有领域 / CC BY / CC BY-SA），每张照片下方注明作者和授权。</p>
     <h3>韩语</h3>
     <p class="small">韩文字母 40 个和拼读表；入门单词 500 个、常用句 150 句（本站编写）；分级词库约 1.1 万词（初级 / 中级 / 高级，对应 TOPIK 1–6 级）。</p>
