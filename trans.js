@@ -21,7 +21,7 @@ function trPool() {
     for (const g of GRAM[L]) for (const e of g.eg) add(e.full, e.t, L, `语法「${g.p}」`, e.furi);
     if (typeof EXAMPLES !== 'undefined') for (const v of VOCAB[L]) for (const [jp, , zh, furi] of EXAMPLES[v.w] || []) add(jp, zh, L, `单词「${v.w}」的例句`, furi);
   }
-  if (typeof readList === 'function') for (const a of readList()) for (const para of a.p) for (const [jp, , zh] of para) add(jp, zh, a.L, `阅读「${a.title}」`);
+  if (typeof readList === 'function') for (const a of readList()) for (const para of a.p) for (const [jp, , zh, , furi] of para) add(jp, zh, a.L, `阅读「${a.title}」`, furi);
   return (TR_POOL = out);
 }
 // 韩语、英语：异步加载语法、阅读和分级例句

@@ -88,7 +88,12 @@ def parse(path):
             sents = []
             for line in para.splitlines():
                 jp, zh = [x.strip() for x in line.split(' | ')]
-                sents.append([jp, reading(jp), zh, tokens(jp, keys)])
+                from furigana import furi, tts, plain_reading, hira as _h   # 汉字头上的假名（翻译练习、生词卡片里显示）
+                kana, f = reading(jp), furi(jp)
+                # 朗读读音和假名标注对不上时按标注重新生成，听到的和看到的一致
+                if f and not re.search(r'[0-9０-９〇A-Za-zＡ-Ｚａ-ｚ]', jp) and plain_reading(jp, f) != _h(re.sub(r'[\s。、，！？!?「」『』…・〜～]', '', kana)).translate(str.maketrans('わおえ', 'はをへ')):
+                    kana = tts(jp, f)
+                sents.append([jp, kana, zh, tokens(jp, keys)] + ([f] if f else []))
             paras.append(sents)
         a = {
             'id': meta['id'], 'L': meta['level'], 'cat': meta['cat'], 'img': meta.get('img', ''),
