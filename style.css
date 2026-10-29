@@ -753,3 +753,6 @@ body.gated { overflow: hidden; }
 .chip.online .dot { width: 8px; height: 8px; border-radius: 50%; background: #2fbf71; box-shadow: 0 0 0 0 rgba(47, 191, 113, .6); animation: online-pulse 2s infinite; }
 @keyframes online-pulse { 0% { box-shadow: 0 0 0 0 rgba(47, 191, 113, .55); } 70% { box-shadow: 0 0 0 7px rgba(47, 191, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(47, 191, 113, 0); } }
 @media (prefers-reduced-motion: reduce) { .chip.online .dot { animation: none; } }
+.biz-lines { display: grid; gap: 10px; margin: 12px 0; }
+.biz-lines .an-t { grid-template-columns: 1fr; gap: 2px; }
+.biz-lines .an-who { font-size: .8rem; }

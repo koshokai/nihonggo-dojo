@@ -30,6 +30,9 @@ def items(lang, which):
         out += [s for a in L('reading') for para in a['p'] for s, _ in para] + [w[0] for a in L('reading') for w in a['w']]
         biz = L('biz')
         out += [x[0] for sc in (biz['phrases'] if biz else []) for x in sc['items']]
+        # 商务场景会话的对话、关键表达和商务词汇
+        out += [l[1] for sc in (biz.get('scenes', []) if biz else []) for l in sc['lines']] + [x[0] for sc in (biz.get('scenes', []) if biz else []) for x in sc.get('phr', [])]
+        out += [w[0] for c in (biz.get('vocab', []) if biz else []) for w in c['words']]
         return out
     if which == 'basic':
         d = json.loads((ROOT / 'tools' / 'lang' / f'{lang}.json').read_text(encoding='utf-8'))

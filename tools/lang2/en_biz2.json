@@ -1,0 +1,2070 @@
+{
+ "phrases": [
+  {
+   "scene": "催促进度",
+   "items": [
+    [
+     "Just checking in on the status of the report.",
+     "想问一下报告进展如何了。",
+     "check in on 是最温和的催促开场，不带指责语气，适合第一次提醒。"
+    ],
+    [
+     "Any update on the contract?",
+     "合同那边有进展吗？",
+     "同事之间的简短追问，常用于 Slack 或聊天工具；对客户最好写完整句。"
+    ],
+    [
+     "I wanted to follow up on my email from last Tuesday.",
+     "我想跟进一下我上周二发的邮件。",
+     "follow up on 是商务中“跟进”的标准说法，点明时间能让对方马上找到邮件。"
+    ],
+    [
+     "Do you have an ETA on that?",
+     "那个大概什么时候能好？",
+     "ETA = estimated time of arrival，职场里泛指“预计完成时间”，口语、内部沟通用。"
+    ],
+    [
+     "We're on a tight deadline, so I'd appreciate it if you could prioritize this.",
+     "我们的截止时间很紧，如果您能优先处理这件事就太感谢了。",
+     "说明原因再提请求，比直接说 Hurry up 礼貌得多；I'd appreciate it if... 是委婉请求的万能句。"
+    ],
+    [
+     "Is there anything you need from me to move this forward?",
+     "需要我这边提供什么来推进这件事吗？",
+     "把催促包装成“我能帮什么忙”，既体面又能找出卡点。"
+    ],
+    [
+     "Would it be possible to have it by end of day Friday?",
+     "能否在周五下班前完成？",
+     "end of day（EOD）指当天下班前；用 Would it be possible 显得商量而非命令。"
+    ],
+    [
+     "Just a gentle reminder that the deadline is tomorrow.",
+     "温馨提醒一下，截止日期是明天。",
+     "gentle reminder 很常见，但重复用会显得有点被动攻击，第二次以后可以直接说明情况。"
+    ]
+   ]
+  },
+  {
+   "scene": "汇报进度",
+   "items": [
+    [
+     "Here's a quick update on where we are with the project.",
+     "简单汇报一下项目目前的进展。",
+     "汇报开场白；quick update 暗示会很简短，听的人更容易接受。"
+    ],
+    [
+     "We're on track to launch by the end of the month.",
+     "我们正按计划推进，预计月底上线。",
+     "on track 表示“进度正常”；反义是 behind schedule。"
+    ],
+    [
+     "We've hit a snag with the supplier.",
+     "供应商那边出了点小问题。",
+     "hit a snag 指遇到意料之外的小障碍，语气比 problem 轻，但要接着说明对策。"
+    ],
+    [
+     "We're running about a week behind schedule.",
+     "我们比计划晚了大约一周。",
+     "坦率说出延误程度，英美上司更看重透明，而不是“报喜不报忧”。"
+    ],
+    [
+     "The main blocker right now is the legal review.",
+     "目前最大的阻碍是法务审核。",
+     "blocker 指卡住进度的事项，敏捷开发和日常站会中非常常用。"
+    ],
+    [
+     "To get back on track, we're bringing in two more developers.",
+     "为了赶回进度，我们会再增加两名开发人员。",
+     "汇报问题时一定要附上解决方案，这是英语职场的基本期待。"
+    ],
+    [
+     "I'll keep you posted.",
+     "有进展我会随时告诉您。",
+     "keep sb posted 是“随时通报”的地道说法，常用来结束汇报。"
+    ],
+    [
+     "Let me know if you'd like more detail on any of this.",
+     "如果哪部分需要更详细的说明，请告诉我。",
+     "汇报结尾留出提问空间，显得专业周到。"
+    ]
+   ]
+  },
+  {
+   "scene": "表达意见与反对",
+   "items": [
+    [
+     "I see where you're coming from, but...",
+     "我理解你的出发点，不过……",
+     "先认可对方立场再提出不同意见，是英语中最常见的缓冲。"
+    ],
+    [
+     "I'm not sure that's the best approach.",
+     "我不太确定这是最好的方法。",
+     "用 I'm not sure 代替 I disagree，委婉表达反对，适合对上级或客户。"
+    ],
+    [
+     "Have we considered the impact on our existing customers?",
+     "我们有没有考虑过对现有客户的影响？",
+     "用提问的方式提出顾虑，比直接否定更容易被接受。"
+    ],
+    [
+     "I'd push back a little on that.",
+     "这一点我想稍微提出点不同看法。",
+     "push back 指“提出异议、反驳”，在美国职场是中性词，适度反对被视为有主见。"
+    ],
+    [
+     "That's a fair point.",
+     "这个说法有道理。",
+     "承认对方观点合理；讨论中多用这句能让气氛更好。"
+    ],
+    [
+     "Just to play devil's advocate, what if sales drop?",
+     "我故意唱个反调：如果销量下降怎么办？",
+     "play devil's advocate 表示“为了全面讨论而故意提出反方意见”，避免显得针对个人。"
+    ],
+    [
+     "I'm on the fence about this one.",
+     "这件事我还拿不定主意。",
+     "on the fence 表示犹豫、中立，适合还没想好时诚实表态。"
+    ],
+    [
+     "I'm fully on board with that.",
+     "我完全赞成。",
+     "be on board 表示“支持、加入”，表达赞同比 I agree 更有积极感。"
+    ]
+   ]
+  },
+  {
+   "scene": "给予反馈",
+   "items": [
+    [
+     "Great job on the presentation yesterday.",
+     "昨天的演示做得很棒。",
+     "表扬要具体说明是哪件事，英美职场习惯及时、公开地肯定同事。"
+    ],
+    [
+     "I really liked how you handled the client's questions.",
+     "我很欣赏你应对客户提问的方式。",
+     "具体指出好在哪里，比笼统的 good job 更有分量。"
+    ],
+    [
+     "Can I give you some feedback on the draft?",
+     "我可以对初稿提些意见吗？",
+     "提批评意见前先征求同意，让对方有心理准备。"
+    ],
+    [
+     "One thing you might want to work on is the structure.",
+     "你可能可以在结构上再下点功夫。",
+     "you might want to... 是非常委婉的建议句式，实际意思是“你应该……”。"
+    ],
+    [
+     "It would be even stronger if you added some data.",
+     "如果加一些数据就会更有说服力。",
+     "even stronger 先肯定再建议，这是常说的“三明治反馈法”。"
+    ],
+    [
+     "Thanks for the feedback — that's really helpful.",
+     "谢谢你的反馈，很有帮助。",
+     "收到批评时先道谢，不要急着解释或辩解。"
+    ],
+    [
+     "Could you clarify what you meant by \"too long\"?",
+     "你说的“太长”具体是指什么？",
+     "对模糊的反馈追问细节，是专业的表现，不算顶撞。"
+    ],
+    [
+     "I'll take that on board for next time.",
+     "下次我会注意这一点。",
+     "take sth on board（英式较多）表示“接受并采纳意见”。"
+    ]
+   ]
+  },
+  {
+   "scene": "接待来访客户",
+   "items": [
+    [
+     "Welcome to Brightway. Did you find us all right?",
+     "欢迎来到布莱特威。找过来还顺利吗？",
+     "客人到达时的寒暄，相当于中文的“路上辛苦了”。"
+    ],
+    [
+     "Can I get you something to drink? Coffee, tea, water?",
+     "要喝点什么吗？咖啡、茶还是水？",
+     "主动列出选项，客人更容易回答。"
+    ],
+    [
+     "Ms. Lopez will be right with you.",
+     "洛佩斯女士马上就来。",
+     "让客人稍等时用；be right with you 比 please wait 自然得多。"
+    ],
+    [
+     "Let me show you around the office.",
+     "我带您参观一下办公室。",
+     "show sb around 是“带人参观”的固定说法。"
+    ],
+    [
+     "This is where our design team works.",
+     "这里是我们设计团队办公的地方。",
+     "参观时介绍各区域的常用句式。"
+    ],
+    [
+     "Please make yourself at home.",
+     "请随意，别客气。",
+     "让客人放松的客套话，语气亲切。"
+    ],
+    [
+     "Thank you for coming all this way.",
+     "感谢您远道而来。",
+     "对从外地或海外来的客户表示感谢。"
+    ],
+    [
+     "Let me walk you to the elevator.",
+     "我送您到电梯口。",
+     "送客时用；walk sb to... 表示“陪某人走到……”。"
+    ]
+   ]
+  },
+  {
+   "scene": "产品介绍",
+   "items": [
+    [
+     "Let me give you a quick overview of what we offer.",
+     "我先简要介绍一下我们的产品和服务。",
+     "推销开场白，quick overview 让对方知道不会占用太多时间。"
+    ],
+    [
+     "Our software is designed for small and mid-sized businesses.",
+     "我们的软件是为中小企业设计的。",
+     "be designed for... 说明目标客户；mid-sized 是美式常用说法。"
+    ],
+    [
+     "What sets us apart is our customer support.",
+     "我们与众不同之处在于客户支持。",
+     "what sets us apart 用来强调竞争优势，比 our advantage is... 更自然。"
+    ],
+    [
+     "It can cut your processing time in half.",
+     "它能把您的处理时间缩短一半。",
+     "用具体数字说明好处，比空泛的形容词更有说服力。"
+    ],
+    [
+     "What are the biggest challenges you're facing right now?",
+     "您目前面临的最大挑战是什么？",
+     "顾问式销售的核心：先了解客户需求，而不是一直自说自话。"
+    ],
+    [
+     "Would you be interested in a free trial?",
+     "您有兴趣免费试用吗？",
+     "推动下一步行动的常用提议。"
+    ],
+    [
+     "I'd be happy to set up a demo for your team.",
+     "我很乐意为您的团队安排一次演示。",
+     "demo（演示）是 IT 和 B2B 销售的高频词。"
+    ],
+    [
+     "Pricing depends on the number of users.",
+     "价格取决于用户数量。",
+     "被问价格时先说明计价方式，避免一开口就报数字。"
+    ]
+   ]
+  },
+  {
+   "scene": "视频会议",
+   "items": [
+    [
+     "Can everyone hear me okay?",
+     "大家都能听清我说话吗？",
+     "线上会议开始时的标准确认句。"
+    ],
+    [
+     "You're on mute.",
+     "你开着静音呢。",
+     "提醒对方取消静音，是线上会议最常听到的一句话。"
+    ],
+    [
+     "Sorry, you broke up a bit there. Could you repeat that?",
+     "抱歉，刚才你的声音断断续续的，能再说一遍吗？",
+     "break up 指网络信号断断续续。"
+    ],
+    [
+     "Let me share my screen.",
+     "我来共享一下屏幕。",
+     "共享屏幕前先说一声，方便大家准备。"
+    ],
+    [
+     "Can you see my screen?",
+     "你们能看到我的屏幕吗？",
+     "共享后马上确认，避免对着空白屏幕讲半天。"
+    ],
+    [
+     "I think we lost Mike.",
+     "迈克好像掉线了。",
+     "有人断线时这样说；lose sb 在这里指“和某人断开连接”。"
+    ],
+    [
+     "I'll drop the link in the chat.",
+     "我把链接发到聊天框里。",
+     "drop 在口语里表示“随手发、放”，很地道。"
+    ],
+    [
+     "Sorry, I have a hard stop at three.",
+     "抱歉，我三点必须准时离开。",
+     "hard stop 表示到点必须结束，提前说明是礼貌的做法。"
+    ]
+   ]
+  },
+  {
+   "scene": "工作交接",
+   "items": [
+    [
+     "I'll be out of office from the 5th to the 12th.",
+     "我 5 号到 12 号不在公司。",
+     "out of office（OOO）是请假、出差不在岗的标准说法。"
+    ],
+    [
+     "Jenny will be covering for me while I'm away.",
+     "我不在的期间由珍妮代我处理工作。",
+     "cover for sb 表示“替某人顶班、代理工作”。"
+    ],
+    [
+     "I've put together a handover document.",
+     "我整理了一份交接文档。",
+     "handover 是“交接”；美式也常说 transition doc。"
+    ],
+    [
+     "Everything you need is in the shared drive.",
+     "你需要的资料都在共享盘里。",
+     "交接时告诉对方资料位置。"
+    ],
+    [
+     "The only urgent item is the Wilson proposal.",
+     "唯一紧急的事情是威尔逊的提案。",
+     "交接时主动点出优先级，对方会非常感激。"
+    ],
+    [
+     "Feel free to reach me by text if anything comes up.",
+     "如果有什么突发情况，可以发短信找我。",
+     "if anything comes up 表示“如果出了什么状况”。"
+    ],
+    [
+     "I've copied you on all the relevant emails.",
+     "相关邮件我都抄送给你了。",
+     "copy sb on... 表示“把某人加进抄送”。"
+    ],
+    [
+     "Thanks so much for picking this up.",
+     "非常感谢你接手这件事。",
+     "pick sth up 表示“接手工作”，交接结束时向同事道谢。"
+    ]
+   ]
+  },
+  {
+   "scene": "商务宴请",
+   "items": [
+    [
+     "Thank you for having us tonight.",
+     "感谢今晚的款待。",
+     "受邀用餐时开头致谢的常用句。"
+    ],
+    [
+     "Is there anything you'd recommend?",
+     "您有什么推荐的菜吗？",
+     "点菜时请主人推荐，既礼貌又能打开话题。"
+    ],
+    [
+     "Do you have any dietary restrictions?",
+     "您有什么饮食禁忌吗？",
+     "做东时必须提前问；欧美客户中素食、过敏的情况很普遍。"
+    ],
+    [
+     "I'll have what she's having.",
+     "我跟她点一样的。",
+     "不知道点什么时的便捷说法。"
+    ],
+    [
+     "I'd like to propose a toast to our partnership.",
+     "我提议为我们的合作干杯。",
+     "西方宴请敬酒通常只有一两次，不像中国酒桌那样频繁，也不劝酒。"
+    ],
+    [
+     "I'm fine, thanks. I'm driving tonight.",
+     "不用了，谢谢，我今晚要开车。",
+     "拒绝饮酒时简单说明即可，对方一般不会再劝。"
+    ],
+    [
+     "This one's on me.",
+     "这顿我请。",
+     "表示自己买单；也可以说 It's my treat.。"
+    ],
+    [
+     "Let's do this again next time you're in town.",
+     "下次您来这边我们再聚。",
+     "道别时的客套话，表示希望保持关系。"
+    ]
+   ]
+  },
+  {
+   "scene": "处理客户投诉",
+   "items": [
+    [
+     "I'm really sorry to hear that.",
+     "听到这个情况我真的很抱歉。",
+     "先共情，不要一上来就解释原因。"
+    ],
+    [
+     "I completely understand your frustration.",
+     "我完全理解您的不满。",
+     "认可对方情绪，有助于平息怒气。"
+    ],
+    [
+     "Let me look into this right away.",
+     "我马上调查一下这件事。",
+     "look into 表示“调查、了解”，显示你在认真处理。"
+    ],
+    [
+     "Could you give me your order number, please?",
+     "能告诉我您的订单号吗？",
+     "获取关键信息是处理投诉的第一步。"
+    ],
+    [
+     "That's definitely not the level of service we aim for.",
+     "这绝对不是我们追求的服务水平。",
+     "承认问题而不推卸责任，比辩解更能挽回信任。"
+    ],
+    [
+     "Here's what we can do for you.",
+     "我们可以为您这样处理。",
+     "引出解决方案的过渡句，把重点转向行动。"
+    ],
+    [
+     "We'll send a replacement at no extra cost.",
+     "我们会免费为您补发一件。",
+     "at no extra cost 表示“不额外收费”。"
+    ],
+    [
+     "I'll personally follow up to make sure it's resolved.",
+     "我会亲自跟进，确保问题得到解决。",
+     "承诺个人负责，让客户感到被重视。"
+    ]
+   ]
+  }
+ ],
+ "emails": [
+  {
+   "title": "回复报价",
+   "zh": "收到询价后向客户发送报价",
+   "body": [
+    "Subject: Quotation for Ceramic Mugs (Ref. Q-2417)",
+    "Dear Mr. Harris,",
+    "",
+    "Thank you for your inquiry and for your interest in our products.",
+    "Please find attached our quotation for 5,000 ceramic mugs (model CM-08).",
+    "The unit price is $2.35 FOB Ningbo, and the quote is valid for 30 days.",
+    "Our lead time is about four weeks from receipt of the deposit.",
+    "For orders over 10,000 units, we can offer an additional 5% discount.",
+    "",
+    "Please don't hesitate to contact me if you have any questions.",
+    "",
+    "Best regards,",
+    "Zhou Min",
+    "Sales Manager, Sunrise Ceramics Co., Ltd."
+   ],
+   "bodyZh": [
+    "主题：陶瓷马克杯报价（编号 Q-2417）",
+    "尊敬的哈里斯先生：",
+    "",
+    "感谢您的询价以及对我们产品的关注。",
+    "附件是 5,000 个陶瓷马克杯（型号 CM-08）的报价单，请查收。",
+    "单价为 2.35 美元（宁波离岸价），报价有效期 30 天。",
+    "交货周期为收到定金后约四周。",
+    "订单超过 10,000 个时，我们可额外提供 5% 的折扣。",
+    "",
+    "如有任何疑问，请随时与我联系。",
+    "",
+    "此致",
+    "周敏",
+    "旭日陶瓷有限公司 销售经理"
+   ]
+  },
+  {
+   "title": "订单确认",
+   "zh": "确认收到客户订单并告知后续安排",
+   "body": [
+    "Subject: Order Confirmation – PO #58321",
+    "Hi Rachel,",
+    "",
+    "Thanks for your order. I'm writing to confirm that we've received PO #58321.",
+    "Here's a quick summary:",
+    "- Item: LED desk lamp (DL-300), 1,200 units",
+    "- Total: $26,400",
+    "- Estimated ship date: June 14",
+    "",
+    "We'll send you the tracking number as soon as the shipment leaves our warehouse.",
+    "Please let me know if anything above needs to be changed.",
+    "",
+    "Thanks again for your business.",
+    "Kind regards,",
+    "Lin Hao"
+   ],
+   "bodyZh": [
+    "主题：订单确认——采购单 #58321",
+    "瑞秋，你好：",
+    "",
+    "感谢您的订单。特此确认我们已收到采购单 #58321。",
+    "订单概要如下：",
+    "- 品名：LED 台灯（DL-300），1,200 台",
+    "- 总金额：26,400 美元",
+    "- 预计发货日期：6 月 14 日",
+    "",
+    "货物一出仓库，我们就会把物流单号发给您。",
+    "如以上内容需要修改，请告知我。",
+    "",
+    "再次感谢您的惠顾。",
+    "祝好",
+    "林浩"
+   ]
+  },
+  {
+   "title": "发送发票",
+   "zh": "向客户发送发票并说明付款方式",
+   "body": [
+    "Subject: Invoice #INV-1093 for October Services",
+    "Dear Accounts Payable Team,",
+    "",
+    "Please find attached Invoice #INV-1093 for consulting services provided in October.",
+    "The total amount due is $8,750, payable within 30 days (by November 30).",
+    "Payment can be made by bank transfer to the account listed on the invoice.",
+    "Please include the invoice number as the payment reference.",
+    "",
+    "If you have any questions about this invoice, feel free to reach out.",
+    "",
+    "Best regards,",
+    "Xu Yan",
+    "Finance Department, Clearpath Consulting"
+   ],
+   "bodyZh": [
+    "主题：10 月服务费发票 #INV-1093",
+    "应付账款部门的各位：",
+    "",
+    "附件是 10 月咨询服务的发票 #INV-1093，请查收。",
+    "应付总额为 8,750 美元，请于 30 天内（11 月 30 日前）付款。",
+    "可通过银行转账支付至发票上列明的账户。",
+    "付款时请在附言中注明发票号码。",
+    "",
+    "如对本发票有任何疑问，欢迎随时联系。",
+    "",
+    "此致",
+    "徐燕",
+    "清途咨询 财务部"
+   ]
+  },
+  {
+   "title": "回复客户投诉",
+   "zh": "就产品问题向客户致歉并提出解决方案",
+   "body": [
+    "Subject: Re: Damaged Items in Order #7745",
+    "Dear Ms. Patel,",
+    "",
+    "Thank you for letting us know about the damaged items in your recent order.",
+    "I'm very sorry for the inconvenience this has caused.",
+    "After looking into it, we found that the boxes were not packed securely enough for overseas shipping.",
+    "We'll ship replacements for all 12 damaged units at no cost to you this week.",
+    "We've also updated our packing process to prevent this from happening again.",
+    "",
+    "We truly value your business and appreciate your patience.",
+    "",
+    "Sincerely,",
+    "Wu Lei",
+    "Customer Service Manager, Evergreen Supplies"
+   ],
+   "bodyZh": [
+    "主题：回复：订单 #7745 商品破损",
+    "尊敬的帕特尔女士：",
+    "",
+    "感谢您告知最近订单中商品破损的情况。",
+    "给您带来不便，我深表歉意。",
+    "经过调查，我们发现包装不够牢固，不适合海外运输。",
+    "本周我们将免费为您补发全部 12 件破损商品。",
+    "我们也已改进包装流程，防止此类情况再次发生。",
+    "",
+    "我们非常珍惜与您的合作，感谢您的耐心。",
+    "",
+    "此致敬礼",
+    "吴磊",
+    "常青用品 客户服务经理"
+   ]
+  },
+  {
+   "title": "引荐介绍",
+   "zh": "把两位联系人互相介绍认识",
+   "body": [
+    "Subject: Introduction: Daniel Brooks <> Liu Qing",
+    "Hi Daniel and Qing,",
+    "",
+    "I'd like to introduce you two, as I think you'd have a lot to talk about.",
+    "Daniel heads up logistics at Northstar Retail and is looking for a reliable partner in South China.",
+    "Qing runs a freight forwarding company in Shenzhen and has worked with several US retailers.",
+    "",
+    "I'll let you two take it from here.",
+    "",
+    "Best,",
+    "Helen"
+   ],
+   "bodyZh": [
+    "主题：引荐：丹尼尔·布鲁克斯 <> 刘清",
+    "丹尼尔、刘清，你们好：",
+    "",
+    "想介绍你们两位认识，我觉得你们会很聊得来。",
+    "丹尼尔负责北星零售的物流业务，正在华南寻找可靠的合作伙伴。",
+    "刘清在深圳经营一家货运代理公司，和多家美国零售商有过合作。",
+    "",
+    "接下来就交给你们俩了。",
+    "",
+    "祝好",
+    "海伦"
+   ]
+  },
+  {
+   "title": "项目进度汇报",
+   "zh": "每周向上司和相关人员汇报项目状态",
+   "body": [
+    "Subject: Weekly Update – Website Redesign (Week 6)",
+    "Hi all,",
+    "",
+    "Here's this week's update on the website redesign.",
+    "",
+    "Completed:",
+    "- Final designs for the homepage and product pages were approved.",
+    "- Content migration is about 70% done.",
+    "",
+    "Issues:",
+    "- The payment integration is delayed by about a week due to an API change.",
+    "",
+    "Next steps:",
+    "- Begin user testing on Monday.",
+    "- We're still on track for the July 1 launch.",
+    "",
+    "Let me know if you have any questions.",
+    "Thanks,",
+    "Zhang Yu"
+   ],
+   "bodyZh": [
+    "主题：每周进度——网站改版（第 6 周）",
+    "各位好：",
+    "",
+    "以下是本周网站改版的进度。",
+    "",
+    "已完成：",
+    "- 首页和产品页的最终设计已获批准。",
+    "- 内容迁移已完成约 70%。",
+    "",
+    "问题：",
+    "- 由于 API 变更，支付功能对接推迟约一周。",
+    "",
+    "下一步：",
+    "- 周一开始用户测试。",
+    "- 我们仍按计划于 7 月 1 日上线。",
+    "",
+    "如有问题请告诉我。",
+    "谢谢",
+    "张宇"
+   ]
+  },
+  {
+   "title": "会议纪要",
+   "zh": "会后发送会议要点和待办事项",
+   "body": [
+    "Subject: Recap – Q3 Marketing Planning Meeting",
+    "Hi team,",
+    "",
+    "Thanks for a productive meeting today. Here's a quick recap.",
+    "",
+    "Key decisions:",
+    "- We'll shift 20% of the print budget to social media ads.",
+    "- The fall campaign will launch on September 15.",
+    "",
+    "Action items:",
+    "- Amy: draft the campaign brief by Friday.",
+    "- Wang Jie: get quotes from three ad agencies.",
+    "- Mark: share last year's campaign data with the team.",
+    "",
+    "Please reply if I've missed anything.",
+    "Thanks,",
+    "Chen Xi"
+   ],
+   "bodyZh": [
+    "主题：会议纪要——第三季度营销规划会",
+    "大家好：",
+    "",
+    "感谢大家今天高效的讨论。以下是会议要点。",
+    "",
+    "主要决定：",
+    "- 将 20% 的印刷预算转投社交媒体广告。",
+    "- 秋季推广活动定于 9 月 15 日启动。",
+    "",
+    "待办事项：",
+    "- 艾米：周五前起草活动方案。",
+    "- 王杰：向三家广告公司询价。",
+    "- 马克：把去年的活动数据分享给团队。",
+    "",
+    "如有遗漏，请回复补充。",
+    "谢谢",
+    "陈曦"
+   ]
+  },
+  {
+   "title": "价格调整通知",
+   "zh": "提前通知客户涨价并说明原因",
+   "body": [
+    "Subject: Notice of Price Adjustment Effective March 1",
+    "Dear Valued Customer,",
+    "",
+    "We're writing to let you know about an upcoming change to our pricing.",
+    "Due to rising raw material and shipping costs, prices on our cotton product line will increase by 6% starting March 1.",
+    "All orders placed before that date will be honored at current prices.",
+    "We've worked hard to keep this increase as small as possible.",
+    "",
+    "Your account manager will be happy to discuss how this affects your upcoming orders.",
+    "Thank you for your understanding and continued support.",
+    "",
+    "Sincerely,",
+    "The Sales Team, Harmony Textiles"
+   ],
+   "bodyZh": [
+    "主题：关于 3 月 1 日起调整价格的通知",
+    "尊敬的客户：",
+    "",
+    "特此通知我们即将调整价格。",
+    "由于原材料和运输成本上涨，自 3 月 1 日起，我们棉制品系列的价格将上调 6%。",
+    "在此日期之前下的订单均按现行价格执行。",
+    "我们已尽最大努力将涨幅控制在最小范围。",
+    "",
+    "您的客户经理很乐意与您沟通此次调整对后续订单的影响。",
+    "感谢您的理解与一贯支持。",
+    "",
+    "此致敬礼",
+    "和谐纺织 销售团队"
+   ]
+  },
+  {
+   "title": "接受录用",
+   "zh": "正式接受工作录用并确认入职细节",
+   "body": [
+    "Subject: Job Offer Acceptance – Li Na",
+    "Dear Ms. Wright,",
+    "",
+    "Thank you so much for offering me the position of Data Analyst at Bluewave Analytics.",
+    "I'm delighted to formally accept the offer.",
+    "As discussed, I understand that my starting salary will be $78,000 per year and my start date will be August 4.",
+    "Please let me know if there's any paperwork I should complete before my first day.",
+    "",
+    "I'm really looking forward to joining the team.",
+    "",
+    "Best regards,",
+    "Li Na"
+   ],
+   "bodyZh": [
+    "主题：接受录用——李娜",
+    "尊敬的赖特女士：",
+    "",
+    "非常感谢贵公司为我提供蓝浪分析数据分析师的职位。",
+    "我很高兴正式接受这份录用。",
+    "按照之前的沟通，我的起薪为每年 78,000 美元，入职日期为 8 月 4 日。",
+    "如入职前需要我填写任何文件，请告诉我。",
+    "",
+    "非常期待加入团队。",
+    "",
+    "此致",
+    "李娜"
+   ]
+  },
+  {
+   "title": "离职告别",
+   "zh": "离职前向同事告别并留下联系方式",
+   "body": [
+    "Subject: Farewell and Thank You",
+    "Hi everyone,",
+    "",
+    "As some of you may know, Friday will be my last day at Redwood.",
+    "I've accepted a new role in Singapore, and I'm excited for the next chapter.",
+    "Working with all of you over the past four years has been a real privilege.",
+    "I've learned so much from this team, and I'll miss our Friday lunches.",
+    "",
+    "Mike will be taking over my accounts, so please reach out to him from next week.",
+    "Let's keep in touch — you can find me on LinkedIn or email me at sun.wei.work@example.com.",
+    "",
+    "All the best,",
+    "Sun Wei"
+   ],
+   "bodyZh": [
+    "主题：告别与感谢",
+    "大家好：",
+    "",
+    "也许有些同事已经知道，周五将是我在红木公司的最后一天。",
+    "我接受了新加坡的一份新工作，对人生的新篇章充满期待。",
+    "过去四年能和大家共事，是我莫大的荣幸。",
+    "我从这个团队学到了很多，也会怀念我们的周五午餐。",
+    "",
+    "我负责的客户将由迈克接手，下周起请直接联系他。",
+    "让我们保持联系——可以在领英上找到我，或发邮件到 sun.wei.work@example.com。",
+    "",
+    "祝一切顺利",
+    "孙伟"
+   ]
+  }
+ ],
+ "vocab": [
+  {
+   "cat": "公司组织",
+   "words": [
+    [
+     "headquarters",
+     "总部",
+     "Our headquarters is in Chicago.",
+     "我们的总部在芝加哥。"
+    ],
+    [
+     "branch office",
+     "分公司；分支机构",
+     "We're opening a new branch office in Shanghai.",
+     "我们将在上海开设一家新的分公司。"
+    ],
+    [
+     "subsidiary",
+     "子公司",
+     "The company has subsidiaries in five countries.",
+     "该公司在五个国家设有子公司。"
+    ],
+    [
+     "parent company",
+     "母公司",
+     "Our parent company is based in Germany.",
+     "我们的母公司总部设在德国。"
+    ],
+    [
+     "department",
+     "部门",
+     "Which department are you in?",
+     "你在哪个部门？"
+    ],
+    [
+     "division",
+     "事业部；分部",
+     "She runs the consumer products division.",
+     "她负责消费品事业部。"
+    ],
+    [
+     "human resources (HR)",
+     "人力资源部",
+     "Please send your timesheet to HR.",
+     "请把你的工时表交给人力资源部。"
+    ],
+    [
+     "accounting department",
+     "会计部",
+     "The accounting department closes the books on the 5th.",
+     "会计部每月 5 号结账。"
+    ],
+    [
+     "legal department",
+     "法务部",
+     "Legal needs to review the contract first.",
+     "合同需要先经过法务部审核。"
+    ],
+    [
+     "R&D",
+     "研发部",
+     "We invest 10% of revenue in R&D.",
+     "我们把营收的 10% 投入研发。"
+    ],
+    [
+     "customer service",
+     "客服部",
+     "Customer service is open 24/7.",
+     "客服部全天候服务。"
+    ],
+    [
+     "IT department",
+     "信息技术部",
+     "Contact the IT department if your laptop won't start.",
+     "如果笔记本电脑无法启动，请联系 IT 部门。"
+    ],
+    [
+     "startup",
+     "初创公司",
+     "He left a big bank to join a startup.",
+     "他离开大银行，加入了一家初创公司。"
+    ],
+    [
+     "board of directors",
+     "董事会",
+     "The board of directors approved the merger.",
+     "董事会批准了这次合并。"
+    ],
+    [
+     "shareholder",
+     "股东",
+     "The CEO sent a letter to shareholders.",
+     "首席执行官给股东写了一封信。"
+    ],
+    [
+     "org chart",
+     "组织架构图",
+     "Check the org chart to see who reports to whom.",
+     "看一下组织架构图就知道谁向谁汇报了。"
+    ],
+    [
+     "team",
+     "团队；小组",
+     "I'm on the marketing team.",
+     "我在市场团队。"
+    ],
+    [
+     "merger",
+     "合并",
+     "The merger will be completed next quarter.",
+     "合并将于下个季度完成。"
+    ],
+    [
+     "acquisition",
+     "收购",
+     "The acquisition gave us access to the Asian market.",
+     "这次收购让我们打开了亚洲市场。"
+    ],
+    [
+     "headcount",
+     "员工人数；编制",
+     "We're not allowed to increase headcount this year.",
+     "今年我们不能增加编制。"
+    ]
+   ]
+  },
+  {
+   "cat": "职位称呼",
+   "words": [
+    [
+     "CEO (chief executive officer)",
+     "首席执行官；总裁",
+     "The CEO will speak at the all-hands meeting.",
+     "首席执行官将在全员大会上讲话。"
+    ],
+    [
+     "CFO (chief financial officer)",
+     "首席财务官",
+     "The CFO presented the annual budget.",
+     "首席财务官介绍了年度预算。"
+    ],
+    [
+     "COO (chief operating officer)",
+     "首席运营官",
+     "The COO oversees day-to-day operations.",
+     "首席运营官负责日常运营。"
+    ],
+    [
+     "president",
+     "总裁；总经理",
+     "She was promoted to president last year.",
+     "她去年升任总裁。"
+    ],
+    [
+     "vice president (VP)",
+     "副总裁",
+     "He's the VP of sales.",
+     "他是销售副总裁。"
+    ],
+    [
+     "director",
+     "总监",
+     "Our marketing director approved the plan.",
+     "我们的市场总监批准了这个方案。"
+    ],
+    [
+     "general manager",
+     "总经理",
+     "The general manager of the hotel greeted us.",
+     "酒店总经理亲自迎接了我们。"
+    ],
+    [
+     "manager",
+     "经理",
+     "I need to check with my manager.",
+     "我需要和我的经理确认一下。"
+    ],
+    [
+     "supervisor",
+     "主管",
+     "Ask your supervisor about overtime.",
+     "加班的事问你的主管。"
+    ],
+    [
+     "team lead",
+     "组长；团队负责人",
+     "Tom is the team lead for this project.",
+     "汤姆是这个项目的组长。"
+    ],
+    [
+     "coordinator",
+     "协调员；专员",
+     "She's our event coordinator.",
+     "她是我们的活动专员。"
+    ],
+    [
+     "assistant",
+     "助理",
+     "My assistant will send you the details.",
+     "我的助理会把详细信息发给您。"
+    ],
+    [
+     "intern",
+     "实习生",
+     "We hire three interns every summer.",
+     "我们每年夏天招三名实习生。"
+    ],
+    [
+     "coworker",
+     "同事",
+     "I had lunch with a coworker.",
+     "我和一位同事吃了午饭。"
+    ],
+    [
+     "boss",
+     "老板；上司",
+     "My boss is out today.",
+     "我的上司今天不在。"
+    ],
+    [
+     "direct report",
+     "直属下属",
+     "She has five direct reports.",
+     "她手下有五名直属员工。"
+    ],
+    [
+     "account manager",
+     "客户经理",
+     "Your account manager will contact you.",
+     "您的客户经理会和您联系。"
+    ],
+    [
+     "consultant",
+     "顾问",
+     "We hired a consultant to review our process.",
+     "我们请了一位顾问来审查流程。"
+    ],
+    [
+     "founder",
+     "创始人",
+     "The founder still runs the company.",
+     "创始人至今仍在经营公司。"
+    ],
+    [
+     "executive",
+     "高管",
+     "Several executives attended the meeting.",
+     "几位高管出席了会议。"
+    ]
+   ]
+  },
+  {
+   "cat": "日常业务",
+   "words": [
+    [
+     "deadline",
+     "截止日期",
+     "The deadline for the proposal is Friday.",
+     "提案的截止日期是周五。"
+    ],
+    [
+     "task",
+     "任务",
+     "I have three tasks to finish today.",
+     "我今天有三项任务要完成。"
+    ],
+    [
+     "schedule",
+     "日程；进度表",
+     "Let me check my schedule.",
+     "我查一下我的日程。"
+    ],
+    [
+     "to-do list",
+     "待办清单",
+     "I always start the day with a to-do list.",
+     "我总是先列待办清单再开始一天的工作。"
+    ],
+    [
+     "priority",
+     "优先事项",
+     "This project is our top priority.",
+     "这个项目是我们的头等大事。"
+    ],
+    [
+     "follow up",
+     "跟进",
+     "I'll follow up with the client tomorrow.",
+     "我明天会跟进这位客户。"
+    ],
+    [
+     "update",
+     "最新进展",
+     "Can you give me an update on the order?",
+     "你能告诉我订单的最新进展吗？"
+    ],
+    [
+     "approval",
+     "批准；审批",
+     "We're still waiting for approval from finance.",
+     "我们还在等财务部批准。"
+    ],
+    [
+     "paperwork",
+     "文书工作；手续",
+     "There's a lot of paperwork for this visa.",
+     "办这个签证要准备很多材料。"
+    ],
+    [
+     "workload",
+     "工作量",
+     "My workload is pretty heavy this week.",
+     "我这周工作量挺大的。"
+    ],
+    [
+     "overtime",
+     "加班",
+     "We had to work overtime to meet the deadline.",
+     "为了赶上截止日期，我们不得不加班。"
+    ],
+    [
+     "day off",
+     "休息日；请假一天",
+     "I'm taking a day off on Monday.",
+     "我周一请一天假。"
+    ],
+    [
+     "business trip",
+     "出差",
+     "She's on a business trip to London.",
+     "她去伦敦出差了。"
+    ],
+    [
+     "cc",
+     "抄送",
+     "Please cc me on that email.",
+     "那封邮件请抄送给我。"
+    ],
+    [
+     "attachment",
+     "附件",
+     "I forgot to include the attachment.",
+     "我忘了加附件。"
+    ],
+    [
+     "draft",
+     "草稿；初稿",
+     "I'll send you a draft by noon.",
+     "我中午前把初稿发给你。"
+    ],
+    [
+     "feedback",
+     "反馈意见",
+     "Thanks for the quick feedback.",
+     "谢谢你这么快给反馈。"
+    ],
+    [
+     "reminder",
+     "提醒",
+     "I set a reminder for the meeting.",
+     "我给这个会议设了提醒。"
+    ],
+    [
+     "heads-up",
+     "提前告知",
+     "Thanks for the heads-up about the delay.",
+     "谢谢你提前告诉我会延误。"
+    ],
+    [
+     "touch base",
+     "联系一下；碰个头",
+     "Let's touch base next week.",
+     "我们下周再碰一下。"
+    ]
+   ]
+  },
+  {
+   "cat": "会议",
+   "words": [
+    [
+     "agenda",
+     "议程",
+     "I'll send out the agenda before the meeting.",
+     "我会在会前发出议程。"
+    ],
+    [
+     "minutes",
+     "会议记录",
+     "Who's taking the minutes today?",
+     "今天谁负责做会议记录？"
+    ],
+    [
+     "chair",
+     "主持（会议）",
+     "Linda will chair the meeting.",
+     "琳达将主持会议。"
+    ],
+    [
+     "attendee",
+     "与会者",
+     "There were about 20 attendees.",
+     "大约有 20 名与会者。"
+    ],
+    [
+     "conference room",
+     "会议室",
+     "I booked the conference room for 2 p.m.",
+     "我订了下午两点的会议室。"
+    ],
+    [
+     "all-hands meeting",
+     "全员大会",
+     "The CEO announced the news at the all-hands meeting.",
+     "首席执行官在全员大会上宣布了这个消息。"
+    ],
+    [
+     "one-on-one",
+     "一对一面谈",
+     "I have a one-on-one with my manager every week.",
+     "我每周和经理有一次一对一面谈。"
+    ],
+    [
+     "brainstorm",
+     "头脑风暴",
+     "Let's brainstorm some ideas for the campaign.",
+     "我们来为这次活动头脑风暴一些点子。"
+    ],
+    [
+     "action item",
+     "待办事项",
+     "Let's go over the action items.",
+     "我们来过一遍待办事项。"
+    ],
+    [
+     "wrap up",
+     "结束；收尾",
+     "Let's wrap up the meeting here.",
+     "会议就到这里吧。"
+    ],
+    [
+     "reschedule",
+     "改期",
+     "Can we reschedule to Thursday?",
+     "我们能改到周四吗？"
+    ],
+    [
+     "postpone",
+     "推迟",
+     "The meeting has been postponed until next week.",
+     "会议推迟到下周了。"
+    ],
+    [
+     "quorum",
+     "法定人数",
+     "We can't vote without a quorum.",
+     "人数不够，无法表决。"
+    ],
+    [
+     "presentation",
+     "演示；汇报",
+     "Her presentation was very clear.",
+     "她的演示讲得很清楚。"
+    ],
+    [
+     "slide",
+     "幻灯片",
+     "Can you go back to the previous slide?",
+     "能回到上一张幻灯片吗？"
+    ],
+    [
+     "handout",
+     "会议资料；讲义",
+     "Please take a handout on your way in.",
+     "进场时请领取一份资料。"
+    ],
+    [
+     "consensus",
+     "共识",
+     "We finally reached a consensus.",
+     "我们终于达成了共识。"
+    ],
+    [
+     "vote",
+     "投票；表决",
+     "Let's put it to a vote.",
+     "我们来投票表决吧。"
+    ],
+    [
+     "video call",
+     "视频通话",
+     "We'll do the interview over a video call.",
+     "面试会通过视频通话进行。"
+    ],
+    [
+     "calendar invite",
+     "日历邀请",
+     "I just sent you a calendar invite.",
+     "我刚给你发了日历邀请。"
+    ]
+   ]
+  },
+  {
+   "cat": "销售营业",
+   "words": [
+    [
+     "client",
+     "客户",
+     "We're meeting a new client today.",
+     "我们今天要见一位新客户。"
+    ],
+    [
+     "prospect",
+     "潜在客户",
+     "He's been calling prospects all morning.",
+     "他一上午都在给潜在客户打电话。"
+    ],
+    [
+     "lead",
+     "销售线索",
+     "The trade show gave us 50 new leads.",
+     "这次展会给我们带来了 50 条新线索。"
+    ],
+    [
+     "quote",
+     "报价",
+     "Could you send me a quote?",
+     "能给我发一份报价吗？"
+    ],
+    [
+     "discount",
+     "折扣",
+     "We can offer a 10% discount for bulk orders.",
+     "大批量订单我们可以打九折。"
+    ],
+    [
+     "commission",
+     "佣金；提成",
+     "Sales reps earn a 5% commission.",
+     "销售代表可以拿 5% 的提成。"
+    ],
+    [
+     "target",
+     "目标；指标",
+     "We hit our sales target this quarter.",
+     "我们这个季度完成了销售目标。"
+    ],
+    [
+     "pitch",
+     "推销；提案陈述",
+     "She gave a great pitch to the investors.",
+     "她向投资人做了一次精彩的推介。"
+    ],
+    [
+     "negotiate",
+     "谈判；协商",
+     "We need to negotiate better terms.",
+     "我们需要争取更好的条件。"
+    ],
+    [
+     "close a deal",
+     "成交；谈成生意",
+     "We finally closed the deal with Apex.",
+     "我们终于和艾佩克斯谈成了这笔生意。"
+    ],
+    [
+     "contract",
+     "合同",
+     "Both parties signed the contract.",
+     "双方签署了合同。"
+    ],
+    [
+     "market share",
+     "市场份额",
+     "We want to grow our market share in Europe.",
+     "我们想扩大在欧洲的市场份额。"
+    ],
+    [
+     "competitor",
+     "竞争对手",
+     "Our main competitor just cut prices.",
+     "我们的主要竞争对手刚刚降价了。"
+    ],
+    [
+     "sales rep",
+     "销售代表",
+     "A sales rep will call you shortly.",
+     "销售代表很快会给您打电话。"
+    ],
+    [
+     "cold call",
+     "陌生电话拜访",
+     "I spent the day making cold calls.",
+     "我花了一整天打陌生拜访电话。"
+    ],
+    [
+     "upsell",
+     "追加销售",
+     "Try to upsell the premium plan.",
+     "试着推销一下高级套餐。"
+    ],
+    [
+     "retail",
+     "零售",
+     "Our products are sold in retail stores.",
+     "我们的产品在零售店有售。"
+    ],
+    [
+     "wholesale",
+     "批发",
+     "We only sell wholesale.",
+     "我们只做批发。"
+    ],
+    [
+     "trade show",
+     "展会；交易会",
+     "We'll have a booth at the trade show.",
+     "我们会在展会上设展位。"
+    ],
+    [
+     "sample",
+     "样品",
+     "Can you send us a sample first?",
+     "能先给我们寄个样品吗？"
+    ]
+   ]
+  },
+  {
+   "cat": "财务会计",
+   "words": [
+    [
+     "budget",
+     "预算",
+     "We're over budget on this project.",
+     "这个项目超预算了。"
+    ],
+    [
+     "revenue",
+     "营收；收入",
+     "Revenue grew 12% last year.",
+     "去年营收增长了 12%。"
+    ],
+    [
+     "profit",
+     "利润",
+     "The company made a record profit.",
+     "公司实现了创纪录的利润。"
+    ],
+    [
+     "loss",
+     "亏损",
+     "The store operated at a loss for two years.",
+     "这家店亏损经营了两年。"
+    ],
+    [
+     "cost",
+     "成本",
+     "We need to cut costs.",
+     "我们需要削减成本。"
+    ],
+    [
+     "expense report",
+     "报销单；费用报告",
+     "Submit your expense report within a week.",
+     "请在一周内提交报销单。"
+    ],
+    [
+     "reimburse",
+     "报销；偿还",
+     "The company will reimburse your travel expenses.",
+     "公司会报销你的差旅费。"
+    ],
+    [
+     "invoice",
+     "发票；账单",
+     "We'll send the invoice at the end of the month.",
+     "我们会在月底寄发票。"
+    ],
+    [
+     "receipt",
+     "收据",
+     "Keep all your receipts.",
+     "请保留所有收据。"
+    ],
+    [
+     "accounts receivable",
+     "应收账款",
+     "Accounts receivable rose sharply this quarter.",
+     "本季度应收账款大幅增加。"
+    ],
+    [
+     "accounts payable",
+     "应付账款",
+     "Accounts payable handles supplier payments.",
+     "应付账款部门负责向供应商付款。"
+    ],
+    [
+     "cash flow",
+     "现金流",
+     "Cash flow is tight right now.",
+     "现在现金流比较紧张。"
+    ],
+    [
+     "balance sheet",
+     "资产负债表",
+     "The auditor reviewed our balance sheet.",
+     "审计师审查了我们的资产负债表。"
+    ],
+    [
+     "fiscal year",
+     "财政年度",
+     "Our fiscal year ends in June.",
+     "我们的财政年度在 6 月结束。"
+    ],
+    [
+     "audit",
+     "审计",
+     "The annual audit starts next week.",
+     "年度审计下周开始。"
+    ],
+    [
+     "tax",
+     "税",
+     "Prices don't include sales tax.",
+     "价格不含销售税。"
+    ],
+    [
+     "forecast",
+     "预测",
+     "We revised our sales forecast downward.",
+     "我们下调了销售预测。"
+    ],
+    [
+     "break even",
+     "收支平衡",
+     "We expect to break even by next year.",
+     "我们预计明年实现收支平衡。"
+    ],
+    [
+     "margin",
+     "利润率",
+     "Our margins on this product are thin.",
+     "这款产品的利润率很低。"
+    ],
+    [
+     "ROI (return on investment)",
+     "投资回报率",
+     "What's the ROI on this campaign?",
+     "这次活动的投资回报率是多少？"
+    ]
+   ]
+  },
+  {
+   "cat": "人事劳务",
+   "words": [
+    [
+     "hire",
+     "雇用；招聘",
+     "We're hiring two new engineers.",
+     "我们正在招两名新工程师。"
+    ],
+    [
+     "recruit",
+     "招募；招聘",
+     "We recruit heavily from local universities.",
+     "我们大量从本地大学招人。"
+    ],
+    [
+     "onboarding",
+     "入职培训；新人引导",
+     "Onboarding takes about two weeks.",
+     "入职培训大约需要两周。"
+    ],
+    [
+     "salary",
+     "薪水；月薪/年薪",
+     "The salary is paid twice a month.",
+     "工资每月发两次。"
+    ],
+    [
+     "raise",
+     "加薪",
+     "I asked my boss for a raise.",
+     "我向老板提出了加薪。"
+    ],
+    [
+     "bonus",
+     "奖金",
+     "Everyone got a year-end bonus.",
+     "每个人都拿到了年终奖。"
+    ],
+    [
+     "benefits",
+     "福利",
+     "The benefits include health insurance and a 401(k).",
+     "福利包括医疗保险和 401(k) 退休计划。"
+    ],
+    [
+     "promotion",
+     "晋升",
+     "Congratulations on your promotion!",
+     "恭喜你升职！"
+    ],
+    [
+     "performance review",
+     "绩效考核",
+     "My performance review is next month.",
+     "我的绩效考核在下个月。"
+    ],
+    [
+     "PTO (paid time off)",
+     "带薪休假",
+     "I have 15 days of PTO a year.",
+     "我每年有 15 天带薪假。"
+    ],
+    [
+     "sick leave",
+     "病假",
+     "She's on sick leave this week.",
+     "她这周请了病假。"
+    ],
+    [
+     "maternity leave",
+     "产假",
+     "She'll be on maternity leave until March.",
+     "她休产假到三月。"
+    ],
+    [
+     "resign",
+     "辞职",
+     "He resigned to start his own business.",
+     "他辞职自己创业了。"
+    ],
+    [
+     "two weeks' notice",
+     "提前两周辞职通知",
+     "I handed in my two weeks' notice today.",
+     "我今天提交了辞职通知，两周后离职。"
+    ],
+    [
+     "lay off",
+     "裁员",
+     "The factory laid off 200 workers.",
+     "工厂裁掉了 200 名工人。"
+    ],
+    [
+     "fire",
+     "解雇；开除",
+     "He was fired for missing too many days.",
+     "他因缺勤太多被解雇了。"
+    ],
+    [
+     "full-time",
+     "全职",
+     "Is this a full-time position?",
+     "这是全职岗位吗？"
+    ],
+    [
+     "part-time",
+     "兼职",
+     "She works part-time on weekends.",
+     "她周末做兼职。"
+    ],
+    [
+     "probation period",
+     "试用期",
+     "The probation period is 90 days.",
+     "试用期为 90 天。"
+    ],
+    [
+     "remote work",
+     "远程办公",
+     "The company allows remote work two days a week.",
+     "公司允许每周远程办公两天。"
+    ]
+   ]
+  },
+  {
+   "cat": "贸易物流",
+   "words": [
+    [
+     "import",
+     "进口",
+     "We import coffee beans from Brazil.",
+     "我们从巴西进口咖啡豆。"
+    ],
+    [
+     "export",
+     "出口",
+     "China exports a lot of electronics.",
+     "中国出口大量电子产品。"
+    ],
+    [
+     "supplier",
+     "供应商",
+     "We're looking for a new supplier.",
+     "我们正在找新的供应商。"
+    ],
+    [
+     "purchase order (PO)",
+     "采购订单",
+     "Please reference the PO number on your invoice.",
+     "请在发票上注明采购订单号。"
+    ],
+    [
+     "shipment",
+     "货物；发货",
+     "The shipment arrived two days late.",
+     "这批货晚到了两天。"
+    ],
+    [
+     "freight",
+     "运费；货运",
+     "Freight costs have doubled.",
+     "运费翻了一倍。"
+    ],
+    [
+     "customs",
+     "海关",
+     "The goods are stuck in customs.",
+     "货物卡在海关了。"
+    ],
+    [
+     "tariff",
+     "关税",
+     "The new tariffs hit our profits.",
+     "新关税影响了我们的利润。"
+    ],
+    [
+     "warehouse",
+     "仓库",
+     "The goods are stored in our warehouse in Ohio.",
+     "货物存放在我们俄亥俄州的仓库里。"
+    ],
+    [
+     "inventory",
+     "库存",
+     "We need to reduce our inventory.",
+     "我们需要减少库存。"
+    ],
+    [
+     "in stock",
+     "有货",
+     "Is this item in stock?",
+     "这件商品有货吗？"
+    ],
+    [
+     "out of stock",
+     "缺货",
+     "Sorry, that model is out of stock.",
+     "抱歉，那款型号缺货了。"
+    ],
+    [
+     "lead time",
+     "交货周期",
+     "The lead time is six weeks.",
+     "交货周期是六周。"
+    ],
+    [
+     "tracking number",
+     "物流单号",
+     "Here's the tracking number for your package.",
+     "这是您包裹的物流单号。"
+    ],
+    [
+     "container",
+     "集装箱",
+     "We shipped three containers to Rotterdam.",
+     "我们发了三个集装箱到鹿特丹。"
+    ],
+    [
+     "bill of lading",
+     "提单",
+     "The bill of lading was sent by courier.",
+     "提单已通过快递寄出。"
+    ],
+    [
+     "letter of credit (L/C)",
+     "信用证",
+     "Payment will be made by letter of credit.",
+     "付款将以信用证方式进行。"
+    ],
+    [
+     "FOB (free on board)",
+     "离岸价",
+     "The price is $5 per unit FOB Shenzhen.",
+     "价格为每件 5 美元，深圳离岸价。"
+    ],
+    [
+     "supply chain",
+     "供应链",
+     "The pandemic disrupted global supply chains.",
+     "疫情扰乱了全球供应链。"
+    ],
+    [
+     "minimum order quantity (MOQ)",
+     "最低起订量",
+     "What's your minimum order quantity?",
+     "你们的最低起订量是多少？"
+    ]
+   ]
+  },
+  {
+   "cat": "IT办公",
+   "words": [
+    [
+     "laptop",
+     "笔记本电脑",
+     "IT will set up your laptop on your first day.",
+     "入职第一天 IT 会帮你配置好笔记本电脑。"
+    ],
+    [
+     "password",
+     "密码",
+     "You need to reset your password every 90 days.",
+     "你每 90 天需要重置一次密码。"
+    ],
+    [
+     "log in",
+     "登录",
+     "I can't log in to my account.",
+     "我登录不了我的账户。"
+    ],
+    [
+     "shared drive",
+     "共享盘",
+     "I saved the file on the shared drive.",
+     "我把文件存在共享盘上了。"
+    ],
+    [
+     "spreadsheet",
+     "电子表格",
+     "I'll put the numbers in a spreadsheet.",
+     "我会把数据放进电子表格里。"
+    ],
+    [
+     "printer",
+     "打印机",
+     "The printer on the third floor is jammed.",
+     "三楼的打印机卡纸了。"
+    ],
+    [
+     "scan",
+     "扫描",
+     "Could you scan this and email it to me?",
+     "你能把这个扫描后发邮件给我吗？"
+    ],
+    [
+     "Wi-Fi",
+     "无线网络",
+     "What's the Wi-Fi password?",
+     "无线网络的密码是多少？"
+    ],
+    [
+     "VPN",
+     "虚拟专用网络",
+     "Connect to the VPN when working from home.",
+     "在家办公时请连接 VPN。"
+    ],
+    [
+     "update (software)",
+     "（软件）更新",
+     "Please install the latest software update.",
+     "请安装最新的软件更新。"
+    ],
+    [
+     "back up",
+     "备份",
+     "Make sure you back up your files.",
+     "一定要备份好你的文件。"
+    ],
+    [
+     "crash",
+     "崩溃；死机",
+     "My computer crashed and I lost my work.",
+     "我的电脑死机了，做的东西全没了。"
+    ],
+    [
+     "IT help desk",
+     "IT 服务台",
+     "Submit a ticket to the IT help desk.",
+     "向 IT 服务台提交一个工单。"
+    ],
+    [
+     "ticket",
+     "（服务）工单",
+     "I opened a ticket for the broken monitor.",
+     "我为坏掉的显示器提交了工单。"
+    ],
+    [
+     "access",
+     "访问权限",
+     "I don't have access to that folder.",
+     "我没有那个文件夹的访问权限。"
+    ],
+    [
+     "upload",
+     "上传",
+     "Upload your slides to the shared folder.",
+     "把你的幻灯片上传到共享文件夹。"
+    ],
+    [
+     "download",
+     "下载",
+     "You can download the report from the portal.",
+     "你可以从门户网站下载报告。"
+    ],
+    [
+     "cloud",
+     "云端",
+     "All our data is stored in the cloud.",
+     "我们所有的数据都存在云端。"
+    ],
+    [
+     "phishing",
+     "网络钓鱼",
+     "Don't click links in phishing emails.",
+     "不要点击钓鱼邮件里的链接。"
+    ],
+    [
+     "messaging app",
+     "即时通讯工具",
+     "We use Slack as our messaging app.",
+     "我们用 Slack 作为即时通讯工具。"
+    ]
+   ]
+  },
+  {
+   "cat": "求职就职",
+   "words": [
+    [
+     "résumé",
+     "简历",
+     "Please attach your résumé.",
+     "请附上您的简历。"
+    ],
+    [
+     "cover letter",
+     "求职信",
+     "A good cover letter can make you stand out.",
+     "一封好的求职信能让你脱颖而出。"
+    ],
+    [
+     "job posting",
+     "招聘启事",
+     "I saw your job posting on LinkedIn.",
+     "我在领英上看到了贵公司的招聘启事。"
+    ],
+    [
+     "apply for",
+     "申请（职位）",
+     "I'm applying for the marketing position.",
+     "我在申请市场营销的职位。"
+    ],
+    [
+     "applicant",
+     "求职者；申请人",
+     "We received over 300 applicants.",
+     "我们收到了 300 多名求职者的申请。"
+    ],
+    [
+     "candidate",
+     "候选人",
+     "She's the strongest candidate so far.",
+     "她是目前最有实力的候选人。"
+    ],
+    [
+     "interview",
+     "面试",
+     "I have a job interview tomorrow.",
+     "我明天有个工作面试。"
+    ],
+    [
+     "recruiter",
+     "招聘人员；猎头",
+     "A recruiter contacted me about a job.",
+     "一位招聘人员联系我谈一份工作。"
+    ],
+    [
+     "reference",
+     "推荐人；推荐信",
+     "Can you provide two references?",
+     "您能提供两位推荐人吗？"
+    ],
+    [
+     "qualifications",
+     "资质；任职资格",
+     "What qualifications do I need for this job?",
+     "这份工作需要什么资质？"
+    ],
+    [
+     "experience",
+     "经验",
+     "Do you have any experience in sales?",
+     "你有销售经验吗？"
+    ],
+    [
+     "skill set",
+     "技能组合",
+     "Your skill set is a great fit for this role.",
+     "你的技能组合非常适合这个岗位。"
+    ],
+    [
+     "job offer",
+     "录用通知",
+     "I got a job offer from Google.",
+     "我收到了谷歌的录用通知。"
+    ],
+    [
+     "offer letter",
+     "录用信",
+     "HR will email you the offer letter.",
+     "人力资源部会把录用信发邮件给你。"
+    ],
+    [
+     "negotiate salary",
+     "谈薪资",
+     "Don't be afraid to negotiate your salary.",
+     "不要害怕谈薪资。"
+    ],
+    [
+     "starting salary",
+     "起薪",
+     "The starting salary is $60,000.",
+     "起薪是 6 万美元。"
+    ],
+    [
+     "background check",
+     "背景调查",
+     "The offer depends on a background check.",
+     "录用以背景调查通过为前提。"
+    ],
+    [
+     "networking",
+     "人脉拓展；社交",
+     "Networking helped me find this job.",
+     "我是靠人脉找到这份工作的。"
+    ],
+    [
+     "career fair",
+     "招聘会",
+     "I met the recruiter at a career fair.",
+     "我在招聘会上认识了这位招聘人员。"
+    ],
+    [
+     "work visa",
+     "工作签证",
+     "The company will sponsor your work visa.",
+     "公司会为你担保办理工作签证。"
+    ]
+   ]
+  }
+ ]
+}

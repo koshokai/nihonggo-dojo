@@ -1,0 +1,1695 @@
+{
+ "scenes": [
+  {
+   "cat": "职场基础",
+   "lv": "四级",
+   "title": "First Day on the Team",
+   "zh": "入职第一天和团队打招呼",
+   "photo": "Canary Wharf / One Canada Square / Canary Wharf station",
+   "note": "英国办公室普遍直呼名字，经理说 call me Emma 就别再叫 Ms. Clarke。「请多关照」直译成 Please take care of me 像是需要人照顾，应说 I'm looking forward to working with you。staff 是集体名词，不说 a new staff，要说 a new member of staff。同事约午饭时爽快答应，有助于融入团队。",
+   "lines": [
+    [
+     "经理 (Emma Clarke)",
+     "Morning, everyone. This is Wang Lei. He's joining us from today as a data analyst.",
+     "大家早。这位是王磊，从今天起作为数据分析师加入我们。"
+    ],
+    [
+     "王磊 (Wang Lei)",
+     "Hi, everyone. Really nice to meet you all. I'm looking forward to working with you.",
+     "大家好，很高兴认识大家，期待和大家一起工作。"
+    ],
+    [
+     "经理 (Emma Clarke)",
+     "Wang Lei, this is Tom. He'll be your buddy for the first few weeks.",
+     "王磊，这是汤姆。头几周由他带你。"
+    ],
+    [
+     "同事 (Tom Hughes)",
+     "Welcome aboard! Shout if you need anything — I'm just over there.",
+     "欢迎加入！有需要就跟我说，我就坐在那边。"
+    ],
+    [
+     "王磊 (Wang Lei)",
+     "Thanks, Tom. Nice to meet you. Sorry, Ms. Clarke, where should I put my things?",
+     "谢谢汤姆，很高兴认识你。不好意思，克拉克女士，我的东西放哪儿？"
+    ],
+    [
+     "经理 (Emma Clarke)",
+     "Oh, please call me Emma — we're all on first-name terms here. Your desk is the one by the window.",
+     "哦，叫我艾玛就好，我们这儿都直呼名字。你的座位是靠窗那张。"
+    ],
+    [
+     "王磊 (Wang Lei)",
+     "Got it. Thanks, Emma.",
+     "明白了，谢谢艾玛。"
+    ],
+    [
+     "同事 (Tom Hughes)",
+     "Fancy grabbing lunch with the team later? There's a decent place near the station.",
+     "待会儿要不要和大家一起吃午饭？车站附近有家不错的店。"
+    ],
+    [
+     "王磊 (Wang Lei)",
+     "Sounds great. Count me in.",
+     "好啊，算我一个。"
+    ]
+   ],
+   "phr": [
+    [
+     "He's joining us (from today) as ...",
+     "他（从今天起）以……身份加入我们；介绍新人的标准说法"
+    ],
+    [
+     "I'm looking forward to working with you.",
+     "期待与大家共事；代替「请多关照」"
+    ],
+    [
+     "Welcome aboard!",
+     "欢迎加入（团队）！"
+    ],
+    [
+     "Shout if you need anything.",
+     "有需要就说一声；shout 在这里不是「大喊」"
+    ],
+    [
+     "We're on first-name terms here.",
+     "我们这里都直呼名字"
+    ],
+    [
+     "Count me in.",
+     "算我一个"
+    ]
+   ],
+   "q": [
+    [
+     "想表达「请多关照」，最自然的是？",
+     "I'm looking forward to working with you.",
+     "Please take care of me.",
+     "Please give me more care.",
+     "I hope you can look after me a lot."
+    ],
+    [
+     "同事说 Shout if you need anything. 意思是？",
+     "有需要就跟我说",
+     "有事就大声喊",
+     "上班不要大声说话",
+     "有需要去找经理"
+    ],
+    [
+     "Which sentence is correct?",
+     "I'm a new member of staff.",
+     "I'm a new staff.",
+     "I'm a new staffs.",
+     "I'm new staff of the team."
+    ]
+   ]
+  },
+  {
+   "cat": "职场基础",
+   "lv": "六级",
+   "title": "Asking a Colleague for a Favour",
+   "zh": "向同事请教、请对方帮忙",
+   "photo": "Raffles Place / Marina Bay Financial Centre",
+   "note": "请同事帮忙时常用 Would you mind...? 或 I was wondering if you could... 软化语气。中国人常说 Please help me check...，在英语里像命令。注意：愿意帮忙要回答 Not at all，答 Yes 反而是「介意」。事后说 I owe you one 或请杯咖啡，是自然的答谢方式。",
+   "lines": [
+    [
+     "周敏 (Zhou Min)",
+     "Hey Priya, have you got a sec?",
+     "嘿，普丽娅，你有空吗？"
+    ],
+    [
+     "同事 (Priya Nair)",
+     "Sure, what's up?",
+     "有啊，怎么了？"
+    ],
+    [
+     "周敏 (Zhou Min)",
+     "I'm trying to submit my expense claim, but the system keeps rejecting it. Would you mind having a quick look?",
+     "我想提交报销单，但系统一直退回。你介意帮我看一眼吗？"
+    ],
+    [
+     "同事 (Priya Nair)",
+     "Not at all. Ah, I see — you need to attach the receipt as a PDF, not a photo.",
+     "不介意。啊，我知道了，收据要用 PDF 附上，不能用照片。"
+    ],
+    [
+     "周敏 (Zhou Min)",
+     "That explains it. Sorry to bother you with something so basic.",
+     "原来如此。拿这么基础的问题麻烦你，不好意思。"
+    ],
+    [
+     "同事 (Priya Nair)",
+     "Don't worry about it — it tripped me up too when I started.",
+     "别在意，我刚来的时候也被这个难住过。"
+    ],
+    [
+     "周敏 (Zhou Min)",
+     "Also, I was wondering if you could cast an eye over my slides before Thursday? No rush.",
+     "另外，周四前你能不能帮我看看幻灯片？不急。"
+    ],
+    [
+     "同事 (Priya Nair)",
+     "Happy to. Just send them over and I'll get back to you by tomorrow.",
+     "乐意帮忙。发给我吧，我明天前回复你。"
+    ],
+    [
+     "周敏 (Zhou Min)",
+     "Thanks a million. I owe you a coffee.",
+     "太感谢了，我欠你一杯咖啡。"
+    ]
+   ],
+   "phr": [
+    [
+     "Have you got a sec?",
+     "你有空吗？（打扰别人前的开场）"
+    ],
+    [
+     "Would you mind having a quick look?",
+     "你介意帮我看一眼吗？"
+    ],
+    [
+     "I was wondering if you could ...",
+     "不知道你能不能……；比 Can you 更委婉"
+    ],
+    [
+     "cast an eye over ...",
+     "大致看一下、过目"
+    ],
+    [
+     "It tripped me up too.",
+     "我也被它难住过"
+    ],
+    [
+     "I owe you one. / I owe you a coffee.",
+     "欠你个人情／欠你一杯咖啡"
+    ]
+   ],
+   "q": [
+    [
+     "对方问 Would you mind having a look? 你愿意帮忙，应回答？",
+     "Not at all. Send it over.",
+     "Yes, I mind.",
+     "Yes, of course I mind.",
+     "No, I can't mind."
+    ],
+    [
+     "Which request sounds the most polite?",
+     "I was wondering if you could review my slides.",
+     "Please help me check my slides.",
+     "You must check my slides.",
+     "Check my slides for me."
+    ],
+    [
+     "It tripped me up too. 的意思是？",
+     "我当初也被这个难住过",
+     "我也被绊倒过",
+     "我也去旅行过",
+     "我也觉得很简单"
+    ]
+   ]
+  },
+  {
+   "cat": "电话",
+   "lv": "四级",
+   "title": "Taking a Message",
+   "zh": "替同事接电话并留言",
+   "photo": "Midtown Manhattan / Rockefeller Center",
+   "note": "接电话先报公司名，再说「名字 + speaking」。问对方是谁时说 Who are you? 很失礼，应说 May I ask who's calling?。同事不在时别说 He is not here，用 I'm afraid he's in a meeting 更客气。姓名和号码要请对方拼写，并复述确认（Let me read that back）。",
+   "lines": [
+    [
+     "刘洋 (Liu Yang)",
+     "Good morning, Kestrel Software, Liu Yang speaking.",
+     "早上好，凯斯特软件公司，我是刘洋。"
+    ],
+    [
+     "来电者 (Diane Ross)",
+     "Hi, could I speak to Mark Bennett, please?",
+     "你好，请找马克·贝内特。"
+    ],
+    [
+     "刘洋 (Liu Yang)",
+     "I'm afraid Mark's in a meeting at the moment. Can I take a message?",
+     "不好意思，马克正在开会。需要我帮您留言吗？"
+    ],
+    [
+     "来电者 (Diane Ross)",
+     "Yes, please. This is Diane Ross from Parkside Media. It's about the contract renewal.",
+     "好的。我是帕克赛德传媒的黛安·罗斯，是关于续约的事。"
+    ],
+    [
+     "刘洋 (Liu Yang)",
+     "Sorry, could you spell your last name for me?",
+     "不好意思，能拼一下您的姓吗？"
+    ],
+    [
+     "来电者 (Diane Ross)",
+     "Sure, it's R-O-S-S.",
+     "好的，R-O-S-S。"
+    ],
+    [
+     "刘洋 (Liu Yang)",
+     "Thanks. And what's the best number to reach you on?",
+     "谢谢。打哪个号码最容易找到您？"
+    ],
+    [
+     "来电者 (Diane Ross)",
+     "212-555-0148. I'm free any time after three.",
+     "212-555-0148。三点以后我都有空。"
+    ],
+    [
+     "刘洋 (Liu Yang)",
+     "Let me read that back: Diane Ross, Parkside Media, 212-555-0148, after 3 p.m. I'll make sure he gets the message.",
+     "我复述一下：黛安·罗斯，帕克赛德传媒，212-555-0148，下午三点以后。我一定转告他。"
+    ],
+    [
+     "来电者 (Diane Ross)",
+     "Great, thanks for your help.",
+     "太好了，谢谢。"
+    ]
+   ],
+   "phr": [
+    [
+     "(Company), (Name) speaking.",
+     "接电话自报公司和姓名"
+    ],
+    [
+     "I'm afraid he's in a meeting at the moment.",
+     "不好意思，他正在开会"
+    ],
+    [
+     "Can I take a message?",
+     "需要我帮您留言吗？"
+    ],
+    [
+     "Could you spell that for me?",
+     "能拼一下吗？"
+    ],
+    [
+     "What's the best number to reach you on?",
+     "打哪个号码能联系到您？"
+    ],
+    [
+     "Let me read that back.",
+     "我复述一遍（确认）"
+    ]
+   ],
+   "q": [
+    [
+     "想问来电者是谁，最得体的是？",
+     "May I ask who's calling?",
+     "Who are you?",
+     "What's your name?",
+     "Who is speaking now?"
+    ],
+    [
+     "接电话时自报姓名，正确的是？",
+     "Liu Yang speaking.",
+     "I am Liu Yang talking.",
+     "Here is Liu Yang.",
+     "This is Liu Yang's speaking."
+    ],
+    [
+     "Can I take a message? 的意思是？",
+     "需要我帮您留言吗？",
+     "我能拿走这条消息吗？",
+     "我可以发短信吗？",
+     "我可以看您的消息吗？"
+    ]
+   ]
+  },
+  {
+   "cat": "电话",
+   "lv": "六级",
+   "title": "A Bad Line on a Call",
+   "zh": "通话信号差时确认信息",
+   "photo": "Singapore Central Business District / Shenton Way",
+   "note": "跨国电话常信号不好。听不清时别说 What? 或 Repeat，要说 Sorry, could you say that again?。My signal is not good 不够地道，可说 The line's bad 或 You're breaking up。日期、数字、地名要复述确认，事后再发邮件留底，确保双方信息一致（on the same page）。",
+   "lines": [
+    [
+     "陈宇 (Chen Yu)",
+     "Hi James, can you hear me okay?",
+     "嗨，詹姆斯，你听得清吗？"
+    ],
+    [
+     "客户 (James Porter)",
+     "You're breaking up a bit, Chen. Could you say that again?",
+     "陈，你的声音有点断断续续。能再说一遍吗？"
+    ],
+    [
+     "陈宇 (Chen Yu)",
+     "Sorry, the line's not great. I said the shipment left Singapore on Monday.",
+     "抱歉，线路不太好。我是说货周一已经从新加坡发出了。"
+    ],
+    [
+     "客户 (James Porter)",
+     "Got it — Monday. And when's it due in Felixstowe?",
+     "明白，周一。那预计什么时候到费利克斯托？"
+    ],
+    [
+     "陈宇 (Chen Yu)",
+     "Around the 14th. Sorry, you cut out for a second there. Did you say Felixstowe?",
+     "大概 14 号。不好意思，刚才你的声音断了一下。你说的是费利克斯托吗？"
+    ],
+    [
+     "客户 (James Porter)",
+     "Yes, Felixstowe. Look, why don't I call you back on a landline?",
+     "对，费利克斯托。这样吧，我用座机给你回拨过去？"
+    ],
+    [
+     "陈宇 (Chen Yu)",
+     "Good idea. In the meantime, I'll drop you an email with the tracking details so we're on the same page.",
+     "好主意。同时我给你发封邮件，附上物流追踪信息，免得我们信息不一致。"
+    ],
+    [
+     "客户 (James Porter)",
+     "Perfect. Speak in five.",
+     "好极了，五分钟后聊。"
+    ]
+   ],
+   "phr": [
+    [
+     "You're breaking up.",
+     "你的声音断断续续的"
+    ],
+    [
+     "You cut out for a second there.",
+     "刚才你的声音断了一下"
+    ],
+    [
+     "Sorry, could you say that again?",
+     "不好意思，能再说一遍吗？"
+    ],
+    [
+     "Why don't I call you back?",
+     "要不我给你回拨过去？"
+    ],
+    [
+     "I'll drop you an email.",
+     "我给你发封邮件"
+    ],
+    [
+     "so we're on the same page",
+     "以便双方信息一致"
+    ]
+   ],
+   "q": [
+    [
+     "You're breaking up. 的意思是？",
+     "你的声音断断续续",
+     "你要跟我分手",
+     "你情绪崩溃了",
+     "你在拆东西"
+    ],
+    [
+     "听不清对方时，最得体的说法是？",
+     "Sorry, could you say that again?",
+     "What? What did you say?",
+     "Speak louder!",
+     "Repeat."
+    ],
+    [
+     "so we're on the same page 的意思是？",
+     "以便我们信息一致",
+     "以便我们看同一页文件",
+     "以便我们坐在一起",
+     "以便我们签同一份合同"
+    ]
+   ]
+  },
+  {
+   "cat": "拜访接待",
+   "lv": "四级",
+   "title": "Checking In at Reception",
+   "zh": "拜访客户公司时在前台报到",
+   "photo": "The Shard London / London Bridge station",
+   "note": "到前台先说清约了谁、几点、自己是哪家公司。I want to find Rachel 或 I come to see Rachel 很生硬，应说 I have a two o'clock meeting with Rachel Moore。拒绝饮品说 I'm fine, thanks，不要说 No, I don't want。英国说 lift，美国说 elevator。",
+   "lines": [
+    [
+     "前台 (Receptionist)",
+     "Good afternoon. How can I help?",
+     "下午好，有什么可以帮您？"
+    ],
+    [
+     "张辉 (Zhang Hui)",
+     "Hi, I have a two o'clock meeting with Rachel Moore. My name's Zhang Hui, from Brightwell Logistics.",
+     "您好，我和瑞秋·摩尔约了两点开会。我叫张辉，来自布莱特维尔物流。"
+    ],
+    [
+     "前台 (Receptionist)",
+     "Let me just check... Yes, she's expecting you. Could you sign in here, please?",
+     "我查一下……是的，她在等您。请在这里登记一下。"
+    ],
+    [
+     "张辉 (Zhang Hui)",
+     "Sure. Do you need to see some ID?",
+     "好的。需要看证件吗？"
+    ],
+    [
+     "前台 (Receptionist)",
+     "Just a photo ID, thanks. Here's your visitor pass — please wear it at all times.",
+     "带照片的证件就行，谢谢。这是您的访客证，请全程佩戴。"
+    ],
+    [
+     "张辉 (Zhang Hui)",
+     "No problem. Which floor is it?",
+     "没问题。在几楼？"
+    ],
+    [
+     "前台 (Receptionist)",
+     "The thirty-second. Take the lifts on your left, and Rachel will meet you there. Can I get you some water before you go up?",
+     "32 楼。请乘左边的电梯，瑞秋会在那里接您。上去之前要喝点水吗？"
+    ],
+    [
+     "张辉 (Zhang Hui)",
+     "I'm fine, thanks. I'll head up now.",
+     "不用了，谢谢。我现在上去。"
+    ]
+   ],
+   "phr": [
+    [
+     "I have a (two o'clock) meeting with ...",
+     "我和……约了（两点）开会"
+    ],
+    [
+     "She's expecting you.",
+     "她在等您"
+    ],
+    [
+     "Could you sign in here, please?",
+     "请在这里登记"
+    ],
+    [
+     "visitor pass",
+     "访客证"
+    ],
+    [
+     "Take the lifts on your left.",
+     "乘左边的电梯（美式 elevators）"
+    ],
+    [
+     "I'm fine, thanks.",
+     "不用了，谢谢（礼貌拒绝）"
+    ]
+   ],
+   "q": [
+    [
+     "在前台说明来意，最自然的是？",
+     "I have a two o'clock meeting with Rachel Moore.",
+     "I want to find Rachel Moore.",
+     "I come to see Rachel Moore at two.",
+     "Where is Rachel Moore?"
+    ],
+    [
+     "前台问 Can I get you anything? 礼貌地拒绝应说？",
+     "I'm fine, thanks.",
+     "No, I don't want.",
+     "No need.",
+     "Don't bother me."
+    ],
+    [
+     "英式英语的 lift 在美式英语里是？",
+     "elevator",
+     "escalator",
+     "stairs",
+     "lifter"
+    ]
+   ]
+  },
+  {
+   "cat": "拜访接待",
+   "lv": "六级",
+   "title": "Showing a Client Around",
+   "zh": "接待来访客户并参观办公室",
+   "photo": "Marina Bay Singapore / One-north Singapore",
+   "note": "接待客户先寒暄旅途（How was the flight?），别一见面就谈生意。Have you eaten? 在英语里像要请对方吃饭。Welcome to our company to visit 是 Chinglish，说 Great to have you here 即可。参观时用 This is... 介绍，再用 Shall we go through? 引向会议室。",
+   "lines": [
+    [
+     "黄杰 (Huang Jie)",
+     "Daniel, great to see you again. How was the flight?",
+     "丹尼尔，很高兴再见到你。航班还顺利吗？"
+    ],
+    [
+     "客户 (Daniel Fischer)",
+     "Not bad at all, thanks. A bit of turbulence, but I managed to get some sleep.",
+     "挺好的，谢谢。有点颠簸，不过还睡了一会儿。"
+    ],
+    [
+     "黄杰 (Huang Jie)",
+     "Glad to hear it. Before we head into the meeting, can I give you a quick tour?",
+     "那就好。开会之前，我带你简单参观一下？"
+    ],
+    [
+     "客户 (Daniel Fischer)",
+     "I'd love that.",
+     "好啊。"
+    ],
+    [
+     "黄杰 (Huang Jie)",
+     "This is our open-plan area — most of the sales team sits here. And through here is the test kitchen, where we develop new recipes.",
+     "这是开放式办公区，销售团队大部分在这儿。这边进去是试验厨房，我们在这里研发新菜谱。"
+    ],
+    [
+     "客户 (Daniel Fischer)",
+     "Wow, impressive set-up. How many people do you have here now?",
+     "哇，配置真不错。你们这里现在有多少人？"
+    ],
+    [
+     "黄杰 (Huang Jie)",
+     "Just under eighty, and we're hoping to double that by next year.",
+     "将近八十人，希望明年翻一番。"
+    ],
+    [
+     "客户 (Daniel Fischer)",
+     "That's quite a growth plan.",
+     "这个增长计划不小啊。"
+    ],
+    [
+     "黄杰 (Huang Jie)",
+     "It is. Right, shall we go through? Can I get you a coffee or tea first?",
+     "是的。好，我们进会议室吧？先给你来杯咖啡还是茶？"
+    ],
+    [
+     "客户 (Daniel Fischer)",
+     "A flat white would be great, thanks.",
+     "来杯馥芮白就好，谢谢。"
+    ]
+   ],
+   "phr": [
+    [
+     "Great to see you again.",
+     "很高兴再见到你"
+    ],
+    [
+     "How was the flight?",
+     "航班还顺利吗？"
+    ],
+    [
+     "Can I give you a quick tour?",
+     "我带你简单参观一下？"
+    ],
+    [
+     "Through here is ...",
+     "这边进去是……（带路介绍）"
+    ],
+    [
+     "just under (eighty)",
+     "将近（八十），略少于"
+    ],
+    [
+     "Shall we go through?",
+     "我们进去（会议室）吧？"
+    ]
+   ],
+   "q": [
+    [
+     "客户刚到，最自然的寒暄是？",
+     "How was the flight?",
+     "Have you eaten?",
+     "Why are you late?",
+     "Welcome to our company to visit."
+    ],
+    [
+     "just under eighty 指的是？",
+     "不到八十（接近八十）",
+     "八十多一点",
+     "正好八十",
+     "远低于八十"
+    ],
+    [
+     "Shall we go through? 在这里的意思是？",
+     "我们进会议室吧？",
+     "我们把文件看完吧？",
+     "我们要通过审核吗？",
+     "我们穿过大楼吧？"
+    ]
+   ]
+  },
+  {
+   "cat": "会议",
+   "lv": "六级",
+   "title": "Running the Weekly Meeting",
+   "zh": "主持团队周会",
+   "photo": "Hudson Yards / Midtown Manhattan",
+   "note": "主持会议要开场说明议程和时长，逐项推进（First up / Moving on to...），结尾总结行动事项。discuss 是及物动词，不说 discuss about the budget。有人跑题时用 Let's take that offline（会后单独谈），不是「下线」。插话用 Sorry, can I just jump in here? 比直接打断礼貌。",
+   "lines": [
+    [
+     "李娜 (Li Na)",
+     "Okay, let's get started. Thanks for coming, everyone. We've got three items on the agenda, so I'll try to keep it to thirty minutes.",
+     "好，我们开始吧。谢谢大家参加。今天议程有三项，我尽量控制在三十分钟内。"
+    ],
+    [
+     "李娜 (Li Na)",
+     "First up, the Q3 campaign. Ben, could you give us a quick update?",
+     "第一项，第三季度推广活动。本，你简单汇报一下进展？"
+    ],
+    [
+     "同事 (Ben Carter)",
+     "Sure. We're about 80% done. The only thing holding us up is final sign-off from Legal.",
+     "好的。我们完成了大约八成，唯一卡住的是法务的最终审批。"
+    ],
+    [
+     "李娜 (Li Na)",
+     "Okay. Can you chase them and let me know by Wednesday?",
+     "好。你能催一下他们，周三前告诉我结果吗？"
+    ],
+    [
+     "同事 (Ben Carter)",
+     "Will do.",
+     "没问题。"
+    ],
+    [
+     "同事 (Sophie Wu)",
+     "Sorry, can I just jump in here? If Legal needs more time, it'll push back the launch date.",
+     "不好意思，我插一句。如果法务需要更多时间，上线日期就得推迟。"
+    ],
+    [
+     "李娜 (Li Na)",
+     "Good point. Let's take that offline after the meeting so we stay on track. Moving on to item two — the budget.",
+     "说得好。这个我们会后单独谈，免得跑题。下面进入第二项：预算。"
+    ],
+    [
+     "李娜 (Li Na)",
+     "Okay, I think that's everything. To sum up: Ben's chasing Legal, and Sophie's drafting a backup timeline. Thanks, everyone.",
+     "好，差不多就这些。总结一下：本去催法务，索菲起草一份备用时间表。谢谢大家。"
+    ]
+   ],
+   "phr": [
+    [
+     "Let's get started.",
+     "我们开始吧"
+    ],
+    [
+     "First up, ... / Moving on to ...",
+     "第一项是…… ／ 下面进入……"
+    ],
+    [
+     "The only thing holding us up is ...",
+     "唯一卡住我们的是……"
+    ],
+    [
+     "Can I just jump in here?",
+     "我能插一句吗？"
+    ],
+    [
+     "Let's take that offline.",
+     "这个会后单独讨论"
+    ],
+    [
+     "To sum up, ...",
+     "总结一下……"
+    ],
+    [
+     "Will do.",
+     "好的，我会去做"
+    ]
+   ],
+   "q": [
+    [
+     "Let's take that offline. 的意思是？",
+     "这个会后单独讨论",
+     "我们下线吧",
+     "把这个删掉",
+     "把网络断开"
+    ],
+    [
+     "Which sentence is correct?",
+     "Let's discuss the budget.",
+     "Let's discuss about the budget.",
+     "Let's discuss on the budget.",
+     "Let's discussing the budget."
+    ],
+    [
+     "想在别人发言时礼貌地插话，可以说？",
+     "Sorry, can I just jump in here?",
+     "Stop, listen to me.",
+     "You are wrong, let me speak.",
+     "Wait wait wait."
+    ]
+   ]
+  },
+  {
+   "cat": "会议",
+   "lv": "雅思",
+   "title": "Disagreeing Diplomatically",
+   "zh": "在会上委婉地提出不同意见",
+   "photo": "City of London / Paternoster Square",
+   "note": "英国职场提反对意见讲究「先肯定、再转折」，用 not entirely、I'm not sure 弱化语气。直接说 Your idea is wrong 会显得很冲。另一个常见问题是会上沉默、会后抱怨，在外企会被看作不投入。最受欢迎的是提出替代方案（What if we...?）。I could live with that 表示「可以接受」，略带勉强。",
+   "lines": [
+    [
+     "总监 (Oliver Grant)",
+     "So the proposal is to move all first-line support to the chatbot by January. Any thoughts?",
+     "提案是一月前把所有一线客服转给聊天机器人。大家有什么想法？"
+    ],
+    [
+     "徐静 (Xu Jing)",
+     "I can see the logic in cutting costs, but I'm not entirely convinced the timing is right.",
+     "我理解降低成本的思路，但我不太确定现在时机合适。"
+    ],
+    [
+     "总监 (Oliver Grant)",
+     "Go on.",
+     "你接着说。"
+    ],
+    [
+     "徐静 (Xu Jing)",
+     "Our latest survey shows that about 40% of complaints come from older customers who prefer talking to a person. If we switch over too quickly, we risk losing some of them.",
+     "最新调查显示，大约四成投诉来自更喜欢和真人沟通的年长客户。切换太快的话，可能会流失一部分客户。"
+    ],
+    [
+     "同事 (Hannah Price)",
+     "That's a fair point, but we can't afford to keep the current team at full size.",
+     "有道理，但我们负担不起维持现有团队的全部规模。"
+    ],
+    [
+     "徐静 (Xu Jing)",
+     "I agree we need to bring costs down. What if we ran a pilot with one product line first and reviewed the numbers in March?",
+     "我同意需要降成本。我们先在一条产品线上试点，三月再看数据，怎么样？"
+    ],
+    [
+     "总监 (Oliver Grant)",
+     "Hmm, I'd be open to that. Hannah, would a phased approach work for you?",
+     "嗯，我可以考虑。汉娜，分阶段推进你能接受吗？"
+    ],
+    [
+     "同事 (Hannah Price)",
+     "I could live with that, as long as we have a clear cut-off date.",
+     "可以接受，只要有明确的截止日期。"
+    ],
+    [
+     "总监 (Oliver Grant)",
+     "Right, let's go with a pilot. Xu Jing, could you put together a proposal by Friday?",
+     "好，就先试点。徐静，你周五前能整理一份方案吗？"
+    ]
+   ],
+   "phr": [
+    [
+     "I can see the logic in ..., but ...",
+     "我理解……的思路，但……（先肯定再转折）"
+    ],
+    [
+     "I'm not entirely convinced ...",
+     "我不太确定……（委婉反对）"
+    ],
+    [
+     "That's a fair point, but ...",
+     "有道理，但……"
+    ],
+    [
+     "What if we ...?",
+     "我们……怎么样？（提出替代方案）"
+    ],
+    [
+     "a phased approach",
+     "分阶段推进"
+    ],
+    [
+     "I could live with that.",
+     "这个我可以接受"
+    ],
+    [
+     "as long as ...",
+     "只要……"
+    ]
+   ],
+   "q": [
+    [
+     "Which is the most diplomatic way to disagree?",
+     "I'm not entirely convinced that's the right approach.",
+     "Your idea is wrong.",
+     "I don't agree with you at all.",
+     "This is a bad plan."
+    ],
+    [
+     "I could live with that. 的意思是？",
+     "这个我可以接受",
+     "我可以住在那里",
+     "我能靠这个生活",
+     "我想和它一起生活"
+    ],
+    [
+     "提出替代方案时，较自然的表达是？",
+     "What if we ran a pilot first?",
+     "You should listen to my plan.",
+     "My plan is better than yours.",
+     "Why not do my way?"
+    ]
+   ]
+  },
+  {
+   "cat": "汇报沟通",
+   "lv": "六级",
+   "title": "Flagging a Delay",
+   "zh": "向上级汇报项目延误",
+   "photo": "Raffles Place MRT station / Singapore skyline",
+   "note": "汇报坏消息要先说结论和影响，再说已采取的对策，不要只把问题抛给领导。中国员工常拖到最后才说，或用 maybe a small problem 绕圈子。give you a heads-up 是「提前打招呼」，keep someone in the loop 是「随时同步」，copy you in 即邮件抄送。inform 后直接接人，不说 inform to the client。",
+   "lines": [
+    [
+     "林涛 (Lin Tao)",
+     "Hi Grace, do you have five minutes? I wanted to give you a heads-up about the Marina project.",
+     "嗨，格蕾丝，你有五分钟吗？我想先跟你说一下 Marina 项目的情况。"
+    ],
+    [
+     "经理 (Grace Tan)",
+     "Sure, what's going on?",
+     "好啊，怎么了？"
+    ],
+    [
+     "林涛 (Lin Tao)",
+     "The supplier has just told us the server hardware won't arrive until the 20th, so we're looking at about a week's delay.",
+     "供应商刚通知，服务器硬件要 20 号才能到，所以大概会延误一周。"
+    ],
+    [
+     "经理 (Grace Tan)",
+     "Hmm, that's not ideal. Does that affect the client go-live?",
+     "嗯，这可不太妙。会影响客户上线吗？"
+    ],
+    [
+     "林涛 (Lin Tao)",
+     "It might. But I've already spoken to the vendor, and they can loan us two units in the meantime. That would let us start testing on schedule.",
+     "有可能。不过我已经和供应商谈过，他们可以先借我们两台，这样测试能按计划开始。"
+    ],
+    [
+     "经理 (Grace Tan)",
+     "Good thinking. Are there any extra costs?",
+     "想得周到。有额外费用吗？"
+    ],
+    [
+     "林涛 (Lin Tao)",
+     "Around two thousand dollars, which is still within our contingency budget.",
+     "大约两千新元，还在应急预算之内。"
+    ],
+    [
+     "经理 (Grace Tan)",
+     "Okay, go ahead. And keep the client in the loop — I'd rather they hear it from us.",
+     "好，就这么办。随时和客户同步，我宁可他们从我们这里听到消息。"
+    ],
+    [
+     "林涛 (Lin Tao)",
+     "Absolutely. I'll send them an update this afternoon and copy you in.",
+     "当然。我今天下午给他们发更新，抄送给你。"
+    ]
+   ],
+   "phr": [
+    [
+     "I wanted to give you a heads-up about ...",
+     "我想先跟你说一声……"
+    ],
+    [
+     "We're looking at about a week's delay.",
+     "大概会延误一周"
+    ],
+    [
+     "That's not ideal.",
+     "这不太妙（委婉表达不满）"
+    ],
+    [
+     "in the meantime",
+     "在此期间、同时"
+    ],
+    [
+     "within our contingency budget",
+     "在应急预算之内"
+    ],
+    [
+     "keep someone in the loop",
+     "随时让某人了解进展"
+    ],
+    [
+     "copy you in",
+     "（邮件）抄送给你"
+    ]
+   ],
+   "q": [
+    [
+     "give you a heads-up 的意思是？",
+     "提前跟你打个招呼",
+     "让你抬起头",
+     "给你加油",
+     "给你一个惊喜"
+    ],
+    [
+     "Which sentence is correct?",
+     "I'll inform the client this afternoon.",
+     "I'll inform to the client this afternoon.",
+     "I'll inform with the client this afternoon.",
+     "I'll informing the client this afternoon."
+    ],
+    [
+     "向上级汇报延误时，最好的做法是？",
+     "先说结论和影响，再提出解决方案",
+     "先道歉很久再慢慢说问题",
+     "等问题解决了再汇报",
+     "只发一句 There is a problem."
+    ]
+   ]
+  },
+  {
+   "cat": "道歉拒绝",
+   "lv": "雅思",
+   "title": "Pushing Back on Extra Work",
+   "zh": "委婉拒绝额外的工作",
+   "photo": "Bank junction London / Moorgate",
+   "note": "在外企，拒绝额外工作是正常的，关键是给出具体理由和替代方案。中国员工常见两种极端：一是什么都答应 OK, no problem，结果做不完；二是直接说 I can't, I'm busy，显得生硬。I'm very busy 太笼统，说清手上的任务和截止日期更有说服力。bandwidth 原指带宽，职场里指「余力」；be upfront 是「坦率地提前说明」。",
+   "lines": [
+    [
+     "经理 (Mike Saunders)",
+     "Sun Qian, could you take on the vendor review as well? It's only a couple of days' work.",
+     "孙倩，供应商评估你也能接一下吗？就两三天的工作量。"
+    ],
+    [
+     "孙倩 (Sun Qian)",
+     "I'd really like to help, but I'm at full capacity with the audit until the end of the month.",
+     "我很想帮忙，但月底之前审计已经让我忙满了。"
+    ],
+    [
+     "经理 (Mike Saunders)",
+     "I know it's a busy period. Is there no way you could squeeze it in?",
+     "我知道这段时间很忙。真的挤不出时间吗？"
+    ],
+    [
+     "孙倩 (Sun Qian)",
+     "If I take it on now, I'm worried the audit would slip, and that has a hard deadline. Could we look at priorities together?",
+     "如果现在接下来，我担心审计会延误，而审计的截止日期是硬性的。我们能一起看看优先级吗？"
+    ],
+    [
+     "经理 (Mike Saunders)",
+     "Fair enough. Which would you say is more urgent?",
+     "有道理。你觉得哪个更急？"
+    ],
+    [
+     "孙倩 (Sun Qian)",
+     "The audit, definitely. But I could pick up the vendor review from the 1st, or you could ask Raj — he mentioned he has some bandwidth this week.",
+     "肯定是审计。不过我可以从 1 号开始接供应商评估，或者你问问拉吉，他说这周有点余力。"
+    ],
+    [
+     "经理 (Mike Saunders)",
+     "Let me check with Raj, then. Thanks for being upfront about it.",
+     "那我问问拉吉。谢谢你坦白说明。"
+    ],
+    [
+     "孙倩 (Sun Qian)",
+     "Of course. I'd rather flag it now than let you down later.",
+     "应该的。我宁可现在说清楚，也不想之后让你失望。"
+    ]
+   ],
+   "phr": [
+    [
+     "I'd really like to help, but ...",
+     "我很想帮忙，但……"
+    ],
+    [
+     "I'm at full capacity.",
+     "我的工作量已经满了"
+    ],
+    [
+     "squeeze it in",
+     "挤出时间来做"
+    ],
+    [
+     "The audit would slip.",
+     "审计会延误"
+    ],
+    [
+     "Could we look at priorities together?",
+     "我们能一起看看优先级吗？"
+    ],
+    [
+     "have some bandwidth",
+     "有余力（处理其他工作）"
+    ],
+    [
+     "be upfront about ...",
+     "对……坦率说明"
+    ]
+   ],
+   "q": [
+    [
+     "I'm at full capacity. 的意思是？",
+     "我手上的工作已经满了",
+     "我能力很强",
+     "我已经吃饱了",
+     "我的电量满了"
+    ],
+    [
+     "拒绝额外任务时，最得体的是？",
+     "I'd really like to help, but I'm tied up with the audit until the 30th.",
+     "I can't. I'm busy.",
+     "No, it's not my job.",
+     "Why always me?"
+    ],
+    [
+     "He has some bandwidth this week. 中的 bandwidth 指？",
+     "处理其他工作的余力",
+     "网速",
+     "带宽费用",
+     "休假时间"
+    ]
+   ]
+  },
+  {
+   "cat": "谈判销售",
+   "lv": "六级",
+   "title": "Pitching to a New Client",
+   "zh": "向潜在客户推介产品",
+   "photo": "Bryant Park / Midtown Manhattan",
+   "note": "美式推销讲究先确认客户的需求（pain point），再用具体数据和案例说明你能解决什么。中国销售常犯的错误是一上来就念产品参数，或者说 Our product is the best in the world，显得夸大、不可信。客户问价格时常说 investment；介绍价格优势要说 cost-effective 或 affordable，cheap 带有「廉价、质量差」的意味。",
+   "lines": [
+    [
+     "高飞 (Gao Fei)",
+     "Thanks for making the time, Linda. I know you're busy, so I'll keep it brief.",
+     "琳达，谢谢你抽出时间。我知道你很忙，我长话短说。"
+    ],
+    [
+     "客户 (Linda Park)",
+     "Appreciate that. So, what can you do for us?",
+     "谢谢。那么，你们能为我们做什么？"
+    ],
+    [
+     "高飞 (Gao Fei)",
+     "From what you told me on the phone, your stores often run out of best-sellers while slow-moving items pile up in the warehouse. Is that still the main pain point?",
+     "根据你电话里说的，你们门店经常畅销品断货，而滞销品在仓库里堆积。这还是主要痛点吗？"
+    ],
+    [
+     "客户 (Linda Park)",
+     "Pretty much, yes.",
+     "基本上是的。"
+    ],
+    [
+     "高飞 (Gao Fei)",
+     "Our system forecasts demand store by store. One of our clients, a chain about your size, cut stock-outs by around 30% in six months.",
+     "我们的系统能按门店预测需求。我们有个客户，规模和你们差不多的连锁店，六个月内断货减少了约三成。"
+    ],
+    [
+     "客户 (Linda Park)",
+     "That sounds good on paper, but how long does it take to set up?",
+     "理论上听着不错，但部署要多久？"
+    ],
+    [
+     "高飞 (Gao Fei)",
+     "Typically six to eight weeks, and we handle the data migration for you.",
+     "一般六到八周，数据迁移由我们负责。"
+    ],
+    [
+     "客户 (Linda Park)",
+     "And what kind of investment are we talking about?",
+     "那大概需要投入多少？"
+    ],
+    [
+     "高飞 (Gao Fei)",
+     "It depends on the number of stores, but I can put together a tailored quote. Would it help if we set up a free trial for, say, five stores first?",
+     "取决于门店数量，我可以做一份定制报价。要不先给比如五家门店做个免费试用？"
+    ],
+    [
+     "客户 (Linda Park)",
+     "That could work. Send me the details.",
+     "可以考虑。把详细资料发给我吧。"
+    ]
+   ],
+   "phr": [
+    [
+     "Thanks for making the time.",
+     "谢谢您抽出时间"
+    ],
+    [
+     "I'll keep it brief.",
+     "我长话短说"
+    ],
+    [
+     "the main pain point",
+     "主要痛点"
+    ],
+    [
+     "That sounds good on paper, but ...",
+     "理论上听着不错，但……"
+    ],
+    [
+     "What kind of investment are we talking about?",
+     "大概要投入多少？（委婉问价）"
+    ],
+    [
+     "a tailored quote",
+     "定制报价"
+    ],
+    [
+     "Would it help if we ...?",
+     "如果我们……会不会有帮助？"
+    ]
+   ],
+   "q": [
+    [
+     "pain point 指的是？",
+     "客户的痛点、主要困扰",
+     "身体疼痛的部位",
+     "价格最高点",
+     "销售的提成点"
+    ],
+    [
+     "描述价格优势时，更合适的词是？",
+     "cost-effective",
+     "cheap",
+     "low-class",
+     "bargain-bin"
+    ],
+    [
+     "That sounds good on paper. 暗示说话人？",
+     "听起来不错，但还有疑虑",
+     "想要书面合同",
+     "已经完全同意",
+     "想要纸质资料"
+    ]
+   ]
+  },
+  {
+   "cat": "谈判销售",
+   "lv": "雅思",
+   "title": "Negotiating Price and Terms",
+   "zh": "谈判价格与付款条件",
+   "photo": "King's Cross London / Granary Square",
+   "note": "英国人谈判语气含蓄，常用 a bit、To be honest 软化。让步要有交换条件（If we..., would you...?），不要一味砍价。price 只能说 high / low，不说 Your price is too expensive。想要降价可问 Is there any room to move on price?。meet halfway 即「各让一步」。",
+   "lines": [
+    [
+     "供应商 (Claire Dawson)",
+     "So, based on 50,000 units, our price would be £1.20 per unit.",
+     "按五万件算，我们的单价是 1.20 英镑。"
+    ],
+    [
+     "何明 (He Ming)",
+     "Thanks, Claire. To be honest, that's a bit higher than we'd budgeted for. We were thinking more along the lines of £1.05.",
+     "谢谢，克莱尔。说实话，这比我们的预算高了一些。我们原本考虑的是 1.05 英镑左右。"
+    ],
+    [
+     "供应商 (Claire Dawson)",
+     "I understand, but our material costs have gone up quite a bit this year. £1.05 would be very difficult for us.",
+     "我理解，但今年我们的材料成本涨了不少。1.05 英镑对我们来说很难。"
+    ],
+    [
+     "何明 (He Ming)",
+     "I appreciate that. What if we committed to a twelve-month contract instead of six? Would that give you some room to move on price?",
+     "我理解。如果我们签十二个月而不是六个月的合同呢？价格上会不会有些空间？"
+    ],
+    [
+     "供应商 (Claire Dawson)",
+     "A longer commitment would definitely help. I could come down to £1.12.",
+     "更长的合约肯定有帮助。我可以降到 1.12 英镑。"
+    ],
+    [
+     "何明 (He Ming)",
+     "That's a step in the right direction. Could we meet halfway at £1.10 if we also agree to 30-day payment terms instead of 60?",
+     "这是个好的开始。如果我们把付款期从 60 天缩短到 30 天，能不能各让一步，定在 1.10 英镑？"
+    ],
+    [
+     "供应商 (Claire Dawson)",
+     "Faster payment would help our cash flow... All right — £1.10, 30-day terms and a twelve-month contract. We have a deal.",
+     "更快付款对我们的现金流有帮助……好吧，1.10 英镑，30 天付款，十二个月合同。成交。"
+    ],
+    [
+     "何明 (He Ming)",
+     "Great. I'll get our legal team to draw up the paperwork, and we'll aim to have it signed by the end of the month.",
+     "太好了。我让法务起草文件，争取月底前签好。"
+    ]
+   ],
+   "phr": [
+    [
+     "more along the lines of ...",
+     "大概在……左右（提出己方期望）"
+    ],
+    [
+     "I appreciate that, but ...",
+     "我理解，但……"
+    ],
+    [
+     "room to move on price",
+     "价格上的调整空间"
+    ],
+    [
+     "come down to ...",
+     "（价格）降到……"
+    ],
+    [
+     "That's a step in the right direction.",
+     "这是个好的开始（还不够）"
+    ],
+    [
+     "meet halfway",
+     "各让一步"
+    ],
+    [
+     "draw up the paperwork",
+     "起草合同文件"
+    ]
+   ],
+   "q": [
+    [
+     "Which sentence is correct?",
+     "Your price is a bit high.",
+     "Your price is a bit expensive.",
+     "Your price is a bit costly.",
+     "Your price is a bit dear for money."
+    ],
+    [
+     "meet halfway 的意思是？",
+     "各让一步，取中间值",
+     "在半路见面",
+     "会议开到一半",
+     "只付一半的钱"
+    ],
+    [
+     "以下哪一句是「有条件的让步」？",
+     "If you can deliver by May, we could accept £1.12.",
+     "Give us a lower price.",
+     "£1.05, final answer.",
+     "We want discount."
+    ]
+   ]
+  },
+  {
+   "cat": "求职面试",
+   "lv": "雅思",
+   "title": "Answering Behavioural Questions",
+   "zh": "面试中回答行为类问题",
+   "photo": "Suntec City / Changi Business Park",
+   "note": "外企面试常问 Tell me about a time when...，建议用 STAR 结构回答：情境、任务、行动、结果。中国求职者常犯：全程只说 we，听不出自己做了什么；过度谦虚 I'm not good enough；被问 Do you have any questions? 时回答 No，显得缺乏兴趣。最好准备一两个关于岗位或团队的问题，第一个问题不要就问工资。",
+   "lines": [
+    [
+     "面试官 (Rachel Lim)",
+     "Can you tell me about a time when you had to deal with a difficult stakeholder?",
+     "能说说你曾经应对难缠的利益相关方的经历吗？"
+    ],
+    [
+     "吴婷 (Wu Ting)",
+     "Sure. In my last role at a logistics firm in Shenzhen, I was coordinating a warehouse system upgrade. One of the regional managers was strongly against it because he was worried about downtime during peak season.",
+     "好的。我上一份工作在深圳一家物流公司，负责协调仓储系统升级。有位区域经理强烈反对，因为他担心旺季时系统停机。"
+    ],
+    [
+     "面试官 (Rachel Lim)",
+     "How did you handle that?",
+     "你是怎么处理的？"
+    ],
+    [
+     "吴婷 (Wu Ting)",
+     "I set up a one-to-one meeting to really understand his concerns. It turned out his main worry was the timing, not the system itself. So I proposed moving the go-live to a quieter month and running the old system in parallel for two weeks.",
+     "我约他单独面谈，认真了解他的顾虑。原来他主要担心的是时机，而不是系统本身。于是我提议把上线推到淡季，并让旧系统并行运行两周。"
+    ],
+    [
+     "面试官 (Rachel Lim)",
+     "And what was the outcome?",
+     "结果如何？"
+    ],
+    [
+     "吴婷 (Wu Ting)",
+     "He agreed to the new plan, and we launched with zero downtime. Order processing actually got about 15% faster. The main thing I took away was to listen first before trying to persuade.",
+     "他同意了新方案，我们零停机上线，订单处理速度还提高了约 15%。我最大的收获是：先倾听，再说服。"
+    ],
+    [
+     "面试官 (Rachel Lim)",
+     "That's a great example. Do you have any questions for us?",
+     "很好的例子。你有什么问题想问我们吗？"
+    ],
+    [
+     "吴婷 (Wu Ting)",
+     "Yes, actually. What would success look like in this role after the first six months?",
+     "有的。这个职位在头六个月里，怎样算是做得成功？"
+    ]
+   ],
+   "phr": [
+    [
+     "Tell me about a time when ...",
+     "请讲讲你……的一次经历（行为面试题）"
+    ],
+    [
+     "In my last role, ...",
+     "在我上一份工作中……"
+    ],
+    [
+     "It turned out (that) ...",
+     "结果发现……"
+    ],
+    [
+     "What was the outcome?",
+     "结果如何？"
+    ],
+    [
+     "The main thing I took away was ...",
+     "我最大的收获是……"
+    ],
+    [
+     "What would success look like in this role?",
+     "这个职位怎样算做得成功？"
+    ]
+   ],
+   "q": [
+    [
+     "回答行为面试题常用的结构是？",
+     "STAR（情境-任务-行动-结果）",
+     "SWOT",
+     "KPI",
+     "PDCA"
+    ],
+    [
+     "面试官问 Do you have any questions for us? 最好的回答是？",
+     "Yes. What would success look like in this role?",
+     "No, I don't have.",
+     "No questions. When can I start?",
+     "How much is the salary? That's all."
+    ],
+    [
+     "The main thing I took away was... 的意思是？",
+     "我最大的收获是……",
+     "我拿走的主要东西是……",
+     "我主要点的外卖是……",
+     "我带走的最大文件是……"
+    ]
+   ]
+  },
+  {
+   "cat": "应酬",
+   "lv": "雅思",
+   "title": "Drinks After Work",
+   "zh": "下班后和同事去酒吧",
+   "photo": "Liverpool Street station / Spitalfields London",
+   "note": "英国 pub 有「轮流请客」（buying rounds）的习惯，别人请了一轮，下一轮你要主动请。不喝酒点软饮完全没问题，也不要像国内饭局那样劝酒、干杯。闲聊避开工资、年龄、婚恋，天气、周末、美食是安全话题。Cheers 在英国除了「干杯」，还常表示「谢谢」或「再见」；想先走时说 I should make a move，比 I want to go home 自然。",
+   "lines": [
+    [
+     "同事 (Jack Turner)",
+     "A few of us are heading to the pub after work. Fancy coming along?",
+     "下班后我们几个要去酒吧，一起来吗？"
+    ],
+    [
+     "郑浩 (Zheng Hao)",
+     "Yeah, why not? Let me just finish this email and I'll be right with you.",
+     "好啊，为什么不呢？我把这封邮件写完就来。"
+    ],
+    [
+     "同事 (Jack Turner)",
+     "Right, it's my round. What are you having?",
+     "好，这轮我请。你喝什么？"
+    ],
+    [
+     "郑浩 (Zheng Hao)",
+     "I'll have a half of the local ale, please. And I'll get the next one.",
+     "来半品脱本地艾尔吧。下一轮我请。"
+    ],
+    [
+     "同事 (Jack Turner)",
+     "Deal. So, how are you finding London so far?",
+     "一言为定。你觉得伦敦怎么样？"
+    ],
+    [
+     "郑浩 (Zheng Hao)",
+     "I'm loving it, though I'm still getting used to the weather!",
+     "非常喜欢，就是天气还没适应！"
+    ],
+    [
+     "同事 (Jack Turner)",
+     "Ha, aren't we all? Been up to anything nice at the weekends?",
+     "哈，我们谁不是呢？周末有去哪儿玩吗？"
+    ],
+    [
+     "郑浩 (Zheng Hao)",
+     "I went to Borough Market last Saturday. The food was amazing.",
+     "上周六去了博罗市场，吃的太棒了。"
+    ],
+    [
+     "同事 (Jack Turner)",
+     "Good shout. You should try Columbia Road Flower Market on a Sunday, too.",
+     "选得好。周日你也该去哥伦比亚路花市看看。"
+    ],
+    [
+     "郑浩 (Zheng Hao)",
+     "I'll have to check it out. Anyway, I should make a move — early start tomorrow. Cheers for tonight!",
+     "我一定去看看。好了，我得先走了，明天要早起。今晚谢谢啦！"
+    ]
+   ],
+   "phr": [
+    [
+     "Fancy coming along?",
+     "要一起来吗？（英式口语）"
+    ],
+    [
+     "It's my round. / What are you having?",
+     "这轮我请 ／ 你喝什么？"
+    ],
+    [
+     "a half (of ...)",
+     "半品脱（啤酒）"
+    ],
+    [
+     "How are you finding ...?",
+     "你觉得……怎么样？"
+    ],
+    [
+     "Good shout.",
+     "好主意、选得好（英式口语）"
+    ],
+    [
+     "I should make a move.",
+     "我该走了"
+    ],
+    [
+     "Cheers for tonight!",
+     "今晚谢谢啦！"
+    ]
+   ],
+   "q": [
+    [
+     "It's my round. 的意思是？",
+     "这一轮我请",
+     "轮到我发言了",
+     "我围着桌子转",
+     "我是圆的"
+    ],
+    [
+     "英国同事离开时说 Cheers!，通常表示？",
+     "谢谢／再见",
+     "干杯，必须喝完",
+     "加油",
+     "对不起"
+    ],
+    [
+     "和同事闲聊时，比较安全的话题是？",
+     "周末去了哪里",
+     "对方的工资",
+     "对方为什么还没结婚",
+     "对方的年龄"
+    ]
+   ]
+  },
+  {
+   "cat": "出差",
+   "lv": "四级",
+   "title": "Checking In at the Hotel",
+   "zh": "出差时办理酒店入住",
+   "photo": "Grand Central Terminal / Lexington Avenue",
+   "note": "入住时说 I have a reservation under + 姓。美国酒店通常会刷信用卡预授权，用于房费以外的杂费（incidentals），离店后解冻，不必紧张。How to go to...? 是典型中式英语，应说 How do I get to...?。纽约的 cab 是出租车，train 在这里指地铁线路。",
+   "lines": [
+    [
+     "前台 (Receptionist)",
+     "Good evening, welcome to the Lexington. Checking in?",
+     "晚上好，欢迎入住列克星敦酒店。办理入住吗？"
+    ],
+    [
+     "马丽 (Ma Li)",
+     "Yes, I have a reservation under Ma, M-A. It was booked through my company, Northgate Analytics.",
+     "是的，我用「马」（M-A）这个姓预订的，是通过我公司诺斯盖特分析订的。"
+    ],
+    [
+     "前台 (Receptionist)",
+     "Let me see... Yes, a king room for three nights. Could I see your passport and a credit card for incidentals?",
+     "我看一下……是的，大床房，住三晚。请出示护照和一张信用卡，用于杂费押金。"
+    ],
+    [
+     "马丽 (Ma Li)",
+     "Here you go. Is breakfast included?",
+     "给您。含早餐吗？"
+    ],
+    [
+     "前台 (Receptionist)",
+     "It is. It's served from 6:30 to 10 on the second floor.",
+     "含的。早上 6 点半到 10 点在二楼供应。"
+    ],
+    [
+     "马丽 (Ma Li)",
+     "Great. And is there somewhere I can print some documents for a meeting tomorrow?",
+     "太好了。有地方可以打印明天开会用的文件吗？"
+    ],
+    [
+     "前台 (Receptionist)",
+     "Yes, our business center is open 24 hours. Here's your key card — you're in room 1208.",
+     "有，我们的商务中心 24 小时开放。这是您的房卡，房间是 1208。"
+    ],
+    [
+     "马丽 (Ma Li)",
+     "Thanks. One more thing — how long does it take to get to Hudson Yards from here?",
+     "谢谢。还有一件事，从这里到哈德逊园区要多久？"
+    ],
+    [
+     "前台 (Receptionist)",
+     "About fifteen minutes by cab, or you can take the 7 train from Grand Central.",
+     "打车大约十五分钟，也可以在中央车站坐 7 号线。"
+    ],
+    [
+     "马丽 (Ma Li)",
+     "Perfect, thank you.",
+     "好的，谢谢。"
+    ]
+   ],
+   "phr": [
+    [
+     "I have a reservation under (Ma).",
+     "我用（马）这个姓预订了"
+    ],
+    [
+     "a credit card for incidentals",
+     "用于杂费押金的信用卡"
+    ],
+    [
+     "Is breakfast included?",
+     "含早餐吗？"
+    ],
+    [
+     "business center",
+     "商务中心"
+    ],
+    [
+     "key card",
+     "房卡"
+    ],
+    [
+     "How long does it take to get to ...?",
+     "到……要多久？"
+    ]
+   ],
+   "q": [
+    [
+     "Which question is correct?",
+     "How do I get to Hudson Yards?",
+     "How to go to Hudson Yards?",
+     "How can I go Hudson Yards?",
+     "Where is the way to go Hudson Yards?"
+    ],
+    [
+     "incidentals 在酒店指的是？",
+     "房费以外的杂费（押金）",
+     "意外事故",
+     "附赠早餐",
+     "小费"
+    ],
+    [
+     "报预订姓名时应该说？",
+     "I have a reservation under Ma.",
+     "I have a reservation of name Ma.",
+     "My reservation name is called Ma.",
+     "Reservation, Ma, have."
+    ]
+   ]
+  },
+  {
+   "cat": "道歉拒绝",
+   "lv": "六级",
+   "title": "Apologising to a Client",
+   "zh": "因账单错误向客户道歉",
+   "photo": "Tanjong Pagar / Guoco Tower Singapore",
+   "note": "向客户道歉：承认错误、简短说明原因、给出补救和预防措施。中国人常把责任推给系统或同事，或反复说 sorry 却没有方案。Sorry to make you trouble 不地道，可说 Sorry for the confusion。结尾说 Thanks for your patience 比再说一遍 sorry 更专业。",
+   "lines": [
+    [
+     "唐雯 (Tang Wen)",
+     "Marcus, thanks for taking my call. I'm calling about the invoice we sent last week. I'm afraid there was an error on our side — you were charged for 600 cases instead of 500.",
+     "马库斯，谢谢你接电话。我打来是关于上周发给你们的发票。很抱歉，是我们这边出了错：多收了 600 箱的钱，实际是 500 箱。"
+    ],
+    [
+     "客户 (Marcus Lee)",
+     "Ah, I was wondering about that. Our finance team flagged it this morning.",
+     "啊，我正纳闷呢。我们财务今天早上提出来了。"
+    ],
+    [
+     "唐雯 (Tang Wen)",
+     "I'm really sorry for the confusion. It was a data entry mistake, and I take full responsibility.",
+     "给你们造成困扰，真的很抱歉。这是录入错误，我负全部责任。"
+    ],
+    [
+     "客户 (Marcus Lee)",
+     "These things happen. What's the next step?",
+     "难免的。下一步怎么办？"
+    ],
+    [
+     "唐雯 (Tang Wen)",
+     "We'll issue a corrected invoice today, and if you've already paid, we'll refund the difference within three working days.",
+     "我们今天就开更正后的发票；如果你们已经付款，三个工作日内退还差额。"
+    ],
+    [
+     "客户 (Marcus Lee)",
+     "We haven't paid yet, so a corrected invoice is fine.",
+     "我们还没付，开张更正发票就行。"
+    ],
+    [
+     "唐雯 (Tang Wen)",
+     "Great. We've also added an extra check to our billing process so this doesn't happen again.",
+     "好的。我们也在开票流程里加了一道核对，避免再出这种问题。"
+    ],
+    [
+     "客户 (Marcus Lee)",
+     "I appreciate you letting us know so quickly.",
+     "谢谢你们这么快通知我们。"
+    ],
+    [
+     "唐雯 (Tang Wen)",
+     "Of course. Thanks for your patience, Marcus.",
+     "应该的。谢谢你的耐心，马库斯。"
+    ]
+   ],
+   "phr": [
+    [
+     "I'm afraid there was an error on our side.",
+     "很抱歉，是我们这边出了错"
+    ],
+    [
+     "I'm really sorry for the confusion.",
+     "给您造成困扰，非常抱歉"
+    ],
+    [
+     "I take full responsibility.",
+     "我负全部责任"
+    ],
+    [
+     "issue a corrected invoice",
+     "开具更正后的发票"
+    ],
+    [
+     "refund the difference",
+     "退还差额"
+    ],
+    [
+     "so this doesn't happen again",
+     "以免再次发生"
+    ],
+    [
+     "Thanks for your patience.",
+     "谢谢您的耐心"
+    ]
+   ],
+   "q": [
+    [
+     "给客户道歉时，最得体的是？",
+     "I'm sorry — it was our mistake, and we'll fix it today.",
+     "Sorry to make you trouble.",
+     "It's not my fault. The system was wrong.",
+     "Sorry, sorry, sorry."
+    ],
+    [
+     "refund the difference 的意思是？",
+     "退还差额",
+     "退还全部货款",
+     "区别对待",
+     "重新开票"
+    ],
+    [
+     "道歉的结尾，比再说一次 sorry 更好的是？",
+     "Thanks for your patience.",
+     "Sorry again and again.",
+     "Please forgive me forever.",
+     "Don't be angry."
+    ]
+   ]
+  }
+ ]
+}

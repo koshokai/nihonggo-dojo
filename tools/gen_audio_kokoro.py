@@ -50,10 +50,15 @@ def run_text(shard, shards):
     from kokoro import KPipeline
     pipe = KPipeline(lang_code='a')
     todo = [t for i, t in enumerate(texts()) if i % shards == shard]
+    old = OUT / 'index-en.json'
+    old = json.loads(old.read_text(encoding='utf-8')) if old.exists() else {}
     idx = {}
     with tempfile.TemporaryDirectory() as tmp:
         wav = Path(tmp) / 'x.wav'
         for n, text in enumerate(todo, 1):
+            if text in old and (OUT / old[text]).exists():   # 已经生成过的不重做，只补新句子
+                idx[text] = old[text]
+                continue
             try:
                 a = synth(pipe, text, WORD_VOICE, speed=0.9 if len(text) < 14 else 1.0)
                 if a is None:
