@@ -373,3 +373,19 @@ $$;
 revoke all on function public.leaderboard_top(date) from public, anon;
 grant execute on function public.leaderboard_top(date) to authenticated;
 ```
+
+## 12. 注册邮件：换成自己的邮件服务（用户多了以后必做）
+
+Supabase 自带的邮件服务每小时只能发很少几封，用户一多，注册验证码就收不到。换成免费的邮件服务：
+
+| 服务 | 免费额度 | 要不要域名 |
+|---|---|---|
+| Brevo | 每天 300 封 | 不需要，验证一个发件邮箱就能用（用 Gmail 当发件人容易进垃圾箱） |
+| Resend | 每月 3000 封、每天 100 封 | 需要自己的域名（一年大约 10 美元），送达率最好 |
+
+以 Brevo 为例：
+1. 在 brevo.com 注册，进入 **Senders, Domains & Dedicated IPs → Senders**，添加并验证你的发件邮箱。
+2. 进入 **SMTP & API → SMTP**，记下 SMTP 服务器（smtp-relay.brevo.com）、端口（587）、登录名，再生成一个 **SMTP key**（相当于密码，只填进 Supabase，不要发给任何人）。
+3. Supabase → **Authentication → Emails → SMTP Settings**，打开 **Enable Custom SMTP**，填上发件邮箱、发件人名字（日语道场）、Host、Port、Username、Password（SMTP key），保存。
+4. **Authentication → Rate Limits** 里把每小时邮件数调高，比如 100。
+5. 用一个新邮箱注册一次，确认能收到验证码。
