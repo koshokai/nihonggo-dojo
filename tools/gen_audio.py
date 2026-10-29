@@ -110,7 +110,21 @@ def items_anime():
     return out
 
 
-def generate(engine, speaker, name, items, speed, commit_every=0):
+def items_examples(levels):
+    """单词例句（按级别，逗号分隔）和全部语法例句：(网页朗读时传的假名, 原文, 假名)"""
+    vocab = js_json('vocab.js', 'VOCAB_DATA = {')
+    ex = js_json('examples.js', 'EXAMPLES = {')
+    out = []
+    for L in levels.split(','):
+        for w, *_ in vocab.get(L.strip(), []):
+            out += [(r[1], r[0], r[1]) for r in ex.get(w, [])]
+    for rows in js_json('grammar.js', 'GRAMMAR_DATA = {').values():
+        for g in rows:
+            out += [(e[1], e[0].replace('[', '').replace(']', ''), e[1]) for e in g['eg']]
+    return out
+
+
+def generate(engine, speaker, name, items, speed, commit_every=0, kbps=40):
     idx_path = OUT / f'index-{name}.json'
     idx = json.loads(idx_path.read_text(encoding='utf-8')) if idx_path.exists() else {}
     # 同一个假名对应好几个词（箸 / 橋）时，用汉字会把某一个的重音套给所有人，所以只用假名
@@ -131,7 +145,7 @@ def generate(engine, speaker, name, items, speed, commit_every=0):
         except Exception as e:
             print('  failed', key, e)
             continue
-        to_mp3(wav, OUT / file)
+        to_mp3(wav, OUT / file, kbps)
         idx[key] = file
         n += 1
         by_kana += used == 'kana' or src == kana
@@ -227,7 +241,7 @@ def probe(engine):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('mode', choices=['probe', 'words', 'daily', 'listen', 'anime'])
+    ap.add_argument('mode', choices=['probe', 'words', 'daily', 'listen', 'anime', 'examples'])
     ap.add_argument('--engine', default='http://127.0.0.1:50021')
     ap.add_argument('--speaker', type=int, default=None)
     ap.add_argument('--level', default='')
@@ -239,12 +253,14 @@ def main():
         return probe(a.engine)
     if a.mode == 'listen':
         return listen(a.engine, min(a.commit_every, 40) if a.commit_every else 0)
-    if a.speaker is None and a.mode == 'anime' and (OUT / 'voice.json').exists():
+    if a.speaker is None and a.mode in ('anime', 'examples') and (OUT / 'voice.json').exists():
         a.speaker = json.loads((OUT / 'voice.json').read_text(encoding='utf-8'))['speaker']   # 和单词、今日一句用同一个声音
     if a.speaker is None:
         sys.exit('--speaker is required')
     if a.mode == 'anime':
         return generate(a.engine, a.speaker, 'anime', items_anime(), a.speed, a.commit_every)
+    if a.mode == 'examples':
+        return generate(a.engine, a.speaker, 'examples', items_examples(a.level or 'N5,N4'), a.speed, a.commit_every, kbps=32)
     items = items_words(a.level) if a.mode == 'words' else items_daily()
     generate(a.engine, a.speaker, 'words' if a.mode == 'words' else 'daily', items, a.speed, a.commit_every)
     (OUT / 'voice.json').write_text(json.dumps({'speaker': a.speaker}), encoding='utf-8')

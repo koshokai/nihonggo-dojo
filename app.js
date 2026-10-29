@@ -216,7 +216,7 @@ let curUtt = null, speakSeq = 0;
 // VOICEVOX 预生成的音频（audio/index-*.json：朗读文本 → mp3）。有就优先播放，没有或加载失败退回浏览器朗读。
 const AUDIO_IDX = {};
 let curAudio = null;
-['words', 'daily', 'anime'].forEach(n => fetch(`audio/index-${n}.json`).then(r => r.ok ? r.json() : {}).then(d => Object.assign(AUDIO_IDX, d)).catch(() => {}));
+['words', 'daily', 'anime', 'examples'].forEach(n => fetch(`audio/index-${n}.json`).then(r => r.ok ? r.json() : {}).then(d => Object.assign(AUDIO_IDX, d)).catch(() => {}));
 function stopSpeech() {
   if (curAudio) { curAudio.onended = curAudio.onerror = null; curAudio.pause(); curAudio = null; }
   if (hasTTS) speechSynthesis.cancel();
