@@ -16,24 +16,24 @@ const trKey = tr => tr === 'ja' ? 'trAgain' : tr === 'ko' ? 'trAgainKo' : 'trAga
 function trPool() {
   if (TR_POOL) return TR_POOL;
   const out = [], seen = new Set();
-  const add = (jp, zh, L, src, furi) => { if (!jp || !zh || seen.has(jp)) return; seen.add(jp); out.push({ jp, zh, L, src, furi, n: trSize('ja', jp) }); };
+  const add = (jp, zh, L, src, furi, ref) => { if (!jp || !zh || seen.has(jp)) return; seen.add(jp); out.push({ jp, zh, L, src, furi, ref, n: trSize('ja', jp) }); };
   for (const L of LEVELS) {
-    for (const g of GRAM[L]) for (const e of g.eg) add(e.full, e.t, L, `语法「${g.p}」`, e.furi);
-    if (typeof EXAMPLES !== 'undefined') for (const v of VOCAB[L]) for (const [jp, , zh, furi] of EXAMPLES[v.w] || []) add(jp, zh, L, `单词「${v.w}」的例句`, furi);
+    for (const g of GRAM[L]) for (const e of g.eg) add(e.full, e.t, L, `语法「${g.p}」`, e.furi, { g });
+    if (typeof EXAMPLES !== 'undefined') for (const v of VOCAB[L]) for (const [jp, , zh, furi] of EXAMPLES[v.w] || []) add(jp, zh, L, `单词「${v.w}」的例句`, furi, { v });
   }
-  if (typeof readList === 'function') for (const a of readList()) for (const para of a.p) for (const [jp, , zh, , furi] of para) add(jp, zh, a.L, `阅读「${a.title}」`, furi);
+  if (typeof readList === 'function') for (const a of readList()) for (const para of a.p) for (const [jp, , zh, , furi] of para) add(jp, zh, a.L, `阅读「${a.title}」`, furi, { a });
   return (TR_POOL = out);
 }
 // 韩语、英语：异步加载语法、阅读和分级例句
 function trPoolL2(tr) {
   if (TR_POOLS[tr]) return Promise.resolve(TR_POOLS[tr]);
   const out = [], seen = new Set();
-  const add = (s, zh, L, src) => { if (!s || !zh || seen.has(s)) return; seen.add(s); out.push({ jp: s, zh, L, src, n: trSize(tr, s) }); };
+  const add = (s, zh, L, src, ref) => { if (!s || !zh || seen.has(s)) return; seen.add(s); out.push({ jp: s, zh, L, src, ref, n: trSize(tr, s) }); };
   return Promise.all([l2Fetch(tr, 'grammar').catch(() => []), l2Fetch(tr, 'reading').catch(() => []),
     ...Object.keys(TR_SRC_LV[tr]).map(k => lvFetch(`${tr}-ex-${k}`).then(d => [k, d]).catch(() => [k, {}]))]).then(([gram, reads, ...exs]) => {
-    gram.forEach(g => g.eg.forEach(([s, zh]) => add(s, zh, g.lv, `语法「${g.p}」`)));
-    reads.forEach(a => a.p.forEach(para => para.forEach(([s, zh]) => add(s, zh, a.lv, `阅读「${a.title}」`))));
-    exs.forEach(([k, d]) => Object.entries(d).forEach(([w, list]) => list.forEach(([s, zh]) => add(s, zh, TR_SRC_LV[tr][k], `单词「${w}」的例句`))));
+    gram.forEach(g => g.eg.forEach(([s, zh]) => add(s, zh, g.lv, `语法「${g.p}」`, { g2: g })));
+    reads.forEach(a => a.p.forEach(para => para.forEach(([s, zh]) => add(s, zh, a.lv, `阅读「${a.title}」`, { a2: a }))));
+    exs.forEach(([k, d]) => Object.entries(d).forEach(([w, list]) => list.forEach(([s, zh]) => add(s, zh, TR_SRC_LV[tr][k], `单词「${w}」的例句`, { w2: w, ex: list }))));
     return (TR_POOLS[tr] = out);
   });
 }
@@ -112,9 +112,11 @@ function trSession(items, dir, tr = 'ja') {
       ans.innerHTML = `<div class="small muted">参考答案</div>
         <div class="tr-ref ${zj && ja ? 'furi' : ''}" ${zj ? `lang="${tr}"` : ''}>${zj && ja ? furiHTML(x.jp, x.furi) : esc(ref)}${zj ? say(x.jp) + shadowBtn(x.jp, '', x.zh, ja ? undefined : tr) : ''}</div>
         ${mine ? `<div class="small">和参考答案的相似度约 <b>${trSimilar(mine, ref)}%</b>（意思对就行，说法不同也可以算会）</div>` : ''}
-        <div class="small muted">出处：${esc(x.src)}</div>
+        <div class="small muted">出处：${x.ref ? `<button type="button" class="link-btn" data-ref>${esc(x.src)} ›</button>` : esc(x.src)}</div>
         <div class="row tr-grade"><button class="btn" type="button" data-g="0">不会</button><button class="btn" type="button" data-g="1">差不多</button><button class="btn pri" type="button" data-g="2">会了</button></div>`;
       box.querySelector('[data-show]').parentElement.remove();
+      const rb = ans.querySelector('[data-ref]');
+      if (rb) rb.onclick = e => { e.stopPropagation(); trRefSheet(x, tr); };
       if (zj) { if (ja) speak(x.jp); else speakLang(x.jp, TRACKS[tr].tts); }
       ans.querySelectorAll('[data-g]').forEach(b => {
         b.onclick = () => {
@@ -130,4 +132,35 @@ function trSession(items, dir, tr = 'ja') {
     };
   };
   show();
+}
+
+// 出处卡片：在练习上面弹出语法点 / 单词 / 文章的说明，关掉就回到原来那一题，不离开练习
+function trRefSheet(x, tr) {
+  closeSheet();
+  const r = x.ref, ja = tr === 'ja', say = t => ja ? speakBtn(t) : sayBtn(t, TRACKS[tr].tts);
+  let body = '';
+  if (r.g) {   // 日语语法
+    body = `<div class="eyebrow">${esc(r.g.L)} 语法</div><b class="ws-word" lang="ja">${esc(r.g.p)}</b><div>${esc(r.g.m)}</div>
+      ${r.g.how ? `<p class="small">${esc(r.g.how)}</p>` : ''}
+      <div class="ex-box">${r.g.eg.map(e => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp furi" lang="ja">${furiHTML(e.full, e.furi, e.at, e.at + e.frag.length)}</div><div class="small muted">${esc(e.t)}</div></div>${speakBtn(e.kana)}</div>`).join('')}</div>`;
+  } else if (r.g2) {   // 韩语、英语语法
+    body = `<div class="eyebrow">${esc(r.g2.lv)} 语法</div><b class="ws-word" lang="${tr}">${esc(r.g2.p)}</b><div>${esc(r.g2.m)}</div>
+      ${r.g2.use ? `<p class="small">${esc(r.g2.use)}</p>` : ''}
+      <div class="ex-box">${r.g2.eg.map(([t, zh]) => `<div class="ex"><div style="flex:1;min-width:0"><div lang="${tr}">${esc(t)}</div><div class="small muted">${esc(zh)}</div></div>${say(t)}</div>`).join('')}</div>`;
+  } else if (r.v) {   // 日语单词
+    body = `<div class="eyebrow">${esc(r.v.L)} 单词</div><div class="row"><b class="ws-word" lang="ja">${esc(r.v.w)}</b>${speakBtn(r.v.r)}</div><div lang="ja" class="muted">${esc(r.v.r)}</div><div>${esc(r.v.m)}</div>
+      <div class="ex-box">${exHTML(r.v.w, 3)}</div>`;
+  } else if (r.w2) {   // 韩语、英语单词
+    body = `<div class="eyebrow">单词</div><div class="row"><b class="ws-word" lang="${tr}">${esc(r.w2)}</b>${say(r.w2)}</div>
+      <div class="ex-box">${r.ex.slice(0, 3).map(([t, zh]) => `<div class="ex"><div style="flex:1;min-width:0"><div lang="${tr}">${esc(t)}</div><div class="small muted">${esc(zh)}</div></div>${say(t)}</div>`).join('')}</div>`;
+  } else if (r.a || r.a2) {   // 阅读文章
+    const a = r.a || r.a2, href = ja ? `#read/${a.id}` : `#${tr}/read/${a.id}`;
+    body = `<div class="eyebrow">阅读文章</div><b class="ws-word" lang="${tr}">${esc(a.title)}</b><div class="muted">${esc(a.zh)}</div>
+      <p class="small">这句话出自这篇文章。想读全文的话，练完这一组再去阅读里打开它。</p><a class="btn small" href="${href}">现在去读全文（会离开练习）</a>`;
+  }
+  const sh = h(`<div class="word-sheet tr-ref-sheet" role="dialog" aria-label="出处"><button class="ws-x" type="button" aria-label="关闭">×</button>${body}
+    <div class="row"><button class="btn pri" type="button" data-back>看完了，回到练习</button></div></div>`);
+  document.body.append(sh);
+  sh.querySelector('.ws-x').onclick = closeSheet;
+  sh.querySelector('[data-back]').onclick = closeSheet;
 }

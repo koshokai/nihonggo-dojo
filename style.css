@@ -763,3 +763,6 @@ body.gated { overflow: hidden; }
 .lock-panel .row { justify-content: center; }
 .guest-btn { margin-top: 6px; width: 100%; }
 .tile-lock { font-size: .8em; }
+.link-btn { background: none; border: 0; padding: 0; font: inherit; color: var(--ai); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.tr-ref-sheet { max-height: 75vh; overflow-y: auto; }
+.tr-ref-sheet .ws-word { font-size: 1.3rem; }
