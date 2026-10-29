@@ -18,7 +18,7 @@ const server = http.createServer(async (req, res) => {
 const BASE = `http://127.0.0.1:${server.address().port}/`;
 const MOCK = await readFile(join(ROOT, 'tests/mock-supabase.js'), 'utf8');
 
-const PAGES = ['home', 'study', 'ri', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'listen', 'exam', 'biz', 'anime', 'trans', 'dict', 'me', 'about',
+const PAGES = ['home', 'study', 'ri', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'listen', 'exam', 'biz', 'anime', 'trans', 'conj', 'dict', 'me', 'about',
   ...['ko', 'en'].flatMap(t => [t, `${t}/study`, `${t}/ri`, `${t}/game`, `${t}/abc`, `${t}/words`, `${t}/phrases`, `${t}/grammar`, `${t}/levels`, `${t}/read`, `${t}/listen`, `${t}/exam`, `${t}/biz`, `${t}/trans`, `${t}/dict`])];
 
 const fails = [];
@@ -63,6 +63,12 @@ await flow('韩语翻译练习', async () => {
   await page.click('[data-start]', { timeout: 8000 });
   await page.click('[data-show]', { timeout: 5000 });
 });
+await flow('日语变形练习', async () => {
+  await page.goto(BASE + '#home'); await page.goto(BASE + '#conj');
+  await page.click('[data-conj-go]', { timeout: 8000 });
+  await page.click('.opt', { timeout: 5000 });
+  await page.waitForSelector('.feedback', { timeout: 5000 });
+});
 await flow('英语阅读文章', async () => {
   await page.goto(BASE + '#en/read'); await page.click('a.read-card', { timeout: 5000 });
   await page.waitForSelector('.ra-text', { timeout: 5000 });
@@ -74,4 +80,4 @@ await flow('后台页面', async () => {
 await browser.close();
 server.close();
 if (fails.length) { console.error(`失败 ${fails.length} 项：\n` + fails.map(f => ' - ' + f).join('\n')); process.exit(1); }
-console.log(`全部通过：${PAGES.length} 个页面 + 5 个流程`);
+console.log(`全部通过：${PAGES.length} 个页面 + 6 个流程`);

@@ -17,7 +17,7 @@ function guestLock(view, arg) {
   const lock = (what, extra) => ({ what, tr, extra });
   if (tr === 'ja') {
     if (['exam', 'biz', 'anime', 'trans'].includes(view)) return lock({ exam: '模拟考', biz: '商务日语', anime: '动漫·日剧名台词', trans: '翻译练习' }[view]);
-    if (['vocab', 'kanji', 'grammar'].includes(view) && S.level !== 'N5') return lock(`${S.level} 的内容`, { n5: true });
+    if (['vocab', 'kanji', 'grammar', 'conj'].includes(view) && S.level !== 'N5') return lock(`${S.level} 的内容`, { n5: true });
     if (view === 'listen') return guestDay().listen ? lock('更多听力（今天的试听题已经做过了）') : lock('完整的听力练习', { listen: true });
     if (view === 'read' && sub) return guestRead(sub, lock);
     return null;
