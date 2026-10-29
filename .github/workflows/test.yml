@@ -1,0 +1,38 @@
+# 每次推送代码都在无头浏览器里把三种语言的主要页面打开一遍、走几个关键流程（tests/smoke.mjs）。
+# 失败时 GitHub 会发邮件提醒，Actions 页面能看到是哪一页、什么错误。
+name: Smoke test
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['audio/**', 'photos/**', 'docs/**', 'tools/**', '*.md']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /*
+            !/audio/
+            !/photos/
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.48.2
+          npx playwright install --with-deps chromium
+      - name: Run
+        run: node tests/smoke.mjs
