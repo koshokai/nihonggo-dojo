@@ -63,22 +63,30 @@ function l2Grammar(tr) {
 
 /* ---------- 阅读 ---------- */
 const L2_CAT_ICON = { 韩国生活: '🏙️', 韩国美食: '🍲', 英美生活: '🏙️', 英美美食: '🍔', 职业日常: '👷', 节日季节: '🎆', 科技社会: '💡' };
-const l2Img = a => a.ph ? `<img class="rc-photo" src="${esc(a.ph[0])}" alt="${esc(a.zh)}" loading="lazy" decoding="async">` : `<div class="rc-ph-none">${L2_CAT_ICON[a.cat] || '📖'}</div>`;
+const l2Img = a => a.ph ? `<img class="rc-photo" src="${esc(a.ph[0])}" alt="${esc(a.zh)}" loading="lazy" decoding="async">` : `<div class="rc-ph-none"><span>${L2_CAT_ICON[a.cat] || '📖'}</span><b>${esc(a.cat || '')}</b></div>`;
 function l2Reading(tr, id) {
   l2Page(tr, ['reading'], `${TRACKS[tr].title}阅读`, all => {
     const done = (S.l2read = S.l2read || {});
     if (id) { const a = all.find(x => x.id === id); if (a) return l2Article(tr, a); }
-    const L = l2Sel[tr + 'r'] || 'all';
-    const list = all.filter(a => L === 'all' || a.lv === L);
+    const L = l2Sel[tr + 'r'] || 'all', cat = l2Sel[tr + 'rc'] || '';
+    const list = all.filter(a => (L === 'all' || a.lv === L) && (!cat || a.cat === cat));
+    const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / DAY) - 1, today = all[doy % all.length];
+    const lvCount = l => { const lv = all.filter(a => a.lv === l); return `${lv.filter(a => done[a.id]).length}/${lv.length}`; };
+    const cats = [...new Set(all.map(a => a.cat))];
+    // 和日语阅读一样：今日阅读 → 级别（带已读数）→ 题材 → 文章卡片
     const p = h(`<section class="panel">
       <div class="row between"><h2>${TRACKS[tr].title}阅读</h2><span class="small muted">已读 ${all.filter(a => done[a.id]).length} / ${all.length} 篇</span></div>
-      <p class="small muted">贴近生活的短文，配真实照片。点一句话朗读并显示中文，读完做个小测验。</p>
-      <div class="seg" role="group">${[...LV_NAMES[tr], 'all'].map(l => `<button type="button" data-rl="${l}" class="${l === L ? 'on' : ''}">${l === 'all' ? '全部' : l}</button>`).join('')}</div>
+      ${today ? `<a class="today-art" href="#${tr}/read/${today.id}"><div class="ta-img">${l2Img(today)}</div><div><span class="tag done">今日阅读</span> <span class="tag lv">${esc(today.lv)}</span><div class="rc-title" lang="${tr}">${esc(today.title)}</div><div class="small muted">${esc(today.zh)} · ${esc(today.cat)}</div></div></a>` : ''}
+      <p class="small muted">贴近生活的短文，配真实照片。每句都能点读、看中文、跟读；读完做个小测验拿经验。</p>
+      <div class="seg read-lv" role="group" aria-label="级别">${LV_NAMES[tr].map(l => `<button type="button" data-rl="${l}" class="${l === L ? 'on' : ''}">${l}<span class="lv-n">${lvCount(l)}</span></button>`).join('')}<button type="button" data-rl="all" class="${L === 'all' ? 'on' : ''}">全部</button></div>
+      <div class="row cat-row"><button type="button" class="chip-btn ${!cat ? 'on' : ''}" data-rc="">全部题材</button>${cats.map(c => `<button type="button" class="chip-btn ${cat === c ? 'on' : ''}" data-rc="${esc(c)}">${L2_CAT_ICON[c] || ''} ${esc(c)}</button>`).join('')}</div>
     </section>`);
     p.querySelectorAll('[data-rl]').forEach(b => { b.onclick = () => { l2Sel[tr + 'r'] = b.dataset.rl; render(); }; });
+    p.querySelectorAll('[data-rc]').forEach(b => { b.onclick = () => { l2Sel[tr + 'rc'] = b.dataset.rc; render(); }; });
     const grid = h('<div class="read-grid"></div>');
+    if (!list.length) grid.append(h('<p class="muted">这个分类还没有文章，换一个看看吧。</p>'));
     list.forEach(a => grid.append(h(`<a class="read-card" href="#${tr}/read/${a.id}">
-      <div class="rc-img">${l2Img(a)}<span class="tag lv">${a.lv}</span>${done[a.id] ? '<span class="rc-done">読了</span>' : ''}</div>
+      <div class="rc-img">${l2Img(a)}<span class="tag lv">${a.lv}</span>${done[a.id] ? '<span class="rc-done">已读</span>' : ''}</div>
       <div class="rc-body"><div class="rc-cat">${L2_CAT_ICON[a.cat] || ''} ${esc(a.cat)}</div><div class="rc-title" lang="${tr}">${esc(a.title)}</div><div class="rc-zh">${esc(a.zh)}</div>
       <div class="rc-first" lang="${tr}">${esc(a.p[0][0][0])}</div></div></a>`)));
     return [p, grid];
@@ -230,11 +238,31 @@ function l2Game(tr) {
   const words = langItems(tr, 'words'), size = 10, n = Math.ceil(words.length / size);
   const st = ((S.l2game = S.l2game || {})[tr] = S.l2game[tr] || {});
   const unlocked = i => i === 0 || st[i - 1] > 0;
-  const p = h(`<section class="panel">
-    <h2>${TRACKS[tr].title}闯关</h2>
-    <p class="small muted">入门 ${words.length} 个单词，每 10 个一关，按主题排列。每关 3 条命，答错的词会再出现一次；全对 3 星。通过一关解锁下一关。</p>
-    <div class="stage-map">${Array.from({ length: n }, (_, i) => `<button type="button" class="stage ${st[i] ? 'done' : ''}" data-stage="${i}" ${unlocked(i) ? '' : 'disabled'}><b>${i + 1}</b><span class="small">${esc(words[i * size].cat)}</span><span class="stars">${'★'.repeat(st[i] || 0)}${'☆'.repeat(3 - (st[i] || 0))}</span></button>`).join('')}</div>
+  // 和日语闯关同样的地图：每 10 关一章（章名取这一章的主题），蜿蜒的关卡路线，当前关有小猫
+  const cur = Array.from({ length: n }, (_, i) => i).find(i => !st[i]) ?? n - 1;
+  const chapters = Math.ceil(n / 10), stars = Object.values(st).reduce((x, y) => x + y, 0);
+  let ch = (l2Sel[tr + 'ch'] ?? Math.floor(cur / 10));
+  ch = Math.min(Math.max(0, ch), chapters - 1);
+  const from = ch * 10, to = Math.min(n, from + 10);
+  const p = h(`<section class="panel game-map">
+    <div class="row between"><h2>${TRACKS[tr].title}闯关</h2></div>
+    <div class="row between small"><span>已过 ${Object.keys(st).length} / ${n} 关 · <b class="star-t">★ ${stars}</b></span><span class="muted">每关 10 个词，3 条命，答错会扣命</span></div>
+    <div class="chap-nav">
+      <button class="btn ghost" type="button" data-ch="-1" ${ch <= 0 ? 'disabled' : ''} aria-label="上一章">‹</button>
+      <div class="chap-title"><span class="eyebrow">第 ${ch + 1} 章 / 共 ${chapters} 章</span><b>${esc(words[from * size].cat)}</b></div>
+      <button class="btn ghost" type="button" data-ch="1" ${ch >= chapters - 1 ? 'disabled' : ''} aria-label="下一章">›</button>
+    </div>
+    <div class="path">${Array.from({ length: to - from }, (_, k) => {
+      const i = from + k, x = Math.round(Math.sin(k * 0.9) * 26), boss = (i + 1) % 10 === 0;
+      return `<div class="node-wrap ${x > 0 ? 'r' : 'l'}" style="--x:${x}%">
+        <button type="button" class="node ${boss ? 'boss' : ''} ${st[i] ? 'done' : ''} ${i === cur ? 'cur' : ''}" data-stage="${i}" ${unlocked(i) ? '' : 'disabled'} aria-label="第 ${i + 1} 关：${esc(words[i * size].cat)}"><span>${boss ? '★' : i + 1}</span></button>
+        <span class="stars">${[1, 2, 3].map(j => `<i class="${j <= (st[i] || 0) ? 'on' : ''}">★</i>`).join('')}</span>
+        ${i === cur ? `<span class="here">${neko('happy', 'mini wave')}</span>` : ''}
+      </div>`;
+    }).join('')}</div>
+    <p class="small muted">入门 ${words.length} 个单词按主题排列。答错的词会再出现一次；全对 3 星，通过一关解锁下一关。</p>
   </section>`);
+  p.querySelectorAll('[data-ch]').forEach(b => { b.onclick = () => { l2Sel[tr + 'ch'] = ch + +b.dataset.ch; render(); }; });
   p.querySelectorAll('[data-stage]').forEach(b => { b.onclick = () => {
     const i = +b.dataset.stage, ws = words.slice(i * size, (i + 1) * size);
     const mk = x => {
@@ -263,17 +291,23 @@ function l2Game(tr) {
 let l2DictQ = {};
 function l2Dict(tr) {
   const T = TRACKS[tr];
+  const tries = tr === 'ko' ? ['사랑', '학교', '감사합니다', '学习', '回家', '먹다'] : ['study', 'schedule', 'take off', '学习', '会议', 'apply'];
+  // 和日语词典同样的排版：大输入框 + 查 按钮 + 「试试」+ 收录说明
   const p = h(`<section class="panel"><h2>${T.title}词典</h2>
-    <input type="search" class="lv-q" placeholder="输入${T.title}或中文" value="${esc(l2DictQ[tr] || '')}"><div data-res class="small muted">加载词库……</div></section>`);
+    <form class="dict-form" role="search"><input type="search" id="dict-q" placeholder="输入${T.title}或中文" value="${esc(l2DictQ[tr] || '')}" aria-label="查词" autocomplete="off"><button class="btn pri" type="submit">查</button></form>
+    <div class="row small"><span class="muted">试试：</span>${tries.map(w => `<button type="button" class="chip-btn" data-try="${esc(w)}">${esc(w)}</button>`).join('')}</div>
+    <div data-res class="small muted">加载词库……</div></section>`);
   main.append(p);
-  const input = p.querySelector('input'), res = p.querySelector('[data-res]');
+  const input = p.querySelector('#dict-q'), res = p.querySelector('[data-res]');
+  p.querySelector('form').onsubmit = e => { e.preventDefault(); input.dispatchEvent(new Event('input')); };
+  p.querySelectorAll('[data-try]').forEach(b => { b.onclick = () => { input.value = b.dataset.try; input.dispatchEvent(new Event('input')); }; });
   if (!langReady(tr)) return;
   lvFetch(`${tr}-levels`).then(meta => Promise.all(meta.map(([k, n]) => lvFetch(`${tr}-${k}`).then(rows => rows.map(([t, pr, zh]) => ({ t, pr, zh, lv: n }))))))
     .then(groups => {
       const all = [...langItems(tr, 'words').map(x => Object.assign({ lv: '入门' }, x)), ...langItems(tr, 'phrases').map(x => Object.assign({ lv: '常用句' }, x)), ...groups.flat()];
       const show = () => {
         const q = input.value.trim(), ql = q.toLowerCase(); l2DictQ[tr] = q;
-        if (!q) { res.innerHTML = `共 ${all.length.toLocaleString()} 条：入门单词、常用句和分级词库。`; return; }
+        if (!q) { res.innerHTML = `收录：${tr === 'ko' ? '国立国语院《한국어기초사전》' : 'ECDICT'}分级词库 + 入门单词和常用句，共 ${all.length.toLocaleString()} 条。`; return; }
         const hits = all.filter(x => x.t.toLowerCase().includes(ql) || x.zh.includes(q) || (x.pr && x.pr.toLowerCase().includes(ql)))
           .sort((a, b) => (a.t.toLowerCase() === ql ? -1 : 0) - (b.t.toLowerCase() === ql ? -1 : 0) || a.t.length - b.t.length).slice(0, 60);
         res.innerHTML = hits.length ? `<div class="list-wrap"><table class="list"><tbody>${hits.map(x => `<tr><td style="width:40px">${sayBtn(x.t, T.tts)}</td><td><b lang="${tr}">${esc(x.t)}</b>${x.pr ? `<div class="small muted">${esc(x.pr)}</div>` : ''}</td><td>${esc(x.zh)}</td><td><span class="tag">${esc(x.lv)}</span></td></tr>`).join('')}</tbody></table></div>`

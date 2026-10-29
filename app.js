@@ -709,7 +709,7 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, study: viewStudy, ri: viewRI, ko: viewKo, en: viewEn, me: viewMe, welcome: viewWelcome, about: viewAbout, anime: viewAnime, trans: viewTrans };
+const VIEWS = { home: viewHome, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, study: viewStudy, ri: viewRI, ko: viewKo, en: viewEn, me: viewMe, welcome: viewWelcome, about: viewAbout, anime: viewAnime, trans: () => viewTrans('ja') };
 function render() {
   const [v, ...rest] = (location.hash || '#home').slice(1).split('/');
   const arg = rest.join('/');
@@ -895,18 +895,7 @@ function viewHome() {
     bn.querySelector('[data-later]').onclick = () => { S.snooze = Date.now(); save(); bn.remove(); };
     banners.push(bn);
   }
-  const progress = h(`<section class="panel">
-    <div class="hero">
-      <div class="ring ${pct >= 1 ? 'full' : ''}"><svg viewBox="0 0 120 120"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--sakura)"/><stop offset="1" style="stop-color:var(--ai)"/></linearGradient></defs><circle class="trk" cx="60" cy="60" r="52"/><circle class="val" cx="60" cy="60" r="52" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}"/></svg>
-        <div class="ring-c"><b>${tx}</b><span class="small muted">/ ${S.goal} 经验</span></div></div>
-      <div class="rank">
-        <div class="eyebrow">当前段位</div>
-        <div class="rank-name"><span lang="ja">${rk[1]}</span> <span class="small muted" style="font-family:var(--f-ui);font-weight:400">${rk[2]}</span></div>
-        <div class="bar"><i style="width:${nx ? (S.xp - rk[0]) / (nx[0] - rk[0]) * 100 : 100}%"></i></div>
-        <p class="small muted">${nx ? `累计 ${S.xp} 经验，距离「${nx[2]}」还差 ${nx[0] - S.xp}` : `累计 ${S.xp} 经验，已是最高段位`}</p>
-      </div>
-    </div>
-  </section>`);
+  const progress = homeProgress();
 
   const ns = nextStage(S.level);
   const tasks = [
@@ -925,6 +914,29 @@ function viewHome() {
   });
   main.append(tp, ...after, progress);
 
+  const lvRows = LEVELS.map(L => { const n = VOCAB[L].filter(learned).length, t = VOCAB[L].length; return `<div class="lv-row"><b>${L}</b><div class="bar"><i style="width:${n / t * 100}%"></i></div><span class="small muted">${n}/${t}</span></div>`; }).join('');
+  main.append(homeRecords(lvRows));
+
+  main.append(homeStamps(), ...banners);
+}
+// 首页的进度环、学习记录和成就印章（日语、韩语、英语首页共用）
+function homeProgress() {
+  const tx = todayXP(), pct = Math.min(1, tx / S.goal), C = 2 * Math.PI * 52;
+  const ri = rankOf(S.xp), rk = RANKS[ri], nx = RANKS[ri + 1];
+  return h(`<section class="panel">
+    <div class="hero">
+      <div class="ring ${pct >= 1 ? 'full' : ''}"><svg viewBox="0 0 120 120"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--sakura)"/><stop offset="1" style="stop-color:var(--ai)"/></linearGradient></defs><circle class="trk" cx="60" cy="60" r="52"/><circle class="val" cx="60" cy="60" r="52" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}"/></svg>
+        <div class="ring-c"><b>${tx}</b><span class="small muted">/ ${S.goal} 经验</span></div></div>
+      <div class="rank">
+        <div class="eyebrow">当前段位</div>
+        <div class="rank-name"><span lang="ja">${rk[1]}</span> <span class="small muted" style="font-family:var(--f-ui);font-weight:400">${rk[2]}</span></div>
+        <div class="bar"><i style="width:${nx ? (S.xp - rk[0]) / (nx[0] - rk[0]) * 100 : 100}%"></i></div>
+        <p class="small muted">${nx ? `累计 ${S.xp} 经验，距离「${nx[2]}」还差 ${nx[0] - S.xp}` : `累计 ${S.xp} 经验，已是最高段位`}</p>
+      </div>
+    </div>
+  </section>`);
+}
+function homeRecords(lvRows, title = '单词进度') {
   // 学习热力图：最近 20 周
   const end = new Date(); end.setHours(0, 0, 0, 0);
   const start = new Date(end); start.setDate(start.getDate() - 7 * 19 - end.getDay());
@@ -934,19 +946,19 @@ function viewHome() {
     const lv = !x ? 0 : x < S.goal / 2 ? 1 : x < S.goal ? 2 : x < S.goal * 2 ? 3 : 4;
     cells += `<i class="h${lv} ${fut ? 'fut' : ''}" title="${dkey(d)}：${x} 经验"></i>`;
   }
-  const lvRows = LEVELS.map(L => { const n = VOCAB[L].filter(learned).length, t = VOCAB[L].length; return `<div class="lv-row"><b>${L}</b><div class="bar"><i style="width:${n / t * 100}%"></i></div><span class="small muted">${n}/${t}</span></div>`; }).join('');
-  main.append(h(`<div class="grid2">
+  return h(`<div class="grid2">
     <section class="panel"><div class="row between"><h2>学习记录</h2><span class="legend">少 <i style="background:var(--heat0)"></i><i style="background:var(--heat1)"></i><i style="background:var(--heat2)"></i><i style="background:var(--heat3)"></i><i style="background:var(--heat4)"></i> 多</span></div>
       <div class="heat-wrap"><div class="heat">${cells}</div></div><p class="small muted">每一格是一天，颜色越深当天经验越多。</p></section>
-    <section class="panel"><h2>单词进度</h2><div class="lv-list">${lvRows}</div></section>
-  </div>`));
-
+    <section class="panel"><h2>${esc(title)}</h2><div class="lv-list">${lvRows}</div></section>
+  </div>`);
+}
+function homeStamps() {
   // 印章：只显示已获得的和接下来 3 个，其余收起
   const stamp = b => `<div class="stamp ${S.badges[b.id] ? 'got' : ''}" title="${esc(b.desc)}"><div class="stamp-in" lang="ja">${b.ch}</div><b>${esc(b.name)}</b><span>${esc(b.desc)}</span></div>`;
   const got = BADGES.filter(b => S.badges[b.id]), next = BADGES.filter(b => !S.badges[b.id]);
-  main.append(h(`<section class="panel"><div class="row between"><h2>成就印章</h2><span class="small muted">${got.length} / ${BADGES.length}</span></div>
+  return h(`<section class="panel"><div class="row between"><h2>成就印章</h2><span class="small muted">${got.length} / ${BADGES.length}</span></div>
     <div class="stamps">${[...got, ...next.slice(0, 3)].map(stamp).join('')}</div>
-    ${next.length > 3 ? `<details class="more-stamps"><summary class="small">查看全部 ${BADGES.length} 枚</summary><div class="stamps">${next.slice(3).map(stamp).join('')}</div></details>` : ''}</section>`), ...banners);
+    ${next.length > 3 ? `<details class="more-stamps"><summary class="small">查看全部 ${BADGES.length} 枚</summary><div class="stamps">${next.slice(3).map(stamp).join('')}</div></details>` : ''}</section>`);
 }
 
 function wrongReview() {

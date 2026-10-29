@@ -258,10 +258,18 @@ function langLevels(tr) {
     const known = items.filter(x => S.srs[x.id] && S.srs[x.id].r > 0).length;
     const due = items.filter(x => S.srs[x.id] && S.srs[x.id].due <= Date.now());
     const name = meta.find(m => m[0] === cur)[1];
-    p.innerHTML = `<div class="row between"><h2>${T.title}分级词库</h2><span class="small muted">${esc(name)}：已学 ${known} / ${items.length}</span></div>
-      <div class="chips-row">${meta.map(([k, n, c]) => `<button type="button" class="chip-btn ${k === cur ? 'on' : ''}" data-lv="${k}">${esc(n)} <span class="small">${c}</span></button>`).join('')}</div>
+    const masteredN = items.filter(x => S.srs[x.id] && mastered(Object.assign({ id: x.id }, x))).length;
+    // 和日语「单词」页同样的排版：级别 → 四格统计 → 背单词 / 测验
+    p.innerHTML = `<div class="row between"><h2>${T.title}分级词库 · ${esc(name)}</h2></div>
+      <div class="seg read-lv" role="group" aria-label="级别">${meta.map(([k, n, c]) => `<button type="button" data-lv="${k}" class="${k === cur ? 'on' : ''}">${esc(n)}<span class="lv-n">${c}</span></button>`).join('')}</div>
+      <div class="stats">
+        <div class="stat"><span class="small muted">本级单词</span><b>${items.length}</b></div>
+        <div class="stat"><span class="small muted">学过</span><b>${known}</b></div>
+        <div class="stat"><span class="small muted">已掌握</span><b>${masteredN}</b></div>
+        <div class="stat"><span class="small muted">待复习</span><b>${due.length}</b></div>
+      </div>
       <p class="small muted">${tr === 'en' ? '按中国的英语考试分级：每个词只放在它第一次出现的级别（例如四级里只有四级新增、高考没有的词），同一级里常用词在前。' : '按国立国语院《韩国语基础词典》的等级：初级≈TOPIK 1–2 级，中级≈3–4 级，高级≈5–6 级。单词下面标出了汉字词对应的汉字（繁体），学过汉语的人一看就懂。'}</p>
-      <div class="row"><button class="btn pri" type="button" data-cards>闪卡：${due.length ? `复习 ${due.length} + ` : ''}新词 15</button><button class="btn" type="button" data-quiz>小测验 10 题</button></div>
+      <div class="row"><button class="btn pri" type="button" data-cards>背单词（复习 ${Math.min(due.length, 50)} + 新词 15）</button><button class="btn" type="button" data-quiz>单词测验 10 题</button></div>
       <input type="search" class="lv-q" placeholder="在这一级里查找：${tr === 'en' ? '英文' : '韩语'} / 中文" value="${esc(lvQuery[tr] || '')}">
       <div class="list-wrap"><table class="list"><tbody>${list.slice(0, lvShown).map(x => `<tr><td style="width:40px">${sayBtn(x.t, T.tts)}</td><td><b lang="${tr}">${esc(x.t)}</b>${x.pr ? `<div class="small muted">${tr === 'ko' ? '汉字 ' : ''}${esc(x.pr)}</div>` : ''}</td><td>${esc(x.zh)}${x.ex ? `<div class="small lv-ex"><span lang="${tr}">${esc(x.ex[0])}</span> ${sayBtn(x.ex[0], T.tts)}<br><span class="muted">${esc(x.ex[1])}</span></div>` : ''}</td><td>${S.srs[x.id] && S.srs[x.id].r > 0 ? '<span class="tag done">已学</span>' : ''}</td></tr>`).join('')}</tbody></table></div>
       ${list.length > lvShown ? `<div class="row" style="justify-content:center"><button class="btn" type="button" data-more>再显示 100 个（共 ${list.length}）</button></div>` : ''}
@@ -400,6 +408,7 @@ function viewLangTrack(tr, sub) {
   if (sub && sub.startsWith('read')) return l2Reading(tr, sub.split('/')[1]);
   if (sub === 'listen') return l2Listen(tr);
   if (sub && sub.startsWith('biz')) return l2Biz(tr, sub.split('/')[1]);
+  if (sub === 'trans') return viewTrans(tr);
   if (sub === 'game') return l2Game(tr);
   if (sub === 'dict') return l2Dict(tr);
   if (!langReady(tr)) return;
@@ -427,16 +436,29 @@ function viewLangTrack(tr, sub) {
     nextStage != null ? { ic: '関', t: `闯关 · 第 ${nextStage + 1} 关`, d: `${words[nextStage * 10].cat}，10 个词，3 条命`, go: () => { location.hash = `${tr}/game`; } } : null
   ].filter(Boolean);
   const tp = taskPanel('今日任务', tasks, T.name);
-  main.append(tp);
-  l2Fetch(tr, 'daily').then(list => { if (tp.isConnected && list.length) tp.after(l2Daily(tr, list)); }).catch(() => {});
-  main.append(h(`<h3 class="sec-h">全部内容</h3>`), tileGrid(trackTiles(tr)));
+  // 和日语首页同样的顺序：今日任务 → 今日阅读 → 今日一句 → 进度 → 学习记录 → 成就印章
+  const slot = h('<div class="home-slot"></div>');
+  main.append(tp, slot);
+  const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / DAY) - 1;
+  Promise.all([l2Fetch(tr, 'reading').catch(() => []), l2Fetch(tr, 'daily').catch(() => [])]).then(([reads, daily]) => {
+    if (!slot.isConnected) return;
+    const a = reads.length && reads[doy % reads.length];
+    if (a && !(S.l2read || {})[a.id]) slot.append(h(`<a class="today-art" href="#${tr}/read/${a.id}"><div class="ta-img">${l2Img(a)}</div><div><span class="tag done">今日阅读</span> <span class="tag lv">${esc(a.lv)}</span><div class="rc-title" lang="${tr}">${esc(a.title)}</div><div class="small muted">${esc(a.zh)} · 生活短文，配照片</div></div></a>`));
+    if (daily.length) slot.append(l2Daily(tr, daily));
+  });
+  main.append(homeProgress());
+  const learnedN = pre => Object.keys(S.srs).filter(id => id.startsWith(pre) && S.srs[id].r > 0).length;
+  const row = (name, n, t) => `<div class="lv-row"><b>${esc(name)}</b><div class="bar"><i style="width:${t ? n / t * 100 : 0}%"></i></div><span class="small muted">${n}/${t}</span></div>`;
+  const rec = homeRecords(row('入门', words.filter(x => S.srs[x.id] && S.srs[x.id].r > 0).length, words.length), '单词进度');
+  main.append(rec, homeStamps());
+  lvFetch(`${tr}-levels`).then(meta => { const box = rec.querySelector('.lv-list'); if (box) box.insertAdjacentHTML('beforeend', meta.map(([k, n, t]) => row(n, learnedN(`${tr}|L|${k}|`), t)).join('')); }).catch(() => {});
 }
 // 各语言的栏目（学习 / 阅读听力 两个分组页和首页都用）
 function trackTiles(tr, group) {
   const ko = tr === 'ko';
   const study = [[`#${tr}/game`, '🎮', '闯关', '每关 10 个词'], [`#${tr}/abc`, ko ? '한' : 'Aa', ko ? '字母' : '字母音标', ko ? '40 个字母 + 拼读表' : '26 个字母 + 音标'], [`#${tr}/words`, '🃏', '单词', '入门 500 词'],
-    [`#${tr}/phrases`, '💬', '常用句', '150 句'], [`#${tr}/grammar`, '📐', '语法', '90 个语法点'], [`#${tr}/levels`, '📚', '分级词库', ko ? 'TOPIK 约 1.1 万词' : '中考→GRE 约 1.5 万词'],
-    [`#${tr}/biz`, '💼', '商务', '职场表达 + 邮件'], [`#${tr}/dict`, '🔎', '词典', '一起查']];
+    [`#${tr}/phrases`, '💬', '常用句', '150 句'], [`#${tr}/grammar`, '📐', '语法', '176 个语法点'], [`#${tr}/levels`, '📚', '分级词库', ko ? 'TOPIK 约 1.1 万词' : '中考→GRE 约 1.5 万词'],
+    [`#${tr}/biz`, '💼', '商务', '场景会话、邮件、词汇'], [`#${tr}/trans`, '✍️', '翻译练习', '中外互译，自己打分']];
   const ri = [[`#${tr}/read`, '📖', '阅读', '生活短文，配照片'], [`#${tr}/listen`, '🎧', '听力', '对话 + 题目']];
   const exam = [[`#${tr}/exam`, '📝', '模拟考', ko ? 'TOPIK I / II' : '四级 / 六级']];
   return group === 'study' ? study : group === 'ri' ? ri : [...study, ...ri, ...exam];
