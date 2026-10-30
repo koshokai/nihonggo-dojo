@@ -358,3 +358,77 @@ function l2Placement(tr) {
     box.replaceWith(p);
   }).catch(() => { box.innerHTML = `<h2>${T.title}分级测试</h2><p>题目加载失败，请检查网络。</p>`; });
 }
+
+/* ---------- 影视名台词（韩剧·韩影 / 英美影视） ---------- */
+// 数据 lang/<tr>-quotes.json（tools/lang2/<tr>_quotes.json → build_lang2.py）。照片只用取景地、故事舞台的实拍，不用剧照。
+let l2QKind = '';
+function l2Quotes(tr, id) {
+  const T = TRACKS[tr], name = tr === 'ko' ? '韩剧 · 韩影名台词' : '英美影视名台词';
+  const kinds = tr === 'ko' ? [['', '全部'], ['drama', '韩剧'], ['movie', '电影']] : [['', '全部'], ['movie', '电影'], ['drama', '剧集']];
+  const box = h(`<section class="panel"><h2>${name}</h2><p class="muted">加载中……</p></section>`);
+  main.append(box);
+  l2Fetch(tr, 'quotes').then(list => {
+    if (!box.isConnected) return;
+    const w = id && list.find(x => x.id === id);
+    if (w) return box.replaceWith(l2QuoteWork(tr, w, list));
+    const p = h(`<section class="panel"><h2>${name}</h2>
+      <p class="small muted">${tr === 'ko' ? '韩国人' : '英语母语者'}挂在嘴边的经典台词：原句、讲解、生词，再看看生活里怎么拿来玩梗。</p>
+      <div class="seg" role="group">${kinds.map(([k, t]) => `<button type="button" data-qk="${k}" class="${l2QKind === k ? 'on' : ''}">${t}</button>`).join('')}</div>
+      <div class="an-grid"></div></section>`);
+    const grid = p.querySelector('.an-grid');
+    const draw = () => {
+      grid.innerHTML = list.filter(x => !l2QKind || x.kind === l2QKind).map(x => `<a class="an-card" href="#${tr}/quotes/${esc(x.id)}">
+        <div class="an-img">${x.ph ? `<img src="${esc(x.ph[0])}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="an-cover" lang="${tr}">${esc(x.title)}</span>`}</div>
+        <div class="an-meta"><b lang="${tr}">${esc(x.title)}</b><span class="small muted">${esc(x.zh)} · ${x.lines.length} 句</span>
+        <span class="small an-first" lang="${tr}">“${esc(x.lines[0].t)}”</span></div></a>`).join('');
+    };
+    p.querySelectorAll('[data-qk]').forEach(b => { b.onclick = () => { l2QKind = b.dataset.qk; p.querySelectorAll('[data-qk]').forEach(x => x.classList.toggle('on', x === b)); draw(); }; });
+    draw();
+    box.replaceWith(p);
+  }).catch(() => { box.innerHTML = `<h2>${name}</h2><p class="muted">内容准备中，过几天再来看看。</p>`; });
+}
+function l2QuoteWork(tr, w, list) {
+  const T = TRACKS[tr];
+  const p = h(`<article class="panel an-work">
+    <a class="an-back" href="#${tr}/quotes">← 全部作品</a>
+    ${w.ph ? `<div class="an-hero"><img src="${esc(w.ph[0])}" alt="${esc(w.place)}" decoding="async" onerror="this.parentElement.remove()"></div>${photoCredit(w)}` : ''}
+    <h2 lang="${tr}">${esc(w.title)} <span class="small muted">${esc(w.zh)}${w.year ? ' · ' + esc(w.year) : ''}</span></h2>
+    ${w.place ? `<p class="small muted">${w.ph ? '📍 ' : ''}${esc(w.place)}</p>` : ''}
+    <div class="an-lines">${w.lines.map(l => `<section class="an-line">
+      <div class="an-q"><span class="an-quote" lang="${tr}">“${esc(l.t)}”</span>${sayBtn(l.t, T.tts)}${shadowBtn(l.t, '', l.zh, tr)}${typeof reportBtn === 'function' ? reportBtn(l.t, l.zh) : ''}</div>
+      <div class="an-zh">${esc(l.zh)}</div>
+      <div class="small muted">—— <span lang="${tr}">${esc(l.who || '')}</span>${l.lv ? ` <span class="tag lv">${esc(l.lv)}</span>` : ''}${l.scene ? ` · ${esc(l.scene)}` : ''}</div>
+      ${l.note ? `<p class="an-note small">${esc(l.note)}</p>` : ''}
+      ${(l.words || []).length ? `<div class="an-words">${l.words.map(([x, r, zh]) => `<span class="an-w"><b lang="${tr}">${esc(x)}</b> <span class="muted">${esc(r)}</span> ${esc(zh)}</span>`).join('')}</div>` : ''}
+      ${(l.talk || []).length ? `<details class="an-talk"><summary class="small">生活里这样用</summary>${l.talk.map(([who, s, zh]) => `<div class="an-t"><span class="an-who">${esc(who)}</span><div><span lang="${tr}">${esc(s)}</span>${sayBtn(s, T.tts)}<div class="small muted">${esc(zh)}</div></div></div>`).join('')}</details>` : ''}
+    </section>`).join('')}</div>
+    <h3>小测验：这句台词是什么意思？</h3><div class="an-quiz"></div>
+  </article>`);
+  l2QuoteQuiz(p.querySelector('.an-quiz'), tr, w, list);
+  return p;
+}
+function l2QuoteQuiz(box, tr, w, list) {
+  const others = list.flatMap(x => x.id === w.id ? [] : x.lines.map(l => l.zh));
+  const qs = sample(w.lines, Math.min(4, w.lines.length));
+  let i = 0, right = 0;
+  const next = () => {
+    if (i >= qs.length) {
+      box.innerHTML = `<p>答对 ${right} / ${qs.length}。</p><button class="btn" type="button">再来一次</button>`;
+      box.querySelector('button').onclick = () => l2QuoteQuiz(box, tr, w, list);
+      if (right) addXP(right * 5);
+      return;
+    }
+    const q = qs[i], opts = sample([q.zh, ...sample(others.filter(z => z !== q.zh), 3)], 4);
+    box.innerHTML = `<p><b lang="${tr}">“${esc(q.t)}”</b> ${sayBtn(q.t, TRACKS[tr].tts)}</p><div class="an-opts">${opts.map(o => `<button class="btn" type="button">${esc(o)}</button>`).join('')}</div>`;
+    box.querySelectorAll('.an-opts button').forEach(b => {
+      b.onclick = () => {
+        const ok = b.textContent === q.zh;
+        if (ok) right++;
+        box.querySelectorAll('.an-opts button').forEach(x => { x.disabled = true; if (x.textContent === q.zh) x.classList.add('pri'); });
+        if (!ok) b.classList.add('danger');
+        i++; setTimeout(next, ok ? 700 : 1500);
+      };
+    });
+  };
+  next();
+}

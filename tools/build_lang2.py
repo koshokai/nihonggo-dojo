@@ -64,6 +64,16 @@ def main():
                     ph = PHOTOS[a['id']]
                     a['ph'] = [ph['file'], ph['by'], ph['license'], ph['page']]
             write(lang, 'reading', d); out['reading'] = len(d)
+        # 影视名台词：照片键名 <lang>-q-<id>
+        d = load(lang, 'quotes')
+        if d is not None:
+            for w in d:
+                key = f"{lang}-q-{w['id']}"
+                w.pop('photo', None)
+                if key in PHOTOS and OVER.get(key) != '':
+                    ph = PHOTOS[key]
+                    w['ph'] = [ph['file'], ph['by'], ph['license'], ph['page']]
+            write(lang, 'quotes', d); out['quotes'] = len(d)
         d = load(lang, 'listen')
         if d is not None:
             for x in d:
@@ -79,6 +89,9 @@ def photo_queries():
         for i, a in enumerate(load(lang, 'reading') or [], 1):
             if a.get('photo'):
                 out[f'{lang}-r-{i:02d}'] = [q.strip() for q in a['photo'].split(' / ') if q.strip()]
+        for w in load(lang, 'quotes') or []:
+            if w.get('photo'):
+                out[f"{lang}-q-{w['id']}"] = [q.strip() for q in w['photo'].split(' / ') if q.strip()]
         for i, sc in enumerate((load(lang, 'biz') or {}).get('scenes', []), 1):
             if sc.get('photo'):
                 out[f'{lang}-bs-{i:02d}'] = [q.strip() for q in sc['photo'].split(' / ') if q.strip()]

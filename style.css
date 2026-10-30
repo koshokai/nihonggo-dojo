@@ -711,7 +711,7 @@ body.gated { overflow: hidden; }
 .wk-tips { margin: 6px 0; padding-left: 20px; }
 .lv-ex { margin-top: 4px; } .card-ex { margin-top: 10px; text-align: left; }
 /* 动漫·日剧名台词 */
-.an-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 12px; }
+.an-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(140px, 44%), 1fr)); gap: 12px; margin-top: 12px; }
 .an-card { display: flex; flex-direction: column; border-radius: var(--r); overflow: hidden; background: var(--surface); border: 1px solid var(--line); color: inherit; text-decoration: none; }
 .an-img { aspect-ratio: 16 / 9; background: var(--ai-soft); display: grid; place-items: center; font-size: 2.4rem; overflow: hidden; }
 .an-img img { width: 100%; height: 100%; object-fit: cover; }

@@ -23,7 +23,7 @@ function guestLock(view, arg) {
     return null;
   }
   const s = sub.split('/')[0];
-  if (['exam', 'biz', 'trans', 'dictation'].includes(s)) return lock({ exam: '模拟考', biz: `商务${TRACKS[tr].title}`, trans: '翻译练习', dictation: '听写' }[s]);
+  if (['exam', 'biz', 'trans', 'dictation', 'quotes'].includes(s)) return lock({ exam: '模拟考', biz: `商务${TRACKS[tr].title}`, trans: '翻译练习', dictation: '听写', quotes: '影视名台词' }[s]);
   if (s === 'grammar' && l2Sel[tr + 'g'] && l2Sel[tr + 'g'] !== LV_NAMES[tr][0]) return lock(`${l2Sel[tr + 'g']}语法`, { lvReset: tr + 'g' });
   if (s === 'levels' && lvSel[tr] && lvSel[tr] !== GUEST_FIRST_LV[tr]) return lock('更高级别的词库', { lvLevels: true });
   if (s === 'listen') return guestDay().listen ? lock('更多听力（今天的试听题已经做过了）') : lock('完整的听力练习', { listen: true });
@@ -52,7 +52,7 @@ function lockPanel(lk) {
     <p class="muted">你现在是游客模式，可以先体验入门内容。免费注册一个账号，就能学到全部内容：</p>
     <ul class="lock-list">
       <li>${T ? `${esc(T.title)}全部级别的单词、语法和阅读` : 'N5 到 N1 全部单词、汉字、语法和阅读'}</li>
-      <li>模拟考、听力、商务${T ? '' : '、动漫·日剧名台词'}、翻译练习</li>
+      <li>模拟考、听力、商务、${T ? '影视' : '动漫·日剧'}名台词、翻译练习</li>
       <li>学习进度云端同步，换手机、换浏览器都不丢</li>
       <li>学习提醒，到点提醒你今天还没学</li>
     </ul>
@@ -98,4 +98,4 @@ function guestBanner(anchor) {
   anchor.after(b);
 }
 // 入口方块上的小锁
-const guestLockedHref = href => isGuest() && /#((ko|en)\/)?(exam|biz|anime|trans|dictation)$/.test(href);
+const guestLockedHref = href => isGuest() && /#((ko|en)\/)?(exam|biz|anime|quotes|trans|dictation)$/.test(href);

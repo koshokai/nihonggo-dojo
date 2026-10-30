@@ -33,6 +33,8 @@ def items(lang, which):
         # 商务场景会话的对话、关键表达和商务词汇
         out += [l[1] for sc in (biz.get('scenes', []) if biz else []) for l in sc['lines']] + [x[0] for sc in (biz.get('scenes', []) if biz else []) for x in sc.get('phr', [])]
         out += [w[0] for c in (biz.get('vocab', []) if biz else []) for w in c['words']]
+        # 影视名台词和生活小对话
+        out += [l['t'] for w in L('quotes') for l in w['lines']] + [x[1] for w in L('quotes') for l in w['lines'] for x in l.get('talk', [])]
         return out
     if which == 'basic':
         d = json.loads((ROOT / 'tools' / 'lang' / f'{lang}.json').read_text(encoding='utf-8'))

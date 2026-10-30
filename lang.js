@@ -408,6 +408,7 @@ function viewLangTrack(tr, sub) {
   if (sub && sub.startsWith('read')) return l2Reading(tr, sub.split('/')[1]);
   if (sub === 'listen') return l2Listen(tr);
   if (sub && sub.startsWith('biz')) return l2Biz(tr, sub.split('/')[1]);
+  if (sub && sub.startsWith('quotes')) return l2Quotes(tr, sub.split('/')[1]);
   if (sub === 'trans') return viewTrans(tr);
   if (sub === 'dictation') return viewDictation(tr);
   if (sub === 'placement') return l2Placement(tr);
@@ -462,7 +463,7 @@ function trackTiles(tr, group) {
   const ko = tr === 'ko';
   const study = [[`#${tr}/game`, '関', '闯关', '每关 10 个词'], [`#${tr}/abc`, ko ? '한' : 'Aa', ko ? '字母' : '字母音标', ko ? '40 个字母 + 拼读表' : '26 个字母 + 音标'], [`#${tr}/words`, '词', '单词', '入门 500 词'],
     [`#${tr}/phrases`, '句', '常用句', '150 句'], [`#${tr}/grammar`, '文', '语法', '176 个语法点'], [`#${tr}/levels`, '级', '分级词库', ko ? 'TOPIK 约 1.1 万词' : '中考→GRE 约 1.5 万词'],
-    [`#${tr}/biz`, '商', '商务', '场景会话、邮件、词汇'], [`#${tr}/trans`, '译', '翻译练习', '中外互译，自己打分']];
+    [`#${tr}/biz`, '商', '商务', '场景会话、邮件、词汇'], [`#${tr}/quotes`, '剧', ko ? '韩剧·韩影' : '影视台词', '名台词和生活用法'], [`#${tr}/trans`, '译', '翻译练习', '中外互译，自己打分']];
   const ri = [[`#${tr}/read`, '读', '阅读', '生活短文，配照片'], [`#${tr}/listen`, '听', '听力', '对话 + 题目'], [`#${tr}/dictation`, '写', '听写', '听一句，写一句']];
   const exam = [[`#${tr}/exam`, '考', '模拟考', ko ? 'TOPIK I / II' : '四级 / 六级']];
   return group === 'study' ? study : group === 'ri' ? ri : [...study, ...ri, ...exam];
@@ -522,7 +523,7 @@ const NAV_ICON = {
   me: '<path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/>'
 };
 const NAV_GROUP = { home: 'home', study: 'study', game: 'study', kana: 'study', vocab: 'study', kanji: 'study', grammar: 'study', dict: 'study', biz: 'study',
-  abc: 'study', words: 'study', phrases: 'study', levels: 'study', ri: 'ri', read: 'ri', listen: 'ri', exam: 'exam', me: 'me' };
+  abc: 'study', words: 'study', phrases: 'study', levels: 'study', quotes: 'study', anime: 'study', trans: 'study', conj: 'study', placement: 'study', dictation: 'ri', ri: 'ri', read: 'ri', listen: 'ri', exam: 'exam', me: 'me' };
 const NAV_MOBILE = matchMedia('(max-width: 800px)');
 // 顶栏有毛玻璃效果（backdrop-filter），里面的 position: fixed 不会贴到屏幕底部，所以手机上把导航移到 body 末尾
 function placeNav() {
