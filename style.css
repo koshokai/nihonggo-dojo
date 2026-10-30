@@ -791,3 +791,5 @@ body.gated { overflow: hidden; }
 .lb-rank { font-weight: 800; color: var(--ai); }
 .lb-input { flex: 1; min-width: 0; font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: inherit; }
 .tatoeba { font-size: .72rem; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 0 5px; text-decoration: none; }
+.tip-spam { background: #FFF6E0; color: #6B4E00; border-radius: 10px; padding: 8px 12px; }
+@media (prefers-color-scheme: dark) { .tip-spam { background: #3A3018; color: #F3DFA6; } }

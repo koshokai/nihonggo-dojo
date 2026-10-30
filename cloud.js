@@ -293,7 +293,7 @@ function authScreen(mode = 'login') {
           <input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="邮件里的验证码">
           <button class="btn pri big" type="submit">完成注册</button>
           <div class="row between"><button class="btn ghost small" type="button" data-resend>重新发送邮件</button><button class="btn ghost small" type="button" data-mode="login">← 返回登录</button></div>
-          <p class="small muted">没收到的话看看垃圾邮件文件夹。</p>`;
+          <p class="small tip-spam">⚠️ 收件箱里没有的话，请到<b>垃圾邮件 / 迷惑邮件 / 广告邮件</b>文件夹找找，发件人是「日语道场」。找到后标记为「不是垃圾邮件」，以后就不会再被拦了。</p>`;
         form.querySelector('[data-mode]').onclick = () => authScreen('login');
         form.querySelector('[data-resend]').onclick = async e => {
           e.stopPropagation();
@@ -318,7 +318,7 @@ function authScreen(mode = 'login') {
           otpSent = true;
           form.querySelector('.otp-row').hidden = false; form.email.readOnly = true;
           btn.textContent = '登录'; form.code.focus();
-          return say('验证码已发送，请查看邮箱（也可以直接点邮件里的链接）。', true);
+          return say('验证码已发送，请查看邮箱（也可以直接点邮件里的链接）。收件箱没有的话，看看垃圾邮件 / 迷惑邮件文件夹。', true);
         }
         const code = form.code.value.replace(/\D/g, '');
         if (code.length < 6) return say('请输入邮件里的验证码。');
@@ -329,7 +329,7 @@ function authScreen(mode = 'login') {
       if (mode === 'forgot') {
         const r = await c.auth.resetPasswordForEmail(email, { redirectTo: REDIRECT() });
         if (r.error) throw r.error;
-        return say('已发送！请打开邮件里的链接设置新密码（没收到看看垃圾邮件）。', true);
+        return say('已发送！请打开邮件里的链接设置新密码（没收到看看垃圾邮件 / 迷惑邮件文件夹）。', true);
       }
       if (mode === 'newpw') {
         const r = await c.auth.updateUser({ password: pwd });
