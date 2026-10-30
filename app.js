@@ -22,6 +22,8 @@ const exList = w => {
   return own.concat(more).slice(0, 5);
 };
 function markWord(jp, w, furi) {
+  // 词条里的「～」和括号说明不算（「～円」找「円」，「パート (タイム)」找「パート」，「いくら～ても」找「いくら」）
+  if (/[～〜(（]/.test(w)) w = w.replace(/\s*[(（][^)）]*[)）]\s*/g, '').split(/[～〜]/).map(x => x.trim()).filter(Boolean)[0] || w;
   const stem = w.length > 1 && /[るうくすつぬむぶぐい]$/.test(w) ? w.slice(0, -1) : w.replace(/する$/, '');
   const i = jp.indexOf(stem);
   if (furi) return furiHTML(jp, furi, i, i < 0 ? -1 : i + stem.length);
