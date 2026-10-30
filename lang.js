@@ -432,7 +432,7 @@ function viewLangTrack(tr, sub) {
   const mark = k => { td[k] = 1; save(); };
   const tasks = [
     { ic: '復', t: '复习到期的卡片', d: due.length ? `${due.length} 张卡片到了复习时间` : '没有到期的卡片', done: !due.length, go: () => langCards(due.slice(0, 50), `${T.title}复习`, tr) },
-    { ic: '新', t: '学 5 个新词', d: td.new ? '今天的新词学过了' : fresh.length ? fresh.map(x => x.t).join('、') : '入门单词都学过了，去分级词库继续', done: !!td.new || !fresh.length, go: () => { mark('new'); langCards(fresh, '今天的新词', tr); } },
+    { ic: '新', t: '学 5 个新词', dl: td.new || !fresh.length ? '' : tr, d: td.new ? '今天的新词学过了' : fresh.length ? fresh.map(x => x.t).join('、') : '入门单词都学过了，去分级词库继续', done: !!td.new || !fresh.length, go: () => { mark('new'); langCards(fresh, '今天的新词', tr); } },
     { ic: '跟', t: '今日一句 · 跟读一遍', d: '听原音，再自己说一遍，自动打分', done: !!td.shadow, go: () => l2Fetch(tr, 'daily').then(list => { const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / DAY) - 1; const [s0, pr, zh] = list[doy % list.length]; mark('shadow'); shadowSheet(s0, pr, zh, tr); }) },
     { ic: '听', t: '听力 1 题', d: `${tr === 'ko' ? 'TOPIK' : '四六级'}题型，听一段对话选答案`, done: !!td.listen, go: () => l2Fetch(tr, 'listen').then(list => { mark('listen'); const lv = LV_NAMES[tr][0], pool = list.filter(x => x.lv === (l2Sel[tr + 'l'] || lv)); runListen(sample(pool.length ? pool : list, 1), lv, { title: '今日听力', again: () => { location.hash = tr; } }); }) },
     nextStage != null ? { ic: '関', t: `闯关 · 第 ${nextStage + 1} 关`, d: `${words[nextStage * 10].cat}，10 个词，3 条命`, go: () => { location.hash = `${tr}/game`; } } : null
@@ -460,17 +460,17 @@ function viewLangTrack(tr, sub) {
 // 各语言的栏目（学习 / 阅读听力 两个分组页和首页都用）
 function trackTiles(tr, group) {
   const ko = tr === 'ko';
-  const study = [[`#${tr}/game`, '🎮', '闯关', '每关 10 个词'], [`#${tr}/abc`, ko ? '한' : 'Aa', ko ? '字母' : '字母音标', ko ? '40 个字母 + 拼读表' : '26 个字母 + 音标'], [`#${tr}/words`, '🃏', '单词', '入门 500 词'],
-    [`#${tr}/phrases`, '💬', '常用句', '150 句'], [`#${tr}/grammar`, '📐', '语法', '176 个语法点'], [`#${tr}/levels`, '📚', '分级词库', ko ? 'TOPIK 约 1.1 万词' : '中考→GRE 约 1.5 万词'],
-    [`#${tr}/biz`, '💼', '商务', '场景会话、邮件、词汇'], [`#${tr}/trans`, '✍️', '翻译练习', '中外互译，自己打分']];
-  const ri = [[`#${tr}/read`, '📖', '阅读', '生活短文，配照片'], [`#${tr}/listen`, '🎧', '听力', '对话 + 题目'], [`#${tr}/dictation`, '✎', '听写', '听一句，写一句']];
-  const exam = [[`#${tr}/exam`, '📝', '模拟考', ko ? 'TOPIK I / II' : '四级 / 六级']];
+  const study = [[`#${tr}/game`, '関', '闯关', '每关 10 个词'], [`#${tr}/abc`, ko ? '한' : 'Aa', ko ? '字母' : '字母音标', ko ? '40 个字母 + 拼读表' : '26 个字母 + 音标'], [`#${tr}/words`, '词', '单词', '入门 500 词'],
+    [`#${tr}/phrases`, '句', '常用句', '150 句'], [`#${tr}/grammar`, '文', '语法', '176 个语法点'], [`#${tr}/levels`, '级', '分级词库', ko ? 'TOPIK 约 1.1 万词' : '中考→GRE 约 1.5 万词'],
+    [`#${tr}/biz`, '商', '商务', '场景会话、邮件、词汇'], [`#${tr}/trans`, '译', '翻译练习', '中外互译，自己打分']];
+  const ri = [[`#${tr}/read`, '读', '阅读', '生活短文，配照片'], [`#${tr}/listen`, '听', '听力', '对话 + 题目'], [`#${tr}/dictation`, '写', '听写', '听一句，写一句']];
+  const exam = [[`#${tr}/exam`, '考', '模拟考', ko ? 'TOPIK I / II' : '四级 / 六级']];
   return group === 'study' ? study : group === 'ri' ? ri : [...study, ...ri, ...exam];
 }
 const JA_TILES = {
-  study: [['#game', '🎮', '闯关', '每关 10 个词'], ['#kana', 'あ', '假名', '五十音'], ['#vocab', '🃏', '单词', 'N5–N1 约 8000 词'], ['#kanji', '漢', '汉字', '2211 个'],
-    ['#grammar', '📐', '语法', '176 个句型'], ['#biz', '💼', '商务', '场景、敬语、邮件'], ['#anime', '🎬', '动漫·日剧', '名台词和生活用法'], ['#trans', '✍️', '翻译练习', '中日互译，自己打分'], ['#conj', '変', '变形练习', '动词、形容词变形']],
-  ri: [['#read', '📖', '阅读', '每天上新，配照片'], ['#listen', '🎧', '听力', 'JLPT 题型'], ['#dictation', '✎', '听写', '听一句，写一句']]
+  study: [['#game', '関', '闯关', '每关 10 个词'], ['#kana', 'あ', '假名', '五十音'], ['#vocab', '词', '单词', 'N5–N1 约 8000 词'], ['#kanji', '漢', '汉字', '2211 个'],
+    ['#grammar', '文', '语法', '176 个句型'], ['#biz', '商', '商务', '场景、敬语、邮件'], ['#anime', '剧', '动漫·日剧', '名台词和生活用法'], ['#trans', '译', '翻译练习', '中日互译，自己打分'], ['#conj', '変', '变形练习', '动词、形容词变形']],
+  ri: [['#read', '读', '阅读', '每天上新，配照片'], ['#listen', '听', '听力', 'JLPT 题型'], ['#dictation', '写', '听写', '听一句，写一句']]
 };
 // 「学习」「阅读听力」分组页
 function hubPage(tr, group) {
@@ -497,7 +497,13 @@ function initTrackSwitch() {
 function applyTrack(view) {
   const tr = trackOf(view);
   document.body.dataset.track = tr;
-  const lv = document.getElementById('chip-lv'); if (lv) lv.hidden = tr !== 'ja';   // JLPT 级别只对日语有意义
+  const lv = document.getElementById('chip-lv');
+  if (lv) {   // 日语显示 JLPT 级别；韩语、英语显示当前学习级别（分级测试结果或手动选的），点开可以换
+    lv.textContent = tr === 'ja' ? S.level : l2CurLevel(tr);
+    lv.href = tr === 'ja' ? '#me' : 'javascript:void 0';
+    lv.title = tr === 'ja' ? '当前目标级别，点击更改' : '当前学习级别，点击更改';
+    lv.onclick = tr === 'ja' ? null : e => { e.preventDefault(); e.stopPropagation(); l2LevelMenu(tr, lv); };
+  }
   document.querySelectorAll('.track-seg [data-track]').forEach(b => b.classList.toggle('on', b.dataset.track === tr));
   const input = document.getElementById('gs-q');
   if (input) input.placeholder = tr === 'ja' ? '查词：日语 / 假名 / 中文 / 英文' : `查${TRACKS[tr].title}：${TRACKS[tr].title} / 中文`;
@@ -575,7 +581,7 @@ function taskPanel(title, tasks, note = '') {
   const left = tasks.filter(t => !t.done).length;
   if (!left) tp.querySelector('h2').insertAdjacentHTML('afterend', '<span class="tag done">今天的任务完成了</span>');
   tasks.forEach(t => {
-    const el = h(`<div class="task ${t.done ? 'done' : ''}"><span class="task-ic">${t.done ? '✓' : t.ic}</span><div class="task-t"><b>${esc(t.t)}</b><div class="small muted">${esc(t.d)}</div></div>${t.done ? '' : '<button class="btn pri" type="button">开始</button>'}</div>`);
+    const el = h(`<div class="task ${t.done ? 'done' : ''}"><span class="task-ic">${t.done ? '✓' : t.ic}</span><div class="task-t"><b>${esc(t.t)}</b><div class="small muted"${t.dl ? ` lang="${t.dl}"` : ''}>${esc(t.d)}</div></div>${t.done ? '' : '<button class="btn pri" type="button">开始</button>'}</div>`);
     const b = el.querySelector('button'); if (b) b.onclick = e => { e.stopPropagation(); t.go(); };
     tp.querySelector('.tasks').append(el);
   });
@@ -583,3 +589,25 @@ function taskPanel(title, tasks, note = '') {
 }
 // 入口方块（两列，带图标）
 const tileGrid = items => h(`<div class="tile-grid">${items.map(([href, ic, name, desc]) => `<a class="tile" href="${href}"><span class="tile-ic">${ic}</span><b>${esc(name)}${typeof guestLockedHref === 'function' && guestLockedHref(href) ? ' <span class="tile-lock" title="注册后解锁">🔒</span>' : ''}</b><span class="small muted">${esc(desc)}</span></a>`).join('')}</div>`);
+
+// 韩语、英语的学习级别：记在 S.l2place，打开网站时同步到语法/阅读/听力/分级词库的级别选择
+const l2CurLevel = tr => (S.l2place || {})[tr] || LV_NAMES[tr][0];
+function l2SetLevel(tr, name) {
+  (S.l2place = S.l2place || {})[tr] = name; save();
+  const k = LV_NAMES[tr].indexOf(name);
+  l2Sel[tr + 'g'] = l2Sel[tr + 'r'] = l2Sel[tr + 'l'] = name;
+  if (k >= 0) lvSel[tr] = L2_PLACE_SRC[tr][k][0];
+}
+function l2LevelMenu(tr, anchor) {
+  document.querySelectorAll('.lv-menu').forEach(m => m.remove());
+  const cur = l2CurLevel(tr), r = anchor.getBoundingClientRect();
+  const m = h(`<div class="lv-menu" role="menu" style="top:${r.bottom + 6}px;right:${Math.max(8, innerWidth - r.right)}px">
+    <div class="small muted">${TRACKS[tr].title}学习级别</div>
+    ${LV_NAMES[tr].map(n => `<button type="button" role="menuitem" data-lvm="${n}" class="${n === cur ? 'on' : ''}">${n}</button>`).join('')}
+    <a href="#${tr}/placement" class="small">不确定？做个分级测试</a></div>`);
+  m.querySelectorAll('[data-lvm]').forEach(b => { b.onclick = () => { l2SetLevel(tr, b.dataset.lvm); m.remove(); toast(`已切到「${b.dataset.lvm}」`); render(); }; });
+  m.querySelector('a').onclick = () => m.remove();
+  document.body.append(m);
+  setTimeout(() => document.addEventListener('click', function off(e) { if (!m.contains(e.target)) { m.remove(); document.removeEventListener('click', off); } }), 0);
+}
+setTimeout(() => { if (typeof LV_NAMES !== 'undefined') Object.entries(S.l2place || {}).forEach(([tr, n]) => { if (LV_NAMES[tr] && !l2Sel[tr + 'g']) l2SetLevel(tr, n); }); }, 0);

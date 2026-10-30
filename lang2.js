@@ -347,8 +347,7 @@ function l2Placement(tr) {
         // 某一级答对 4 题以上算过关；推荐第一个没过关的级别
         let k = per.findIndex(n => n < 4); if (k < 0) k = per.length - 1;
         const name = L2_PLACE_SRC[tr][k][1];
-        ((S.l2place = S.l2place || {})[tr] = name); save();
-        l2Sel[tr + 'g'] = l2Sel[tr + 'r'] = l2Sel[tr + 'l'] = name; lvSel[tr] = L2_PLACE_SRC[tr][k][0];
+        l2SetLevel(tr, name); updateTop();
         host.innerHTML = '';
         host.append(h(`<section class="panel"><h2>推荐从「${esc(name)}」开始</h2>
           <div class="stats">${L2_PLACE_SRC[tr].map(([, n], i) => `<div class="stat"><span class="small muted">${esc(n)}</span><b>${per[i]} / 5</b></div>`).join('')}</div>

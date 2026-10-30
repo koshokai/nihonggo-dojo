@@ -42,11 +42,16 @@ function msgCard(m, onDone) {
   if (x) x.onclick = async e => { e.stopPropagation(); await inboxMark(m); done(); };
   return el;
 }
-// 首页问候下面插入未读消息（最多 2 条）
+// 首页问候下面插入未读消息：收成一行小横条（不把今日任务挤下去），点开才显示正文和按钮
 function inboxFill(anchor) {
   inboxLoad().then(list => {
     if (!anchor.isConnected) return;
-    list.filter(m => !m.read_at).slice(0, 2).reverse().forEach(m => anchor.after(msgCard(m, el => el.remove())));
+    const un = list.filter(m => !m.read_at);
+    if (!un.length) return;
+    const bar = h(`<details class="msg-mini"><summary><span class="msg-dot" aria-hidden="true">🔔</span><span class="msg-mini-t"><b>${esc(un[0].title)}</b>${un.length > 1 ? `<span class="small muted"> 等 ${un.length} 条消息</span>` : `<span class="small muted"> · ${esc(un[0].body)}</span>`}</span><span class="msg-more small">查看</span></summary><div class="msg-mini-body"></div></details>`);
+    const body = bar.querySelector('.msg-mini-body');
+    un.slice(0, 3).forEach(m => body.append(msgCard(m, el => { el.remove(); if (!body.children.length) bar.remove(); })));
+    anchor.after(bar);
   }).catch(() => {});
 }
 

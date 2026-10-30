@@ -385,7 +385,8 @@ function updateTop() {
   document.getElementById('xp-today').textContent = todayXP();
   document.getElementById('xp-goal').textContent = '/' + S.goal;
   document.getElementById('chip-xp').classList.toggle('lit', todayXP() >= S.goal);
-  document.getElementById('chip-lv').textContent = S.level;
+  const tr = document.body.dataset.track || 'ja';
+  document.getElementById('chip-lv').textContent = tr === 'ja' ? S.level : typeof l2CurLevel === 'function' ? l2CurLevel(tr) : '';
 }
 function applyTheme() {
   if (S.theme) document.documentElement.dataset.theme = S.theme; else delete document.documentElement.dataset.theme;
