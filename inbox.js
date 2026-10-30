@@ -27,7 +27,7 @@ async function inboxMark(m, reply) {
 function msgCard(m, onDone) {
   const reps = Array.isArray(m.replies) ? m.replies : [];
   const el = h(`<section class="banner msg-card ${m.read_at ? 'read' : ''}"><div>
-      <div class="row between"><b>${esc(m.title)}</b><span class="small muted">${new Date(m.created_at).toLocaleDateString()}</span></div>
+      <div class="row between"><b>${esc(m.title)}</b><span class="small muted">${new Date(m.created_at).toLocaleDateString('zh-CN')}</span></div>
       <div class="small">${esc(m.body)}</div>
       ${m.reply ? `<div class="small muted">你的回复：${esc(m.reply)}</div>` : ''}
     </div>

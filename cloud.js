@@ -38,7 +38,7 @@ async function cloudPull(interactive) {
   return new Promise(resolve => {
     const d = h(`<div class="word-sheet" role="dialog" aria-label="选择进度">
       <b>这个账号在云端已经有学习进度</b>
-      <div class="small">云端：${data.xp} 经验，${new Date(remoteAt).toLocaleString()}<br>这台设备：${S.xp} 经验</div>
+      <div class="small">云端：${data.xp} 经验，${new Date(remoteAt).toLocaleString('zh-CN')}<br>这台设备：${S.xp} 经验</div>
       <div class="row"><button class="btn pri" type="button" data-r>用云端的进度</button><button class="btn" type="button" data-l>用这台设备的进度</button></div>
       <div class="small muted">另一份会被覆盖。拿不准的话，选经验多的那份。</div>
     </div>`);
@@ -115,7 +115,7 @@ function accountPanel() {
   const draw = () => {
     if (sbUser) {
       box.innerHTML = `<p>已登录：<b>${esc(sbUser.email || '')}</b></p>
-        <p class="small muted" data-sync-note>${esc(syncNote || (S.syncedAt ? '上次同步 ' + new Date(S.syncedAt).toLocaleString() : '还没有同步'))}</p>
+        <p class="small muted" data-sync-note>${esc(syncNote || (S.syncedAt ? '上次同步 ' + new Date(S.syncedAt).toLocaleString('zh-CN') : '还没有同步'))}</p>
         <p class="small muted">学习进度会自动同步。换手机或换浏览器后，用同一个账号登录就能接着学。</p>
         <div class="row"><button class="btn pri" type="button" data-sync>立即同步</button><button class="btn" type="button" data-out>退出登录</button><button class="btn ghost danger" type="button" data-del>删除账号</button></div>`;
       box.querySelector('[data-sync]').onclick = async () => { box.querySelector('[data-sync-note]').textContent = '同步中……'; await cloudPull(true).catch(() => {}); await cloudPush(); };

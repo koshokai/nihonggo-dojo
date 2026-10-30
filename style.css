@@ -145,7 +145,8 @@ input[type=search] { flex: 1 1 200px; min-width: 0; }
 .task-ic { width: 38px; height: 38px; border-radius: 8px; display: grid; place-items: center; background: var(--ai-soft); color: var(--ai); font-family: var(--f-disp); font-weight: 800; font-size: 1.1rem; flex: none; }
 .task-t { flex: 1; min-width: 0; }
 .task.done .task-ic { background: var(--ok-soft); color: var(--ok); }
-.heat-wrap { overflow-x: auto; }
+.heat-wrap { overflow-x: auto; direction: rtl; }   /* 手机上窄，默认停在最右边（最近几周） */
+.heat-wrap > .heat { direction: ltr; }
 .heat { display: grid; grid-template-rows: repeat(7, 12px); grid-auto-flow: column; grid-auto-columns: 12px; gap: 3px; width: max-content; }
 .heat i { border-radius: 3px; background: var(--heat0); }
 .heat i.h1 { background: var(--heat1); } .heat i.h2 { background: var(--heat2); } .heat i.h3 { background: var(--heat3); } .heat i.h4 { background: var(--heat4); }
@@ -649,6 +650,9 @@ body.gated { overflow: hidden; }
 .rc-new { position: absolute; top: 8px; right: 8px; }
 .today-art { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 10px; margin: 10px 0; text-decoration: none; color: inherit; background: var(--surface); }
 .today-art .ta-img { height: 80px; border-radius: 8px; overflow: hidden; }
+.today-art .rc-ph-none { min-height: 80px; }
+.today-art .rc-ph-none span { font-size: 1.8rem; }
+.today-art .rc-ph-none b { font-size: .75rem; }
 .today-art:hover { border-color: var(--ai); }
 .lv-q { width: 100%; min-height: 40px; border-radius: 999px; border: 1.5px solid var(--line); padding: 0 14px; margin: 10px 0; background: var(--surface); }
 

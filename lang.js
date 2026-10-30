@@ -447,7 +447,7 @@ function viewLangTrack(tr, sub) {
   Promise.all([l2Fetch(tr, 'reading').catch(() => []), l2Fetch(tr, 'daily').catch(() => [])]).then(([reads, daily]) => {
     if (!slot.isConnected) return;
     const a = reads.length && reads[doy % reads.length];
-    if (a && !(S.l2read || {})[a.id]) slot.append(h(`<a class="today-art" href="#${tr}/read/${a.id}"><div class="ta-img">${l2Img(a)}</div><div><span class="tag done">今日阅读</span> <span class="tag lv">${esc(a.lv)}</span><div class="rc-title" lang="${tr}">${esc(a.title)}</div><div class="small muted">${esc(a.zh)} · 生活短文，配照片</div></div></a>`));
+    if (a && !(S.l2read || {})[a.id]) slot.append(h(`<a class="today-art" href="#${tr}/read/${a.id}"><div class="ta-img">${l2Img(a)}</div><div><span class="tag done">今日阅读</span> <span class="tag lv">${esc(a.lv)}</span><div class="rc-title" lang="${tr}">${esc(a.title)}</div><div class="small muted">${esc(a.zh)} · 生活短文${a.ph ? '，配照片' : ''}</div></div></a>`));
     if (daily.length) slot.append(l2Daily(tr, daily));
   });
   main.append(homeProgress());
