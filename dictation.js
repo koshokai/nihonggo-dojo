@@ -38,7 +38,7 @@ function dictPool(tr) {
 
 function viewDictation(tr = 'ja') {
   const name = { ja: '日语', ko: '韩语', en: '英语' }[tr];
-  const box = h(`<section class="panel"><h2>听写</h2><p class="muted">加载句子……</p></section>`);
+  const box = h(`<section class="panel"><h2>听写</h2><div class="skel" aria-label="加载中" role="status"><i></i><i></i><i></i></div></section>`);
   main.append(box);
   const o = ((S.dictOpt = S.dictOpt || {})[tr] = Object.assign({ src: 'ex', lv: tr === 'ja' ? '' : LV_NAMES[tr][0] }, (S.dictOpt || {})[tr]));
   dictPool(tr).then(all => {

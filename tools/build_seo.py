@@ -22,7 +22,7 @@ def page(path, title, desc, body, lang='ja'):
     depth = '../' * (path.count('/'))
     out.write_text(f'''<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{E(title)}</title><meta name="description" content="{E(desc)}"><link rel="canonical" href="{SITE}{E(path)}">
-<style>{CSS}</style></head><body><nav><a href="{depth}">日语道场</a> · <a href="{depth}{path.split('/')[0]}/">{'单词' if path.startswith('w/') else '语法'}索引</a></nav>
+<style>{CSS}</style></head><body><nav><a href="{depth}{'#' + path[2:4] if path.startswith(('g/ko-', 'g/en-')) else ''}">{'韩语道场' if path.startswith('g/ko-') else '英语道场' if path.startswith('g/en-') else '日语道场'}</a> · <a href="{depth}{path.split('/')[0]}/">{'单词' if path.startswith('w/') else '语法'}索引</a></nav>
 {body}
 <p class="muted">日语道场：免费学日语、韩语、英语。单词卡、闯关、阅读、听力、模拟考，每天十分钟。</p></body></html>''', encoding='utf-8')
 

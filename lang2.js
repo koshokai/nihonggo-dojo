@@ -8,7 +8,7 @@ const l2Fetch = (tr, kind) => L2[`${tr}-${kind}`] ? Promise.resolve(L2[`${tr}-${
   : fetch(`lang/${tr}-${kind}.json`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => (L2[`${tr}-${kind}`] = d));
 // 先放一个「加载中」面板，数据到了再画；失败时提示还在准备中
 function l2Page(tr, kinds, title, draw) {
-  const p = h(`<section class="panel"><h2>${title}</h2><p class="muted">加载中……</p></section>`);
+  const p = h(`<section class="panel"><h2>${title}</h2><div class="skel" aria-label="加载中" role="status"><i></i><i></i><i></i></div></section>`);
   main.append(p);
   Promise.all(kinds.map(k => l2Fetch(tr, k))).then(ds => { if (p.isConnected) { const n = draw(...ds); p.replaceWith(...[].concat(n)); } })
     .catch(() => { if (p.isConnected) p.innerHTML = `<h2>${title}</h2><p>加载失败：这部分内容可能还在准备中，或者网络有问题，请稍后再试。</p>`; });
@@ -324,7 +324,7 @@ function l2Dict(tr) {
 const L2_PLACE_SRC = { ko: [['A', '初级'], ['B', '中级'], ['C', '高级']], en: [['zk', '基础'], ['cet4', '四级'], ['cet6', '六级']] };
 function l2Placement(tr) {
   const T = TRACKS[tr];
-  const box = h(`<section class="panel"><h2>${T.title}分级测试</h2><p class="muted">准备题目……</p></section>`);
+  const box = h(`<section class="panel"><h2>${T.title}分级测试</h2><div class="skel" aria-label="加载中" role="status"><i></i><i></i><i></i></div></section>`);
   main.append(box);
   Promise.all(L2_PLACE_SRC[tr].map(([k]) => lvFetch(`${tr}-${k}`))).then(lists => {
     if (!box.isConnected) return;
@@ -365,7 +365,7 @@ let l2QKind = '';
 function l2Quotes(tr, id) {
   const T = TRACKS[tr], name = tr === 'ko' ? '韩剧 · 韩影名台词' : '英美影视名台词';
   const kinds = tr === 'ko' ? [['', '全部'], ['drama', '韩剧'], ['movie', '电影']] : [['', '全部'], ['movie', '电影'], ['drama', '剧集']];
-  const box = h(`<section class="panel"><h2>${name}</h2><p class="muted">加载中……</p></section>`);
+  const box = h(`<section class="panel"><h2>${name}</h2><div class="skel" aria-label="加载中" role="status"><i></i><i></i><i></i></div></section>`);
   main.append(box);
   l2Fetch(tr, 'quotes').then(list => {
     if (!box.isConnected) return;

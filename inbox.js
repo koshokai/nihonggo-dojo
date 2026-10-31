@@ -48,7 +48,7 @@ function inboxFill(anchor) {
     if (!anchor.isConnected) return;
     const un = list.filter(m => !m.read_at);
     if (!un.length) return;
-    const bar = h(`<details class="msg-mini"><summary><span class="msg-dot" aria-hidden="true">🔔</span><span class="msg-mini-t"><b>${esc(un[0].title)}</b>${un.length > 1 ? `<span class="small muted"> 等 ${un.length} 条消息</span>` : `<span class="small muted"> · ${esc(un[0].body)}</span>`}</span><span class="msg-more small">查看</span></summary><div class="msg-mini-body"></div></details>`);
+    const bar = h(`<details class="msg-mini"><summary aria-label="${esc(`${un.length} 条未读消息：${un[0].title}，点开查看`)}"><span class="msg-dot" aria-hidden="true">🔔</span><span class="msg-mini-t"><b>${esc(un[0].title)}</b>${un.length > 1 ? `<span class="small muted"> 等 ${un.length} 条消息</span>` : `<span class="small muted"> · ${esc(un[0].body)}</span>`}</span><span class="msg-more small">查看</span></summary><div class="msg-mini-body"></div></details>`);
     const body = bar.querySelector('.msg-mini-body');
     un.slice(0, 3).forEach(m => body.append(msgCard(m, el => { el.remove(); if (!body.children.length) bar.remove(); })));
     anchor.after(bar);

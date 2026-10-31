@@ -6,7 +6,7 @@ const animeLoad = () => ANIME ? Promise.resolve(ANIME) : fetch('lang/ja-anime.js
 const ANIME_ICON = { anime: '🎬', drama: '📺' };
 
 function viewAnime(arg) {
-  const box = h('<div><p class="muted">加载中……</p></div>');
+  const box = h('<div><div class="skel" aria-label="加载中" role="status"><i></i><i></i><i></i></div></div>');
   main.append(box);
   animeLoad().then(list => {
     box.innerHTML = '';

@@ -50,7 +50,7 @@ const conjShow = ([w, r]) => w === r ? w : `${w}（${r}）`;
 
 function viewConj() {
   const o = S.conjOpt = Object.assign({ kind: 'v', forms: ['masu', 'nai', 'ta', 'te'] }, S.conjOpt);
-  const box = h('<section class="panel"><h2>动词变形</h2><p class="muted">加载中……</p></section>');
+  const box = h('<section class="panel"><h2>动词变形</h2><div class="skel" aria-label="加载中" role="status"><i></i><i></i><i></i></div></section>');
   main.append(box);
   conjLoad().then(d => {
     if (!box.isConnected) return;

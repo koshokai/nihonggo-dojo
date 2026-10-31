@@ -42,7 +42,7 @@ function viewTrans(tr = 'ja') {
   const opts = tr === 'ja' ? (S.trOpt = Object.assign({ dir: 'zj', lv: S.level || 'N5', len: '' }, S.trOpt))
     : ((S.trOpt2 = S.trOpt2 || {})[tr] = Object.assign({ dir: 'zj', lv: LV_NAMES[tr][0], len: '' }, S.trOpt2[tr]));
   const o = opts, lvs = tr === 'ja' ? LEVELS : LV_NAMES[tr], LEN = trLen(tr), name = TR_LANG[tr];
-  const box = h(`<section class="panel"><h2>翻译练习</h2><p class="muted">加载句子……</p></section>`);
+  const box = h(`<section class="panel"><h2>翻译练习</h2><div class="skel" aria-label="加载中" role="status"><i></i><i></i><i></i></div></section>`);
   main.append(box);
   (tr === 'ja' ? Promise.resolve(trPool()) : trPoolL2(tr)).then(all => {
     if (!box.isConnected) return;

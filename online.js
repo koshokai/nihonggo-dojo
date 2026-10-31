@@ -23,6 +23,9 @@
     if (document.visibilityState === 'visible') track();
     else idle = setTimeout(untrack, 60000);
   });
+  // 先显示「1」（至少有你自己），连上后再更新成实际人数——标签一开始就占好位置，旁边的标签不会被挤动
+  const early = () => draw(1);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', early); else early();
   // 页面出来以后再连，不拖慢首屏
   addEventListener('load', () => setTimeout(start, 1500));
 })();

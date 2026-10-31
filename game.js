@@ -197,6 +197,7 @@ function sprintGame(L) {
     box.querySelector('[data-bar]').style.width = Math.min(100, left / 600) + '%';
     if (!left) finish();
   }, 100);
+  focusMode(true);
   box.querySelector('[data-exit]').onclick = () => { clearInterval(examTimer); keyHandler = null; go('game'); };
   const finish = () => {
     over = true; clearInterval(examTimer); keyHandler = null;
@@ -228,6 +229,7 @@ function matchGame(L) {
   const board = box.querySelector('[data-board]');
   clearInterval(examTimer);
   examTimer = setInterval(() => { box.querySelector('[data-time]').textContent = fmtSec(Math.floor((Date.now() - t0) / 1000)); }, 500);
+  focusMode(true);
   box.querySelector('[data-exit]').onclick = () => { clearInterval(examTimer); go('game'); };
   const deal = () => {
     // 同一轮里的意思不能重复，否则无法分辨

@@ -25,7 +25,7 @@
   --f-disp: "Shippori Mincho B1", "Noto Serif JP", "Songti SC", serif;
   --f-round: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Noto Sans SC", sans-serif;
   --f-jp: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
-  --f-ui: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --f-ui: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Noto Sans CJK SC", "Source Han Sans SC", system-ui, -apple-system, sans-serif;   /* 用手机、电脑自带的中文字体（日本系统也要优先用简体字形） */
   --r: 18px;
   color-scheme: light;
 }
@@ -829,3 +829,21 @@ body.gated { overflow: hidden; }
 .lv-menu button { font: inherit; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: none; color: inherit; text-align: left; cursor: pointer; }
 .lv-menu button.on { background: var(--ai); color: #fff; border-color: var(--ai); }
 .lv-menu a { color: var(--ai); padding: 4px 2px; }
+/* 专注模式（做题、背卡片）：手机上隐藏底部导航 */
+@media (max-width: 800px) {
+  body.focus .tabs { display: none; }
+  body.focus { padding-bottom: env(safe-area-inset-bottom, 0px); }
+}
+html { scroll-padding-bottom: 90px; }
+/* 自定义确认框 */
+.ask-mask { position: fixed; inset: 0; z-index: 80; background: rgba(20, 10, 18, .45); display: grid; place-items: center; padding: 20px; animation: fade-in .15s ease-out; }
+.ask-box { background: var(--surface); color: var(--ink); border-radius: 18px; padding: 20px; max-width: 340px; width: 100%; box-shadow: 0 12px 40px rgba(0, 0, 0, .25); display: grid; gap: 14px; }
+.ask-box p { margin: 0; line-height: 1.7; }
+.ask-box .row { justify-content: flex-end; gap: 8px; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+/* 加载占位：几条灰色横条，代替一行「加载中……」 */
+.skel { display: grid; gap: 10px; padding: 6px 0; }
+.skel i { display: block; height: 14px; border-radius: 8px; background: linear-gradient(90deg, var(--line) 25%, color-mix(in srgb, var(--line) 40%, var(--surface)) 50%, var(--line) 75%); background-size: 200% 100%; animation: skel 1.2s linear infinite; }
+.skel i:nth-child(1) { width: 70%; } .skel i:nth-child(2) { width: 92%; } .skel i:nth-child(3) { width: 55%; }
+@keyframes skel { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .skel i { animation: none; } }

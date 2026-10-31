@@ -243,7 +243,7 @@ const lvFetch = name => LV_DATA[name] ? Promise.resolve(LV_DATA[name])
 let lvSel = {}, lvQuery = {}, lvShown = 100;
 function langLevels(tr) {
   const T = TRACKS[tr];
-  const p = h(`<section class="panel"><h2>${T.title}分级词库</h2><p class="muted">加载中……</p></section>`);
+  const p = h(`<section class="panel"><h2>${T.title}分级词库</h2><div class="skel" aria-label="加载中" role="status"><i></i><i></i><i></i></div></section>`);
   main.append(p);
   lvFetch(`${tr}-levels`).then(meta => {
     const cur = lvSel[tr] && meta.some(m => m[0] === lvSel[tr]) ? lvSel[tr] : meta[0][0];
@@ -334,7 +334,7 @@ function langExam(tr) {
   Object.entries(X.types).forEach(([k, [n]]) => { KIND_NAMES['x' + k] = n; });   // 成绩分析里显示题型名
   const L = lexamSel[tr] || X.levels[0][0]; lexamSel[tr] = L;
   const lname = X.levels.find(l => l[0] === L)[1];
-  const p = h(`<section class="panel"><h2>模拟考 · ${esc(lname)}</h2><p class="muted">加载中……</p></section>`);
+  const p = h(`<section class="panel"><h2>模拟考 · ${esc(lname)}</h2><div class="skel" aria-label="加载中" role="status"><i></i><i></i><i></i></div></section>`);
   main.append(p);
   lvFetch(`exam-${L}`).then(bank => {
     if (!p.isConnected) return;
@@ -511,6 +511,7 @@ function applyTrack(view) {
   // 站名随语言变化
   const name = { ja: '日语道场', ko: '韩语道场', en: '英语道场' }[tr];
   const bn = document.querySelector('.brand span'); if (bn) bn.textContent = name;
+  const fb = document.querySelector('[data-foot-brand]'); if (fb) fb.textContent = `${name} · 免费学${{ ja: '日语', ko: '韩语', en: '英语' }[tr]}`;
   document.title = name + ' · 免费学' + { ja: '日语', ko: '韩语', en: '英语' }[tr];
   buildNav(tr, view);
 }

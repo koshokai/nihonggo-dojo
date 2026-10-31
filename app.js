@@ -392,7 +392,12 @@ function updateTop() {
 }
 function applyTheme() {
   if (S.theme) document.documentElement.dataset.theme = S.theme; else delete document.documentElement.dataset.theme;
+  // 手机状态栏颜色跟着浅色 / 深色走
+  const dark = S.theme ? S.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.remove());
+  document.head.append(Object.assign(document.createElement('meta'), { name: 'theme-color', content: dark ? '#221C27' : '#F7EEF2' }));
 }
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { if (!S.theme) applyTheme(); });
 const levelSeg = (cur, attr = 'data-level') => `<div class="seg" role="group" aria-label="JLPT 级别">${LEVELS.map(L => `<button type="button" ${attr}="${L}" class="${L === cur ? 'on' : ''}" aria-pressed="${L === cur}">${L}</button>`).join('')}</div>`;
 
 let keyHandler = null;
@@ -453,6 +458,23 @@ const dueList = levels => levels.flatMap(L => [...VOCAB[L], ...GRAM[L]]).filter(
 const newLeft = () => Math.max(0, S.newPerDay - (S.newLog[dkey()] || 0));
 const newList = L => LEARN[L].filter(v => !S.srs[v.id]);
 
+// 做题、背卡片时进入专注模式：手机上隐藏底部导航，题目和反馈不被挡住；切换页面时自动退出
+const focusMode = on => document.body.classList.toggle('focus', !!on);
+// 轻震动（只有安卓等支持的浏览器才有效；iPhone 的网页不支持震动）
+const buzz = p => { try { if (S.haptic !== false && navigator.vibrate) navigator.vibrate(p); } catch (e) { /* 忽略 */ } };
+// 自己画的确认框（比浏览器自带的 confirm 好看，也不会被某些 App 内置浏览器拦截）
+function askConfirm(text, ok = '确定', cancel = '取消') {
+  return new Promise(res => {
+    const m = h(`<div class="ask-mask" role="dialog" aria-modal="true"><div class="ask-box"><p>${esc(text)}</p>
+      <div class="row"><button class="btn" type="button" data-n>${esc(cancel)}</button><button class="btn pri" type="button" data-y>${esc(ok)}</button></div></div></div>`);
+    const close = v => { m.remove(); res(v); };
+    m.querySelector('[data-y]').onclick = () => close(true);
+    m.querySelector('[data-n]').onclick = () => close(false);
+    m.onclick = e => { if (e.target === m) close(false); };
+    document.body.append(m);
+    m.querySelector('[data-n]').focus();
+  });
+}
 function startCards(host, ids, title, onExit) {
   let queue = ids.slice(), done = 0, revealed = false;
   host.innerHTML = '';
@@ -464,7 +486,8 @@ function startCards(host, ids, title, onExit) {
   host.append(box);
   box.querySelector('[data-exit]').onclick = finish;
   const stage = box.querySelector('[data-stage]');
-  function finish() { keyHandler = null; onExit(done); }
+  focusMode(true);
+  function finish() { keyHandler = null; focusMode(false); onExit(done); }
   function show() {
     const total = done + queue.length;
     box.querySelector('[data-left]').textContent = `剩余 ${queue.length}`;
@@ -644,7 +667,12 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
   </section>`);
   host.append(box);
   const stage = box.querySelector('[data-stage]'), extra = box.querySelector('[data-extra]');
-  box.querySelector('[data-exit]').onclick = () => { clearInterval(examTimer); keyHandler = null; onDone(null); };
+  focusMode(true);
+  box.querySelector('[data-exit]').onclick = async () => {
+    // 答过题再退出要确认，免得手滑丢了这一轮
+    if (res.length && res.length < qs.length && !await askConfirm(exam ? '确定退出考试吗？这次的作答不会保存。' : '确定退出吗？这一轮的进度不会保存。', '退出', '继续做题')) return;
+    clearInterval(examTimer); keyHandler = null; focusMode(false); onDone(null);
+  };
   if (exam && minutes) {
     const end = Date.now() + minutes * 60000;
     const tick = () => {
@@ -661,7 +689,7 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
     if (!exam) extra.innerHTML = (combo >= 3 ? `<span class="combo">${combo} 连对</span> ` : '') + heartsHTML();
     stage.innerHTML = `<div class="q-prompt pop">${q.prompt}</div>
       <div class="opts">${q.options.map((o, j) => `<button class="opt" type="button" data-o="${j}"><span class="k">${j + 1}</span><span ${q.optLang ? `lang="${q.optLang}"` : ''}>${esc(o)}</span></button>`).join('')}</div>
-      <div data-fb></div>`;
+      <div data-fb role="status" aria-live="polite"></div>`;
     stage.querySelectorAll('[data-o]').forEach(b => { b.onclick = () => pick(+b.dataset.o); });
     if (q.autoSay) speak(q.autoSay);
     keyHandler = e => {
@@ -689,6 +717,7 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
     const btns = stage.querySelectorAll('[data-o]');
     btns.forEach((b, k) => { b.disabled = true; if (k === q.answer) b.classList.add('right'); else if (k === j) b.classList.add('wrong'); });
     if (ok) popFrom(btns[j]);
+    buzz(ok ? 12 : [30, 50, 30]);
     combo = ok ? combo + 1 : 0;
     if (hearts) extra.innerHTML = (combo >= 3 ? `<span class="combo">${combo} 连对</span> ` : '') + heartsHTML();
     if (ok) addXP(xpEach + (combo && combo % 5 === 0 ? 5 : 0)); else save();
@@ -698,10 +727,12 @@ function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false
       <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn pri" type="button" data-next>${failed ? '生命值用完了，看结果' : i + 1 < qs.length ? '下一题' : '查看结果'}（Enter）</button></div>`;
     stage.querySelector('[data-next]').onclick = next;
     stage.querySelector('[data-next]').focus({ preventScroll: true });
+    // 反馈和「下一题」按钮滚到看得见的位置（手机上常在屏幕下面）
+    requestAnimationFrame(() => stage.querySelector('[data-next]').scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' }));
   }
   function next() { i++; if (!failed && i < qs.length && res.length < qs.length) show(); else finish(); }
   function finish() {
-    clearInterval(examTimer); keyHandler = null;
+    clearInterval(examTimer); keyHandler = null; focusMode(false);
     const score = res.filter(r => r.ok).length;
     onDone({ res, score, total: res.length, hearts: life, failed });
   }
@@ -735,7 +766,7 @@ function render() {
   let view = !location.hash && S.track && S.track !== 'ja' ? S.track : VIEWS[v] ? v : 'home';
   if (!S.onboarded && view !== 'me') view = 'welcome';
   if (S.onboarded && view === 'welcome') view = 'home';
-  clearInterval(examTimer); keyHandler = null;
+  clearInterval(examTimer); keyHandler = null; focusMode(false);
   if (lsStop) lsStop();
   main.innerHTML = '';
   if (trackOf(view) === 'ja' && ['home', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict', 'study', 'ri', 'conj', 'anime', 'trans', 'dictation'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
@@ -1313,12 +1344,14 @@ function viewMe() {
     <div class="row between"><span>每天新单词</span><div class="seg">${opt([[5, '5'], [10, '10'], [20, '20'], [30, '30']], S.newPerDay, 'data-new')}</div></div>
     <div class="row between"><span>外观</span><div class="seg">${opt([['', '跟随系统'], ['light', '浅色'], ['dark', '深色']], S.theme, 'data-theme-set')}</div></div>
     <div class="row between"><span>樱花飘落</span><div class="seg">${opt([[1, '开'], [0, '关']], S.petals ? 1 : 0, 'data-petals')}</div></div>
+    <div class="row between"><span>答题震动<span class="small muted">（安卓手机）</span></span><div class="seg">${opt([[1, '开'], [0, '关']], S.haptic === false ? 0 : 1, 'data-haptic')}</div></div>
     <p class="small muted">经验怎么来：测验答对 10（假名 5），单词卡每张 5，模拟考每题 10，合格再加 50，每 5 连对额外 5。</p>
   </section>`);
   bindLevel(p);
   p.querySelectorAll('[data-trk-set]').forEach(b => { b.onclick = () => { S.track = b.dataset.trkSet; save(); render(); }; });
   p.querySelectorAll('[data-goal]').forEach(b => { b.onclick = () => { S.goal = +b.dataset.goal; save(); render(); }; });
   p.querySelectorAll('[data-new]').forEach(b => { b.onclick = () => { S.newPerDay = +b.dataset.new; save(); render(); }; });
+  p.querySelectorAll('[data-haptic]').forEach(b => { b.onclick = () => { S.haptic = b.dataset.haptic === '1'; save(); if (S.haptic) buzz(20); render(); }; });
   p.querySelectorAll('[data-petals]').forEach(b => { b.onclick = () => { S.petals = b.dataset.petals === '1'; save(); startPetals(); render(); }; });
   const vs = jaVoices();
   const cur = currentVoice();
