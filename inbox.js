@@ -48,7 +48,9 @@ function inboxFill(anchor) {
     if (!anchor.isConnected) return;
     const un = list.filter(m => !m.read_at);
     if (!un.length) return;
-    const bar = h(`<details class="msg-mini"><summary aria-label="${esc(`${un.length} 条未读消息：${un[0].title}，点开查看`)}"><span class="msg-dot" aria-hidden="true">🔔</span><span class="msg-mini-t"><b>${esc(un[0].title)}</b>${un.length > 1 ? `<span class="small muted"> 等 ${un.length} 条消息</span>` : `<span class="small muted"> · ${esc(un[0].body)}</span>`}</span><span class="msg-more small">查看</span></summary><div class="msg-mini-body"></div></details>`);
+    // 横条只显示标题（正文点开才看），外面再套一层普通 div 做排版：iPhone 的 Safari 不认 <summary> 上的 flex，
+    // 文字会撑出屏幕；套一层以后，再长的标题也只是在一行里省略成「……」
+    const bar = h(`<details class="msg-mini"><summary aria-label="${esc(`${un.length} 条未读消息：${un[0].title}，点开查看`)}"><div class="msg-mini-row"><span class="msg-dot" aria-hidden="true">🔔</span><span class="msg-mini-t">${esc(un[0].title)}</span>${un.length > 1 ? `<span class="msg-n small">${un.length} 条</span>` : ''}<span class="msg-more small">查看</span></div></summary><div class="msg-mini-body"></div></details>`);
     const body = bar.querySelector('.msg-mini-body');
     un.slice(0, 3).forEach(m => body.append(msgCard(m, el => { el.remove(); if (!body.children.length) bar.remove(); })));
     anchor.after(bar);
