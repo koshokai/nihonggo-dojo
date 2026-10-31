@@ -96,8 +96,8 @@ function draw() {
   <div class="panel"><h2>发消息</h2>
     <div class="row">${TEMPLATES.map(t => `<button class="chip ${t === tpl ? 'on' : ''}" data-t="${t.k}">${t.name}</button>`).join('')}</div>
     <div class="grid2"><div>
-      <label class="f">标题（可用 {lang} {due} {streak} {gap}）</label><input type="text" id="ti" maxlength="80" value="${esc(draft.title)}">
-      <label class="f">内容</label><textarea id="bo" maxlength="600">${esc(draft.body)}</textarea>
+      <label class="f">标题（建议 15 字以内；可用 {lang} {due} {streak} {gap}）</label><input type="text" id="ti" maxlength="80" value="${esc(draft.title)}">
+      <label class="f">内容（建议 50 字以内，手机通知栏只显示前一两行）</label><textarea id="bo" maxlength="600">${esc(draft.body)}</textarea>
       <div class="grid2"><div><label class="f">按钮跳到</label><select id="ac">${ACTIONS.map(([v, t]) => `<option value="${v}" ${draft.action === v ? 'selected' : ''}>${t}</option>`).join('')}<option value="__url" ${draft.action && !ACTIONS.some(a => a[0] === draft.action) ? 'selected' : ''}>网址……</option></select></div>
         <div><label class="f">按钮文字</label><input type="text" id="la" maxlength="20" value="${esc(draft.label)}"></div></div>
       <input type="text" id="url" placeholder="https://…" style="margin-top:6px" value="${esc(draft.action && !ACTIONS.some(a => a[0] === draft.action) ? draft.action : '')}" ${draft.action && !ACTIONS.some(a => a[0] === draft.action) ? '' : 'hidden'}>

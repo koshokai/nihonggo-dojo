@@ -26,14 +26,14 @@ async function inboxMark(m, reply) {
 // 一条消息的卡片：标题、正文、跳转按钮、快捷回复
 function msgCard(m, onDone) {
   const reps = Array.isArray(m.replies) ? m.replies : [];
-  const el = h(`<section class="banner msg-card ${m.read_at ? 'read' : ''}"><div>
-      <div class="row between"><b>${esc(m.title)}</b><span class="small muted">${new Date(m.created_at).toLocaleDateString('zh-CN')}</span></div>
-      <div class="small">${esc(m.body)}</div>
-      ${m.reply ? `<div class="small muted">你的回复：${esc(m.reply)}</div>` : ''}
-    </div>
-    <div class="row">${m.action ? `<button class="btn pri" type="button" data-act>${esc(m.action_label || '去看看')}</button>` : ''}
-      ${m.reply ? '' : reps.map((r, i) => `<button class="btn ghost" type="button" data-rep="${i}">${esc(r)}</button>`).join('')}
-      ${m.read_at ? '' : '<button class="btn ghost" type="button" data-x aria-label="知道了">知道了</button>'}</div></section>`);
+  // 标题、日期一行；正文；按钮一行（小号按钮，放不下就换行，「知道了」靠右），文字再长也不会把卡片撑变形
+  const el = h(`<section class="msg-card ${m.read_at ? 'read' : ''}">
+    <div class="msg-head"><b>${esc(m.title)}</b><span class="small muted">${new Date(m.created_at).toLocaleDateString('zh-CN')}</span></div>
+    <div class="small msg-body">${esc(m.body)}</div>
+    ${m.reply ? `<div class="small muted">你的回复：${esc(m.reply)}</div>` : ''}
+    <div class="msg-acts">${m.action ? `<button class="btn pri" type="button" data-act>${esc(m.action_label || '去看看')}</button>` : ''}
+      ${m.reply ? '' : reps.map((r, i) => `<button class="chip-btn" type="button" data-rep="${i}">${esc(r)}</button>`).join('')}
+      ${m.read_at ? '' : '<button class="msg-x" type="button" data-x>知道了</button>'}</div></section>`);
   const done = () => { if (onDone) onDone(el); };
   const go = el.querySelector('[data-act]');
   if (go) go.onclick = async e => { e.stopPropagation(); await inboxMark(m); done(); if (/^#/.test(m.action)) location.hash = m.action; else window.open(m.action, '_blank', 'noopener'); };
