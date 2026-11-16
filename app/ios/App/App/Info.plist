@@ -4,6 +4,8 @@
 <dict>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>跟读练习时录下你的发音，和标准录音对比。音読練習であなたの声を録音し、お手本と比べます。</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>把打卡图、毕业证书、邀请图保存到相册。シェア用の画像（学習記録・卒業証書・招待画像）を写真に保存します。</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>跟读练习时识别你说的句子并打分。音読練習で話した文を認識して採点します。</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

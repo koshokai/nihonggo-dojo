@@ -221,16 +221,32 @@ async function scQR() {
   return code ? refLink(code) : '';   // 没有邀请码就不放二维码（图上写着「扫码送 3 天」）
 }
 // 把画好的图显示出来：系统分享 / 保存
+// 手机（触屏、App）：「保存图片」打开系统的分享菜单（里面的「存储图像」存进相册；直接下载在 iPhone 上会存进「文件」，App 里没反应）
+const scTouch = () => !!window.DOJO_APP || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches);
+const scFileName = () => `nekosensei-${dkey()}-${Date.now() % 1e5}.png`;   // 英文文件名（中文名在有些浏览器里会变成 download）
+// 保存一张图：手机用分享菜单，电脑下载
+function scSave(file, dataUrl, T) {
+  if (scTouch() && navigator.canShare && navigator.canShare({ files: [file] })) {
+    toast(T('在弹出的菜单里选「存储图像」就能存进相册', 'メニューの「画像を保存」で写真に保存できます'));
+    navigator.share({ files: [file] }).catch(() => {});
+    return;
+  }
+  const a = document.createElement('a'); a.href = dataUrl; a.download = file.name; document.body.append(a); a.click(); a.remove();
+}
+// 把画好的图显示出来：系统分享 / 保存（图片用 data URL：长按保存在 Safari 和 App 里都能用）
 function shareCanvasOut(out, c, name, tr = scTr()) {
   const T = (zh, ja) => scT(tr, zh, ja);
+  const dataUrl = c.toDataURL('image/png');
   c.toBlob(blob => {
     if (!blob) return;
-    const url = URL.createObjectURL(blob), file = new File([blob], `${name}-${dkey()}.png`, { type: 'image/png' });
-    out.innerHTML = `<img class="share-img" src="${url}" alt="${esc(name)}">
-      <div class="row">${navigator.canShare && navigator.canShare({ files: [file] }) ? `<button class="btn pri" type="button" data-sys>${T('分享图片', '画像をシェア')}</button>` : ''}<a class="btn" href="${url}" download="${file.name}">${T('保存图片', '画像を保存')}</a></div>
-      <p class="small muted">${T('手机上也可以长按图片保存。', 'スマートフォンでは画像を長押しして保存することもできます。')}</p>`;
+    const file = new File([blob], scFileName(), { type: 'image/png' });
+    const canShare = navigator.canShare && navigator.canShare({ files: [file] });
+    out.innerHTML = `<img class="share-img" src="${dataUrl}" alt="${esc(name)}">
+      <div class="row">${canShare ? `<button class="btn pri" type="button" data-sys>${T('分享图片', '画像をシェア')}</button>` : ''}<button class="btn" type="button" data-save>${T('保存图片', '画像を保存')}</button></div>
+      <p class="small muted">${T('手机上也可以长按图片，选「存储图像」保存到相册。', 'スマートフォンでは画像を長押しして「写真に保存」することもできます。')}</p>`;
     const sys = out.querySelector('[data-sys]');
     if (sys) sys.onclick = () => navigator.share({ files: [file] }).catch(() => {});
+    out.querySelector('[data-save]').onclick = () => scSave(file, dataUrl, T);
   }, 'image/png');
 }
 

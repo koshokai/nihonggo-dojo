@@ -175,13 +175,13 @@ function invitePanel() {
     const cv = body.querySelector('.inv-qr');
     if (typeof qrcode === 'function') refDrawQR(cv.getContext('2d'), url, 0, 0, 300); else cv.remove();
     // 邀请图先画好：苹果手机要求点按钮后马上调用系统分享，点了再画图会被拦掉
-    const out = body.querySelector('[data-out]'), name = `${BRAND}-${code}.png`;
+    const out = body.querySelector('[data-out]'), name = `nekosensei-invite-${code}.png`;   // 英文文件名
     let file = null, png = '';
-    if (typeof shareInviteCanvas === 'function' && typeof qrcode === 'function') shareInviteCanvas(code, url).then(c => c.toBlob(b => { if (b) { file = new File([b], name, { type: 'image/png' }); png = URL.createObjectURL(b); } }, 'image/png')).catch(() => {});
+    if (typeof shareInviteCanvas === 'function' && typeof qrcode === 'function') shareInviteCanvas(code, url).then(c => { const d = c.toDataURL('image/png'); c.toBlob(b => { if (b) { file = new File([b], name, { type: 'image/png' }); png = d; } }, 'image/png'); }).catch(() => {});
     // 不能直接分享图片的时候（电脑浏览器等）：把图显示出来，可以保存或长按
     const showImg = () => {
       if (!png) return;
-      out.innerHTML = `<img class="share-img" src="${png}" alt="${T('邀请图', '招待画像', 'Invite image')}"><div class="row"><a class="btn" href="${png}" download="${name}">${T('保存图片', '画像を保存', 'Save image')}</a></div><p class="small muted">${T('手机上也可以长按图片保存，再发给朋友。', 'スマートフォンでは画像を長押しして保存できます。', 'On a phone you can also long-press the image to save it.')}</p>`;
+      out.innerHTML = `<img class="share-img" src="${png}" alt="${T('邀请图', '招待画像', 'Invite image')}"><p class="small muted">${T('手机上可以长按图片，选「存储图像」保存到相册，再发给朋友。', 'スマートフォンでは画像を長押しして「写真に保存」できます。', 'On a phone, long-press the image and choose Save to Photos.')}</p>`;
     };
     body.querySelector('[data-share]').onclick = () => {
       if (!file) { toast(T('图片还在生成，请稍等一下再点', '画像を作成中です。少し待ってからもう一度どうぞ', 'Still preparing the image — tap again in a moment')); return; }
@@ -190,7 +190,8 @@ function invitePanel() {
     };
     body.querySelector('[data-save]').onclick = () => {
       if (!png) { toast(T('图片还在生成，请稍等一下再点', '画像を作成中です。少し待ってからもう一度どうぞ', 'Still preparing the image — tap again in a moment')); return; }
-      const a = document.createElement('a'); a.href = png; a.download = name; a.click(); showImg();
+      if (typeof scSave === 'function') scSave(file, png, (zh, ja) => T(zh, ja)); else { const a = document.createElement('a'); a.href = png; a.download = name; a.click(); }
+      showImg();
     };
     body.querySelector('[data-copy]').onclick = async () => { try { await navigator.clipboard.writeText(code); toast(T('邀请码已复制', 'コードをコピーしました', 'Code copied')); } catch (e) { prompt('', code); } };
     body.querySelector('[data-link]').onclick = async () => {
