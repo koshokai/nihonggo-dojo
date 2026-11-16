@@ -2,7 +2,7 @@
 // 页面和脚本：有网时先取最新版（最多等 3 秒），拿到就更新缓存；没网或太慢才用缓存。所以更新后打开就是新版本。
 // 发音 MP3：文件名是内容哈希，不会变，缓存了就一直用（cache-first）。
 // 账号、同步等跨域请求（Supabase、jsDelivr）不经过缓存。
-const VERSION = 'v254';
+const VERSION = 'v258';
 const SHELL = `shell-${VERSION}`, AUDIO = 'audio-v2';
 const CORE = ['./', 'index.html', 'style.css', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-maskable-192.png', 'icon-maskable-512.png', 'icon.svg',
   'i18n.js', 'mascot.js', 'fx.js', 'japlus.js', 'furi-map.js', 'kanapad.js', 'swipe.js', 'conv.js', 'pitch.js', 'tour.js', 'zh.js', 'zh-biz.js', 'practice2.js', 'week2.js', 'vocab.js', 'kanji.js', 'grammar.js', 'data.js', 'daily.js', 'jlpt.js', 'game.js', 'dict.js', 'reading.js',
@@ -20,8 +20,8 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  // 录音：本站的，以及音频仓库（日语、英语录音）的，都放进录音缓存（离线听）
-  const audioRepo = url.href.startsWith('https://koshokai.github.io/nihonggo-dojo-audio/');
+  // 录音：本站的，以及两个音频仓库（日语、英语录音；词典录音）的，都放进录音缓存（离线听）
+  const audioRepo = /^https:\/\/koshokai\.github\.io\/nihonggo-dojo-audio2?\//.test(url.href);
   if (url.origin !== location.origin && !audioRepo) return;
   if (url.pathname.endsWith('.mp3')) {
     e.respondWith(caches.open(AUDIO).then(async c => {

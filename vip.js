@@ -55,7 +55,8 @@ const VIP_PERKS = {
     ['play', '学习路线每个级别第 16 关以后', '学習ルートの各レベル第 16 ステージ以降', 'Learning-path stages from 16 onward at every level']
   ]
 };
-const VIP_ALL = [['点词看释义、例句语音不限次数（免费每天有次数）', '単語タップ・例文音声が回数無制限（無料は 1 日の回数に上限あり）', 'Unlimited word lookups and example audio (free: daily limit)'],
+const VIP_ALL = [['学习路线完整开放：会员级别的阅读、模拟考也排进路线，毕业测试一步不少', '学習ルートがすべて使える：メンバー対象レベルの読み物・模擬試験もルートに入り、卒業テストまで進める', 'The full learning roadmap: member-level reading and mock exams are part of your route, all the way to graduation'],
+  ['会员内容都有人声配音，还能下载到手机，没网也能学', 'メンバーコンテンツはすべて音声つき。端末にダウンロードしてオフラインでも学べる', 'All member content comes with natural voice audio, and you can download it to study offline'],
   ['学习诊断、水平测试的完整报告', '学習診断・レベルチェックの詳しいレポート', 'Full study diagnosis and level-check reports'],
   ['对战不限局数，还能玩听力抢答、汉字读音', '対戦が回数無制限、リスニング早押し・ピンイン当ても遊べる', 'Unlimited duels, plus listening and reading modes']];
 // 一种语言的会员内容：分类 + 内容，三种语言同一个格式
@@ -137,7 +138,7 @@ async function vipPlans(box) {
   const names = { l1: tje('一种语言', '1 言語', '1 language'), l2: tje('两种语言', '2 言語', '2 languages'), l3: tje('三种语言', '3 言語（すべて）', 'All 3 languages') };
   if (!Object.keys(by).length) { box.innerHTML = `<p class="muted">${tje('暂时没有可以购买的方案。', '現在購入できるプランはありません。', 'No plans available right now.')}</p>`; return; }
   box.innerHTML = ['l1', 'l2', 'l3'].filter(t => by[t]).map(t => `<div class="vip-tier ${on && cur === t ? 'cur' : ''}"><div class="vip-tier-t"><b>${names[t]}</b>${on && cur === t ? `<span class="tag done">${tje('当前方案', '現在のプラン', 'Current')}</span>` : ''}</div>
-    <div class="vip-buy">${['1', '3'].filter(d => by[t][d]).map(d => `<button class="btn ${d === '3' ? 'pri' : ''}" type="button" data-pk="${t}.${d}"><span>${d === '1' ? tje('1 个月', '1 か月', '1 month') : tje('3 个月', '3 か月', '3 months')}</span><b>${esc(by[t][d].product.priceString)}</b></button>`).join('')}</div></div>`).join('');
+    <div class="vip-buy">${['1', '3'].filter(d => by[t][d]).map(d => `<button class="btn ${d === '3' ? 'pri' : 'vip-1m'}" type="button" data-pk="${t}.${d}"><span>${d === '1' ? tje('1 个月', '1 か月', '1 month') : tje('3 个月', '3 か月', '3 months')}</span><b>${esc(by[t][d].product.priceString)}</b></button>`).join('')}</div></div>`).join('');
   box.querySelectorAll('[data-pk]').forEach(b => { b.onclick = async () => {
     const [t, d] = b.dataset.pk.split('.'), pkg = by[t][d];
     // 一种、两种方案：先选语言，再付款（三种方案全部开放，直接付款）

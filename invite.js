@@ -11,6 +11,8 @@ const refLink = code => SHARE_SITE + (code ? `?r=${code}` : '');
 
 const APP_STORE = 'https://apps.apple.com/app/id6830187313';
 const refIOSWeb = () => !window.DOJO_APP && (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+// 这台设备上有登录过的账号（Supabase 存在 localStorage 的 sb-…-auth-token）
+const refSession = () => { try { return Object.keys(localStorage).some(k => /^sb-.*-auth-token$/.test(k)); } catch (e) { return false; } };
 async function refCopy(t) { try { await navigator.clipboard.writeText(t); return true; } catch (e) { return false; } }
 // 扫码落地页（苹果设备的浏览器）：下载 App / 继续用网页
 function refLanding(code) {
@@ -36,6 +38,7 @@ function refLanding(code) {
     localStorage.setItem(REF_KEY, m[1].toUpperCase());
     history.replaceState(history.state, '', location.pathname + location.hash);
     // 苹果手机 / iPad 的浏览器里：先请他下载 App（邀请码自动复制，App 里登录后粘贴）；其他设备直接在网页上用
+    if (refSession()) return;   // 已经登录：登录后自动提交（refAfterLogin），不用再提示
     if (refIOSWeb()) addEventListener('load', () => refLanding(m[1].toUpperCase()));
     else addEventListener('load', () => setTimeout(() => { if (typeof toast === 'function') toast(refT('已记下好友的邀请码：注册后送你 3 天会员', '友だちの招待コードを記録しました。登録すると 3 日間メンバーになれます', 'Invite code saved: sign up to get 3 free days of membership')); }, 1500));
   } catch (e) { /* 忽略 */ }
@@ -99,13 +102,14 @@ async function refAfterLogin() {
   if (code && !(S.ref && S.ref.claimed)) await refClaim(code, true);
   else refAskApp();
   refCheck();
+  refMyCode().catch(() => {});   // 先拿到邀请码：分享链接、分享图马上就能带上
 }
 // App 里新注册的账号（7 天内）登录后问一次：有没有好友的邀请码（扫码落地页已经帮他复制好了，点「粘贴」就行）
 function refAskApp() {
-  if (!window.DOJO_APP || !refLogged() || (S.ref && S.ref.claimed) || S.refAsked) return;
+  if (!window.DOJO_APP || !refLogged() || (S.ref && S.ref.claimed) || S.refAsked === sbUser.id) return;
   const born = Date.parse(sbUser.created_at || '');
   if (!born || Date.now() - born > 7 * 864e5) return;
-  S.refAsked = 1; save();
+  S.refAsked = sbUser.id; save();   // 每个账号只问一次
   const T = refT;
   const m = h(`<div class="ask-mask inv-land" role="dialog" aria-modal="true"><div class="ask-box">
     <h2>${T('有好友的邀请码吗？', '友だちの招待コードはありますか？', 'Have a friend\'s invite code?')}</h2>
@@ -115,7 +119,7 @@ function refAskApp() {
   </div></div>`);
   const inp = m.querySelector('[data-code]');
   m.querySelector('[data-paste]').onclick = async () => {
-    try { const t = await navigator.clipboard.readText(); const c = /[0-9A-Za-z]{6}/.exec(t || ''); if (c) inp.value = c[0].toUpperCase(); else toast(T('剪贴板里没有邀请码，请手动输入', 'クリップボードにコードがありません。入力してください', 'No code on the clipboard — please type it')); }
+    try { const t = await navigator.clipboard.readText(); const c = /[?&]r=([0-9A-Za-z]{6})/.exec(t || '') || /(?:^|[^0-9A-Za-z])([0-9A-F]{6})(?![0-9A-Za-z])/i.exec(t || ''); if (c) inp.value = c[1].toUpperCase(); else toast(T('剪贴板里没有邀请码，请手动输入', 'クリップボードにコードがありません。入力してください', 'No code on the clipboard — please type it')); }
     catch (e) { toast(T('不能读取剪贴板，请手动输入', 'クリップボードを読み取れません。入力してください', 'Could not read the clipboard — please type it')); }
   };
   m.querySelector('[data-no]').onclick = () => m.remove();
@@ -135,6 +139,7 @@ function refDrawQR(x, text, X, Y, size, color = '#2A2226') {
 }
 
 /* ---------- 「我的 → 邀请好友」 ---------- */
+let refWaited = 0;   // 已经等过一次登录恢复了
 function invitePanel() {
   const T = refT;
   const p = h(`<section class="panel invite"><h2>${T('邀请好友', '友だちを招待', 'Invite friends')}</h2>
@@ -145,6 +150,14 @@ function invitePanel() {
     <p class="small muted">${T('会员三种语言都能用。每人通过邀请最多累计 12 周；正在付费订阅的话，奖励先存起来，订阅停了自动接上。', 'メンバーは 3 言語すべて使えます。招待で受け取れるのは合計 12 週まで。サブスク中の場合は貯めておき、サブスクが終わったら自動で使われます。', 'Membership covers all three languages. Up to 12 weeks in total. If you have an active subscription, the weeks are saved and start when it ends.')}</p>
     <div data-body><div class="skel" role="status"><i></i><i></i></div></div></section>`);
   const body = p.querySelector('[data-body]');
+  // 直接打开这个页面时登录状态可能还没恢复：有登录记录就等一会儿（最多 8 秒）再画
+  if (!refLogged() && refSession() && !refWaited) {
+    const t0 = Date.now(), iv = setInterval(() => {
+      if (!p.isConnected) return clearInterval(iv);
+      if (refLogged() || Date.now() - t0 > 8000) { clearInterval(iv); refWaited = 1; p.replaceWith(invitePanel()); }
+    }, 250);
+    return p;
+  }
   if (!refLogged()) {
     body.innerHTML = `<p>${T('登录以后就有自己的邀请码。', 'ログインすると自分の招待コードが表示されます。', 'Sign in to get your invite code.')}</p><a class="btn pri" href="#me/account">${T('登录 / 注册', 'ログイン・登録', 'Sign in')}</a>`;
     return p;
@@ -158,7 +171,7 @@ function invitePanel() {
       <div data-out></div>
       ${st ? `<div class="inv-stats"><div><b>${st.invited}</b><span class="small muted">${T('已邀请', '招待した人', 'Invited')}</span></div><div><b>${st.rewarded}</b><span class="small muted">${T('学满 3 天', '3 日学習', 'Studied 3 days')}</span></div><div><b>${st.weeks} / 12</b><span class="small muted">${T('拿到的周数', 'もらった週', 'Weeks earned')}</span></div></div>
         ${st.bank ? `<p class="small">${T(`有 ${st.bank} 天奖励存着，订阅停了以后自动接上。`, `${st.bank} 日分を貯めています。サブスクが終わると自動で使われます。`, `${st.bank} days saved; they start when your subscription ends.`)}</p>` : ''}` : ''}
-      ${st && !st.claimed ? `<details class="inv-have"><summary>${T('我有好友的邀请码', '友だちの招待コードを持っている', 'I have a friend\'s code')}</summary><div class="row"><input type="text" maxlength="8" placeholder="${T('输入 6 位邀请码', '6 桁のコード', '6-character code')}" data-code autocapitalize="characters"><button class="btn" type="button" data-claim>${T('领取 3 天会员', '3 日間を受け取る', 'Get 3 days')}</button></div><p class="small muted">${T('注册后 7 天内有效。', '登録から 7 日以内に入力できます。', 'Valid within 7 days of signing up.')}</p></details>` : ''}`;
+      ${!st || !st.claimed ? `<details class="inv-have"><summary>${T('我有好友的邀请码', '友だちの招待コードを持っている', 'I have a friend\'s code')}</summary><div class="row"><input type="text" maxlength="8" placeholder="${T('输入 6 位邀请码', '6 桁のコード', '6-character code')}" data-code autocapitalize="characters"><button class="btn" type="button" data-claim>${T('领取 3 天会员', '3 日間を受け取る', 'Get 3 days')}</button></div><p class="small muted">${T('注册后 7 天内有效。', '登録から 7 日以内に入力できます。', 'Valid within 7 days of signing up.')}</p></details>` : ''}`;
     const cv = body.querySelector('.inv-qr');
     if (typeof qrcode === 'function') refDrawQR(cv.getContext('2d'), url, 0, 0, 300); else cv.remove();
     // 邀请图先画好：苹果手机要求点按钮后马上调用系统分享，点了再画图会被拦掉

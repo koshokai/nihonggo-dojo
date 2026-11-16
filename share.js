@@ -19,7 +19,7 @@ function shareData() {
   return { v: 1, t: tr, ui: tr === 'zh' ? 'ja' : tr === 'en' ? (S.enNative || 'zh') : 'zh', n: (S.lb && S.lb.nick) || '', lv, s: streak(), x: S.xp, w: words, r: reads, b: Object.keys(S.badges || {}).length, d: bits, dt: dkey() };
 }
 // 带上我的邀请码（invite.js 拿到以后记在 S.refCode）：朋友从这个链接注册，双方都有奖励
-const shareLink = () => SHARE_SITE + (S.refCode ? `?r=${S.refCode}` : '') + '#hi/' + b64url(JSON.stringify(shareData()));
+const shareLink = () => SHARE_SITE + (S.refCode && typeof sbUser !== 'undefined' && sbUser && S.refUser === sbUser.id ? `?r=${S.refCode}` : '') + '#hi/' + b64url(JSON.stringify(shareData()));
 
 /* ---------- 打开分享链接看到的页面 ----------
    界面语言跟着「看的人」的手机走（中文 / 日本語 / English），不是分享人的设定：

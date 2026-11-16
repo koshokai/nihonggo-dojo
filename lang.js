@@ -19,8 +19,9 @@ const LANG_AUDIO = {};
 // 单词优先用真人录音（audio/index-<语言>-human.json，来自 Wikimedia Commons），其次是合成音
 const jsonOr = url => fetch(url).then(r => r.ok ? r.json() : {}).catch(() => ({}));
 const LANG_IDX_READY = {};   // 已经加载好的录音目录（同步可用）
-const langAudioIdx = code => LANG_AUDIO[code] || (LANG_AUDIO[code] = Promise.all([jsonOr(`${audIdxBase(code)}index-${code}.json`), jsonOr(`${audIdxBase(code)}index-${code}-human.json`)])
-  .then(([tts, human]) => (LANG_IDX_READY[code] = Object.assign({}, tts, human))));
+// 词典里级别词表以外的词：录音在 nihonggo-dojo-audio2（index-dict-<语言>.json）
+const langAudioIdx = code => LANG_AUDIO[code] || (LANG_AUDIO[code] = Promise.all([jsonOr(`${audIdxBase(code)}index-${code}.json`), jsonOr(`${audIdxBase(code)}index-${code}-human.json`), code === 'zh' || code === 'en' ? jsonOr(`${AUD2}index-dict-${code}.json`) : {}])
+  .then(([tts, human, dict]) => (LANG_IDX_READY[code] = Object.assign({}, dict, tts, human))));
 // 中文、英语的录音共用一个播放器：iPhone 只允许「点击当下」开始播放，
 // 同一个播放器被点击解锁过一次以后，之后换录音再播放（例如测验每题自动播放）就不会被拦。
 let langAudioEl = null, langSeq = 0;
@@ -36,10 +37,9 @@ function speakLang(text, lang, rate) {
   const code = lang.slice(0, 2), rt = rate || S.rate;
   stopSpeech();
   const el = langPlayer(); el.pause();
-  if (S.voiceSrc === 'tts') return speakLangTTS(text, lang, rt);
   const idx = LANG_IDX_READY[code];
   // 录音目录还没加载好（刚打开 App 时）：点击当下先用一段静音「解锁」播放器（iPhone 只允许点击当下开始播放），
-  // 等目录加载好再放录音；4 秒还没好才改用手机朗读
+  // 等目录加载好再放录音
   if (!idx) {
     const seq = ++langSeq;
     el.src = SILENT_WAV; el.play().catch(() => {});
@@ -63,17 +63,8 @@ function speakLang(text, lang, rate) {
   el.defaultPlaybackRate = el.playbackRate = Math.min(1.3, Math.max(.5, rt + .2));
   el.play().catch(() => speakLangTTS(text, lang, rt));
 }
-function speakLangTTS(text, lang, rate) {
-  if (!hasTTS) { toast(tj('这个浏览器不支持朗读', 'このブラウザは読み上げに対応していません')); return; }
-  stopSpeech();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = lang; u.rate = (rate || S.rate) + .1;
-  const vs = speechSynthesis.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
-  const v = vs.find(v => /natural|online|google|premium|enhanced/i.test(v.name)) || vs.find(v => v.lang.replace('_', '-') === lang) || vs[0];
-  if (v) u.voice = v;
-  else if (!speakLang.warned) { speakLang.warned = 1; toast(lang.startsWith('zh') ? '中国語の音声が見つかりません。端末の設定（読み上げ・音声）で中国語（普通話）を追加してください' : '没有找到英语语音，可以在系统设置的「文字转语音」里添加'); }
-  speechSynthesis.speak(u);
-}
+// 以前没有录音时用手机朗读；现在只放生成的人声
+function speakLangTTS() { noVoice(); }
 const sayBtn = (text, lang) => `<button class="speak" type="button" data-lsay="${esc(text)}" data-lang="${lang}" aria-label="${tj('朗读', '読み上げ')}">${SPEAK_SVG}</button>`;
 const exSayBtn = (text, lang) => sayBtn(text, lang).replace('<button ', '<button data-exq ');   // 例句：有每日额度
 document.addEventListener('click', e => {

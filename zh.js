@@ -649,10 +649,7 @@ function zhPlayLines(lines, onDone) {
     playLine(spk, zh, file);
   };
   const playLine = (spk, zh, file) => {
-    if (!file || S.voiceSrc === 'tts') {   // 没有录音：用手机朗读，读完接下一句
-      const u = new SpeechSynthesisUtterance(zh); u.lang = 'zh-CN'; u.rate = S.rate + .1; u.pitch = spk === 'M' ? .7 : 1.1;
-      u.onend = () => setTimeout(next, 350); speechSynthesis.speak(u); return;
-    }
+    if (!file) return noVoice(next);   // 没有录音：不用手机朗读，接下一句
     el.src = audUrl(file); el.preservesPitch = el.mozPreservesPitch = el.webkitPreservesPitch = spk !== 'M';
     el.defaultPlaybackRate = el.playbackRate = spk === 'M' ? .86 : 1;
     el.onended = () => setTimeout(next, 350);

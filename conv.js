@@ -10,20 +10,12 @@ const T2 = (zh, ja) => tj(zh, ja);
 // 等朗读结束再往下走（录音 / 手机朗读都支持；万一没有回调，按长度估一个超时）
 const waitMs = ms => new Promise(r => setTimeout(r, ms));
 function sayJa(text) { return new Promise(res => { let done = false; const fin = () => { if (!done) { done = true; res(); } }; speak(text, { onend: fin }); setTimeout(fin, 1500 + text.length * 350); }); }
-function sayTTS(text, lang) {
-  return new Promise(res => {
-    if (!hasTTS) return res();
-    let done = false; const fin = () => { if (!done) { done = true; res(); } };
-    const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = S.rate + .1; u.onend = u.onerror = fin;
-    const vs = speechSynthesis.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase().startsWith(lang.slice(0, 2)));
-    if (vs[0]) u.voice = vs.find(v => /natural|premium|enhanced|google/i.test(v.name)) || vs[0];
-    speechSynthesis.speak(u); setTimeout(fin, 1500 + text.length * 400);
-  });
-}
-// 中文、英语：有录音（MeloTTS / Kokoro）用录音，没有用手机朗读
+// 母语的意思：没有录音，不用手机朗读，停一会儿让人看屏幕上的意思
+function sayTTS(text) { return waitMs(Math.min(3500, 900 + text.length * 120)); }
+// 中文、英语：有录音（MeloTTS / Kokoro）用录音（没有就跳过，不用手机朗读）
 function sayZh(text, code = 'zh', tts = 'zh-CN') {
   const file = (LANG_IDX_READY[code] || {})[text];
-  if (!file || S.voiceSrc === 'tts') return sayTTS(text, tts);
+  if (!file) return new Promise(res => noVoice(res));
   return new Promise(res => { let done = false; const fin = () => { if (!done) { done = true; res(); } }; const el = langPlayer(); el.src = audUrl(file); el.onended = fin; el.onerror = fin; el.play().catch(fin); setTimeout(fin, 1500 + text.length * 450); });
 }
 async function commuteItems(src, n) {
@@ -232,15 +224,13 @@ function viewReader() {
     list.unshift({ id: Date.now().toString(36), t: text, l: zh ? 'zh' : 'ja', at: Date.now() }); S.myTexts = list.slice(0, 20); save();
     if (zh) {
       const by = await zhIndex();
-      out.innerHTML = `<div class="row between"><b>${T2('原文', '本文')}</b><span>${sayBtn(text, 'zh-CN')}</span></div><div class="rd-text zh-line" lang="zh-CN">${readerHTMLZh(text, by)}</div>
+      out.innerHTML = `<div class="row between"><b>${T2('原文', '本文')}</b></div><div class="rd-text zh-line" lang="zh-CN">${readerHTMLZh(text, by)}</div>
         <p class="small muted">HSK の単語にピンインをつけています。点線の単語はタップで意味。</p>`;
       out.querySelectorAll('[data-zw]').forEach(el => { el.onclick = e => { e.stopPropagation(); if (!glossOK()) return; zhSheet(by[el.dataset.zw]); }; });
     } else {
       await loadJmdict().catch(() => {});
       const toks = readerTokensJa(text);
-      // 朗读按页面上标的读音来读（汉字换成标出的假名），读音和注音一致；没查到的词交给语音引擎
-      const sayText = toks.map(x => x.ruby ? x.ruby.r + x.ruby.rest : x.t).join('');
-      out.innerHTML = `<div class="row between"><b>原文</b><span>${speakBtn(sayText)}</span></div><div class="rd-text jp furi" lang="ja">${readerHTMLJa(text)}</div>
+      out.innerHTML = `<div class="row between"><b>原文</b></div><div class="rd-text jp furi" lang="ja">${readerHTMLJa(text)}</div>
         <p class="small muted">词典里能查到的词标了读音、画了虚线，点一下看意思；读音按词典的原形推算，偶尔不准。 <a href="https://translate.google.com/?sl=ja&tl=zh-CN&text=${encodeURIComponent(text.slice(0, 1500))}&op=translate" target="_blank" rel="noopener">整段翻译 ↗</a></p>`;
       out.querySelectorAll('[data-i]').forEach(el => { el.onclick = e => { e.stopPropagation(); if (!glossOK()) return; const x = toks[+el.dataset.i]; showSheet(x.t, x.hit, null); }; });
     }

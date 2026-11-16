@@ -129,6 +129,7 @@ function memberPurge() {
 // 退出登录 / 换账号：清掉会员身份和设备里的会员内容
 function memberSignedOut() {
   delete S.member; delete S.memberUser;
+  delete S.refCode; delete S.refUser; delete S.ref;   // 邀请码和邀请状态跟着账号走（invite.js；S.refAsked 记的是账号 ID，不用删）
   memberIdbDrop();
   save(); memberSig = memberState(); memberChanged();
 }

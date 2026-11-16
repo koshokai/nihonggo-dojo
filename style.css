@@ -1447,6 +1447,8 @@ body[data-track="en"] .q-sent { font-family: "Nunito", sans-serif; }
 .vip-buy { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .vip-buy .btn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px; }
 .vip-buy .btn b { font-size: 1.05rem; }
+/* 1 个月也带一点粉色，不要被 3 个月的按钮盖过去 */
+.vip-buy .btn.vip-1m { background: var(--ai-soft); border-color: color-mix(in srgb, var(--ai) 45%, transparent); color: var(--ai); }
 .vip-langs { border: 1px dashed var(--ai); border-radius: 14px; padding: 12px 14px; margin: 10px 0; }
 .vip-legal { margin-top: 16px; line-height: 1.6; }
 .node.vip-lock { opacity: .75; }
@@ -1553,6 +1555,7 @@ a.panel, a.wk-more, a.en-more { text-decoration: none; color: inherit; }
 .intro-box h2 { margin: 0; font-size: 1.25rem; }
 .intro-box p { min-height: 6.8em; color: var(--ink); }
 .intro-ic { font-size: 3.2rem; line-height: 1.2; }
+.intro-ic img { width: 88px; height: 88px; border-radius: 22px; box-shadow: 0 6px 18px rgba(80, 40, 70, .18); display: block; margin: 0 auto; }
 .intro-skip { position: absolute; top: 10px; right: 12px; background: none; border: 0; color: var(--muted); padding: 8px; cursor: pointer; }
 .intro-dots { display: flex; gap: 6px; justify-content: center; }
 .intro-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }

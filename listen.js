@@ -64,29 +64,7 @@ function lsPlay(x, L, { slow = false, onend, onTTS } = {}) {
   const stop = () => { dead = true; clearTimeout(timer); if (audio) { audio.onended = audio.onerror = null; audio.pause(); } if (hasTTS) speechSynthesis.cancel(); };
   lsStop = stop;
   const done = () => { if (!dead) { dead = true; if (lsStop === stop) lsStop = null; if (onend) onend(); } };
-  const viaTTS = () => {
-    if (!hasTTS) { toast('这个浏览器不支持朗读'); return done(); }
-    if (onTTS) onTTS();
-    const lang = x.lang || 'ja', tag = LTTS[lang];
-    const vs = lang === 'ja' ? jaVoices() : speechSynthesis.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase().startsWith(lang));
-    const male = vs.find(v => /ichiro|otoya|keita|hattori|injoon|daniel|alex|fred|guy|male|男/i.test(v.name));
-    const segs = lsSegs(x);
-    const next = k => {
-      if (dead) return;
-      if (k >= segs.length) return done();
-      const [spk, text, pause] = segs[k];
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = tag;
-      u.rate = (spk === 'N' ? 1 : LRATE[L] || 1) * (slow ? .8 : 1);
-      const isM = spk[0] === 'M';
-      u.voice = (isM && male) || (lang === 'ja' ? currentVoice() : vs[0]) || null;
-      // 音调只轻微区分：压得太低或抬得太高，设备语音会变得很怪
-      u.pitch = spk === 'N' || (isM && male) ? 1 : isM ? (spk === 'M2' ? .8 : .88) : spk === 'F2' ? 1.12 : 1.04;
-      u.onend = u.onerror = () => { if (!dead) timer = setTimeout(() => next(k + 1), pause * 1000); };
-      speechSynthesis.speak(u);
-    };
-    speechSynthesis.cancel(); setTimeout(() => next(0), 80);
-  };
+  const viaTTS = () => noVoice(done);   // 没有录音：不用手机朗读
   listenIdx(x.lang).then(async idx => {
     if (dead) return;
     let file = S.voiceSrc !== 'tts' && idx[x.id];
@@ -213,8 +191,7 @@ function runListen(qs, L, { exam = false, title, again }) {
     const spoken = LSPOKEN[x.t];
     stage.innerHTML = `<div class="q-prompt pop"><div class="eyebrow">${ltype(x.t, x.lang)[0]}</div><div class="small muted">${ltype(x.t, x.lang)[1]}</div>
       <div class="ls-player"><button class="btn pri ls-play" type="button" data-play>▶ 播放</button>
-      ${exam ? '<span class="small muted">考试模式：只能听一遍</span>' : '<label class="small"><input type="checkbox" data-slow> 慢速</label>'}</div>
-      <div class="small muted" data-ttsnote hidden>这道题的真人语音还在制作中，暂时用手机自带的朗读，声音会比较生硬。</div></div>
+      ${exam ? '<span class="small muted">考试模式：只能听一遍</span>' : '<label class="small"><input type="checkbox" data-slow> 慢速</label>'}</div></div>
       <div class="opts">${x.c.map((c, j) => `<button class="opt" type="button" data-o="${j}"><span class="k">${j + 1}</span><span lang="${x.lang || 'ja'}">${spoken ? '' : esc(c)}</span></button>`).join('')}</div>
       <div data-fb></div>`;
     const btn = stage.querySelector('[data-play]');

@@ -141,7 +141,7 @@ function l2Listen(tr) {
     const p = h(`<section class="panel">
       <div class="row between"><h2>${TRACKS[tr].title}听力 · ${L}</h2>${lvChips(tr, L)}</div>
       <p>按${tr === 'ko' ? ' TOPIK ' : '四六级'}听力的题型出题，男女声对话。<b>听力测验</b>和考试一样每题只能听一遍；<b>题型练习</b>可以反复听、放慢。交卷后看原文、翻译和解说。</p>
-      <p class="small muted">题目为本站原创。对话音频由 MeloTTS 生成，还没有音频的题用设备自带的语音。</p>
+      <p class="small muted">题目为本站原创。对话音频由 MeloTTS 生成。</p>
       ${list.length ? `<div class="row"><button class="btn pri" type="button" data-start>开始听力测验（${Math.min(10, list.length)} 题）</button></div>
       <h3>题型练习</h3><div class="row">${types.map(t => `<button class="chip-btn" type="button" data-drill="${t}">${ltype(t, tr)[0]} <span class="small">${list.filter(x => x.t === t).length}</span></button>`).join('')}</div>` : '<p>这个级别的听力题还在准备中。</p>'}
       ${hist.length ? `<h3>最近成绩</h3><div class="list-wrap"><table class="list"><thead><tr><th>日期</th><th>级别</th><th>得分</th></tr></thead><tbody>${hist.map(e => `<tr><td>${e.date}</td><td>${e.L}</td><td>${e.score}/${e.total}</td></tr>`).join('')}</tbody></table></div>` : ''}

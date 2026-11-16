@@ -77,7 +77,7 @@ async function shareCardCanvas(qr) {
   stats.forEach(([t, v], i) => {
     const X = bx + 40 + i * (tw3 + 20), Y = by + 360;
     x.fillStyle = th.soft; scRound(x, X, Y, tw3, 150, 28); x.fill();
-    x.fillStyle = th.deep; x.font = F(900, 64); x.fillText(String(v), X + tw3 / 2, Y + 82);
+    x.fillStyle = th.deep; x.font = F(900, 64); x.fillText(String(v), X + tw3 / 2, Y + 82, tw3 - 24);
     x.fillStyle = '#7A6E80'; x.font = F(500, 30); x.fillText(t, X + tw3 / 2, Y + 124);
   });
   // 学习路线进度（path.js 记的「现在在哪一步」）
@@ -218,7 +218,7 @@ async function scQR() {
   if (S.shareNoQR || typeof refQRLib !== 'function') return '';
   try { await refQRLib(); } catch (e) { return ''; }
   const code = typeof refMyCode === 'function' ? await refMyCode().catch(() => '') : '';
-  return refLink(code);
+  return code ? refLink(code) : '';   // 没有邀请码就不放二维码（图上写着「扫码送 3 天」）
 }
 // 把画好的图显示出来：系统分享 / 保存
 function shareCanvasOut(out, c, name, tr = scTr()) {
@@ -237,7 +237,7 @@ function shareCanvasOut(out, c, name, tr = scTr()) {
 function sharePanel() {
   const brand = BRAND;
   const p = h(`<section class="panel"><h2>${tj('分享学习成果', '学習の記録をシェア')}</h2>
-    <p class="small muted">${tj(`生成一张打卡图，可以发朋友圈、小红书。图上只有「${brand}」和你的学习数据，没有二维码和网址，不会被平台拦截。`, `学習記録の画像を作って、SNS でシェアできます。画像には「${brand}」とあなたの学習データだけが入り、QR コードや URL は入りません。`)}</p>
+    <p class="small muted">${tj(`生成一张打卡图，可以发朋友圈、小红书。图上有「${brand}」和你的学习数据；可以选择带上你的邀请二维码。`, `学習記録の画像を作って、SNS でシェアできます。画像には「${brand}」とあなたの学習データが入り、招待 QR コードを入れることもできます。`)}</p>
     <div class="row"><button class="btn pri" type="button" data-link>${tj('分享我的学习页', '学習ページをシェア')}</button><button class="btn" type="button" data-card>${tj('生成打卡图', '画像を作成')}</button></div>
     <label class="small sc-qr"><input type="checkbox" data-qr ${S.shareNoQR ? '' : 'checked'}> ${tj('图上带二维码（带你的邀请码：朋友扫码注册送 3 天，学满 3 天你得一周会员）', '画像に QR コードを入れる（招待コードつき：友だちは 3 日間、友だちが 3 日学ぶとあなたに 1 週間）')}</label>
     <p class="small muted">${tj('微信、小红书有时会限流带二维码的图片，发不出去时取消勾选再生成一次。', 'SNS によっては QR コード入りの画像が表示されにくいことがあります。うまく投稿できないときはチェックを外してください。')}</p>

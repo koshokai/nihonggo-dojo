@@ -32,20 +32,8 @@ let enSeqTok = 0;
 const enRate = () => Math.min(1.3, Math.max(.6, (S.rate || .8) + .2));
 function enStop() { enSeqTok++; try { stopSpeech(); } catch (e) { /* 忽略 */ } const el = langPlayer(); el.onended = el.onerror = null; el.pause(); }
 window.addEventListener('hashchange', () => enStop());
-function enTTS(text, spk, end) {
-  if (!hasTTS) { end(); return; }
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = (S.rate || .8) + .1;
-  const vs = speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang));
-  const us = vs.filter(v => /en[-_]US/i.test(v.lang));
-  const male = us.find(v => /male|david|alex|fred|daniel|aaron|guy|man/i.test(v.name) && !/female/i.test(v.name));
-  const isM = spk && spk[0] === 'M';
-  const v = (isM && male) || us.find(v => /natural|online|google|premium|enhanced|samantha/i.test(v.name)) || us[0] || vs[0];
-  if (v) u.voice = v;
-  if (isM && !male) u.pitch = .7;
-  let done = false; u.onend = u.onerror = () => { if (!done) { done = true; end(); } };
-  speechSynthesis.speak(u);
-}
+// 没有录音的句子：不用手机朗读，跳过（接着播下一句）
+function enTTS(text, spk, end) { noVoice(end); }
 // 播一个录音文件；失败时 fail()（只调用一次）
 function enPlayFile(file, end, fail) {
   const el = langPlayer();
@@ -313,7 +301,7 @@ function enRunListen(qs, title, more) {
         return;
       }
       if (file) { enStop(); const tok = ++enSeqTok; enPlayFile(file, () => { if (tok === enSeqTok) end(); }, () => { if (tok === enSeqTok) enSeq(enLSegs(x), { onEnd: end }); }); }
-      else { const n = stage.querySelector('[data-ttsnote]'); if (n && S.voiceSrc !== 'tts') n.hidden = false; enSeq(enLSegs(x), { onEnd: end }); }
+      else { enSeq(enLSegs(x), { onEnd: end }); }
     };
     pb.onclick = play;
     stage.querySelectorAll('[data-o]').forEach(b => { b.onclick = () => pick(+b.dataset.o); });

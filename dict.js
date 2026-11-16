@@ -6,6 +6,7 @@ let JMDICT = null, jmLoading = null, dictQuery = '', dictDir = null;
 function loadJmdict() {
   if (JMDICT) return Promise.resolve(JMDICT);
   if (!jmLoading) {
+    if (typeof dictJaIdx === 'function') dictJaIdx();   // 词典词条的录音目录一起下载（app.js）
     jmLoading = fetch('dict.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(d => { JMDICT = d.map(([k, r, s, p, zh]) => ({ k, r, rh: r.map(toHira), s, p, zh: zh || '' })); return JMDICT; })   // zh：本站编写的中文释义
       .catch(e => { jmLoading = null; throw e; });

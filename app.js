@@ -192,6 +192,7 @@ function load() {
 }
 let S = load();
 if (S.xp > 0) S.onboarded = true;
+if (S.voiceSrc === 'tts') S.voiceSrc = 'vv';   // 不再用手机自带的机器朗读（只用生成的人声）
 // 新版界面：樱花飘落默认关闭（会分散注意力），想要的人在「我的」里打开
 if (!S.uiV2) { S.uiV2 = 1; S.petals = false; }
 if (!['ja', 'zh', 'en'].includes(S.track || 'ja')) S.track = 'ja';   // 已删除的语言（韩语）回到日语
@@ -289,6 +290,15 @@ const AUDIO_IDX = {};
 let curAudio = null;
 let JA_IDX_OK = false;
 const JA_IDX = Promise.all(['words', 'daily', 'examples'].map(n => fetch(`${AUD}index-${n}.json`).then(r => r.ok ? r.json() : {}).then(d => Object.assign(AUDIO_IDX, d)).catch(() => {}))).then(() => { JA_IDX_OK = true; });
+// 词典里 JLPT 以外的词（JMdict）：录音在 nihonggo-dojo-audio2 的 ja-d/（index-dict-ja.json，约 1.3 MB），第一次用到时才下载
+let DICT_JA = null, DICT_JA_P = null;
+const dictJaIdx = () => DICT_JA_P || (DICT_JA_P = fetch(`${AUD2}index-dict-ja.json`).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(d => (DICT_JA = d)));
+// 不用手机自带的机器朗读，只放生成的人声：没有录音时不出声，提示一次，然后接着往下走（连续播放不会卡住）
+let noVoiceWarned = false;
+function noVoice(end) {
+  if (!noVoiceWarned) { noVoiceWarned = true; toast(tje('这一句的录音还在准备中', 'この文の音声は準備中です', 'Audio for this line is coming soon')); }
+  if (end) setTimeout(end, 500);
+}
 function stopSpeech() {
   if (typeof langSeq !== 'undefined') langSeq++;   // 还在等录音目录的那一次（lang.js）也取消
   if (curAudio) { curAudio.onended = curAudio.onerror = null; curAudio.pause(); curAudio = null; }
@@ -319,15 +329,15 @@ function audioPrime() {
   if (typeof langUnlock === 'function') langUnlock();
 }
 function speak(text, opts = {}, pre) {
-  const file = S.voiceSrc !== 'tts' && (HUMAN_JA[text] || KANA_IDX[text] || AUDIO_IDX[text]);
-  // 刚打开时录音目录还没加载好：先在点击当下用静音解锁一个播放器，等目录好了再放录音（4 秒还没好才用手机朗读）
-  if (!file && !pre && S.voiceSrc !== 'tts' && !JA_IDX_OK && typeof SILENT_WAV !== 'undefined') {
+  const file = HUMAN_JA[text] || KANA_IDX[text] || AUDIO_IDX[text] || (DICT_JA && DICT_JA[text]);
+  // 录音目录还没加载好（刚打开时；词典的录音目录第一次用到时才下载）：先在点击当下用静音解锁一个播放器，等目录好了再放录音
+  if (!file && !pre && (!JA_IDX_OK || !DICT_JA) && typeof SILENT_WAV !== 'undefined') {
     stopSpeech(); const seq = ++speakSeq;
     const a = jaPlayer(); a.onended = a.onerror = null; a.src = SILENT_WAV; a.play().catch(() => {});
     curAudio = a;
     let done = false;
     const go = () => { if (done || seq !== speakSeq || curAudio !== a) return; done = true; curAudio = null; speak(text, opts, a); };
-    JA_IDX.then(go); setTimeout(go, 4000);
+    Promise.all([JA_IDX, dictJaIdx()]).then(go); setTimeout(go, 6000);
     return;
   }
   if (file) {
@@ -348,35 +358,8 @@ function speak(text, opts = {}, pre) {
   if (curAudio) { curAudio.pause(); curAudio = null; }
   speakTTS(text, opts);
 }
-function speakTTS(text, opts = {}) {
-  if (!hasTTS) { if (!warnedVoice) { warnedVoice = true; toast(tj('这个浏览器不支持朗读', 'このブラウザは読み上げに対応していません')); } return; }
-  const clean = text.replace(/[～~＿[\]]/g, '');
-  const seq = ++speakSeq;
-  const make = () => {
-    const u = new SpeechSynthesisUtterance(clean);
-    u.lang = 'ja-JP';
-    // 句子比单词再慢一点，方便跟读
-    u.rate = (opts.rate || S.rate) * (clean.length > 8 ? .95 : 1);
-    u.pitch = 1;
-    const v = currentVoice(); if (v) u.voice = v;
-    let started = false;
-    u.onstart = () => { started = true; };
-    u.onend = u.onerror = e => { if (curUtt === u) curUtt = null; if (opts.onend && !(e && e.error === 'interrupted' && seq !== speakSeq)) opts.onend(); };
-    u.check = () => started;
-    return u;
-  };
-  const go = (retry) => {
-    if (seq !== speakSeq) return;
-    const u = make(); curUtt = u;
-    try { speechSynthesis.resume(); } catch (e) { /* 忽略 */ }
-    speechSynthesis.speak(u);
-    // 0.9 秒还没开始读，多半是被吞了：再试一次
-    if (retry) setTimeout(() => { if (seq === speakSeq && curUtt === u && !u.check() && !speechSynthesis.speaking) { speechSynthesis.cancel(); setTimeout(() => go(false), 60); } }, 900);
-  };
-  const busy = speechSynthesis.speaking || speechSynthesis.pending;
-  if (busy) { speechSynthesis.cancel(); setTimeout(() => go(true), 80); } else go(true);
-  if (!currentVoice() && speechSynthesis.getVoices().length && !warnedVoice) { warnedVoice = true; toast(tj('没有找到日语语音，可以在系统设置里添加日语语音包', '日本語の音声が見つかりません。端末の設定で日本語の音声を追加してください')); }
-}
+// 以前没有录音时用手机朗读；现在只放生成的人声（noVoice：不出声，连续播放接着往下走）
+function speakTTS(text, opts = {}) { noVoice(opts.onend); }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-say]');
   if (b) {
@@ -1708,21 +1691,14 @@ function viewMe(sec) {
   const VTR = S.track === 'zh' || S.track === 'en' ? S.track : 'ja';   // 正在学的语言
   const voiceP = h(`<section class="panel"><h2>${tj('发音', '発音')}</h2>
     <div class="row between"><span>${tj('语速', '読み上げの速さ')}</span><div class="seg">${opt(J ? [[.6, 'とてもゆっくり'], [.8, 'ゆっくり'], [.95, 'ふつう']] : [[.6, '很慢'], [.8, '慢'], [.95, '正常']], S.rate, 'data-rate')}</div></div>
-    <div class="row between"><span>${tj('发音来源', '音声の種類')}</span><div class="seg">${opt(J ? [['vv', '収録音声'], ['tts', '端末の音声']] : [['vv', VTR === 'ja' ? '真人感（VOICEVOX）' : '真人感录音'], ['tts', '设备自带']], S.voiceSrc || 'vv', 'data-vsrc')}</div></div>
     <div class="row between"><span>${tj('翻卡和答题后自动朗读', 'カードをめくった時・解答後に自動で読み上げ')}</span><div class="seg">${opt(onOff, S.autoSpeak ? 1 : 0, 'data-auto')}</div></div>
-    ${VTR !== 'ja' ? '' : `<div class="row between"><label for="voice-sel">语音</label><div class="row"><select id="voice-sel" ${vs.length ? '' : 'disabled'}>${vs.length ? vs.map(v => `<option value="${esc(v.name)}" ${cur && cur.name === v.name ? 'selected' : ''}>${esc(v.name)}</option>`).join('') : '<option>没有找到日语语音</option>'}</select><button class="btn" type="button" data-try>试听</button></div></div>
-    <p class="small muted">单词和今日一句优先使用 VOICEVOX 预先生成的真人感发音；其余句子和没有音频的内容使用设备自带的语音，不同设备差别很大。名字里带 Natural、Online 或 Google 的通常更自然（例如 Edge 浏览器的 Nanami Online）。手机上没有日语语音时，可以在系统设置的「文字转语音」里下载日语语音。</p>`}
-    ${VTR !== 'ja' ? `<div class="row"><button class="btn" type="button" data-try>${tj('试听', '試しに聞く')}</button></div>
-    <p class="small muted">${VTR === 'zh' ? '「収録音声」を選ぶと、用意してある音声を優先して再生し、ないものは端末の音声で読み上げます。「端末の音声」は常に端末の読み上げ機能を使います（端末によって聞こえ方がかなり違います）。中国語の音声が出ないときは、端末の設定の「テキスト読み上げ」で中国語（普通話）の音声を追加してください。'
-      : tj('选「真人感录音」时优先播放预先录好的英语发音，没有的再用设备自带的语音；选「设备自带」时一律用设备的朗读功能（不同设备差别很大）。英语语音出不来时，可以在系统设置的「文字转语音」里添加英语语音。', '「収録音声」を選ぶと、用意してある英語の音声を優先して再生し、ないものは端末の音声で読み上げます。「端末の音声」は常に端末の読み上げ機能を使います（端末によって聞こえ方がかなり違います）。英語の音声が出ないときは、端末の設定の「テキスト読み上げ」で英語の音声を追加してください。')}</p>` : ''}
+    <div class="row"><button class="btn" type="button" data-try>${tje('试听', '試しに聞く', 'Listen')}</button></div>
+    <p class="small muted">${tje('所有发音都是预先生成的人声录音（日语 VOICEVOX、中文 MeloTTS、英语 Kokoro），不使用手机自带的机器朗读。', '発音はすべて、あらかじめ用意した人の声の音声です（日本語 VOICEVOX・中国語 MeloTTS・英語 Kokoro）。端末の機械読み上げは使いません。', 'All audio is pre-generated natural voice recordings (Japanese: VOICEVOX, Chinese: MeloTTS, English: Kokoro). Your device\'s text-to-speech is never used.')}</p>
   </section>`);
   // 试听跟着正在学的语言（不是界面语言：学英语的日本用户界面是日语，但要听英语）
-  const trySay = () => VTR === 'zh' ? speakLang('你好！我们一起学习中文吧。', 'zh-CN') : VTR === 'en' ? speakLang('Hello! Let\'s learn English together.', 'en-US') : speak('こんにちは。いっしょに にほんごを べんきょうしましょう。');
-  voiceP.querySelectorAll('[data-rate]').forEach(b => { b.onclick = () => { S.rate = +b.dataset.rate; save(); if (VTR === 'zh') speakLang('今天也加油吧。', 'zh-CN'); else if (VTR === 'en') speakLang('Keep up the good work today.', 'en-US'); else speak('きょうも がんばりましょう。'); render(); }; });
-  voiceP.querySelectorAll('[data-vsrc]').forEach(b => { b.onclick = () => { S.voiceSrc = b.dataset.vsrc; save(); render(); }; });
+  const trySay = () => VTR === 'zh' ? speakLang('谢谢', 'zh-CN') : VTR === 'en' ? speakLang('hello', 'en-US') : speak('こんにちは');   // 有录音的词
+  voiceP.querySelectorAll('[data-rate]').forEach(b => { b.onclick = () => { S.rate = +b.dataset.rate; save(); trySay(); render(); }; });
   voiceP.querySelectorAll('[data-auto]').forEach(b => { b.onclick = () => { S.autoSpeak = b.dataset.auto === '1'; save(); render(); }; });
-  const vsel = voiceP.querySelector('#voice-sel');
-  if (vsel) vsel.onchange = e => { S.voice = e.target.value; save(); speak('こんにちは。いっしょに にほんごを べんきょうしましょう。'); };
   voiceP.querySelector('[data-try]').onclick = trySay;
   p.querySelectorAll('[data-theme-set]').forEach(b => { b.onclick = () => { S.theme = b.dataset.themeSet; applyTheme(); save(); startPetals(); render(); }; });
 
@@ -1785,7 +1761,7 @@ function viewMe(sec) {
     { id: 'check', ic: tj('测', '測'), t: tje('水平测试', 'レベルチェック', 'Level check'), d: tje('20 题测测现在是几级、进步了多少', '20 問で今のレベルと伸びをチェック', '20 questions: your level now and your progress'), href: '#check' },
     { id: 'share', ic: tj('图', '図'), t: tj('分享学习成果', '学習の成果をシェア'), d: tj('生成打卡图发朋友圈、小红书', '記録画像を作って SNS でシェア'), show: () => typeof sharePanel === 'function', build: () => [sharePanel()] },
     { id: 'settings', ic: tj('设', '設'), t: tj('学习设置', '学習設定'), d: tj('学习的语言、目标级别、每日目标、外观', '学ぶ言語・1日の目標・テーマ'), build: () => [p] },
-    { id: 'voice', ic: '音', t: tj('发音', '発音'), d: tj('语速、发音来源、自动朗读', '読み上げの速さ・音声の種類・自動読み上げ'), build: () => [voiceP] },
+    { id: 'voice', ic: '音', t: tj('发音', '発音'), d: tj('语速、自动朗读', '読み上げの速さ・自動読み上げ'), build: () => [voiceP] },
     { id: 'device', ic: tj('机', '機'), t: tj('设备与备份', '端末とバックアップ'), d: tj('装到手机桌面、备份和换设备', 'ホーム画面に追加・バックアップ・機種変更'), build: () => [installPanel(), bk] },
     { id: 'account', ic: '号', t: tj('账号与同步', 'アカウントと同期'), d: tj('登录、云端同步、删除账号', 'ログイン・クラウド同期・アカウント削除'), show: () => cloudOn(), build: () => [accountPanel()] },
   ].filter(x => !x.show || x.show());
