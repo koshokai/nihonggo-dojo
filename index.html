@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>猫先生 — 日语・中文・英语</title>
+<meta name="description" data-ja-content="中国語学習サイト。HSK の単語カード（間隔反復）、ピンイン、文法、リスニングなどで、毎日少しずつ中国語を学べます。" content="日语学习网站：五十音、JLPT N5–N1 单词卡（间隔重复）、汉字、语法、模拟考试、错题本，连续打卡和成就徽章帮你坚持下去。">
+<meta name="theme-color" content="#F7EEF2">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="猫先生">
+<meta property="og:title" content="猫先生 — 日本語 · 中文 · English">
+<meta property="og:description" content="每天 10 分钟学日语、中文、英语 ｜ 1 日 10 分で日本語・中国語・英語 ｜ Learn Japanese, Chinese and English in 10 minutes a day">
+<meta property="og:image" content="https://koshokai.github.io/nihonggo-dojo/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="猫先生">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- 字体不阻塞页面：连不上 Google（例如中国大陆）时直接用系统字体显示 -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Maru+Gothic:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;700&family=Nunito:wght@800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Maru+Gothic:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;700&family=Nunito:wght@800&display=swap"></noscript>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="petals" aria-hidden="true"></canvas>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#vip" title="猫先生会员" aria-label="猫先生会员"><img class="brand-mark" src="icon-192.png" alt="" width="36" height="36"><span>猫先生</span></a>
+    <form class="gsearch" role="search" autocomplete="off">
+      <svg class="gs-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3a7 7 0 0 1 5.6 11.2l4.6 4.6-1.4 1.4-4.6-4.6A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>
+      <input type="search" id="gs-q" placeholder="查词：日语 / 假名 / 中文 / 英文" aria-label="查词" data-ja-aria-label="辞書検索" enterkeyhint="search">
+      <div class="gs-drop" hidden></div>
+    </form>
+    <div class="chips">
+      <a class="chip online" id="chip-online" href="#duel" title="现在在学的人数，点这里去对战" hidden><i class="dot" aria-hidden="true"></i><b id="online-n">0</b><span class="chip-l" data-ja="人が学習中" data-en="online">人在学</span></a>
+      <a class="chip lv" id="chip-lv" href="#me" title="当前目标级别，点击更改">N5</a>
+      <span class="chip" id="chip-streak" title="连续学习天数" data-ja-title="連続学習日数"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-4 2-5 0 2 1 3 2 3 0-3 0-6 1-9z"/></svg><b id="streak-n">0</b><span class="chip-l" data-ja="日" data-en="days">天</span></span>
+      <span class="chip" id="chip-xp" title="今日经验 / 每日目标" data-ja-title="今日の XP / 1 日の目標"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 7 7 .6-5.3 4.6 1.6 7L12 17.6 5.7 21.2l1.6-7L2 9.6 9 9z"/></svg><b id="xp-today">0</b><span class="chip-l" id="xp-goal">/50</span></span>
+    </div>
+  </div>
+  <nav class="tabs" aria-label="主要栏目" data-ja-aria-label="メインメニュー"></nav>
+</header>
+
+<main id="main" class="wrap" tabindex="-1"></main>
+
+<footer class="foot wrap">
+  <p><span data-foot-brand>猫先生 · 玩转日语。</span><span data-ja="ログインすると学習記録がクラウドに自動で同期され、機種変更やブラウザを変えても消えません。">登录后学习进度自动同步到云端，换手机、换浏览器都不丢。</span><a href="privacy.html" data-ja="プライバシーポリシー">隐私政策</a><a href="terms.html" data-ja="利用規約">用户协议</a><a href="#about" data-ja="コンテンツの出典">内容来源</a><a href="#" data-feedback-link hidden data-ja="ご意見・ご要望">意见反馈</a></p>
+</footer>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+  // 录音的位置：网站上就是 audio/；装在 iPhone App 里时（app/build-web.mjs 会在前面加上 DOJO_APP），录音从网站在线加载
+  // 日语录音（VOICEVOX）放在公开的音频仓库的 ja/ 下（在那边生成，Actions 不限分钟）；中文录音还在本站 audio/ 下
+  window.AUD = 'https://koshokai.github.io/nihonggo-dojo-audio/ja/';
+  window.AUD_ZH = (window.DOJO_APP && DOJO_APP.remote || '') + 'audio/';
+  // 英语的录音（en-k/、en-h/、en-listen/ 和目录 index-en*.json）
+  // 放在另一个仓库的 GitHub Pages 上：一个 GitHub Pages 网站最多 1 GB，主站放不下（koshokai/nihonggo-dojo-audio）
+  window.AUD_EN = 'https://koshokai.github.io/nihonggo-dojo-audio/';
+  window.audIdxBase = code => code === 'en' ? AUD_EN : code === 'zh' ? AUD_ZH : AUD;
+  // App 里没有 Service Worker：录音目录（index-*.json，共约 2 MB）存在手机里，启动时先用存的那份（马上能播录音），同时在后台更新
+  if (window.DOJO_APP && window.caches) {
+    const net = window.fetch.bind(window), IDX = /\/index-[\w-]+\.json$/;
+    window.fetch = (u, o) => {
+      if (o || typeof u !== 'string' || !IDX.test(u) || !/^https:/.test(u)) return net(u, o);
+      return caches.open('audio-idx').then(c => c.match(u).then(hit => {
+        const fresh = net(u).then(r => { if (r.ok) c.put(u, r.clone()).catch(() => {}); return r; });
+        if (hit) { fresh.catch(() => {}); return hit; }
+        return fresh;
+      })).catch(() => net(u));
+    };
+  }
+  window.audUrl = f => /^https?:/.test(f) ? f : (/^en-(k|h|listen)\//.test(f) ? AUD_EN : /^zh(-h)?\//.test(f) ? AUD_ZH : AUD) + f;   // 会员录音是完整的临时地址（member.js memberSign）
+</script>
+<script src="i18n.js"></script>
+<script src="mascot.js"></script>
+<script src="fx.js"></script>
+<script src="japlus.js"></script>
+<script src="kanapad.js"></script>
+<script src="swipe.js"></script>
+<script src="conv.js"></script>
+<script src="pitch.js"></script>
+<script src="tour.js"></script>
+<script src="vocab.js"></script>
+<script src="kanji.js"></script>
+<script src="grammar.js"></script>
+<script src="data.js"></script>
+<script>
+// 打开速度：注音表（furi-map.js，约 300 KB）和今日一句（daily.js）只有日语板块用。学中文、英语、打开的也不是日语页面时，
+// 先不加载（页面出来以后再在后台加载，app.js 的 LAZY_JA）；去日语页面时 render 会等它们加载好
+(function () {
+  var tr = 'ja';
+  try { tr = JSON.parse(localStorage.getItem('nihongo-dojo:v1') || '{}').track || 'ja'; } catch (e) { /* 忽略 */ }
+  var later = (tr === 'zh' || tr === 'en') && (!location.hash || /^#(zh|en|me|path|check|diag|fav|calendar|offline|buddy|duel|vip|hi|about|commute)\b/.test(location.hash));
+  if (later) window.LAZY_JA = ['furi-map.js', 'daily.js'];
+  else document.write('<script src="furi-map.js"><\/script><script src="daily.js"><\/script>');
+})();
+</script>
+<script src="game.js"></script>
+<script src="dict.js"></script>
+<script src="read.js"></script>
+<script src="week.js"></script>
+<script src="vip.js"></script>
+<script src="en.js"></script>
+<script src="en-study.js"></script>
+<script src="en-course.js"></script>
+<script src="en-path.js"></script>
+<script src="exam2.js"></script>
+<script src="anime.js"></script>
+<script src="course.js"></script>
+<script src="duel.js"></script>
+<script src="buddy.js"></script>
+<script src="trans.js"></script>
+<script src="conj.js"></script>
+<script src="dictation.js"></script>
+<script src="strokes.js"></script>
+<script src="sharecard.js"></script>
+<script src="share.js"></script>
+<script src="invite.js"></script>
+<script src="levelcheck.js"></script>
+<script src="diagnose.js"></script>
+<script src="path.js"></script>
+<script src="weak.js"></script>
+<script src="hub.js"></script>
+<script src="leaderboard.js"></script>
+<script src="biz.js"></script>
+<script src="shadow.js"></script>
+<script src="listen.js"></script>
+<script src="lang.js"></script>
+<script src="lang2.js"></script>
+<script src="zh.js"></script>
+<script src="practice2.js"></script>
+<script src="week2.js"></script>
+<script src="zh-biz.js"></script>
+<script src="stats.js"></script>
+<script src="config.js"></script>
+<script src="member.js"></script>
+<script src="cloud.js"></script>
+<script src="inbox.js"></script>
+<script src="online.js"></script>
+<script src="guest.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

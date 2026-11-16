@@ -1,0 +1,13 @@
+__pycache__/
+# 助手正在写的内容文件：写完、检查过后再用 git add -f 提交
+tools/kozh/ex_zh_*.tsv
+tools/lang2/*_listen[0-9].json
+tools/lang2/ko_grammar[0-9].json
+tools/lang2/*_reading[0-9].json
+tools/lexam/*_[0-9].json
+tools/anime/*.json
+tools/lang2/*_biz[0-9].json
+
+# 情景课程原稿：放在私有仓库里，公开仓库只放网站用的样课数据（lang/ja-course*.json）
+tools/course/*.json
+audio-new/

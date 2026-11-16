@@ -1,0 +1,430 @@
+[
+ {
+  "name": "四国めたん",
+  "styles": {
+   "ノーマル": 2,
+   "あまあま": 0,
+   "ツンツン": 6,
+   "セクシー": 4,
+   "ささやき": 36,
+   "ヒソヒソ": 37
+  },
+  "sample": "samples/002-四国めたん.mp3",
+  "policy": "四国めたんの音声ライブラリを用いて生成した音声は、 「VOICEVOX:四国めたん」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://zunko.jp/con_ongen_kiyaku.html "
+ },
+ {
+  "name": "ずんだもん",
+  "styles": {
+   "ノーマル": 3,
+   "あまあま": 1,
+   "ツンツン": 7,
+   "セクシー": 5,
+   "ささやき": 22,
+   "ヒソヒソ": 38,
+   "ヘロヘロ": 75,
+   "なみだめ": 76
+  },
+  "sample": "samples/003-ずんだもん.mp3",
+  "policy": "ずんだもんの音声ライブラリを用いて生成した音声は、 「VOICEVOX:ずんだもん」とそれぞれクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://zunko.jp/con_ongen_kiyaku.html "
+ },
+ {
+  "name": "春日部つむぎ",
+  "styles": {
+   "ノーマル": 8
+  },
+  "sample": "samples/008-春日部つむぎ.mp3",
+  "policy": "春日部つむぎの音声ライブラリを用いて生成した音声は、 「VOICEVOX:春日部つむぎ」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://tsumugi-official.studio.site/rule "
+ },
+ {
+  "name": "雨晴はう",
+  "styles": {
+   "ノーマル": 10
+  },
+  "sample": "samples/010-雨晴はう.mp3",
+  "policy": "雨晴はうの音声ライブラリを用いて生成した音声は、 「VOICEVOX:雨晴はう」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://amehau.com/?page_id=225 "
+ },
+ {
+  "name": "波音リツ",
+  "styles": {
+   "ノーマル": 9,
+   "クイーン": 65
+  },
+  "sample": "samples/009-波音リツ.mp3",
+  "policy": "波音リツの音声ライブラリを用いて生成した音声は、 「VOICEVOX:波音リツ」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 http://canon-voice.com/kiyaku.html "
+ },
+ {
+  "name": "玄野武宏",
+  "styles": {
+   "ノーマル": 11,
+   "喜び": 39,
+   "ツンギレ": 40,
+   "悲しみ": 41
+  },
+  "sample": "samples/011-玄野武宏.mp3",
+  "policy": "玄野武宏の音声ライブラリを用いて生成した音声は、 「VOICEVOX:玄野武宏」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://www.virvoxproject.com/voicevoxの利用規約 "
+ },
+ {
+  "name": "白上虎太郎",
+  "styles": {
+   "ふつう": 12,
+   "わーい": 32,
+   "びくびく": 33,
+   "おこ": 34,
+   "びえーん": 35
+  },
+  "sample": "samples/012-白上虎太郎.mp3",
+  "policy": "白上虎太郎の音声ライブラリを用いて生成した音声は、 「VOICEVOX:白上虎太郎」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://www.virvoxproject.com/voicevoxの利用規約 "
+ },
+ {
+  "name": "青山龍星",
+  "styles": {
+   "ノーマル": 13,
+   "熱血": 81,
+   "不機嫌": 82,
+   "喜び": 83,
+   "しっとり": 84,
+   "かなしみ": 85,
+   "囁き": 86
+  },
+  "sample": "samples/013-青山龍星.mp3",
+  "policy": "個人が青山龍星の音声ライブラリを用いて生成した音声は、 「VOICEVOX:青山龍星」とクレジットを記載すれば、商用・非商用で利用可能です。 ただし企業が携わる形で利用する場合は、「ななはぴ(https://v.seventhh.com/contact/)」に対し事前確認を取る必要があります。 利用規約の詳細は以下をご確認ください。 https://www.virvoxproject.com/voicevoxの利用規約 "
+ },
+ {
+  "name": "冥鳴ひまり",
+  "styles": {
+   "ノーマル": 14
+  },
+  "sample": "samples/014-冥鳴ひまり.mp3",
+  "policy": "冥鳴ひまりの音声ライブラリを用いて生成した音声は、 「VOICEVOX:冥鳴ひまり」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://meimeihimari.wixsite.com/himari/terms-of-use "
+ },
+ {
+  "name": "九州そら",
+  "styles": {
+   "ノーマル": 16,
+   "あまあま": 15,
+   "ツンツン": 18,
+   "セクシー": 17,
+   "ささやき": 19
+  },
+  "sample": "samples/016-九州そら.mp3",
+  "policy": "九州そらの音声ライブラリを用いて生成した音声は、 「VOICEVOX:九州そら」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://zunko.jp/con_ongen_kiyaku.html "
+ },
+ {
+  "name": "もち子さん",
+  "styles": {
+   "ノーマル": 20,
+   "セクシー／あん子": 66,
+   "泣き": 77,
+   "怒り": 78,
+   "喜び": 79,
+   "のんびり": 80
+  },
+  "sample": "samples/020-もち子さん.mp3",
+  "policy": "個人がもち子さんの音声ライブラリを用いて生成した音声は、 「VOICEVOX:もち子(cv 明日葉よもぎ)」とクレジットを記載すれば、 音声作品・音声素材・ゲーム作品等を除いて商用・非商用で利用可能です。 ただし企業が携わる形で利用する場合は、「[もちぞら模型店](https://vtubermochio.wixsite.com/mochizora/contact)」に対し事前確認を取る必要があります。 利用規約の詳細は以下をご確認ください。 https://vtubermochio.wixsite.com/mochizora/利用規約 "
+ },
+ {
+  "name": "剣崎雌雄",
+  "styles": {
+   "ノーマル": 21
+  },
+  "sample": "samples/021-剣崎雌雄.mp3",
+  "policy": "剣崎雌雄の音声ライブラリを用いて生成した音声は、 「VOICEVOX:剣崎雌雄」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://frontier.creatia.cc/fanclubs/413/posts/4507 "
+ },
+ {
+  "name": "WhiteCUL",
+  "styles": {
+   "ノーマル": 23,
+   "たのしい": 24,
+   "かなしい": 25,
+   "びえーん": 26
+  },
+  "sample": "samples/023-WhiteCUL.mp3",
+  "policy": "WhiteCULの音声ライブラリを用いて生成した音声は、 「VOICEVOX:WhiteCUL」とそれぞれクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://www.whitecul.com/guideline "
+ },
+ {
+  "name": "後鬼",
+  "styles": {
+   "人間ver.": 27,
+   "ぬいぐるみver.": 28,
+   "人間（怒り）ver.": 87,
+   "鬼ver.": 88
+  },
+  "sample": "samples/027-後鬼.mp3",
+  "policy": "個人が後鬼の音声ライブラリを用いて生成した音声は、 「VOICEVOX:後鬼」とクレジットを記載すれば、商用・非商用で利用可能です。 ただし企業が携わる形で利用する場合は、「[【鬼っ子ハンターついなちゃん】プロジェクト](https://ついなちゃん.com/mail/)」に対し事前確認を取る必要があります。 利用規約の詳細は以下をご確認ください。 https://ついなちゃん.com/voicevox_terms/ "
+ },
+ {
+  "name": "No.7",
+  "styles": {
+   "ノーマル": 29,
+   "アナウンス": 30,
+   "読み聞かせ": 31
+  },
+  "sample": "samples/029-No.7.mp3",
+  "policy": "個人がNo.7の音声ライブラリを用いて生成した音声は、 「VOICEVOX:No.7」とクレジットを記載すれば、非商用（同人利用や配信による収入はOK）で利用可能です。 その他商用利用の場合は、「[No.7製作委員会](https://voiceseven.com/)」に対し事前確認を取る必要があります。 利用規約の詳細は以下をご確認ください。 https://voiceseven.com/#j0200 "
+ },
+ {
+  "name": "ちび式じい",
+  "styles": {
+   "ノーマル": 42
+  },
+  "sample": "samples/042-ちび式じい.mp3",
+  "policy": "ちび式じいの音声ライブラリを用いて生成した音声は、 「VOICEVOX:ちび式じい」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://docs.google.com/presentation/d/1AcD8zXkfzKFf2ertHwWRwJuQXjNnijMxhz7AJzEkaI4 "
+ },
+ {
+  "name": "櫻歌ミコ",
+  "styles": {
+   "ノーマル": 43,
+   "第二形態": 44,
+   "ロリ": 45
+  },
+  "sample": "samples/043-櫻歌ミコ.mp3",
+  "policy": "櫻歌ミコの音声ライブラリを用いて生成した音声は、 「VOICEVOX:櫻歌ミコ」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://voicevox35miko.studio.site/rule "
+ },
+ {
+  "name": "小夜/SAYO",
+  "styles": {
+   "ノーマル": 46
+  },
+  "sample": "samples/046-小夜/SAYO.mp3",
+  "policy": "小夜/SAYOの音声ライブラリを用いて生成した音声は、 「VOICEVOX:小夜/SAYO」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://316soramegu.wixsite.com/sayo-official/guideline "
+ },
+ {
+  "name": "ナースロボ＿タイプＴ",
+  "styles": {
+   "ノーマル": 47,
+   "楽々": 48,
+   "恐怖": 49,
+   "内緒話": 50
+  },
+  "sample": "samples/047-ナースロボ＿タイプＴ.mp3",
+  "policy": "ナースロボ＿タイプＴの音声ライブラリを用いて生成した音声は、 「VOICEVOX:ナースロボ＿タイプＴ」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://www.krnr.top/rules "
+ },
+ {
+  "name": "†聖騎士 紅桜†",
+  "styles": {
+   "ノーマル": 51
+  },
+  "sample": "samples/051-†聖騎士 紅桜†.mp3",
+  "policy": "†聖騎士 紅桜†の音声ライブラリを用いて生成した音声は、 「VOICEVOX:†聖騎士 紅桜†」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://commons.nicovideo.jp/material/nc296132 "
+ },
+ {
+  "name": "雀松朱司",
+  "styles": {
+   "ノーマル": 52
+  },
+  "sample": "samples/052-雀松朱司.mp3",
+  "policy": "雀松朱司の音声ライブラリを用いて生成した音声は、 「VOICEVOX:雀松朱司」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://www.virvoxproject.com/voicevoxの利用規約 "
+ },
+ {
+  "name": "麒ヶ島宗麟",
+  "styles": {
+   "ノーマル": 53
+  },
+  "sample": "samples/053-麒ヶ島宗麟.mp3",
+  "policy": "麒ヶ島宗麟の音声ライブラリを用いて生成した音声は、 「VOICEVOX:麒ヶ島宗麟」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://www.virvoxproject.com/voicevoxの利用規約 "
+ },
+ {
+  "name": "春歌ナナ",
+  "styles": {
+   "ノーマル": 54
+  },
+  "sample": "samples/054-春歌ナナ.mp3",
+  "policy": "春歌ナナの音声ライブラリを用いて生成した音声は、 「VOICEVOX:春歌ナナ」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://nanahira.jp/haruka_nana/guideline.html "
+ },
+ {
+  "name": "猫使アル",
+  "styles": {
+   "ノーマル": 55,
+   "おちつき": 56,
+   "うきうき": 57,
+   "つよつよ": 110,
+   "へろへろ": 111
+  },
+  "sample": "samples/055-猫使アル.mp3",
+  "policy": "猫使アルの音声ライブラリを用いて生成した音声は、 「VOICEVOX:猫使アル」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://nekotukarb.wixsite.com/nekonohako/利用規約 "
+ },
+ {
+  "name": "猫使ビィ",
+  "styles": {
+   "ノーマル": 58,
+   "おちつき": 59,
+   "人見知り": 60,
+   "つよつよ": 112
+  },
+  "sample": "samples/058-猫使ビィ.mp3",
+  "policy": "猫使ビィの音声ライブラリを用いて生成した音声は、 「VOICEVOX:猫使ビィ」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://nekotukarb.wixsite.com/nekonohako/利用規約 "
+ },
+ {
+  "name": "中国うさぎ",
+  "styles": {
+   "ノーマル": 61,
+   "おどろき": 62,
+   "こわがり": 63,
+   "へろへろ": 64
+  },
+  "sample": "samples/061-中国うさぎ.mp3",
+  "policy": "中国うさぎの音声ライブラリを用いて生成した音声は、 「VOICEVOX:中国うさぎ」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://zunko.jp/con_ongen_kiyaku.html "
+ },
+ {
+  "name": "栗田まろん",
+  "styles": {
+   "ノーマル": 67
+  },
+  "sample": "samples/067-栗田まろん.mp3",
+  "policy": "栗田まろんの音声ライブラリを用いて生成した音声は、 「VOICEVOX:栗田まろん」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://aivoice.jp/character/maron/ "
+ },
+ {
+  "name": "あいえるたん",
+  "styles": {
+   "ノーマル": 68
+  },
+  "sample": "samples/068-あいえるたん.mp3",
+  "policy": "あいえるたんの音声ライブラリを用いて生成した音声は、 「VOICEVOX:あいえるたん」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://www.infiniteloop.co.jp/special/iltan/terms/ "
+ },
+ {
+  "name": "満別花丸",
+  "styles": {
+   "ノーマル": 69,
+   "元気": 70,
+   "ささやき": 71,
+   "ぶりっ子": 72,
+   "ボーイ": 73
+  },
+  "sample": "samples/069-満別花丸.mp3",
+  "policy": "満別花丸の音声ライブラリを用いて生成した音声は、 「VOICEVOX:満別花丸」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://100hanamaru.wixsite.com/manbetsu-hanamaru/rule "
+ },
+ {
+  "name": "琴詠ニア",
+  "styles": {
+   "ノーマル": 74
+  },
+  "sample": "samples/074-琴詠ニア.mp3",
+  "policy": "琴詠ニアの音声ライブラリを用いて生成した音声は、 「VOICEVOX:琴詠ニア」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://commons.nicovideo.jp/works/nc315435 "
+ },
+ {
+  "name": "Voidoll",
+  "styles": {
+   "ノーマル": 89
+  },
+  "sample": "samples/089-Voidoll.mp3",
+  "policy": "個人がVoidollの音声ライブラリを用いて生成した音声は、 「VOICEVOX:Voidoll(CV:丹下桜)」とクレジットを記載すれば、商用・非商用で利用可能です。 ただし法人による利用の場合は、個別に問い合わせ(https://qa.nicovideo.jp/)が必要です。 利用規約の詳細は以下をご確認ください。 https://blog.nicovideo.jp/niconews/224589.html "
+ },
+ {
+  "name": "ぞん子",
+  "styles": {
+   "ノーマル": 90,
+   "低血圧": 91,
+   "覚醒": 92,
+   "実況風": 93
+  },
+  "sample": "samples/090-ぞん子.mp3",
+  "policy": "ぞん子の音声ライブラリを用いて生成した音声は、 「VOICEVOX:ぞん子」とクレジットを記載すれば、商用・非商用で利用可能です。 ただし商用利用の場合は、個別に問い合わせ(https://zonko.zone-energy.jp/contact)が必要です。 利用規約の詳細は以下をご確認ください。 https://zonko.zone-energy.jp/guideline "
+ },
+ {
+  "name": "中部つるぎ",
+  "styles": {
+   "ノーマル": 94,
+   "怒り": 95,
+   "ヒソヒソ": 96,
+   "おどおど": 97,
+   "絶望と敗北": 98
+  },
+  "sample": "samples/094-中部つるぎ.mp3",
+  "policy": "中部つるぎの音声ライブラリを用いて生成した音声は、 「VOICEVOX:中部つるぎ」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://zunko.jp/con_ongen_kiyaku.html "
+ },
+ {
+  "name": "離途",
+  "styles": {
+   "ノーマル": 99,
+   "シリアス": 101
+  },
+  "sample": "samples/099-離途.mp3",
+  "policy": "離途の音声ライブラリを用いて生成した音声は、 「VOICEVOX:離途」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://litmus9.com/#/voicebank#rules "
+ },
+ {
+  "name": "黒沢冴白",
+  "styles": {
+   "ノーマル": 100
+  },
+  "sample": "samples/100-黒沢冴白.mp3",
+  "policy": "黒沢冴白の音声ライブラリを用いて生成した音声は、 「VOICEVOX:黒沢冴白」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://www.virvoxproject.com/voicevoxの利用規約 "
+ },
+ {
+  "name": "ユーレイちゃん",
+  "styles": {
+   "ノーマル": 102,
+   "甘々": 103,
+   "哀しみ": 104,
+   "ささやき": 105,
+   "ツクモちゃん": 106
+  },
+  "sample": "samples/102-ユーレイちゃん.mp3",
+  "policy": "個人がユーレイちゃんの音声ライブラリを用いて生成した音声は、 「VOICEVOX:ユーレイちゃん(CV:神崎零)」とクレジットを記載すれば、非商用（同人利用や配信による収入は OK）で利用可能です。 その他商用利用の場合は、「[ユーステラ](https://u-stella.co.jp/)」に対し事前確認を取る必要があります。 利用規約の詳細は以下をご確認ください。 https://u-stella.co.jp/voicevox-ure-chan-tucumo-terms-of-use/ "
+ },
+ {
+  "name": "東北ずん子",
+  "styles": {
+   "ノーマル": 107
+  },
+  "sample": "samples/107-東北ずん子.mp3",
+  "policy": "東北ずん子の音声ライブラリを用いて生成した音声は、 「VOICEVOX:東北ずん子」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://zunko.jp/con_ongen_kiyaku.html "
+ },
+ {
+  "name": "東北きりたん",
+  "styles": {
+   "ノーマル": 108
+  },
+  "sample": "samples/108-東北きりたん.mp3",
+  "policy": "東北きりたんの音声ライブラリを用いて生成した音声は、 「VOICEVOX:東北きりたん」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://zunko.jp/con_ongen_kiyaku.html "
+ },
+ {
+  "name": "東北イタコ",
+  "styles": {
+   "ノーマル": 109
+  },
+  "sample": "samples/109-東北イタコ.mp3",
+  "policy": "東北イタコの音声ライブラリを用いて生成した音声は、 「VOICEVOX:東北イタコ」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://zunko.jp/con_ongen_kiyaku.html "
+ },
+ {
+  "name": "あんこもん",
+  "styles": {
+   "ノーマル": 113,
+   "つよつよ": 114,
+   "よわよわ": 115,
+   "けだるげ": 116,
+   "ささやき": 117
+  },
+  "sample": "samples/113-あんこもん.mp3",
+  "policy": "あんこもんの音声ライブラリを用いて生成した音声は、 「VOICEVOX:あんこもん」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://zunko.jp/con_ongen_kiyaku.html "
+ },
+ {
+  "name": "夜語トバリ",
+  "styles": {
+   "ノーマル": 118,
+   "明るい": 119,
+   "哀しみ": 120,
+   "呆れ": 121
+  },
+  "sample": "samples/118-夜語トバリ.mp3",
+  "policy": "夜語トバリの音声ライブラリを用いて生成した音声は、 「VOICEVOX:夜語トバリ」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://yogataritobari.studio.site/#rules "
+ },
+ {
+  "name": "暁記ミタマ",
+  "styles": {
+   "ノーマル": 122,
+   "怒り": 123,
+   "哀しみ": 124,
+   "ささやき": 125
+  },
+  "sample": "samples/122-暁記ミタマ.mp3",
+  "policy": "暁記ミタマの音声ライブラリを用いて生成した音声は、 「VOICEVOX:暁記ミタマ」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://yogataritobari.studio.site/#rules "
+ },
+ {
+  "name": "里石ユカ",
+  "styles": {
+   "つぼみ": 126
+  },
+  "sample": "samples/126-里石ユカ.mp3",
+  "policy": "里石ユカ（つぼみ）の音声ライブラリを用いて生成した音声は、 「VOICEVOX:里石ユカ（つぼみ）」とクレジットを記載すれば、商用・非商用で利用可能です。 利用規約の詳細は以下をご確認ください。 https://satoishiyuka.wixsite.com/satoishi/kiyaku "
+ }
+]

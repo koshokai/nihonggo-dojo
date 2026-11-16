@@ -1,0 +1,108 @@
+# 在 GitHub 的 Mac 机器上编译 iPhone App（不需要自己的 Mac）。在 Actions 页面手动运行。
+#   upload = true（默认）：签名、打包，上传到 App Store Connect → 几分钟到半小时后出现在 TestFlight
+#   upload = false：只检查能不能编译通过（模拟器版本，不签名）
+# 需要的仓库 Secrets（只填在 GitHub，不放进代码）：ASC_KEY_ID、ASC_ISSUER_ID、ASC_KEY_P8（App Store Connect API 密钥）、APPLE_TEAM_ID
+# 签名证书和描述文件由 Xcode 用 API 密钥自动创建（-allowProvisioningUpdates），不用手动管理。打包时先不签名，导出上传时再由 Xcode 用 API 密钥签发布版（Apple Distribution），不需要登记测试设备。
+name: iOS app build
+on:
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: 上传到 TestFlight（false = 只检查编译）
+        type: boolean
+        default: true
+      version:
+        description: 版本号（App Store 上显示的，例如 1.0.0）
+        default: '1.0.0'
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode 26（App Store 要求用 iOS 26 SDK 以上编译）
+        run: |
+          ls -d /Applications/Xcode*.app
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          test -n "$X" || { echo "这台机器上没有 Xcode 26"; exit 1; }
+          sudo xcode-select -s "$X/Contents/Developer"
+          xcodebuild -version
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Web files → app/www
+        working-directory: app
+        run: |
+          npm ci --no-audit --no-fund
+          node build-web.mjs
+          npx cap sync ios
+
+      - name: Build (simulator, unsigned)
+        if: ${{ !inputs.upload }}
+        working-directory: app/ios/App
+        run: |
+          set -o pipefail
+          xcodebuild -project App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/dd" CODE_SIGNING_ALLOWED=NO build | tail -40
+          A=$(find "$RUNNER_TEMP/dd/Build/Products" -name App.app -maxdepth 2 | head -1)
+          test -f "$A/PrivacyInfo.xcprivacy" || { echo "App 里没有 PrivacyInfo.xcprivacy"; exit 1; }
+          plutil -lint "$A/PrivacyInfo.xcprivacy"
+
+      - name: API key
+        if: ${{ inputs.upload }}
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          test -n "$ASC_KEY_ID" -a -n "$ASC_KEY_P8" || { echo "缺少 Secrets：ASC_KEY_ID / ASC_KEY_P8"; exit 1; }
+          mkdir -p "$RUNNER_TEMP/keys"
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/keys/AuthKey_$ASC_KEY_ID.p8"
+
+      - name: Archive (unsigned; signed at export)
+        if: ${{ inputs.upload }}
+        working-directory: app/ios/App
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -o pipefail
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" archive \
+            DEVELOPMENT_TEAM="$TEAM" CODE_SIGNING_ALLOWED=NO \
+            MARKETING_VERSION="${{ inputs.version }}" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" | tail -60
+
+      - name: Export & upload to App Store Connect
+        if: ${{ inputs.upload }}
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -o pipefail
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$TEAM</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          EOF
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey_$ASC_KEY_ID.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" | tail -60
+          echo "已上传：版本 ${{ inputs.version }}（构建号 $BUILD_NUMBER）。在 App Store Connect → TestFlight 里等它处理完成。"
+
+      - name: Clean up key
+        if: ${{ always() }}
+        run: rm -rf "$RUNNER_TEMP/keys"

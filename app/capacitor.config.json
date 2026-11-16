@@ -1,0 +1,10 @@
+{
+  "appId": "com.koshokai.omnisphere",
+  "appName": "猫先生",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#FFF7F9",
+    "limitsNavigationsToAppBoundDomains": false
+  }
+}
