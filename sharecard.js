@@ -176,6 +176,43 @@ async function shareCertCanvas(tr, lv, pct, at, qr) {
   return c;
 }
 
+// 邀请图（「我的 → 邀请好友」分享用）：大二维码 + 邀请码 + 「送你 3 天会员」。code 邀请码，url 二维码里的网址
+async function shareInviteCanvas(code, url) {
+  const W = 1080, H = 1350, c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const x = c.getContext('2d'), tr = scTr(), th = SC_THEME[tr], T = (zh, ja) => scT(tr, zh, ja), F = (w, px) => scFont(tr, w, px);
+  const lang = { ja: T('日语', '日本語'), en: T('英语', '英語'), zh: T('中文', '中国語') }[tr];
+  scBackground(x, W, H, th);
+  // 顶部：吉祥物 + 名字
+  const img = await scMascot(tr, 'happy');
+  if (img) x.drawImage(img, 70, 50, 130, 140);
+  x.textAlign = 'left'; x.fillStyle = th.deep; x.font = F(900, 60); x.fillText(BRAND, 220, 118);
+  x.fillStyle = '#5E5260'; x.font = F(600, 30); x.fillText(T(`和我一起学${lang}`, `一緒に${lang}を学ぼう`), 222, 168);
+  // 大标题
+  x.textAlign = 'center'; x.fillStyle = th.main; x.font = F(900, 92);
+  x.fillText(T('送你 3 天会员', '3 日間メンバー無料'), W / 2, 330);
+  x.fillStyle = '#5E5260'; x.font = F(600, 34);
+  x.fillText(T('日语 · 英语 · 中文　三种语言都能学', '日本語・英語・中国語　3 言語すべて'), W / 2, 392);
+  // 白色卡片：二维码
+  const cw = 640, ch = 760, cx = (W - cw) / 2, cy = 450;
+  scCard(x, cx, cy, cw, ch, 48);
+  const qs = 500, qx = (W - qs) / 2, qy = cy + 56;
+  if (typeof qrcode === 'function') refDrawQR(x, url, qx, qy, qs, '#2A2226');
+  x.fillStyle = th.deep; x.font = F(800, 40); x.fillText(T('扫码注册', 'QR コードから登録'), W / 2, qy + qs + 70);
+  // 邀请码（胶囊）
+  x.font = '800 46px "SF Mono",Menlo,Consolas,monospace';
+  const label = T('邀请码', '招待コード'), cwid = x.measureText(code).width;
+  x.font = F(600, 28); const lw = x.measureText(label).width;
+  const pw = lw + cwid + 80, px0 = (W - pw) / 2, py0 = qy + qs + 100;
+  x.fillStyle = th.soft; scRound(x, px0, py0, pw, 72, 36); x.fill();
+  x.textAlign = 'left'; x.fillStyle = '#5E5260'; x.fillText(label, px0 + 32, py0 + 46);
+  x.fillStyle = th.main; x.font = '800 46px "SF Mono",Menlo,Consolas,monospace'; x.fillText(code, px0 + 48 + lw, py0 + 52);
+  // 底部说明
+  x.textAlign = 'center'; x.fillStyle = '#5E5260'; x.font = F(500, 28);
+  x.fillText(T('扫码 → 下载 App → 登录后粘贴邀请码，就能领取', 'QR を読み取る → App をダウンロード → ログイン後にコードを貼り付け'), W / 2, H - 70);
+  return c;
+}
+
 // 分享图上的二维码：带我的邀请码的网址（没登录就只放网站地址）；用户关掉了就不放
 async function scQR() {
   if (S.shareNoQR || typeof refQRLib !== 'function') return '';

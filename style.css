@@ -1714,3 +1714,14 @@ details.gp summary > :last-child:not(.pat):not(.muted) { grid-area: fav; }
 .inv-have summary { cursor: pointer; color: var(--ai); font-size: .9rem; }
 .inv-have input { flex: 1; min-width: 0; text-transform: uppercase; letter-spacing: .1em; }
 .sc-qr { display: flex; gap: 6px; align-items: flex-start; }
+/* 扫邀请二维码的落地页、App 里问邀请码：盖在登录页上面 */
+.inv-land { z-index: 120; background: rgba(20, 10, 18, .5); }
+.inv-land .ask-box { max-width: 380px; text-align: center; }
+.inv-land h2 { margin: 0; font-size: 1.35rem; }
+.inv-land .inv-code { justify-content: center; text-align: center; }
+.inv-land .btn { width: 100%; justify-content: center; }
+.inv-land .row .btn, .inv-land .ask-opts .btn { width: auto; }
+.inv-land input { flex: 1; min-width: 0; text-transform: uppercase; letter-spacing: .1em; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; font: inherit; background: var(--surface); color: var(--ink); }
+.inv-land-top { display: flex; align-items: center; gap: 10px; justify-content: center; text-align: left; }
+.inv-land-top svg { width: 56px; height: 60px; }
+.inv-land-top > div { display: grid; }
