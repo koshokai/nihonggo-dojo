@@ -18,9 +18,10 @@ jobs:
   build:
     runs-on: macos-15
     timeout-minutes: 60
-    env:
-      BUILD_NUMBER: ${{ github.run_number }}
     steps:
+      # 构建号必须比以前上传过的都大。公开仓库是新建的，运行编号从 1 重新开始；旧仓库最后一次是 34，所以加 100
+      - name: 构建号
+        run: echo "BUILD_NUMBER=$((GITHUB_RUN_NUMBER + 100))" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
       - name: Xcode 26（App Store 要求用 iOS 26 SDK 以上编译）
         run: |
