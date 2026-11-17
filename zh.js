@@ -631,31 +631,41 @@ function zhGrammarItem(id) {
 }
 
 /* ---------- 听力 ---------- */
-// 一句一句播放（男声的句子降调播放，听起来像两个人），每题自动播放一次，答完显示原文、拼音、翻译和解析
+// 一句一句播放，每题自动播放一次，答完显示原文、拼音、翻译和解析。
+// 每个人用自己的声音：第一个女声（F）和旁白（N）是 MeloTTS 的录音（index-zh.json，按原文）；
+// 男声（M、M2）和第二个女声（F2）是 Kokoro 的录音（index-zh-voices.json，按「说话人|原文」；会员题在私有存储，索引 audio/zh-voices.json）。
+// 没有这个人的录音就不播（不拿女声的录音冒充），接下一句。
 let zhListenLv = '';
+let ZH_VOICES = null, ZH_VOICES_READY = null;
+const zhVoiceIdx = () => ZH_VOICES || (ZH_VOICES = jsonOr(`${AUD_EN}index-zh-voices.json`).then(d => (ZH_VOICES_READY = d)));
+const zhOwnVoice = spk => spk !== 'F' && spk !== 'N';
 function zhPlayLines(lines, onDone) {
   let i = 0, stop = false;
   const el = langPlayer();
   const next = () => {
     if (stop || i >= lines.length) { el.onended = null; if (!stop && onDone) onDone(); return; }
     const [spk, zh] = lines[i++];
-    const idx = LANG_IDX_READY.zh || {}, file = idx[zh];
+    const own = zhOwnVoice(spk), key = `${spk}|${zh}`;
+    const file = own ? (ZH_VOICES_READY || {})[key] : (LANG_IDX_READY.zh || {})[zh];
     // 会员题：录音在私有存储里，取临时地址
     if (!file && S.voiceSrc !== 'tts' && typeof memberTextAudio === 'function' && isMember('zh')) {
       langUnlock();
-      memberTextAudio('zh', zh).then(u => { if (!stop) playLine(spk, zh, u); }, () => { if (!stop) playLine(spk, zh, null); });
+      memberTextAudio('zh', own ? key : zh, own ? 'zh-voices' : 'zh').then(u => { if (!stop) playLine(u); }, () => { if (!stop) playLine(null); });
       return;
     }
-    playLine(spk, zh, file);
+    playLine(file);
   };
-  const playLine = (spk, zh, file) => {
+  const playLine = file => {
     if (!file) return noVoice(next);   // 没有录音：不用手机朗读，接下一句
-    el.src = audUrl(file); el.preservesPitch = el.mozPreservesPitch = el.webkitPreservesPitch = spk !== 'M';
-    el.defaultPlaybackRate = el.playbackRate = spk === 'M' ? .86 : 1;
+    el.src = audUrl(file); el.defaultPlaybackRate = el.playbackRate = 1;
     el.onended = () => setTimeout(next, 350);
     el.play().catch(() => { el.onended = null; });
   };
-  langAudioIdx('zh'); stopSpeech(); el.pause(); next();
+  stopSpeech(); el.pause();
+  // 两个录音目录都加载好了再开始（第一次要等网络：先在点击当下解锁播放器，iPhone 才能接着自动播放）
+  const go = () => { if (!stop) next(); };
+  if (LANG_IDX_READY.zh && ZH_VOICES_READY) go();
+  else { langUnlock(); Promise.all([langAudioIdx('zh'), zhVoiceIdx()]).then(go, go); }
   return () => { stop = true; el.pause(); el.onended = null; if (hasTTS) speechSynthesis.cancel(); };
 }
 function zhListenPage() {
@@ -710,7 +720,7 @@ function zhListenRun(items, back = 'zh/listen') {   // back：やめた・もう
     buzz(ok ? 12 : [30, 50, 30]);
     stage.querySelectorAll('[data-o]').forEach((b, j) => { b.disabled = true; if (j === x.a) b.classList.add('right'); else if (j === k) b.classList.add('wrong'); });
     stage.querySelector('[data-fb]').innerHTML = `<div class="feedback ${ok ? 'ok' : 'no'}">${neko(ok ? 'happy' : 'sad', 'mini')}<div class="fb-t"><b>${ok ? '正解！' : 'ドンマイ！'}</b><p class="small">${esc(x.why)}</p></div></div>
-      <details class="zh-script" open><summary class="small">スクリプト</summary>${x.lines.map(([spk, zh, ja, py]) => `<div class="zh-sent"><div class="row"><b class="small muted">${spk === 'M' ? '男' : '女'}</b><span ${ZHL}>${zhTap(zh)}</span>${zhSayBtn(zh)}</div><div class="zh-py small">${esc(py)}</div><div class="small muted">${esc(ja)}</div></div>`).join('')}
+      <details class="zh-script" open><summary class="small">スクリプト</summary>${x.lines.map(([spk, zh, ja, py]) => `<div class="zh-sent"><div class="row"><b class="small muted">${{ M: '男', M2: '男2', F2: '女2' }[spk] || '女'}</b><span ${ZHL}>${zhTap(zh)}</span>${zhSayBtn(zh)}</div><div class="zh-py small">${esc(py)}</div><div class="small muted">${esc(ja)}</div></div>`).join('')}
       ${x.words.length ? `<div class="small zh-lw">${x.words.map(([w, py, ja]) => `<span><b ${ZHL}>${esc(w)}</b> ${esc(py)} ${esc(ja)}</span>`).join('')}</div>` : ''}</details>
       <div class="row" style="justify-content:flex-end"><button class="btn pri" type="button" data-next>${i + 1 < items.length ? '次へ' : '結果を見る'}</button></div>`;
     stage.querySelector('[data-next]').onclick = () => { if (stopPlay) stopPlay(); i++; if (i < items.length) show(); else end(); };

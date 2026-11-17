@@ -78,7 +78,7 @@
   }
   // 词典里级别词表以外的词（三种语言）：录音在第二个音频仓库（ja-d/、zh-d/、en-d/，index-dict-*.json）
   window.AUD2 = 'https://koshokai.github.io/nihonggo-dojo-audio2/';
-  window.audUrl = f => /^https?:/.test(f) ? f : /^(ja|zh|en)-d\//.test(f) ? AUD2 + f : (/^en-(k|h|listen)\//.test(f) ? AUD_EN : /^zh(-h)?\//.test(f) ? AUD_ZH : AUD) + f;   // 会员录音是完整的临时地址（member.js memberSign）
+  window.audUrl = f => /^https?:/.test(f) ? f : /^(ja|zh|en)-d\//.test(f) ? AUD2 + f : (/^(en-(k|h|listen)|zh-v)\//.test(f) ? AUD_EN : /^zh(-h)?\//.test(f) ? AUD_ZH : AUD) + f;   // zh-v/：中文听力的男声（Kokoro），在音频仓库里生成   // 会员录音是完整的临时地址（member.js memberSign）
 </script>
 <script src="i18n.js"></script>
 <script src="mascot.js"></script>

@@ -190,10 +190,11 @@ async function memberAudioKeys(track, name, list, m) {
   const url = await memberSign(keys.map(k => m[k])).catch(() => ({}));
   for (const k of keys) if (url[m[k]]) AUDIO_IDX[k] = url[m[k]];
 }
-// 中文、英语的会员录音按文字查（audio/zh.json、audio/en.json：文字 → 文件），返回临时播放地址或 null
-async function memberTextAudio(track, text) {
+// 中文、英语的会员录音按文字查（audio/zh.json、audio/en.json：文字 → 文件），返回临时播放地址或 null。
+// name：别的索引（中文听力里男声等的台词：audio/zh-voices.json，key「说话人|原文」）
+async function memberTextAudio(track, text, name = track) {
   if (typeof isMember !== 'function' || !isMember(track)) return null;
-  const m = await memberData(track, `audio/${track}.json`).catch(() => null);
+  const m = await memberData(track, `audio/${name}.json`).catch(() => null);
   const p = m && m[text];
   return p ? (await memberSign([p]))[p] : null;
 }

@@ -1693,7 +1693,7 @@ function viewMe(sec) {
     <div class="row between"><span>${tj('语速', '読み上げの速さ')}</span><div class="seg">${opt(J ? [[.6, 'とてもゆっくり'], [.8, 'ゆっくり'], [.95, 'ふつう']] : [[.6, '很慢'], [.8, '慢'], [.95, '正常']], S.rate, 'data-rate')}</div></div>
     <div class="row between"><span>${tj('翻卡和答题后自动朗读', 'カードをめくった時・解答後に自動で読み上げ')}</span><div class="seg">${opt(onOff, S.autoSpeak ? 1 : 0, 'data-auto')}</div></div>
     <div class="row"><button class="btn" type="button" data-try>${tje('试听', '試しに聞く', 'Listen')}</button></div>
-    <p class="small muted">${tje('所有发音都是预先生成的人声录音（日语 VOICEVOX、中文 MeloTTS、英语 Kokoro），不使用手机自带的机器朗读。', '発音はすべて、あらかじめ用意した人の声の音声です（日本語 VOICEVOX・中国語 MeloTTS・英語 Kokoro）。端末の機械読み上げは使いません。', 'All audio is pre-generated natural voice recordings (Japanese: VOICEVOX, Chinese: MeloTTS, English: Kokoro). Your device\'s text-to-speech is never used.')}</p>
+    <p class="small muted">${tje('所有发音都是预先生成的人声录音（日语 VOICEVOX、中文 MeloTTS / Kokoro、英语 Kokoro），不使用手机自带的机器朗读。', '発音はすべて、あらかじめ用意した人の声の音声です（日本語 VOICEVOX・中国語 MeloTTS / Kokoro・英語 Kokoro）。端末の機械読み上げは使いません。', 'All audio is pre-generated natural voice recordings (Japanese: VOICEVOX, Chinese: MeloTTS / Kokoro, English: Kokoro). Your device\'s text-to-speech is never used.')}</p>
   </section>`);
   // 试听跟着正在学的语言（不是界面语言：学英语的日本用户界面是日语，但要听英语）
   const trySay = () => VTR === 'zh' ? speakLang('谢谢', 'zh-CN') : VTR === 'en' ? speakLang('hello', 'en-US') : speak('こんにちは');   // 有录音的词
