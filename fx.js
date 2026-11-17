@@ -2,12 +2,37 @@
 // 系统打开「减少动态效果」时只显示提示卡，不放动画。依赖 app.js 的 S、h、esc、neko、tj、buzz（运行时才调用）。
 const fxCalm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ---------- 翻页：新页面从书脊处翻进来；按返回时从另一侧翻回去 ---------- */
-let fxBack = false;
-addEventListener('popstate', () => { fxBack = true; });
+/* ---------- 换页：旧页面化成颗粒慢慢消失，新页面「哗」地弹出来；按返回时反方向 ---------- */
+let fxBack = false, fxRoute = null;
+// 是不是「返回」：自己记一份走过的地址（浏览器换 # 时也会发 popstate，不能用它判断）
+const fxStack = [location.hash];
+addEventListener('hashchange', () => {
+  const h = location.hash, n = fxStack.length;
+  fxBack = n > 1 && fxStack[n - 2] === h;
+  if (fxBack) fxStack.pop(); else if (fxStack[n - 1] !== h) { fxStack.push(h); if (fxStack.length > 60) fxStack.shift(); }
+});
+const fxChanged = () => location.hash !== fxRoute;   // 同一页重画（数据更新、骨架换成内容）不放动画
+// render() 清空页面之前调用：把当前画面拍成「快照」盖在上面，快照带着颗粒噪点、变模糊、慢慢消失
+function fxPageOut() {
+  const m = document.getElementById('main');
+  if (!m || fxCalm() || fxRoute === null || !fxChanged() || !m.firstElementChild) return;
+  document.querySelectorAll('.pg-ghost').forEach(g => g.remove());
+  if (m.getElementsByTagName('*').length > 2500) return;   // 很长的页面（单词表）不拍快照，只做弹出，免得手机卡
+  const r = m.getBoundingClientRect(), g = m.cloneNode(true);
+  g.removeAttribute('id'); g.removeAttribute('tabindex');
+  g.querySelectorAll('[id]').forEach(e => e.removeAttribute('id'));
+  g.classList.remove('page-in', 'page-back', 'swipe-l', 'swipe-r');
+  g.classList.add('pg-ghost');
+  if (fxBack) g.classList.add('back');
+  g.setAttribute('aria-hidden', 'true'); g.inert = true;
+  Object.assign(g.style, { top: r.top + 'px', left: r.left + 'px', width: r.width + 'px', height: Math.min(r.height, innerHeight - Math.max(0, r.top)) + 'px' });
+  document.body.append(g);
+  setTimeout(() => g.remove(), 360);
+}
 function fxPageIn() {
   const m = document.getElementById('main');
-  if (!m || fxCalm()) return;
+  const changed = fxChanged(); fxRoute = location.hash;
+  if (!m || fxCalm() || !changed) return;
   m.classList.remove('page-in', 'page-back', 'swipe-l', 'swipe-r');
   void m.offsetWidth;
   const sw = document.body.dataset.swipe;   // 左右滑动换页（swipe.js）：新页面从滑动的方向进来

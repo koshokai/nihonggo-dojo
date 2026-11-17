@@ -936,6 +936,7 @@ function render() {
   if (S.onboarded && view === 'welcome') view = 'home';
   clearInterval(examTimer); keyHandler = null; focusMode(false);
   if (lsStop) lsStop();
+  if (typeof fxPageOut === 'function') fxPageOut();   // 旧页面化成颗粒消失（fx.js）
   main.innerHTML = '';
   if (trackOf(view) === 'ja' && ['home', 'week', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict', 'study', 'ri', 'conj', 'anime', 'trans', 'dictation', 'course'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
   applyTrack(view);
@@ -965,7 +966,7 @@ function render() {
   if (view === 'welcome' && typeof introShow === 'function' && !introSeen()) introShow();
   updateTop();
   if (typeof liveBadges !== 'undefined') liveBadges.paint();   // 底部导航重画后补上小红点
-  if (typeof fxPageIn === 'function') fxPageIn();   // 翻书一样的换页
+  if (typeof fxPageIn === 'function') fxPageIn();   // 新页面「哗」地弹出来（fx.js）
 }
 // 正在做题（专注模式）时离开当前页面（返回手势、点顶部链接等）先确认，选「继续做题」就留在原地，进度不丢
 let navHash = location.hash, navGo = false;
@@ -1801,7 +1802,7 @@ function viewAbout() {
     <h3>日本語（中国語話者向け）</h3>
     <p class="small">単語・漢字・文法で JLPT N5〜N1 をカバー。ほかに読み物（「日本の暮らし」は毎日更新）、ビジネス日本語、リスニング、模擬試験があります。中国語訳・例文・文章・問題は当サイトで作成したもので、専門家による校閲は受けていません。試験対策には公式問題集や教材もあわせてご利用ください。</p>
     <p class="small muted">データの出典：単語リスト <a href="https://github.com/jamsinclair/open-anki-jlpt-decks" target="_blank" rel="noopener">open-anki-jlpt-decks</a>（MIT）、元データは <a href="http://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller の JLPT 資料</a>（CC BY）。漢字 <a href="https://github.com/davidluzgouveia/kanji-data" target="_blank" rel="noopener">kanji-data</a>（MIT）と KANJIDIC。辞書の英語訳 <a href="https://www.edrdg.org/jmdict/j_jmdict.html" target="_blank" rel="noopener">JMdict</a>（EDRDG、CC BY-SA 4.0）。</p>
-    <p class="small muted">配音：<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>:春日部つむぎ、VOICEVOX:剣崎雌雄。リスニングと場面別コースではほかに VOICEVOX:冥鳴ひまり（<a href="https://meimeihimari.wixsite.com/himari/terms-of-use" target="_blank" rel="noopener">使用条款</a>）、VOICEVOX:九州そら、VOICEVOX:雀松朱司、VOICEVOX:玄野武宏、VOICEVOX:小夜/SAYO、VOICEVOX:WhiteCUL、VOICEVOX:四国めたん、VOICEVOX:白上虎太郎、VOICEVOX:麒ヶ島宗麟を使用しています。</p>
+    <p class="small muted">配音：<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>:冥鳴ひまり（<a href="https://meimeihimari.wixsite.com/himari/terms-of-use" target="_blank" rel="noopener">使用条款</a>）、VOICEVOX:剣崎雌雄。リスニングと場面別コースではほかに VOICEVOX:春日部つむぎ、VOICEVOX:九州そら、VOICEVOX:雀松朱司、VOICEVOX:玄野武宏、VOICEVOX:小夜/SAYO、VOICEVOX:WhiteCUL、VOICEVOX:四国めたん、VOICEVOX:白上虎太郎、VOICEVOX:麒ヶ島宗麟を使用しています。</p>
     <p class="small muted">「Tatoeba」と表示された日本語の例文は <a href="https://tatoeba.org" target="_blank" rel="noopener">Tatoeba</a>（CC BY 2.0 FR）のもので、ボランティアが翻訳した日中対訳です。</p>
     <p class="small muted">漢字の筆順アニメーションは <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a>（Ulrich Apel、CC BY-SA 3.0）を使用しています。単語のアクセントは <a href="https://github.com/mifunetoshiro/kanjium" target="_blank" rel="noopener">Kanjium</a>（CC BY-SA 4.0）より：The pitch accent notation was provided by Uros O. through his free database.</p>
     <p class="small muted">読み物の写真は <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a> の自由に利用できるライセンス（CC0 / パブリックドメイン / CC BY / CC BY-SA）のもので、各写真の下に作者とライセンスを記載しています。</p>
@@ -1811,7 +1812,7 @@ function viewAbout() {
     <h3>日语</h3>
     <p class="small">单词、汉字、语法覆盖 JLPT N5–N1；另有阅读文章（「日本生活」每天上新）、商务日语、听力和模拟考。中文释义、例句、文章和题目由本站编写，未经专业审核，备考时请配合官方真题和教材。</p>
     <p class="small muted">数据来源：单词表 <a href="https://github.com/jamsinclair/open-anki-jlpt-decks" target="_blank" rel="noopener">open-anki-jlpt-decks</a>（MIT），基于 <a href="http://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller 的 JLPT 资料</a>（CC BY）；汉字 <a href="https://github.com/davidluzgouveia/kanji-data" target="_blank" rel="noopener">kanji-data</a>（MIT）与 KANJIDIC；词典英文释义 <a href="https://www.edrdg.org/jmdict/j_jmdict.html" target="_blank" rel="noopener">JMdict</a>（EDRDG，CC BY-SA 4.0）。</p>
-    <p class="small muted">配音：<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>:春日部つむぎ、VOICEVOX:剣崎雌雄；听力和情景课程另用 VOICEVOX:冥鳴ひまり（<a href="https://meimeihimari.wixsite.com/himari/terms-of-use" target="_blank" rel="noopener">使用条款</a>）、VOICEVOX:九州そら、VOICEVOX:雀松朱司、VOICEVOX:玄野武宏、VOICEVOX:小夜/SAYO、VOICEVOX:WhiteCUL、VOICEVOX:四国めたん、VOICEVOX:白上虎太郎、VOICEVOX:麒ヶ島宗麟。</p>
+    <p class="small muted">配音：<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>:冥鳴ひまり（<a href="https://meimeihimari.wixsite.com/himari/terms-of-use" target="_blank" rel="noopener">使用条款</a>）、VOICEVOX:剣崎雌雄；听力和情景课程另用 VOICEVOX:春日部つむぎ、VOICEVOX:九州そら、VOICEVOX:雀松朱司、VOICEVOX:玄野武宏、VOICEVOX:小夜/SAYO、VOICEVOX:WhiteCUL、VOICEVOX:四国めたん、VOICEVOX:白上虎太郎、VOICEVOX:麒ヶ島宗麟。</p>
     <p class="small muted">标着「Tatoeba」的日语例句来自 <a href="https://tatoeba.org" target="_blank" rel="noopener">Tatoeba</a>（CC BY 2.0 FR），是志愿者人工翻译的日中对照句。</p>
     <p class="small muted">汉字笔顺动画来自 <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a>（Ulrich Apel，CC BY-SA 3.0）。单词音调来自 <a href="https://github.com/mifunetoshiro/kanjium" target="_blank" rel="noopener">Kanjium</a>（CC BY-SA 4.0）：The pitch accent notation was provided by Uros O. through his free database.</p>
     <p class="small muted">阅读文章的照片来自 <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a>，均为可自由使用的授权（CC0 / 公有领域 / CC BY / CC BY-SA），每张照片下方注明作者和授权。</p>
