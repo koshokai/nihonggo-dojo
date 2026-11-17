@@ -61,6 +61,7 @@ function viewCommute() {
     <p class="small muted">${T2('提示：锁屏后有的手机会暂停朗读，最好保持屏幕亮着（可以调暗）。', 'ヒント：画面をロックすると読み上げが止まる端末があります。画面はつけたまま（暗くしてOK）がおすすめです。')}</p></section>`);
   ['src', 'n', 'gap', 'ex'].forEach(k => p.querySelectorAll(`[data-${k}]`).forEach(b => { b.onclick = () => { const v = b.dataset[k]; o[k] = k === 'src' ? v : k === 'ex' ? v === 'true' : +v; if (k === 'src') o.userSet = 1; save(); render(); }; }));
   p.querySelector('[data-play]').onclick = async () => {
+    if (typeof audioPrime === 'function') audioPrime();   // 点击当下解锁播放器：下面要先下载词表，过了点击那一刻 iPhone 就不让出声了
     const items = await commuteItems(o.src, o.n).catch(() => []);
     if (!items.length) return toast(T2('这里还没有内容，换一个试试', 'まだ内容がありません。別のものを選んでください'));
     commutePlay(items, o);

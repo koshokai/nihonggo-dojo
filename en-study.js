@@ -281,7 +281,7 @@ function enRunListen(qs, title, more) {
     box.querySelector('[data-count]').textContent = `${i + 1} / ${qs.length}`;
     box.querySelector('[data-bar]').style.width = (i / qs.length * 100) + '%';
     stage.innerHTML = `<div class="q-prompt pop"><div class="eyebrow">${'Read the question, then listen'}</div><p lang="en" class="small muted">${esc(x.intro)}</p><div class="q-sent" lang="en">${esc(x.q)}</div>
-      <div class="row" style="justify-content:center"><button class="btn pri" type="button" data-play>▶ ${'Play'}</button></div><div class="small muted" data-ttsnote hidden>${'Recorded audio is on its way. Using your device\'s voice for now.'}</div></div>
+      <div class="row" style="justify-content:center"><button class="btn pri" type="button" data-play>▶ ${'Play'}</button></div></div>
       <div class="opts">${x.c.map((c, j) => `<button class="opt" type="button" data-o="${j}"><span class="k">${j + 1}</span><span lang="en">${esc(c)}</span></button>`).join('')}</div><div data-fb role="status" aria-live="polite"></div>`;
     const pb = stage.querySelector('[data-play]');
     const setBtn = () => { pb.textContent = playing ? `■ ${'Stop'}` : `▶ ${answered ? 'Listen again' : 'Play'}`; };

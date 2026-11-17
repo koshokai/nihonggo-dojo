@@ -190,7 +190,7 @@ function invitePanel() {
     };
     body.querySelector('[data-save]').onclick = () => {
       if (!png) { toast(T('图片还在生成，请稍等一下再点', '画像を作成中です。少し待ってからもう一度どうぞ', 'Still preparing the image — tap again in a moment')); return; }
-      if (typeof scSave === 'function') scSave(file, png, (zh, ja) => T(zh, ja)); else { const a = document.createElement('a'); a.href = png; a.download = name; a.click(); }
+      if (typeof scSave === 'function') scSave(file, png, (zh, ja) => scT(scTr(), zh, ja)); else { const a = document.createElement('a'); a.href = png; a.download = name; a.click(); }
       showImg();
     };
     body.querySelector('[data-copy]').onclick = async () => { try { await navigator.clipboard.writeText(code); toast(T('邀请码已复制', 'コードをコピーしました', 'Code copied')); } catch (e) { prompt('', code); } };

@@ -222,7 +222,7 @@ function jmCard(e) {
   const w = e.k[0] || e.r[0];
   const sents = sentencesWith(w, 3);
   return h(`<section class="panel dict-card">
-    <div class="row between"><div class="row"><span class="dict-w furi" lang="ja">${jrWord(w, e.r[0])}</span><span class="dict-r" lang="ja">${esc(e.r.join('・'))}</span>${speakBtn(e.r[0])}</div>${e.p ? `<span class="tag">${esc(e.p)}</span>` : ''}</div>
+    <div class="row between"><div class="row"><span class="dict-w furi" lang="ja">${jrWord(w, e.r[0])}</span><span class="dict-r" lang="ja">${esc(e.r.join('・'))}</span>${speakBtn(`${w}|${e.r[0]}`)}</div>${e.p ? `<span class="tag">${esc(e.p)}</span>` : ''}</div>
     ${e.zh ? `<div class="dict-zh"><b>${esc(e.zh)}</b></div>` : ''}
     <ol class="dict-senses ${e.zh ? 'small muted' : ''}" lang="en">${e.s.map(g => `<li>${esc(g.join('; '))}</li>`).join('')}</ol>
     ${e.k.length > 1 ? `<div class="small muted">其他写法：<span lang="ja">${esc(e.k.slice(1).join('、'))}</span></div>` : ''}

@@ -294,12 +294,14 @@ const JA_IDX = Promise.all(['words', 'daily', 'examples'].map(n => fetch(`${AUD}
 let DICT_JA = null, DICT_JA_P = null;
 const dictJaIdx = () => DICT_JA_P || (DICT_JA_P = fetch(`${AUD2}index-dict-ja.json`).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(d => (DICT_JA = d)));
 // 不用手机自带的机器朗读，只放生成的人声：没有录音时不出声，提示一次，然后接着往下走（连续播放不会卡住）
-let noVoiceWarned = false;
+let noVoiceWarned = false, noVoiceTimer = 0;
 function noVoice(end) {
   if (!noVoiceWarned) { noVoiceWarned = true; toast(tje('这一句的录音还在准备中', 'この文の音声は準備中です', 'Audio for this line is coming soon')); }
-  if (end) setTimeout(end, 500);
+  clearTimeout(noVoiceTimer);
+  if (end) noVoiceTimer = setTimeout(end, 500);   // 按了停止（stopSpeech）就取消，不会多跳一句
 }
 function stopSpeech() {
+  clearTimeout(noVoiceTimer);
   if (typeof langSeq !== 'undefined') langSeq++;   // 还在等录音目录的那一次（lang.js）也取消
   if (curAudio) { curAudio.onended = curAudio.onerror = null; curAudio.pause(); curAudio = null; }
   if (hasTTS) speechSynthesis.cancel();
@@ -329,14 +331,17 @@ function audioPrime() {
   if (typeof langUnlock === 'function') langUnlock();
 }
 function speak(text, opts = {}, pre) {
-  const file = HUMAN_JA[text] || KANA_IDX[text] || AUDIO_IDX[text] || (DICT_JA && DICT_JA[text]);
+  // 词典卡片传「写法|读音」：同音词（箸 / 橋）各有自己的录音（index-dict-ja.json）；别的录音目录按读音找
+  const pair = text.includes('|') ? text : '';
+  if (pair) text = pair.split('|')[1];
+  const file = (pair && DICT_JA && DICT_JA[pair]) || HUMAN_JA[text] || KANA_IDX[text] || AUDIO_IDX[text] || (DICT_JA && DICT_JA[text]);
   // 录音目录还没加载好（刚打开时；词典的录音目录第一次用到时才下载）：先在点击当下用静音解锁一个播放器，等目录好了再放录音
   if (!file && !pre && (!JA_IDX_OK || !DICT_JA) && typeof SILENT_WAV !== 'undefined') {
     stopSpeech(); const seq = ++speakSeq;
     const a = jaPlayer(); a.onended = a.onerror = null; a.src = SILENT_WAV; a.play().catch(() => {});
     curAudio = a;
     let done = false;
-    const go = () => { if (done || seq !== speakSeq || curAudio !== a) return; done = true; curAudio = null; speak(text, opts, a); };
+    const go = () => { if (done || seq !== speakSeq || curAudio !== a) return; done = true; curAudio = null; speak(pair || text, opts, a); };
     Promise.all([JA_IDX, dictJaIdx()]).then(go); setTimeout(go, 6000);
     return;
   }
