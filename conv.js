@@ -300,7 +300,7 @@ function viewFav() {
 /* =====================================================================
    5. 离线下载录音：把一个级别的单词和例句录音存进浏览器，没网也能听
    ===================================================================== */
-const AUDIO_CACHE = 'audio-v2';
+const AUDIO_CACHE = 'audio-v3';   // 和 sw.js 的 AUDIO 一样；换名字时旧缓存被清掉，下载记录也要清掉（下面 viewOffline）
 function audioFilesFor(L) {
   if (isEn()) {   // 英语的录音在同一个域名下的音频仓库（koshokai.github.io/nihonggo-dojo-audio），service worker 一样能离线读
     const idx = LANG_IDX_READY.en || {};
@@ -317,6 +317,7 @@ function audioFilesFor(L) {
 let offlineJob = null;
 function viewOffline() {
   const J = uiJa(), zh = isZh(), en = isEn(), app = !!window.DOJO_APP;
+  if (S.offlineCache !== AUDIO_CACHE) { S.offline = {}; S.offlineCache = AUDIO_CACHE; save(); }   // 录音缓存换过名字：以前下载的已经清掉了，要重新下载
   const lvs = zh ? ZH_LEVELS.map(x => x[0]) : en ? EN_LV : LEVELS, done = (S.offline = S.offline || {});
   const p = h(`<section class="panel"><h2>⬇ ${T2('离线录音', 'オフライン音声')}</h2>
     <p class="muted">${T2('把一个级别的单词和例句录音下载到这台设备，地铁里、没网的时候也能听。', 'レベルごとに単語と例文の音声をこの端末に保存します。電波のない場所でも聞けます。')}</p>

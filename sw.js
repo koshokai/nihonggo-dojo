@@ -1,9 +1,10 @@
 // 离线缓存：打开过一次以后没有网络也能用，「添加到主屏幕」后就像一个 App。
 // 页面和脚本：有网时先取最新版（最多等 3 秒），拿到就更新缓存；没网或太慢才用缓存。所以更新后打开就是新版本。
-// 发音 MP3：文件名是内容哈希，不会变，缓存了就一直用（cache-first）。
+// 发音 MP3：先用缓存（离线也能听），同时在后台向网络确认一次，录音重录过（同名文件内容变了）就更新缓存，下次播放就是新录音。
+// AUDIO 换名字（audio-v3）：清掉以前缓存的全部录音（有些录音重录时没换文件名，听过的人一直是旧录音）。
 // 账号、同步等跨域请求（Supabase、jsDelivr）不经过缓存。
-const VERSION = 'v271';
-const SHELL = `shell-${VERSION}`, AUDIO = 'audio-v2';
+const VERSION = 'v272';
+const SHELL = `shell-${VERSION}`, AUDIO = 'audio-v3';
 const CORE = ['./', 'index.html', 'style.css', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-maskable-192.png', 'icon-maskable-512.png', 'icon.svg',
   'i18n.js', 'mascot.js', 'fx.js', 'japlus.js', 'furi-map.js', 'kanapad.js', 'swipe.js', 'conv.js', 'pitch.js', 'tour.js', 'zh.js', 'zh-biz.js', 'practice2.js', 'week2.js', 'vocab.js', 'kanji.js', 'grammar.js', 'data.js', 'daily.js', 'jlpt.js', 'game.js', 'dict.js', 'reading.js',
   'scenes.js', 'read.js', 'week.js', 'weekly.js', 'vip.js', 'en.js', 'en-study.js', 'en-course.js', 'en-path.js', 'exam2.js', 'anime.js', 'course.js', 'duel.js', 'buddy.js', 'trans.js', 'conj.js', 'dictation.js', 'strokes.js', 'sharecard.js', 'share.js', 'invite.js', 'levelcheck.js', 'diagnose.js', 'path.js', 'weak.js', 'hub.js', 'leaderboard.js', 'business.js', 'biz.js', 'shadow.js', 'listen.js', 'listening.js', 'furi-listen.js', 'lang.js', 'lang2.js', 'stats.js', 'config.js', 'member.js', 'cloud.js', 'inbox.js', 'online.js', 'guest.js', 'app.js', 'privacy.html', 'terms.html', 'share-qr.png', 'vendor/supabase.js', 'vendor/qrcode.js'];
@@ -26,10 +27,12 @@ self.addEventListener('fetch', e => {
   if (url.pathname.endsWith('.mp3')) {
     e.respondWith(caches.open(AUDIO).then(async c => {
       const hit = await c.match(req);
-      if (hit) return hit;
-      const res = await fetch(req);
-      if (res.ok) c.put(req, res.clone());
-      return res;
+      const fresh = fetch(req, { cache: 'no-cache' }).then(res => {
+        if (res.status === 200) c.put(req, res.clone()).catch(() => {});
+        return res;
+      });
+      if (hit) { e.waitUntil(fresh.catch(() => {})); return hit; }
+      return fresh;
     }));
     return;
   }
