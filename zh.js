@@ -633,24 +633,25 @@ function zhGrammarItem(id) {
 /* ---------- 听力 ---------- */
 // 一句一句播放，每题自动播放一次，答完显示原文、拼音、翻译和解析。
 // 每个人用自己的声音：第一个女声（F）和旁白（N）是 MeloTTS 的录音（index-zh.json，按原文）；
-// 男声（M、M2）和第二个女声（F2）是 Kokoro 的录音（index-zh-voices.json，按「说话人|原文」；会员题在私有存储，索引 audio/zh-voices.json）。
-// 没有这个人的录音就不播（不拿女声的录音冒充），接下一句。
+// 听力的每个说话人都是 Kokoro 的录音（index-zh-voices.json，按「说话人|原文」；会员题在私有存储，索引 audio/zh-voices.json）：
+// 男声（M、M2）、女声（F：晓伊，F2）同一个引擎，听起来是一个整体。女声（F、N）没有 Kokoro 录音时用原来的 MeloTTS 录音
+// （读物里的句子也走这里，用的是 MeloTTS）；男声没有录音就不播（不拿女声的录音冒充），接下一句。
 let zhListenLv = '';
 let ZH_VOICES = null, ZH_VOICES_READY = null;
 const zhVoiceIdx = () => ZH_VOICES || (ZH_VOICES = jsonOr(`${AUD_EN}index-zh-voices.json`).then(d => (ZH_VOICES_READY = d)));
-const zhOwnVoice = spk => spk !== 'F' && spk !== 'N';
 function zhPlayLines(lines, onDone) {
   let i = 0, stop = false;
   const el = langPlayer();
   const next = () => {
     if (stop || i >= lines.length) { el.onended = null; if (!stop && onDone) onDone(); return; }
     const [spk, zh] = lines[i++];
-    const own = zhOwnVoice(spk), key = `${spk}|${zh}`;
-    const file = own ? (ZH_VOICES_READY || {})[key] : (LANG_IDX_READY.zh || {})[zh];
-    // 会员题：录音在私有存储里，取临时地址
+    const key = `${spk}|${zh}`, female = spk === 'F' || spk === 'N';
+    const file = (ZH_VOICES_READY || {})[key] || (female ? (LANG_IDX_READY.zh || {})[zh] : null);
+    // 会员题：录音在私有存储里，取临时地址（女声先找 Kokoro 的，没有再找 MeloTTS 的）
     if (!file && S.voiceSrc !== 'tts' && typeof memberTextAudio === 'function' && isMember('zh')) {
       langUnlock();
-      memberTextAudio('zh', own ? key : zh, own ? 'zh-voices' : 'zh').then(u => { if (!stop) playLine(u); }, () => { if (!stop) playLine(null); });
+      memberTextAudio('zh', key, 'zh-voices').then(u => u || (female ? memberTextAudio('zh', zh, 'zh') : null))
+        .then(u => { if (!stop) playLine(u); }, () => { if (!stop) playLine(null); });
       return;
     }
     playLine(file);
