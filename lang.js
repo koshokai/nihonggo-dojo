@@ -20,8 +20,8 @@ const LANG_AUDIO = {};
 const jsonOr = url => fetch(url).then(r => r.ok ? r.json() : {}).catch(() => ({}));
 const LANG_IDX_READY = {};   // 已经加载好的录音目录（同步可用）
 // 词典里级别词表以外的词：录音在 nihonggo-dojo-audio2（index-dict-<语言>.json）
-const langAudioIdx = code => LANG_AUDIO[code] || (LANG_AUDIO[code] = Promise.all([jsonOr(`${audIdxBase(code)}index-${code}.json`), jsonOr(`${audIdxBase(code)}index-${code}-human.json`), code === 'zh' || code === 'en' ? jsonOr(`${AUD2}index-dict-${code}.json`) : {}, code === 'zh' ? jsonOr(`${AUD_EN}index-zh2.json`) : {}])
-  .then(([tts, human, dict, more]) => (LANG_IDX_READY[code] = Object.assign({}, dict, more, tts, human))));   // more：音频仓库里新增的中文录音（zh2/）
+const langAudioIdx = code => LANG_AUDIO[code] || (LANG_AUDIO[code] = Promise.all([jsonOr(`${audIdxBase(code)}index-${code}.json`), jsonOr(`${audIdxBase(code)}index-${code}-human.json`), code === 'zh' || code === 'en' ? jsonOr(`${AUD2}index-dict-${code}.json`) : {}, code === 'zh' ? jsonOr(`${AUD_EN}index-zh2.json`) : {}, code === 'zh' ? jsonOr(`${AUD_EN}index-zh-syl.json`) : {}])
+  .then(([tts, human, dict, more, syl]) => (LANG_IDX_READY[code] = Object.assign({}, dict, tts, more, syl, human))));   // syl：单字的真人发音（按拼音音节，Wikimedia Commons）   // more：音频仓库里的中文录音（zh2/：新增的和按纠正后的拼音重录的，优先于主站原来的）
 // 中文、英语的录音共用一个播放器：iPhone 只允许「点击当下」开始播放，
 // 同一个播放器被点击解锁过一次以后，之后换录音再播放（例如测验每题自动播放）就不会被拦。
 let langAudioEl = null, langSeq = 0;
