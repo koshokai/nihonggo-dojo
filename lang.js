@@ -17,11 +17,56 @@ const trackOf = view => view === 'zh' || view === 'en' ? view : TRACK_NEUTRAL.in
 // MeloTTS 预生成的音频（audio/index-ko.json、index-en.json：朗读文本 → mp3），没有的再用浏览器朗读
 const LANG_AUDIO = {};
 // 单词优先用真人录音（audio/index-<语言>-human.json，来自 Wikimedia Commons），其次是合成音
-const jsonOr = url => fetch(url).then(r => r.ok ? r.json() : {}).catch(() => ({}));
+// 录音目录（文字 → 录音文件）的加载：
+//   · 网络慢或偶尔出错时重试（以前失败一次就当成空目录，这一整次打开期间这个目录里的词都没声音）
+//   · 成功取到的存在本机（IndexedDB）：下次打开先用本机的，马上就能放；同时在后台取最新的，取到了再换上
+const IDX_DB = (() => { let p = null; return () => p || (p = new Promise(res => {
+  try { const r = indexedDB.open('dojo-audio-idx', 1); r.onupgradeneeded = () => r.result.createObjectStore('j'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); }
+  setTimeout(() => res(null), 3000);   // 打不开（隐私模式等）就不用本机缓存
+})); })();
+const idxGet = k => IDX_DB().then(db => db && new Promise(res => { try { const q = db.transaction('j').objectStore('j').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); } catch (e) { res(null); } }));
+const idxPut = (k, v) => IDX_DB().then(db => { try { if (db) db.transaction('j', 'readwrite').objectStore('j').put(v, k); } catch (e) { /* 存不下就算了 */ } });
+async function fetchJsonRetry(url, tries = 3) {
+  for (let i = 0; i < tries; i++) {
+    try {
+      const ctl = typeof AbortController === 'function' ? new AbortController() : null;
+      const t = ctl ? setTimeout(() => ctl.abort(), 20000) : 0;
+      const r = await fetch(url, ctl ? { signal: ctl.signal } : undefined);
+      clearTimeout(t);
+      if (r.ok) return await r.json();
+      if (r.status === 404) return null;   // 没有这个目录，不用再试
+    } catch (e) { /* 网络出错：等一会儿再试 */ }
+    if (i < tries - 1) await new Promise(ok => setTimeout(ok, 1500 * (i + 1)));
+  }
+  return null;
+}
+const IDX_FAILED = new Set();   // 这次打开期间没取到、本机也没有的目录：用到时再取一次
+// 返回目录（取不到时 {}）；onFresh：先用了本机存的、后台又取到新的时调用
+const jsonOr = (url, onFresh) => (idxGet(url).catch(() => null)).then(cached => {
+  const fresh = fetchJsonRetry(url).then(d => {
+    if (d) { IDX_FAILED.delete(url); idxPut(url, d); if (cached && onFresh) onFresh(d); }
+    else if (!cached) IDX_FAILED.add(url);
+    return d;
+  });
+  return cached || fresh.then(d => d || {});
+});
 const LANG_IDX_READY = {};   // 已经加载好的录音目录（同步可用）
-// 词典里级别词表以外的词：录音在 nihonggo-dojo-audio2（index-dict-<语言>.json）
-const langAudioIdx = code => LANG_AUDIO[code] || (LANG_AUDIO[code] = Promise.all([jsonOr(`${audIdxBase(code)}index-${code}.json`), jsonOr(`${audIdxBase(code)}index-${code}-human.json`), code === 'zh' || code === 'en' ? jsonOr(`${AUD2}index-dict-${code}.json`) : {}, code === 'zh' ? jsonOr(`${AUD_EN}index-zh2.json`) : {}, code === 'zh' ? jsonOr(`${AUD_EN}index-zh-syl.json`) : {}, code === 'zh' ? jsonOr(`${AUD_EN}index-zh-human2.json`) : {}])
-  .then(([tts, human, dict, more, syl, human2]) => (LANG_IDX_READY[code] = Object.assign({}, dict, tts, more, syl, human2, human))));   // syl：单字的真人发音（按拼音音节，Wikimedia Commons）   // more：音频仓库里的中文录音（zh2/：新增的和按纠正后的拼音重录的，优先于主站原来的）
+// 中文、英语的录音目录：几个目录按优先级合并（后面的优先）。词典里级别词表以外的词：nihonggo-dojo-audio2（index-dict-<语言>.json）
+// 合并顺序：词典 < 主站合成音 < 音频仓库补录（zh2）< 单字真人音节（syl）< 更多真人录音（human2）< 真人录音（human）
+const langIdxUrls = code => [code === 'zh' || code === 'en' ? `${AUD2}index-dict-${code}.json` : null, `${audIdxBase(code)}index-${code}.json`,
+  code === 'zh' ? `${AUD_EN}index-zh2.json` : null, code === 'zh' ? `${AUD_EN}index-zh-syl.json` : null, code === 'zh' ? `${AUD_EN}index-zh-human2.json` : null,
+  `${audIdxBase(code)}index-${code}-human.json`];
+const langAudioIdx = code => LANG_AUDIO[code] || (LANG_AUDIO[code] = (() => {
+  const urls = langIdxUrls(code), parts = urls.map(() => ({}));
+  const merge = () => (LANG_IDX_READY[code] = Object.assign({}, ...parts));
+  return Promise.all(urls.map((u, i) => u && jsonOr(u, d => { parts[i] = d; merge(); }).then(d => { parts[i] = d; }))).then(merge);
+})());
+// 有目录没取到时：重新取一次（以前失败的这次打开期间就一直没声音）
+const langIdxRetry = code => {
+  if (!langIdxUrls(code).some(u => u && IDX_FAILED.has(u))) return null;
+  delete LANG_AUDIO[code];
+  return langAudioIdx(code);
+};
 // 中文、英语的录音共用一个播放器：iPhone 只允许「点击当下」开始播放，
 // 同一个播放器被点击解锁过一次以后，之后换录音再播放（例如测验每题自动播放）就不会被拦。
 let langAudioEl = null, langSeq = 0;
@@ -33,7 +78,7 @@ const langPlayer = () => langAudioEl || (langAudioEl = new Audio());
 // 要先等网络（会员录音的临时地址）再播放时：点击当下先用静音把播放器「解锁」（iPhone 只允许点击当下开始播放）
 const langUnlock = () => { const el = langPlayer(); if (!el.paused || typeof SILENT_WAV === 'undefined') return; el.onended = el.onerror = null; el.src = SILENT_WAV; el.play().catch(() => {}); };
 // rate：这一次的语速（例如听写的「慢速」）；不传就用设置里的语速
-function speakLang(text, lang, rate) {
+function speakLang(text, lang, rate, retried) {
   const code = lang.slice(0, 2), rt = rate || S.rate;
   stopSpeech();
   const el = langPlayer(); el.pause();
@@ -44,12 +89,19 @@ function speakLang(text, lang, rate) {
     const seq = ++langSeq;
     el.src = SILENT_WAV; el.play().catch(() => {});
     let done = false;
-    const give = setTimeout(() => { if (!done && seq === langSeq) { done = true; speakLangTTS(text, lang, rt); } }, 4000);
+    const give = setTimeout(() => { if (!done && seq === langSeq) { done = true; speakLangTTS(text, lang, rt, 'net'); } }, 10000);
     langAudioIdx(code).then(() => { if (done || seq !== langSeq) return; done = true; clearTimeout(give); speakLang(text, lang, rate); });
     return;
   }
   ++langSeq;
   const file = idx[text];
+  const again = !file && !retried && langIdxRetry(code);
+  if (again) {   // 有目录这次没取到（网络不好）：先在点击当下解锁播放器，重新取目录后再放
+    const seq = langSeq;
+    el.src = SILENT_WAV; el.play().catch(() => {});
+    again.then(() => { if (seq === langSeq) speakLang(text, lang, rate, true); });
+    return;
+  }
   if (!file) {
     // 会员内容的录音在私有存储里：取临时地址再放（同一个播放器之前被点击解锁过，异步播放也不会被拦）
     if (typeof memberTextAudio === 'function' && (code === 'zh' || code === 'en') && isMember(code)) {
@@ -61,10 +113,16 @@ function speakLang(text, lang, rate) {
   }
   el.src = audUrl(file);
   el.defaultPlaybackRate = el.playbackRate = Math.min(1.3, Math.max(.5, rt + .2));
-  el.play().catch(() => speakLangTTS(text, lang, rt));
+  const seq = langSeq;
+  el.play().catch(() => {   // 网络抖一下没放出来：隔一会儿再试一次
+    setTimeout(() => {
+      if (seq !== langSeq) return;
+      el.src = audUrl(file); el.play().catch(() => { if (seq === langSeq) speakLangTTS(text, lang, rt, 'net'); });
+    }, 800);
+  });
 }
 // 以前没有录音时用手机朗读；现在只放生成的人声
-function speakLangTTS() { noVoice(); }
+function speakLangTTS(text, lang, rt, why) { noVoice(null, why); }
 const sayBtn = (text, lang) => `<button class="speak" type="button" data-lsay="${esc(text)}" data-lang="${lang}" aria-label="${tj('朗读', '読み上げ')}">${SPEAK_SVG}</button>`;
 const exSayBtn = (text, lang) => sayBtn(text, lang).replace('<button ', '<button data-exq ');   // 例句：有每日额度
 document.addEventListener('click', e => {

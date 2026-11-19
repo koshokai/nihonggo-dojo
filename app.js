@@ -289,14 +289,20 @@ let curUtt = null, speakSeq = 0;
 const AUDIO_IDX = {};
 let curAudio = null;
 let JA_IDX_OK = false;
-const JA_IDX = Promise.all(['words', 'daily', 'examples'].map(n => fetch(`${AUD}index-${n}.json`).then(r => r.ok ? r.json() : {}).then(d => Object.assign(AUDIO_IDX, d)).catch(() => {}))).then(() => { JA_IDX_OK = true; });
+// 目录用 lang.js 的 jsonOr 加载：网络不好时重试，存在本机，下次打开马上可用（以前失败一次，这次打开期间这些词都没声音）
+const JA_MAIN = ['words', 'daily', 'examples'].map(n => `${AUD}index-${n}.json`);
+const jaIdxLoad = () => Promise.all(JA_MAIN.map(u => jsonOr(u, d => Object.assign(AUDIO_IDX, d)).then(d => Object.assign(AUDIO_IDX, d)))).then(() => { JA_IDX_OK = true; });
+let JA_IDX = jaIdxLoad();
 // 词典里 JLPT 以外的词（JMdict）：录音在 nihonggo-dojo-audio2 的 ja-d/（index-dict-ja.json，约 1.3 MB），第一次用到时才下载
 let DICT_JA = null, DICT_JA_P = null;
-const dictJaIdx = () => DICT_JA_P || (DICT_JA_P = fetch(`${AUD2}index-dict-ja.json`).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(d => (DICT_JA = d)));
+const dictJaIdx = () => DICT_JA_P || (DICT_JA_P = jsonOr(`${AUD2}index-dict-ja.json`, d => { DICT_JA = d; }).then(d => (DICT_JA = d)));
 // 不用手机自带的机器朗读，只放生成的人声：没有录音时不出声，提示一次，然后接着往下走（连续播放不会卡住）
 let noVoiceWarned = false, noVoiceTimer = 0;
-function noVoice(end) {
-  if (!noVoiceWarned) { noVoiceWarned = true; toast(tje('这一句的录音还在准备中', 'この文の音声は準備中です', 'Audio for this line is coming soon')); }
+let noNetWarnedAt = 0;
+function noVoice(end, why) {
+  if (why === 'net') {   // 网络不好、录音没加载出来（不是没有录音）
+    if (Date.now() - noNetWarnedAt > 20000) { noNetWarnedAt = Date.now(); toast(tje('网络不太好，录音没加载出来，请稍后再点一次', '通信が不安定で音声を読み込めませんでした。少し待ってからもう一度タップしてください', 'Audio could not load (slow connection). Please tap again in a moment.')); }
+  } else if (!noVoiceWarned) { noVoiceWarned = true; toast(tje('这一句的录音还在准备中', 'この文の音声は準備中です', 'Audio for this line is coming soon')); }
   clearTimeout(noVoiceTimer);
   if (end) noVoiceTimer = setTimeout(end, 500);   // 按了停止（stopSpeech）就取消，不会多跳一句
 }
@@ -308,16 +314,16 @@ function stopSpeech() {
 }
 // 按需加载的录音索引（阅读文章、商务日语、N2/N1 的单词例句）：第一次用到时下载，合并进 AUDIO_IDX，不拖慢首屏
 const AUDIO_MORE = {};
-const audioIdx = name => AUDIO_MORE[name] || (AUDIO_MORE[name] = fetch(`${AUD}index-${name}.json`).then(r => r.ok ? r.json() : {})
-  .then(d => { for (const k in d) if (!AUDIO_IDX[k]) AUDIO_IDX[k] = d[k]; }).catch(() => {}));
+const addMore = d => { for (const k in d) if (!AUDIO_IDX[k]) AUDIO_IDX[k] = d[k]; };
+const audioIdx = name => AUDIO_MORE[name] || (AUDIO_MORE[name] = jsonOr(`${AUD}index-${name}.json`, addMore).then(addMore));
 // N2、N1 的例句录音很多（约 1.4 万句），只给在学 N2、N1 的人加载
 const levelAudio = () => { if (S.level === 'N2' || S.level === 'N1') audioIdx('examples-' + S.level); };
 // 五十音单独一套（音高、长短、音量统一），优先于单词库里的同名录音
 let KANA_IDX = {};
-fetch(`${AUD}index-kana.json`).then(r => r.ok ? r.json() : {}).then(d => { KANA_IDX = d; }).catch(() => {});
+jsonOr(`${AUD}index-kana.json`, d => { KANA_IDX = d; }).then(d => { KANA_IDX = d; });
 // 真人录音（audio/index-ja-human.json，Wikimedia Commons / Lingua Libre 的母语者录音）：单个假名、单词优先用它，合成音读单字最不自然
 let HUMAN_JA = {};
-fetch(`${AUD}index-ja-human.json`).then(r => r.ok ? r.json() : {}).then(d => { HUMAN_JA = d; }).catch(() => {});
+jsonOr(`${AUD}index-ja-human.json`, d => { HUMAN_JA = d; }).then(d => { HUMAN_JA = d; });
 // 日语录音始终用同一个播放器：iPhone 只允许「点击当下」开始播放，同一个播放器被点击解锁过以后，
 // 之后隔一段时间再自动播放（全文朗读、循环播放从头再来）也不会被拦；每次新建播放器的话，过了点击那一刻就放不出来
 let jaAudioEl = null;
@@ -342,7 +348,17 @@ function speak(text, opts = {}, pre) {
     curAudio = a;
     let done = false;
     const go = () => { if (done || seq !== speakSeq || curAudio !== a) return; done = true; curAudio = null; speak(pair || text, opts, a); };
-    Promise.all([JA_IDX, dictJaIdx()]).then(go); setTimeout(go, 6000);
+    Promise.all([JA_IDX, dictJaIdx()]).then(go); setTimeout(go, 10000);
+    return;
+  }
+  // 查不到、而且有目录这次没取到（网络不好）：重新取一次再放
+  if (!file && !opts.retried && typeof IDX_FAILED !== 'undefined' && [...JA_MAIN, `${AUD2}index-dict-ja.json`].some(u => IDX_FAILED.has(u)) && typeof SILENT_WAV !== 'undefined') {
+    stopSpeech(); const seq = ++speakSeq;
+    const a = pre || jaPlayer(); a.onended = a.onerror = null; a.src = SILENT_WAV; a.play().catch(() => {});
+    curAudio = a;
+    if (IDX_FAILED.has(`${AUD2}index-dict-ja.json`)) DICT_JA_P = null;
+    JA_IDX = jaIdxLoad();
+    Promise.all([JA_IDX, dictJaIdx()]).then(() => { if (seq === speakSeq && curAudio === a) { curAudio = null; speak(pair || text, Object.assign({}, opts, { retried: true }), a); } });
     return;
   }
   if (file) {
@@ -353,7 +369,12 @@ function speak(text, opts = {}, pre) {
     a.playbackRate = Math.min(1.5, Math.max(0.5, (opts.rate || S.rate) + 0.2));
     let fell = false;
     // 换了下一句（同一个播放器被打断）时不要再用手机朗读读这一句
-    const fallback = () => { if (fell || seq !== speakSeq) return; fell = true; curAudio = null; speakTTS(text, opts); };
+    let tries = 0;
+    const fallback = () => {
+      if (fell || seq !== speakSeq) return;
+      if (tries++ < 1) { setTimeout(() => { if (seq === speakSeq && curAudio === a) { a.src = audUrl(file); a.play().catch(fallback); } }, 800); return; }   // 网络抖一下：再试一次
+      fell = true; curAudio = null; speakTTS(text, opts, 'net');
+    };
     a.onended = () => { if (curAudio === a) curAudio = null; if (opts.onend) opts.onend(); };
     a.onerror = fallback;
     curAudio = a;
@@ -361,10 +382,10 @@ function speak(text, opts = {}, pre) {
     return;
   }
   if (curAudio) { curAudio.pause(); curAudio = null; }
-  speakTTS(text, opts);
+  speakTTS(text, opts, JA_IDX_OK ? undefined : 'net');   // 目录还没加载出来（网络慢）时提示网络，不说「准备中」
 }
 // 以前没有录音时用手机朗读；现在只放生成的人声（noVoice：不出声，连续播放接着往下走）
-function speakTTS(text, opts = {}) { noVoice(opts.onend); }
+function speakTTS(text, opts = {}, why) { noVoice(opts.onend, why); }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-say]');
   if (b) {
