@@ -10,6 +10,17 @@
 	<string>跟读练习时识别你说的句子并打分。音読練習で話した文を認識して採点します。</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.koshokai.omnisphere.login</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.koshokai.omnisphere</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>zh-Hans</string>
 	<key>CFBundleLocalizations</key>

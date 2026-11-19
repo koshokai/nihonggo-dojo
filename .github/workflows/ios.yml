@@ -11,9 +11,13 @@ on:
         description: 上传到 TestFlight（false = 只检查编译）
         type: boolean
         default: true
+      siwa:
+        description: 带上「通过 Apple 登录」权限（苹果开发者后台的 App ID 要先打开 Sign In with Apple）
+        type: boolean
+        default: false
       version:
         description: 版本号（App Store 上显示的，例如 1.0.0）
-        default: '1.2.2'
+        default: '1.2.4'
 jobs:
   build:
     runs-on: macos-26   # Xcode 27（iOS 27 SDK）要在 macOS 26 上运行
@@ -82,6 +86,18 @@ jobs:
             DEVELOPMENT_TEAM="$TEAM" CODE_SIGNING_ALLOWED=NO \
             MARKETING_VERSION="${{ inputs.version }}" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" | tail -60
 
+      # 不签名打包时权限（entitlements）不会写进 App。要「通过 Apple 登录」时，先用临时签名（ad-hoc）把权限写进去，
+      # 导出时 Xcode 用 API 密钥正式签名，会按 App 里写的权限生成描述文件。
+      - name: Sign in with Apple entitlement
+        if: ${{ inputs.upload && inputs.siwa }}
+        run: |
+          APP="$RUNNER_TEMP/App.xcarchive/Products/Applications/App.app"
+          if [ -d "$APP/Frameworks" ]; then
+            find "$APP/Frameworks" -maxdepth 1 \( -name '*.framework' -o -name '*.dylib' \) -exec codesign --force --sign - --timestamp=none {} \;
+          fi
+          codesign --force --sign - --timestamp=none --entitlements app/ios/App/App/App.entitlements "$APP"
+          codesign -d --entitlements - --xml "$APP" | grep -q com.apple.developer.applesignin || { echo "权限没有写进去"; exit 1; }
+
       - name: Export & upload to App Store Connect
         if: ${{ inputs.upload }}
         env:
@@ -102,6 +118,19 @@ jobs:
             <key>manageAppVersionAndBuildNumber</key><false/>
           </dict></plist>
           EOF
+          if [ "${{ inputs.siwa }}" = true ]; then
+            # 先导出到本地检查正式签名后的 App 里有没有「通过 Apple 登录」权限，没有就不上传
+            sed -e 's|<string>upload</string>|<string>export</string>|' "$RUNNER_TEMP/ExportOptions.plist" > "$RUNNER_TEMP/ExportCheck.plist"
+            xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/App.xcarchive" \
+              -exportOptionsPlist "$RUNNER_TEMP/ExportCheck.plist" -exportPath "$RUNNER_TEMP/check" \
+              -allowProvisioningUpdates \
+              -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey_$ASC_KEY_ID.p8" \
+              -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" | tail -30
+            mkdir -p "$RUNNER_TEMP/ipa" && unzip -q "$RUNNER_TEMP/check/"*.ipa -d "$RUNNER_TEMP/ipa"
+            codesign -d --entitlements - --xml "$RUNNER_TEMP/ipa/Payload/App.app" | grep -q com.apple.developer.applesignin \
+              || { echo "正式签名后的 App 里没有 Sign in with Apple 权限：请在苹果开发者后台给 App ID 打开 Sign In with Apple"; exit 1; }
+            echo "Sign in with Apple 权限：OK"
+          fi
           xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/App.xcarchive" \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" \
             -allowProvisioningUpdates \

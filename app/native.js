@@ -75,4 +75,48 @@
     if (off) off.onclick = async () => { await setReminder(null); S.appRemind = null; save(); toast('已关闭学习提醒'); render(); };
     return p;
   };
+
+  // 4. 一键登录（cloud.js 的 socialGo / appAuthReturn）：
+  //    Apple：系统原生的「通过 Apple 登录」（@capacitor-community/apple-sign-in）→ 拿到 Apple 的 ID token → supabase.auth.signInWithIdToken
+  //    Google / Facebook（Supabase OAuth）、LINE（Edge Function line-auth）：在系统浏览器（@capacitor/browser）里登录，
+  //    最后跳到 com.koshokai.omnisphere://login?…（Info.plist 登记的 URL scheme）→ App 收到（@capacitor/app 的 appUrlOpen）→ 关掉浏览器，交给 appAuthReturn 完成登录
+  const { App: CapApp, Browser, SignInWithApple } = P;
+  const BACK = 'com.koshokai.omnisphere://login';
+  if (CapApp && Browser) {
+    const sha256hex = async t => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(b => b.toString(16).padStart(2, '0')).join('');
+    const cancelled = e => Object.assign(new Error('cancelled'), { cancelled: true, cause: e });
+    window.appAuth = {
+      apple: SignInWithApple ? async () => {
+        const raw = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
+        let r;
+        try {
+          r = await SignInWithApple.authorize({ clientId: 'com.koshokai.omnisphere', redirectURI: `${CLOUD.url}/auth/v1/callback`, scopes: 'email name', nonce: await sha256hex(raw) });
+        } catch (e) {
+          if (/cancel|1001/i.test(String((e && (e.code || e.message)) || ''))) throw cancelled(e);
+          throw e;
+        }
+        const res = (r && r.response) || {};
+        const c = await cloudClient();
+        const { data, error } = await c.auth.signInWithIdToken({ provider: 'apple', token: res.identityToken, nonce: raw });
+        if (error) throw error;
+        const name = [res.familyName, res.givenName].filter(Boolean).join(' ');   // Apple 只在第一次登录时给名字
+        if (name) c.auth.updateUser({ data: { full_name: name } }).catch(() => {});
+        return data.user;
+      } : null,
+      async oauth(provider) {
+        const c = await cloudClient();
+        const { data, error } = await c.auth.signInWithOAuth({ provider, options: { redirectTo: BACK, skipBrowserRedirect: true } });
+        if (error) throw error;
+        await Browser.open({ url: data.url, presentationStyle: 'popover' });
+      },
+      async line() {
+        await Browser.open({ url: `${CLOUD.url}/functions/v1/line-auth?redirect=${encodeURIComponent(BACK)}`, presentationStyle: 'popover' });
+      },
+    };
+    CapApp.addListener('appUrlOpen', ({ url }) => {
+      if (!url || !url.startsWith(BACK)) return;
+      Browser.close().catch(() => {});
+      if (typeof window.appAuthReturn === 'function') window.appAuthReturn(url);
+    });
+  }
 })();

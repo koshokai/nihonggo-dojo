@@ -620,6 +620,10 @@ body.gated { overflow: hidden; }
 .auth-or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .85rem; }
 .auth-or::before, .auth-or::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
 .google-btn { gap: 10px; }
+.auth-quick { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+.auth-quick .btn { width: 100%; justify-content: center; }
+.line-btn { gap: 10px; background: #06c755; color: #fff; border-color: #06c755; }
+.facebook-btn { gap: 10px; background: #1877f2; color: #fff; border-color: #1877f2; }
 .auth-foot { margin: 0; text-align: center; }
 .acc-form .btn.small { justify-self: start; padding: 4px 6px; min-height: 0; }
 .otp-row input { letter-spacing: .4em; text-align: center; font-size: 1.3rem !important; }
