@@ -20,6 +20,18 @@
 				<string>com.koshokai.omnisphere</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>line3rdp</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>line3rdp.com.koshokai.omnisphere</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>lineauth2</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>zh-Hans</string>

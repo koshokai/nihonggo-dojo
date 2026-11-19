@@ -80,7 +80,7 @@
   //    Apple：系统原生的「通过 Apple 登录」（@capacitor-community/apple-sign-in）→ 拿到 Apple 的 ID token → supabase.auth.signInWithIdToken
   //    Google / Facebook（Supabase OAuth）、LINE（Edge Function line-auth）：在系统浏览器（@capacitor/browser）里登录，
   //    最后跳到 com.koshokai.omnisphere://login?…（Info.plist 登记的 URL scheme）→ App 收到（@capacitor/app 的 appUrlOpen）→ 关掉浏览器，交给 appAuthReturn 完成登录
-  const { App: CapApp, Browser, SignInWithApple } = P;
+  const { App: CapApp, Browser, SignInWithApple, LineLogin } = P;
   const BACK = 'com.koshokai.omnisphere://login';
   if (CapApp && Browser) {
     const sha256hex = async t => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -109,8 +109,27 @@
         if (error) throw error;
         await Browser.open({ url: data.url, presentationStyle: 'popover' });
       },
+      // LINE：有 LINE SDK 插件（app/plugins/capacitor-line-login）时直接打开手机上的 LINE App 授权，不用输入账号；
+      // 拿到 ID token 交给服务器 line-auth 换成一次性登录凭证，再登录。没有插件时在系统浏览器里用网页登录
       async line() {
+        if (LineLogin && CLOUD.lineChannelId) {
+          let r;
+          try { r = await LineLogin.login({ channelId: CLOUD.lineChannelId }); } catch (e) {
+            if (e && (e.code === 'CANCELLED' || /cancel/i.test(e.message || ''))) throw cancelled(e);
+            throw e;
+          }
+          const res = await fetch(`${CLOUD.url}/functions/v1/line-auth`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CLOUD.anonKey }, body: JSON.stringify({ id_token: r.idToken }),
+          });
+          const d = await res.json().catch(() => ({}));
+          if (!res.ok || !d.token_hash) throw new Error('LINE 登录没有完成，请再试一次。');
+          const c = await cloudClient();
+          const { data, error } = await c.auth.verifyOtp({ token_hash: d.token_hash, type: 'magiclink' });
+          if (error) throw error;
+          return data.user;
+        }
         await Browser.open({ url: `${CLOUD.url}/functions/v1/line-auth?redirect=${encodeURIComponent(BACK)}`, presentationStyle: 'popover' });
+        return null;
       },
     };
     CapApp.addListener('appUrlOpen', ({ url }) => {

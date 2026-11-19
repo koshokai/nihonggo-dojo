@@ -351,7 +351,8 @@ async function socialGo(p, say, btn) {
   try {
     if (window.DOJO_APP && A) {
       if (p === 'apple') { const user = await A.apple(); if (user) await afterLogin(user); return; }
-      await (p === 'line' ? A.line() : A.oauth(p));   // 在系统浏览器里登录，跳回 App 后由 appAuthReturn 接着做
+      const user = await (p === 'line' ? A.line() : A.oauth(p));   // LINE 用 LINE App 授权，直接返回登录好的用户；其他在系统浏览器里登录，跳回 App 后由 appAuthReturn 接着做
+      if (user) await afterLogin(user);
       return;
     }
     if (p === 'line') { location.href = `${CLOUD.url}/functions/v1/line-auth?redirect=${encodeURIComponent(REDIRECT())}`; return; }

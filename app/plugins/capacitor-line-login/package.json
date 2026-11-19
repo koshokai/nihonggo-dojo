@@ -1,0 +1,12 @@
+{
+  "name": "capacitor-line-login",
+  "version": "1.0.0",
+  "private": true,
+  "description": "猫先生 App 内用的 LINE 登录（LINE SDK for iOS）：打开手机上的 LINE App 授权，拿到 ID token 交给服务器（Edge Function line-auth）换成登录。",
+  "license": "UNLICENSED",
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    }
+  }
+}
