@@ -620,10 +620,19 @@ body.gated { overflow: hidden; }
 .auth-or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .85rem; }
 .auth-or::before, .auth-or::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
 .google-btn { gap: 10px; }
-.auth-quick { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
-.auth-quick .btn { width: 100%; justify-content: center; }
-.line-btn { gap: 10px; background: #06c755; color: #fff; border-color: #06c755; }
-.facebook-btn { gap: 10px; background: #1877f2; color: #fff; border-color: #1877f2; }
+/* 一键登录：邮箱表单下面一排小圆按钮 */
+.auth-social { display: flex; justify-content: center; gap: 18px; margin: 4px 0 2px; }
+.soc-btn { width: 48px; height: 48px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card, #fff); color: var(--ink, #222); box-shadow: 0 1px 3px rgba(0,0,0,.08); transition: transform .12s; }
+.soc-btn:active { transform: scale(.94); }
+.soc-btn:disabled { opacity: .5; }
+.soc-apple { background: #000; color: #fff; border-color: #000; }
+.soc-line { background: #06c755; color: #fff; border-color: #06c755; }
+.soc-facebook { background: #1877f2; color: #fff; border-color: #1877f2; }
+.soc-google { background: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .soc-apple { background: #fff; color: #000; border-color: #fff; } }
+:root[data-theme="dark"] .soc-apple { background: #fff; color: #000; border-color: #fff; }
+.auth-social-note { text-align: center; }
 .auth-foot { margin: 0; text-align: center; }
 .acc-form .btn.small { justify-self: start; padding: 4px 6px; min-height: 0; }
 .otp-row input { letter-spacing: .4em; text-align: center; font-size: 1.3rem !important; }

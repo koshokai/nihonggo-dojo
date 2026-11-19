@@ -339,12 +339,20 @@ function socialList() {
   }
   return ['apple', 'line', 'google', 'facebook'].filter(k => CLOUD[k]);
 }
-const SOCIAL_BTN = {
-  apple: () => `<button class="btn big apple-btn" type="button" data-social="apple"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.4.8c1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1-3.2-1 .1-2.2.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg>${tje('通过 Apple 登录', 'Apple でサインイン', 'Sign in with Apple')}</button>`,
-  line: () => `<button class="btn big line-btn" type="button" data-social="line"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 2.5C6.2 2.5 1.5 6.3 1.5 11c0 4.2 3.7 7.7 8.8 8.4.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5s6.1-3.6 8.3-6.2c1.5-1.7 2.2-3.4 2.2-5.1 0-4.7-4.7-8.5-10.5-8.5zM8.3 13.6H6.2c-.3 0-.6-.3-.6-.6V8.8c0-.3.3-.6.6-.6s.6.3.6.6v3.6h1.5c.3 0 .6.3.6.6s-.3.6-.6.6zm2.2-.6c0 .3-.3.6-.6.6s-.6-.3-.6-.6V8.8c0-.3.3-.6.6-.6s.6.3.6.6V13zm5 0c0 .3-.2.5-.4.6h-.2c-.2 0-.4-.1-.5-.2l-2.1-2.9V13c0 .3-.3.6-.6.6s-.6-.3-.6-.6V8.8c0-.3.2-.5.4-.6h.2c.2 0 .4.1.5.3l2.1 2.9V8.8c0-.3.3-.6.6-.6s.6.3.6.6V13zm3.4-2.7c.3 0 .6.3.6.6s-.3.6-.6.6h-1.5v.9h1.5c.3 0 .6.3.6.6s-.3.6-.6.6h-2.1c-.3 0-.6-.3-.6-.6V8.8c0-.3.3-.6.6-.6h2.1c.3 0 .6.3.6.6s-.3.6-.6.6h-1.5v.9h1.5z"/></svg>${tje('用 LINE 登录', 'LINE でログイン', 'Continue with LINE')}</button>`,
-  google: () => `<button class="btn big google-btn" type="button" data-social="google"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9h-4v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.7V6.6h-4a12 12 0 0 0 0 10.9l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"/></svg>${tje('用 Google 登录', 'Google でログイン', 'Sign in with Google')}</button>`,
-  facebook: () => `<button class="btn big facebook-btn" type="button" data-social="facebook"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z"/></svg>${tje('用 Facebook 登录', 'Facebook でログイン', 'Continue with Facebook')}</button>`,
+// 一键登录的小圆按钮（只有图标；名字放在 aria-label / title 里）
+const SOCIAL_ICON = {
+  apple: '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.4.8c1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1-3.2-1 .1-2.2.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg>',
+  line: '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M12 2.5C6.2 2.5 1.5 6.3 1.5 11c0 4.2 3.7 7.7 8.8 8.4.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5s6.1-3.6 8.3-6.2c1.5-1.7 2.2-3.4 2.2-5.1 0-4.7-4.7-8.5-10.5-8.5zM8.3 13.6H6.2c-.3 0-.6-.3-.6-.6V8.8c0-.3.3-.6.6-.6s.6.3.6.6v3.6h1.5c.3 0 .6.3.6.6s-.3.6-.6.6zm2.2-.6c0 .3-.3.6-.6.6s-.6-.3-.6-.6V8.8c0-.3.3-.6.6-.6s.6.3.6.6V13zm5 0c0 .3-.2.5-.4.6h-.2c-.2 0-.4-.1-.5-.2l-2.1-2.9V13c0 .3-.3.6-.6.6s-.6-.3-.6-.6V8.8c0-.3.2-.5.4-.6h.2c.2 0 .4.1.5.3l2.1 2.9V8.8c0-.3.3-.6.6-.6s.6.3.6.6V13zm3.4-2.7c.3 0 .6.3.6.6s-.3.6-.6.6h-1.5v.9h1.5c.3 0 .6.3.6.6s-.3.6-.6.6h-2.1c-.3 0-.6-.3-.6-.6V8.8c0-.3.3-.6.6-.6h2.1c.3 0 .6.3.6.6s-.3.6-.6.6h-1.5v.9h1.5z"/></svg>',
+  google: '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9h-4v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.7V6.6h-4a12 12 0 0 0 0 10.9l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"/></svg>',
+  facebook: '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z"/></svg>',
 };
+const SOCIAL_LABEL = {
+  apple: () => tje('通过 Apple 登录', 'Apple でサインイン', 'Sign in with Apple'),
+  line: () => tje('用 LINE 登录', 'LINE でログイン', 'Continue with LINE'),
+  google: () => tje('用 Google 登录', 'Google でログイン', 'Sign in with Google'),
+  facebook: () => tje('用 Facebook 登录', 'Facebook でログイン', 'Continue with Facebook'),
+};
+const SOCIAL_BTN = k => `<button class="soc-btn soc-${k}" type="button" data-social="${k}" aria-label="${SOCIAL_LABEL[k]()}" title="${SOCIAL_LABEL[k]()}">${SOCIAL_ICON[k]}</button>`;
 async function socialGo(p, say, btn) {
   const A = window.appAuth;
   if (btn) btn.disabled = true;
@@ -425,15 +433,15 @@ function authScreen(mode = 'login') {
   const title = { login: tje('欢迎回来', 'おかえりなさい', 'Welcome back'), signup: tje('创建账号', 'アカウント作成', 'Create account'), otp: tje('验证码登录', 'コードでログイン', 'Email code'), forgot: tje('找回密码', 'パスワードの再設定', 'Reset password'), newpw: tje('设置新密码', '新しいパスワードの設定', 'New password'), linkerr: tje('没有登录成功', 'ログインできませんでした', 'Sign-in failed') }[mode];
   const soc = ['login', 'signup', 'otp'].includes(mode) ? socialList() : [];
   const cnNote = tje('中国大陆网络用不了 Google、LINE、Facebook 登录，请用' + (soc.includes('apple') ? ' Apple 或' : '') + '邮箱。', '', '');   // 只在中文界面提示
-  const quick = soc.length ? `<div class="auth-quick">${soc.map(k => SOCIAL_BTN[k]()).join('')}${cnNote && soc.some(k => k !== 'apple') ? `<p class="small muted auth-note">${cnNote}</p>` : ''}</div><div class="auth-or"><span>${tje('或者用邮箱', 'またはメールで', 'or use email')}</span></div>` : '';
+  const quick = soc.length ? `<div class="auth-or"><span>${tje('或者用以下方式登录', 'ほかの方法でログイン', 'Or sign in with')}</span></div><div class="auth-social">${soc.map(SOCIAL_BTN).join('')}</div>${cnNote && soc.some(k => k !== 'apple') ? `<p class="small muted auth-note auth-social-note">${cnNote}</p>` : ''}` : '';
   host.innerHTML = `<div class="auth-card">
     ${gate ? '' : `<button class="ws-x" type="button" data-close aria-label="${tje('关闭', '閉じる', 'Close')}">×</button>`}
     <div class="auth-brand">${typeof neko === 'function' ? neko('happy', 'mini') : ''}<span>${authBrand()}</span>${S.onboarded ? '' : `<div class="seg auth-lang" role="group" aria-label="language"><button type="button" data-ui="zh" lang="zh-CN" class="${!preEn() && !uiJa() ? 'on' : ''}">中文</button><button type="button" data-ui="ja" lang="ja" class="${!preEn() && uiJa() ? 'on' : ''}">日本語</button><button type="button" data-ui="en" lang="en" class="${preEn() ? 'on' : ''}">English</button></div>`}</div>
     <h2>${title}</h2>
     ${tabs}
-    ${quick}
     <form class="acc-form" data-af novalidate>${forms[mode]}</form>
     <p class="small auth-msg" data-msg role="status"></p>
+    ${quick}
     ${['login', 'signup', 'otp'].includes(mode) ? `<p class="small muted auth-note">${tje('继续即表示你同意<a href="terms.html" target="_blank" rel="noopener">《用户协议》</a>和<a href="privacy.html" target="_blank" rel="noopener">《隐私政策》</a>。', '続行すると、<a href="terms.html" target="_blank" rel="noopener">利用規約</a>と<a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>に同意したものとみなされます。', 'By continuing you agree to the <a href="terms.html" target="_blank" rel="noopener">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.')}</p>` : ''}
     ${['login', 'signup', 'otp'].includes(mode) ? `<p class="small muted auth-foot">${tje('登录后学习进度会自动同步到云端。<a href="privacy.html" target="_blank">隐私政策</a>', 'ログインすると学習記録がクラウドに自動で同期されます。<a href="privacy.html" target="_blank">プライバシーポリシー</a>', 'Your progress syncs to the cloud after you sign in. <a href="privacy.html" target="_blank">Privacy Policy</a>')}</p>` : ''}
     ${gate && ['login', 'signup', 'otp'].includes(mode) ? `<button class="btn ghost guest-btn" type="button" data-guest>${tje('先不注册，以游客身份体验 →', '登録せずにゲストとして試す →', 'Try it first as a guest →')}</button>` : ''}
