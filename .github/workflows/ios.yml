@@ -16,18 +16,23 @@ on:
         default: '1.2.2'
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-26   # Xcode 27（iOS 27 SDK）要在 macOS 26 上运行
     timeout-minutes: 60
     steps:
       # 构建号必须比以前上传过的都大。公开仓库是新建的，运行编号从 1 重新开始；旧仓库最后一次是 34，所以加 100
       - name: 构建号
         run: echo "BUILD_NUMBER=$((GITHUB_RUN_NUMBER + 100))" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
-      - name: Xcode 26（App Store 要求用 iOS 26 SDK 以上编译）
+      # App Store：2027 年 4 月起必须用 iOS 27 SDK（Xcode 27）以上编译（ITMS-90725）。有 Xcode 27 用 27，没有时先用 26 并提示
+      - name: Xcode 27（iOS 27 SDK）
         run: |
           ls -d /Applications/Xcode*.app
-          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
-          test -n "$X" || { echo "这台机器上没有 Xcode 26"; exit 1; }
+          X=$(ls -d /Applications/Xcode_27*.app 2>/dev/null | grep -v -i beta | sort -V | tail -1)
+          if [ -z "$X" ]; then
+            X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+            echo "::warning::这台机器上没有 Xcode 27，先用 Xcode 26 编译（2027 年 4 月以后 App Store 不再接受）"
+          fi
+          test -n "$X" || { echo "这台机器上没有 Xcode 26 / 27"; exit 1; }
           sudo xcode-select -s "$X/Contents/Developer"
           xcodebuild -version
       - uses: actions/setup-node@v4
