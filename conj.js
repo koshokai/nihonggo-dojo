@@ -71,6 +71,7 @@ function conjKeigo(box) {
 const conjShow = ([w, r]) => w === r ? w : `${w}（${r}）`;
 
 function viewConj() {
+  if (typeof audioIdx === 'function') audioIdx('conj');   // 各种变形的录音（index-conj.json，只在这里用）
   const o = S.conjOpt = Object.assign({ kind: 'v', forms: ['masu', 'nai', 'ta', 'te'] }, S.conjOpt);
   const box = h('<section class="panel"><h2>动词变形</h2><div class="skel" aria-label="加载中" role="status"><i></i><i></i><i></i></div></section>');
   main.append(box);

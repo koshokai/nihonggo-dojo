@@ -115,7 +115,7 @@ function enCoLesson(tid, lid) {
           <div class="cl-jp" lang="en">${enTap(x.en)}</div>
           <div class="cl-zh small">${esc(enNat(x.zh, x.ja))}</div>${S.enBoth ? `<div class="cl-zh small muted">${esc(enOther(x.zh, x.ja))}</div>` : ''}
           ${x.note_zh ? `<details class="cl-note"><summary class="small">${enNat('讲解', '解説')}</summary><p class="small">${esc(enNat(x.note_zh, x.note_ja))}</p></details>` : ''}
-          <div class="cl-acts"><button class="speak" type="button" data-say="${k}" aria-label="Play">${SPEAK_SVG}</button></div></div></div>`; }).join('')}</div>
+          <div class="cl-acts"><button class="speak" type="button" data-cl-say="${k}" aria-label="Play">${SPEAK_SVG}</button></div></div></div>`; }).join('')}</div>
       ${(l.words || []).length ? `<h3>${'Key words'}</h3><div class="cl-words">${l.words.map(([w, z, j]) => `<div class="cl-word"><div class="row"><b lang="en">${esc(w)}</b>${sayBtn(w, 'en-US')}</div><div class="small">${esc(enNat(z, j))}</div></div>`).join('')}</div>` : ''}
       ${(l.patterns || []).length ? `<h3>${'Patterns'}</h3>${l.patterns.map(pt => `<section class="cl-pat"><div class="row"><b lang="en">${esc(pt.p)}</b></div><p class="small">${esc(enNat(pt.zh, pt.ja))}</p>
         ${(pt.ex || []).map(([e, z, j]) => `<div class="en-ex"><div class="en-ex-en" lang="en">${enTap(e)} ${sayBtn(e, 'en-US')}</div>${enTr(z, j)}</div>`).join('')}</section>`).join('')}` : ''}
@@ -128,7 +128,7 @@ function enCoLesson(tid, lid) {
     const lEls = [...p.querySelectorAll('.cl-line')];
     const mark = k => lEls.forEach((el, j) => el.classList.toggle('on', j === k));
     const one = k => enSeq([{ t: l.lines[k].en, spk: spk(l.lines[k]) }], { onItem: mark });
-    p.querySelectorAll('[data-say]').forEach(b => { b.onclick = e => { e.stopPropagation(); one(+b.dataset.say); }; });
+    p.querySelectorAll('[data-cl-say]').forEach(b => { b.onclick = e => { e.stopPropagation(); one(+b.dataset.clSay); }; });
     p.querySelectorAll('.cl-line .cl-jp').forEach(el => { el.onclick = e => { if (e.target.closest('.zw')) return; one(+el.closest('.cl-line').dataset.i); }; });
     const allBtn = p.querySelector('[data-all]');
     let playing = false;

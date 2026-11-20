@@ -14,10 +14,10 @@ on:
       siwa:
         description: 带上「通过 Apple 登录」权限（苹果开发者后台的 App ID 要先打开 Sign In with Apple）
         type: boolean
-        default: false
+        default: true
       version:
         description: 版本号（App Store 上显示的，例如 1.0.0）
-        default: '1.2.4'
+        default: '1.2.9'
 jobs:
   build:
     runs-on: macos-26   # Xcode 27（iOS 27 SDK）要在 macOS 26 上运行

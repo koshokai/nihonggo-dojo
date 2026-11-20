@@ -237,13 +237,13 @@ function duelStart(o) {
     const q = qs[i]; answered = false; t0 = Date.now();
     box.querySelector('[data-qn]').textContent = `${i + 1} / ${DUEL_Q}`;
     const say = () => { if (zh && typeof zhSay === 'function') zhSay(q.v.w); else if (en) speakLang(q.v.w, 'en-US'); else speak(q.v.r || q.v.w); };
-    const head = q.listen ? `<div class="eyebrow">${tj('听发音，选出意思', '発音を聞いて、意味を選んでください')}</div><button class="btn pri ls-play" type="button" data-say>▶ ${tj('再听一次', 'もう一度聞く')}</button>`
+    const head = q.listen ? `<div class="eyebrow">${tj('听发音，选出意思', '発音を聞いて、意味を選んでください')}</div><button class="btn pri ls-play" type="button" data-duel-say>▶ ${tj('再听一次', 'もう一度聞く')}</button>`
       : q.kanji ? `<div class="eyebrow">${zh ? tj('选出正确的拼音', '正しいピンインを選んでください') : tj('选出正确的读音', '正しい読み方を選んでください')}</div><div class="q-big" lang="${wl}">${esc(q.v.w)}</div>` : null;
     if (head) {
       stage.innerHTML = `<div class="q-prompt duel-q">${head}</div>
       <div class="opts">${q.opts.map((x, k) => `<button class="opt" type="button" data-o="${k}"><span class="k">${k + 1}</span><span ${q.kanji ? `lang="${zh ? 'zh-Latn-pinyin' : 'ja'}"` : ml}>${esc(q.kanji ? x.r : mOf(x))}</span></button>`).join('')}</div>
       <div data-fb></div>`;
-      const sb = stage.querySelector('[data-say]'); if (sb) { sb.onclick = say; say(); }
+      const sb = stage.querySelector('[data-duel-say]'); if (sb) { sb.onclick = say; say(); }
     } else
     stage.innerHTML = `<div class="q-prompt duel-q">${q.toMeaning ? `<div class="q-big" lang="${wl}">${esc(q.v.w)}</div>` : `<div class="eyebrow">${tj('选出这个意思的单词', 'この意味の単語を選んでください')}</div><div class="duel-m"${ml}>${esc(mOf(q.v))}</div>`}</div>
       <div class="opts">${q.opts.map((x, k) => `<button class="opt" type="button" data-o="${k}"><span class="k">${k + 1}</span><span ${q.toMeaning ? ml : `lang="${wl}"`}>${esc(q.toMeaning ? mOf(x) : x.w)}</span></button>`).join('')}</div>

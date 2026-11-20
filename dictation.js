@@ -22,7 +22,8 @@ function dictPool(tr) {
     for (const g of GRAM[L]) for (const e of g.eg) if (AUDIO_IDX[e.kana]) out.push({ src: 'ex', say: e.kana, jp: e.full, zh: e.t, furi: e.furi, L });
     if (typeof DAILY !== 'undefined') for (const d of DAILY) if (AUDIO_IDX[d[8]]) out.push({ src: 'daily', say: d[8], jp: d[0], zh: d[2] });
     return animeLoad().then(list => {
-      list.forEach(w => w.lines.forEach(l => { if (AUDIO_IDX[l.jp]) out.push({ src: 'anime', say: l.jp, jp: l.jp, zh: l.zh, furi: l.furi }); }));
+      list.forEach(w => w.lines.forEach(l => { if (!AUDIO_IDX[l.jp] && w.aud && w.aud[l.jp]) AUDIO_IDX[l.jp] = w.aud[l.jp];   // 没打开过的作品：录音地址在作品自己的 aud 里
+        if (AUDIO_IDX[l.jp]) out.push({ src: 'anime', say: l.jp, jp: l.jp, zh: l.zh, furi: l.furi }); }));
       return out;
     }).catch(() => out);
   }

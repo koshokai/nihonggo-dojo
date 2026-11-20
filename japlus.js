@@ -161,6 +161,7 @@ const hardMode = L => S.demon || L === 'N1' || L === 'N2';
 let DEMON = null;
 const demonList = () => DEMON ? Promise.resolve(DEMON) : fetch('lang/ja-demon.json').then(r => r.ok ? r.json() : []).catch(() => []).then(d => (DEMON = d));
 function demonChallenge() {
+  if (typeof audioIdx === 'function') audioIdx('conj');   // 难读词的录音和变形练习放在同一个索引里
   demonList().then(list => {
     S.demon = true;
     const qs = [];

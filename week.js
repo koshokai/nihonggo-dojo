@@ -112,7 +112,7 @@ function weekPage(arg) {
   qz.querySelector('[data-qs]').onclick = () => wkQuiz(x, qz.querySelector('[data-qb]'), score => { const st = wkState(x.wk); st.q = Math.max(st.q, score); save(); tick(); });
   p.append(qz);
   p.append(h(`<section class="panel"><h3>本周会话</h3><div class="wk-talk">${x.k.map(([jp, kana, zh, note, f]) => `<div class="wk-t">
-    <div class="ex"><div style="flex:1;min-width:0"><div class="jp furi jtap" lang="ja">${jaTapHTML(jp, f)}</div><div class="small muted">${esc(zh)}</div></div><button class="speak" type="button" data-wks="${esc(kana)}" aria-label="朗读">${SPEAK_SVG}</button>${typeof shadowBtn === 'function' ? shadowBtn(jp, kana, zh) : ''}${favBtn('s', jp, zh, 'ja', f)}</div>
+    <div class="ex"><div style="flex:1;min-width:0"><div class="jp furi jtap" lang="ja">${jaTapHTML(jp, f)}</div><div class="small muted">${esc(zh)}</div></div><button class="speak" type="button" data-wks="${esc(kana)}" aria-label="朗读">${SPEAK_SVG}</button>${typeof shadowBtn === 'function' ? shadowBtn(jp, kana, zh) : ''}${favBtn('s', jp, zh, 'ja', f, kana)}</div>
     <div class="small wk-note">${jrNote(note)}</div></div>`).join('')}</div></section>`));
   const talk = p.lastElementChild;
   talk.querySelectorAll('.wk-t').forEach((el, i) => { const b = el.querySelector('[data-wks]'); b.onclick = () => { speak(b.dataset.wks); wkState(x.wk).t[i] = 1; save(); tick(); }; });

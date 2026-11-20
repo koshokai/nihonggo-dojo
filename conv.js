@@ -13,10 +13,14 @@ function sayJa(text) { return new Promise(res => { let done = false; const fin =
 // 母语的意思：没有录音，不用手机朗读，停一会儿让人看屏幕上的意思
 function sayTTS(text) { return waitMs(Math.min(3500, 900 + text.length * 120)); }
 // 中文、英语：有录音（MeloTTS / Kokoro）用录音（没有就跳过，不用手机朗读）
-function sayZh(text, code = 'zh', tts = 'zh-CN') {
-  const file = (LANG_IDX_READY[code] || {})[text];
-  if (!file) return new Promise(res => noVoice(res));
-  return new Promise(res => { let done = false; const fin = () => { if (!done) { done = true; res(); } }; const el = langPlayer(); el.src = audUrl(file); el.onended = fin; el.onerror = fin; el.play().catch(fin); setTimeout(fin, 1500 + text.length * 450); });
+// 录音目录还没好时先等一下（最多 8 秒）；公开目录里没有、是会员的话再到会员录音里找
+async function sayZh(text, code = 'zh', tts = 'zh-CN') {
+  if (!LANG_IDX_READY[code] && typeof langAudioIdx === 'function') await Promise.race([langAudioIdx(code), waitMs(8000)]).catch(() => {});
+  let src = (LANG_IDX_READY[code] || {})[text];
+  if (src) src = audUrl(src);
+  else if (typeof memberTextAudio === 'function' && typeof isMember === 'function' && isMember(code)) src = await memberTextAudio(code, text).catch(() => null);
+  if (!src) return new Promise(res => noVoice(res));
+  return new Promise(res => { let done = false; const fin = () => { if (!done) { done = true; res(); } }; const el = langPlayer(); el.src = src; el.onended = fin; el.onerror = fin; el.play().catch(fin); setTimeout(fin, 1500 + text.length * 450); });
 }
 async function commuteItems(src, n) {
   if (isEn()) {   // 英语：A1–C1 词表（en.js）
@@ -248,8 +252,22 @@ function viewReader() {
    ===================================================================== */
 // favBtn(种类 w/s/g, 正文, 补充（读音或翻译）, 语言)
 const favKey = (k, t) => k + '|' + t;
+// 收藏夹里的日语：录音按读音（假名）找，不能用写法。单词用「写法|读音」，句子用收藏时存下的假名（y）；以前收藏的句子到例句、语法、今日一句里找
+let FAV_KANA = null;
+const favSay = f => {
+  if (f.y) return f.y;
+  if (f.k === 'w') { const r = (f.s || '').split(/\s/)[0]; return r && r !== f.t && /^[ぁ-ゟァ-ヿー・]+$/.test(r) ? `${f.t}|${r}` : f.t; }
+  if (!FAV_KANA) {
+    FAV_KANA = new Map();
+    for (const rows of Object.values(typeof EXAMPLES !== 'undefined' && EXAMPLES || {})) for (const [jp, kana] of rows) if (!FAV_KANA.has(jp)) FAV_KANA.set(jp, kana);
+    for (const gs of Object.values(typeof GRAM !== 'undefined' ? GRAM : {})) for (const g of gs) for (const e of g.eg || []) if (e.full && e.kana && !FAV_KANA.has(e.full)) FAV_KANA.set(e.full, e.kana);
+    if (typeof DAILY !== 'undefined') for (const d of DAILY) { if (d[4] && d[5]) FAV_KANA.set(d[4], d[5]); if (d[0] && d[8]) FAV_KANA.set(d[0], d[8]); }
+    if (!EXAMPLES) { const m = FAV_KANA; setTimeout(() => { if (FAV_KANA === m) FAV_KANA = null; }, 0); }   // 例句还没加载好：下次再建
+  }
+  return FAV_KANA.get(f.t) || f.t;
+};
 const isFav = (k, t) => (S.fav || []).some(f => favKey(f.k, f.t) === favKey(k, t));
-const favBtn = (k, t, sub = '', l = 'ja', furi = '') => `<button class="speak fav ${isFav(k, t) ? 'on' : ''}" type="button" data-fav="${k}" data-ft="${esc(t)}" data-fs="${esc(sub)}" data-fl="${l}"${furi ? ` data-ff="${esc(furi)}"` : ''} aria-label="${T2('收藏', 'お気に入り')}">${isFav(k, t) ? '★' : '☆'}</button>`;
+const favBtn = (k, t, sub = '', l = 'ja', furi = '', say = '') => `<button class="speak fav ${isFav(k, t) ? 'on' : ''}" type="button" data-fav="${k}" data-ft="${esc(t)}" data-fs="${esc(sub)}" data-fl="${l}"${furi ? ` data-ff="${esc(furi)}"` : ''}${say ? ` data-fy="${esc(say)}"` : ''} aria-label="${T2('收藏', 'お気に入り')}">${isFav(k, t) ? '★' : '☆'}</button>`;
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-fav]');
   if (!b) return;
@@ -259,7 +277,7 @@ document.addEventListener('click', e => {
   const i = list.findIndex(f => favKey(f.k, f.t) === favKey(k, t));
   // 收藏例句时把它的假名（data-ff）一起存下来（f），收藏夹里就能标假名
   if (i >= 0) { list.splice(i, 1); toast(T2('已取消收藏', 'お気に入りから外しました')); }
-  else { list.unshift(Object.assign({ k, t, s: b.dataset.fs, l: b.dataset.fl, at: Date.now() }, b.dataset.ff ? { f: b.dataset.ff } : {})); toast(T2('已收藏 ★', 'お気に入りに追加 ★')); buzz(10); }
+  else { list.unshift(Object.assign({ k, t, s: b.dataset.fs, l: b.dataset.fl, at: Date.now() }, b.dataset.ff ? { f: b.dataset.ff } : {}, b.dataset.fy ? { y: b.dataset.fy } : {})); toast(T2('已收藏 ★', 'お気に入りに追加 ★')); buzz(10); }
   save();
   document.querySelectorAll(`[data-fav="${k}"]`).forEach(x => { if (x.dataset.ft === t) { x.classList.toggle('on', i < 0); x.textContent = i < 0 ? '★' : '☆'; } });
 }, true);
@@ -273,7 +291,7 @@ function viewFav() {
     <p class="muted">${T2('在单词卡片、例句、语法、读物旁边点 ☆ 就能收藏到这里。', '単語カード・例文・文法・読み物の ☆ をタップすると、ここに集まります。')}</p>
     <div class="row zh-cats"><button type="button" class="chip-btn ${favFilter ? '' : 'on'}" data-ff="">${T2('全部', 'すべて')} ${all.length}</button>${Object.entries(name).map(([k, n]) => `<button type="button" class="chip-btn ${favFilter === k ? 'on' : ''}" data-ff="${k}">${n} ${all.filter(f => f.k === k).length}</button>`).join('')}</div>
     ${list.length ? `<div class="fav-list">${list.map(f => `<div class="fav-item"><div><b lang="${zh ? 'zh-CN' : en ? 'en' : 'ja'}" class="${zh || en ? '' : 'furi'}">${zh || en ? esc(f.t) : f.f ? furiHTML(f.t, f.f) : f.k === 'w' && f.s && /^[ぁ-ゟァ-ヿー]+/.test(f.s) ? jrWord(f.t, f.s.split(/\s/)[0]) : jr(f.t)}</b>${f.s ? `<div class="small muted">${esc(f.s)}</div>` : ''}</div>
-      <span class="tag">${name[f.k] || ''}</span>${f.k !== 'g' ? (zh ? sayBtn(f.t, 'zh-CN') : en ? sayBtn(f.t, 'en-US') : speakBtn(f.t)) : ''}${favBtn(f.k, f.t, f.s, f.l)}</div>`).join('')}</div>` : `<p class="small muted">${T2('还没有收藏。在单词卡、例句、今日一句旁边点 ☆ 就会出现在这里。', 'まだありません。単語カード・例文・今日のひとことの ☆ をタップすると、ここに集まります。')}</p><div class="row"><a class="btn pri" href="#${en ? 'en/words' : zh ? 'zh/words' : 'vocab'}">${T2('去单词表看看', '単語帳を開く')}</a></div>`}
+      <span class="tag">${name[f.k] || ''}</span>${f.k !== 'g' ? (zh ? sayBtn(f.t, 'zh-CN') : en ? sayBtn(f.t, 'en-US') : speakBtn(favSay(f))) : ''}${favBtn(f.k, f.t, f.s, f.l)}</div>`).join('')}</div>` : `<p class="small muted">${T2('还没有收藏。在单词卡、例句、今日一句旁边点 ☆ 就会出现在这里。', 'まだありません。単語カード・例文・今日のひとことの ☆ をタップすると、ここに集まります。')}</p><div class="row"><a class="btn pri" href="#${en ? 'en/words' : zh ? 'zh/words' : 'vocab'}">${T2('去单词表看看', '単語帳を開く')}</a></div>`}
     <div class="row" ${all.length ? '' : 'hidden'}><button class="btn pri" type="button" data-cards ${all.some(f => f.k === 'w') ? '' : 'disabled'}>${T2('收藏的单词做成卡片', '単語をカードで復習')}</button><button class="btn" type="button" data-commute ${all.some(f => f.k === 'w') ? '' : 'disabled'}>🎧 ${T2('通勤听', '通勤リスニングで聞く')}</button><button class="btn ghost" type="button" data-export ${all.length ? '' : 'disabled'}>${T2('导出 Anki', 'Anki に書き出す')}</button></div></section>`);
   p.querySelectorAll('[data-ff]').forEach(b => { b.onclick = () => { favFilter = b.dataset.ff; render(); }; });
   p.querySelector('[data-cards]').onclick = async () => {

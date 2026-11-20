@@ -52,7 +52,7 @@ function corpus() {
 function sentencesWith(q, n = 5) {
   return corpus().filter(x => x.jp.includes(q)).sort((a, b) => a.jp.length - b.jp.length).slice(0, n);
 }
-const sentenceHTML = (x, mark) => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp furi jtap" lang="ja">${x.furi ? jaTapHTML(x.jp, x.furi, mark ? x.jp.indexOf(mark) : -1, mark && x.jp.indexOf(mark) >= 0 ? x.jp.indexOf(mark) + mark.length : -1) : mark ? esc(x.jp).split(esc(mark)).join(`<mark>${esc(mark)}</mark>`) : esc(x.jp)}</div><div class="small muted">${esc(x.zh)}</div></div>${speakBtn(x.kana, '朗读例句')}${shadowBtn(x.jp, x.kana, x.zh)}${typeof favBtn === 'function' ? favBtn('s', x.jp, x.zh, 'ja', x.furi || '') : ''}</div>`;
+const sentenceHTML = (x, mark) => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp furi jtap" lang="ja">${x.furi ? jaTapHTML(x.jp, x.furi, mark ? x.jp.indexOf(mark) : -1, mark && x.jp.indexOf(mark) >= 0 ? x.jp.indexOf(mark) + mark.length : -1) : mark ? esc(x.jp).split(esc(mark)).join(`<mark>${esc(mark)}</mark>`) : esc(x.jp)}</div><div class="small muted">${esc(x.zh)}</div></div>${speakBtn(x.kana, '朗读例句')}${shadowBtn(x.jp, x.kana, x.zh)}${typeof favBtn === 'function' ? favBtn('s', x.jp, x.zh, 'ja', x.furi || '', x.kana || '') : ''}</div>`;
 
 /* 搜索 */
 function searchAll(raw) {

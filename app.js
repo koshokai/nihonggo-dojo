@@ -317,6 +317,7 @@ const AUDIO_MORE = {};
 const addMore = d => { for (const k in d) if (!AUDIO_IDX[k]) AUDIO_IDX[k] = d[k]; };
 const audioIdx = name => AUDIO_MORE[name] || (AUDIO_MORE[name] = jsonOr(`${AUD}index-${name}.json`, addMore).then(addMore));
 // N2、N1 的例句录音很多（约 1.4 万句），只给在学 N2、N1 的人加载
+const LAZY_JA = ['biz', 'reading', 'examples-N2', 'examples-N1'];   // 查不到的句子再到这些目录里找（speak）
 const levelAudio = () => { if (S.level === 'N2' || S.level === 'N1') audioIdx('examples-' + S.level); };
 // 五十音单独一套（音高、长短、音量统一），优先于单词库里的同名录音
 let KANA_IDX = {};
@@ -359,6 +360,16 @@ function speak(text, opts = {}, pre) {
     if (IDX_FAILED.has(`${AUD2}index-dict-ja.json`)) DICT_JA_P = null;
     JA_IDX = jaIdxLoad();
     Promise.all([JA_IDX, dictJaIdx()]).then(() => { if (seq === speakSeq && curAudio === a) { curAudio = null; speak(pair || text, Object.assign({}, opts, { retried: true }), a); } });
+    return;
+  }
+  // 查不到：可能在按需加载的目录里（商务、阅读、N2/N1 例句——比如词典、翻译练习里出现别的级别的例句）。加载这些目录后再找一次
+  if (!file && !opts.more && LAZY_JA.some(n => !AUDIO_MORE[n]) && typeof SILENT_WAV !== 'undefined') {
+    stopSpeech(); const seq = ++speakSeq;
+    const a = pre || jaPlayer(); a.onended = a.onerror = null; a.src = SILENT_WAV; a.play().catch(() => {});
+    curAudio = a;
+    let done = false;
+    const go = () => { if (done || seq !== speakSeq || curAudio !== a) return; done = true; curAudio = null; speak(pair || text, Object.assign({}, opts, { more: true }), a); };
+    Promise.all(LAZY_JA.map(n => audioIdx(n).catch(() => {}))).then(go); setTimeout(go, 10000);
     return;
   }
   if (file) {
@@ -655,7 +666,7 @@ function startCards(host, ids, title, onExit) {
     const reveal = () => {
       if (revealed) return; revealed = true; fxFlip(card);
       stage.querySelector('[data-ans]').hidden = false; stage.querySelector('[data-hint]').hidden = true;
-      stage.querySelector('[data-grades]').hidden = false; stage.querySelector('[data-exbox]').hidden = false; if (S.autoSpeak) { if (e && typeof exAudioOK === 'function') exAudioOK('ja|' + e.kana, true).then(ok => speak(ok ? e.kana : v.r)); else speak(e ? e.kana : v.r); }
+      stage.querySelector('[data-grades]').hidden = false; stage.querySelector('[data-exbox]').hidden = false; if (S.autoSpeak) { if (e && typeof exAudioOK === 'function') exAudioOK('ja|' + e.kana, true).then(ok => { if (ok) speak(e.kana); else if (v.r) speak(v.r); }); else speak(e ? e.kana : v.r); }
       const wEl = stage.querySelector('.card .word'); if (wEl && !e) { wEl.classList.add('furi'); wEl.innerHTML = jrWord(v.w, v.r); }   // 翻开以后词头标假名（翻开前是测验，不标）
     };
     card.onclick = reveal;
