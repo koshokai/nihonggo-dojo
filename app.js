@@ -1444,7 +1444,7 @@ function viewVocab() {
   top.querySelector('[data-demon]').onclick = () => demonChallenge();
 
   const tbl = h(`<section class="panel">
-    <div class="row"><input type="search" id="v-search" placeholder="搜索单词、读音、中文或英文" value="${esc(vocabSearch)}" aria-label="搜索单词">
+    <div class="row"><input type="search" id="v-search" placeholder="搜单词、读音或意思" value="${esc(vocabSearch)}" aria-label="搜索单词">
       <select id="v-filter" aria-label="筛选"><option value="all">全部</option><option value="new">没学过</option><option value="learn">学习中</option><option value="done">已掌握</option></select></div>
     <p class="small muted">点一个单词展开例句，每句都能朗读。<span data-count></span></p>
     <div class="list-wrap"><table class="list vlist"><thead><tr><th>单词</th><th class="col-r">读音</th><th>意思</th><th class="col-st">状态</th><th></th></tr></thead><tbody></tbody></table></div>

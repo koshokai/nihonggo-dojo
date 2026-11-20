@@ -386,9 +386,9 @@ function zhWordsPage(Lsel) {
     const p = h(`<section class="panel zh-words">
       <h2>単語帳</h2>
       <div class="seg zh-lvseg" role="group" aria-label="級">${ZH_LEVELS.map(([L]) => `<a href="#zh/words/${L}" class="${zhLvNum(L) === n ? 'on' : ''}">${L}</a>`).join('')}</div>
-      <div class="lv-row"><b>HSK${n}</b><div class="bar"><i style="width:${known / list.length * 100}%"></i></div></div>
+      <div class="lv-row zh-prog"><span class="small muted">覚えた</span><div class="bar"><i style="width:${known / list.length * 100}%"></i></div><span class="small muted">${known} / ${list.length}</span></div>
       <div class="row"><button class="btn pri" type="button" data-new ${fresh.length ? '' : 'disabled'}>新しい単語を覚える</button><button class="btn" type="button" data-quiz>テスト</button></div>
-      <input class="lb-input" type="search" placeholder="この級の中で探す（中国語・ピンイン・日本語）" value="${esc(zhWordsQ)}" data-q>
+      <input class="lb-input" type="search" placeholder="中国語・ピンイン・日本語で探す" value="${esc(zhWordsQ)}" data-q>
       <div class="zh-list" data-list></div>
       <div class="row" data-morebox></div>
       <p class="small muted">英語の語義は CC-CEDICT（CC BY-SA 4.0）、HSK 語彙表は complete-hsk-vocabulary（MIT）、HSK 外の語の選定は wordfreq（CC BY-SA 4.0）より。日本語訳と例文は当サイトのオリジナルです。</p>
@@ -522,9 +522,9 @@ let zhDictQ = '';
 function zhDictPage(host, q) {
   if (q != null) zhDictQ = q;
   const p = h(`<section class="panel zh-dict"><h2>辞書</h2>
-    <form class="dict-form" data-form role="search"><input type="search" placeholder="中国語・ピンイン（声調なしでOK）・日本語・英語" value="${esc(zhDictQ)}" aria-label="辞書を検索" autocomplete="off" data-in><button class="btn pri" type="submit">検索</button></form>
+    <form class="dict-form" data-form role="search"><input type="search" placeholder="中国語・ピンイン・日本語・英語" value="${esc(zhDictQ)}" aria-label="辞書を検索" autocomplete="off" data-in><button class="btn pri" type="submit">検索</button></form>
     <div class="row small"><span class="muted">例：</span>${['你好', 'xiexie', '経済', 'おいしい', '电脑', 'happy'].map(w => `<button type="button" class="chip-btn" data-try="${w}">${w}</button>`).join('')}</div>
-    <p class="small muted" data-st>HSK 1〜6級の単語と HSK 外のよく使う語を収録。日本の漢字（経済・電話など）で入力しても簡体字に変換して探します。</p>
+    <p class="small muted" data-st>HSK 1〜6級の単語と HSK 外のよく使う語を収録。日本の漢字（経済・電話など）で入力しても簡体字に変換して探します。ピンインは声調なしでも OK です。</p>
     <div class="zh-list" data-res></div></section>`);
   host.append(p);
   const inp = p.querySelector('[data-in]'), res = p.querySelector('[data-res]'), st = p.querySelector('[data-st]');
@@ -680,8 +680,13 @@ function zhListenPage() {
     const p = h(`<section class="panel"><h2>リスニング</h2>
       <p class="muted">会話やアナウンスを聞いて答えます。答えたあとで原文・ピンイン・日本語訳を確認できます。</p>
       <div class="seg zh-lvseg">${ZH_LEVELS.map(([L]) => `<button type="button" data-lv="${L}" class="${L === lv ? 'on' : ''}">${L}</button>`).join('')}</div>
-      <div class="row"><button class="btn pri big" type="button" data-lstart ${pool.length ? '' : 'disabled'}>${Math.min(5, pool.length)} 問に挑戦</button></div></section>`);
+      <div class="row"><button class="btn pri big" type="button" data-lstart ${pool.length ? '' : 'disabled'}>${Math.min(5, pool.length)} 問に挑戦</button>
+        <span class="small muted">${lv}：${pool.length} 問 · 解いた ${pool.filter(x => done[x.id]).length} 問</span></div>
+      ${pool.length ? `<ol class="ls-list">${pool.map((x, k) => `<li><button type="button" class="ls-item${done[x.id] ? ' done' : ''}" data-one="${k}">
+        <span class="ls-n">${done[x.id] ? '✓' : k + 1}</span><span class="ls-b"><span class="ls-q">${esc(x.q)}</span><span class="small muted">${esc(x.t || '')}</span></span></button></li>`).join('')}</ol>` : ''}</section>`);
     p.querySelectorAll('[data-lv]').forEach(b => { b.onclick = () => { zhListenLv = b.dataset.lv; render(); }; });
+    // 一覧から 1 問だけ解く（会員向けの級は同じ判定）
+    p.querySelectorAll('[data-one]').forEach(b => { b.onclick = () => { if (zhGuest() && zhLvNum(lv) > 2) return zhLocked('リスニング ' + lv); zhListenRun([pool[+b.dataset.one]]); }; });
     p.querySelector('[data-lstart]').onclick = () => {
       if (zhGuest() && zhLvNum(lv) > 2) return zhLocked('リスニング ' + lv);
       const fresh = pool.filter(x => !done[x.id]);

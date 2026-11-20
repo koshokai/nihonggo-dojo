@@ -176,7 +176,7 @@ function enWordsPage(lvArg) {
         <div class="stat"><span class="small muted">${'To review'}</span><b>${due.length}</b></div>
       </div>
       <div class="row"><button class="btn pri" type="button" data-cards>Flashcards (review ${Math.min(due.length, 50)} + new 10)</button><button class="btn" type="button" data-quiz>${'Quiz (10)'}</button></div>
-      <input type="search" class="lv-q" placeholder="${'Search this level: English / 中文 / 日本語'}" value="${esc(enQuery)}">
+      <input type="search" class="lv-q" placeholder="${'Search: English / 中文 / 日本語'}" value="${esc(enQuery)}">
       <div class="en-list">${list.slice(0, enShown).map((x, i) => `<details class="en-row"><summary><span class="en-w" lang="en">${esc(x.w)}</span><span class="en-ipa">${esc(x.ipa ? `/${x.ipa}/` : '')}</span><span class="tag">${esc(enPos(x.pos))}</span><span class="en-m">${enGlossHTML(x)}</span>${S.srs[x.id] ? `<span class="tag done">${'Learned'}</span>` : ''}</summary>
         <div class="en-body"><div class="row">${sayBtn(x.w, 'en-US')}${typeof favBtn === 'function' ? favBtn('w', x.w, enGloss(x), 'en') : ''}<button type="button" class="chip-btn" data-add="${i}">${S.srs[x.id] ? 'In your cards' : '+ Add to cards'}</button></div>${enExHTML(x)}</div></details>`).join('')}</div>
       ${list.length > enShown ? `<div class="row" style="justify-content:center"><button class="btn" type="button" data-more>${'Show more'}</button></div>` : ''}

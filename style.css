@@ -1752,3 +1752,42 @@ details.gp summary > :last-child:not(.pat):not(.muted) { grid-area: fav; }
 .inv-land-top { display: flex; align-items: center; gap: 10px; justify-content: center; text-align: left; }
 .inv-land-top svg { width: 56px; height: 60px; }
 .inv-land-top > div { display: grid; }
+
+/* ===== 页面美化（v280） ===== */
+/* 顶部小圆标：手机上也显示单位（连续「3 天」、经验「13/50」），一眼看懂；窄屏省掉品牌文字给它们让位 */
+@media (max-width: 560px) {
+  .top .chip-l { display: inline; font-size: .72rem; font-weight: 600; margin-left: -1px; }
+  #chip-online .chip-l { display: none; }
+}
+@media (max-width: 430px) { .brand > span:last-child { display: none; } .top-in { gap: 8px; } }
+/* 级别选择（HSK1–6、N5–N1、A1–C1）：一行放下、每个一样宽，不再折成两行 */
+.zh-lvseg, .panel > .seg.read-lv, .panel > .seg.lv-seg { display: flex; flex-wrap: nowrap; width: 100%; max-width: 440px; overflow: visible; }
+.zh-lvseg > *, .panel > .seg.read-lv > *, .panel > .seg.lv-seg > * { flex: 1 1 0; min-width: 0; padding: 6px 2px; text-align: center; white-space: nowrap; font-size: .88rem; }
+/* 单词表的释义：最多两行，不再一行就被截断 */
+.zh-row-w .zh-ja { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.35; }
+/* VIP 角标放在卡片上沿，不压住标题 */
+.vip-tag:not(.inl) { top: -7px; right: 12px; box-shadow: 0 2px 6px rgba(124, 58, 237, .25); }
+/* 每周打卡的四个格子：文字不挤出格子 */
+.wk-step { padding: 10px 2px; }
+.wk-step span { font-size: .78rem; white-space: nowrap; letter-spacing: -.02em; }
+/* 「全文を聞く」等按钮：不被挤成一个字一行 */
+.btn[data-all] { flex: 0 0 auto; white-space: nowrap; }
+/* 返回链接做成小按钮（「← 我的」「← 全部主题」…） */
+a.an-back { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 6px 14px 6px 10px; margin: 0 0 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); text-decoration: none; font-size: .9rem; font-weight: 600; }
+a.an-back:hover { border-color: var(--ai); color: var(--ai); }
+/* 英语课程的台词不需要给假名留行距 */
+.cl-jp[lang="en"] { line-height: 1.55; }
+/* 中文听力：本级的题目一览 */
+.ls-list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+.ls-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); text-align: left; cursor: pointer; font: inherit; }
+.ls-item:hover { border-color: var(--ai); }
+.ls-n { flex: 0 0 auto; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--ai-soft); color: var(--ai); font-weight: 700; font-size: .85rem; }
+.ls-item.done .ls-n { background: var(--ok, #2fbf71); color: #fff; }
+.ls-b { display: grid; gap: 2px; min-width: 0; }
+.ls-q { font-weight: 600; }
+/* 六个级别（HSK1–6）的选择：字小一点，选中的也不被切掉 */
+.zh-lvseg:has(> :nth-child(6)) > *, .panel > .seg.read-lv:has(> :nth-child(6)) > * { font-size: .8rem; letter-spacing: -.02em; }
+/* 返回按钮只占文字的宽度 */
+a.an-back { align-self: flex-start; width: fit-content; max-width: 100%; }
+/* 中文单词帐：已掌握的进度（覚えた 3 / 150） */
+.lv-row.zh-prog { grid-template-columns: auto 1fr auto; }
