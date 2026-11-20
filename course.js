@@ -252,6 +252,7 @@ function courseQuiz(box, l) {
     if (i >= l.quiz.length) {
       const prev = courseDone(l.id);
       (S.course = S.course || {})[l.id] = { t: Date.now(), s: Math.max(right, prev ? prev.s : 0), n: l.quiz.length };
+      if (typeof actLog === 'function') actLog('c', 'ja');   // 学习方案：今天上了一课情景会话
       if (!prev) addXP(20 + right * 5); else save();
       box.innerHTML = `<div class="cl-result"><b>答对 ${right} / ${l.quiz.length}</b><span class="small muted">${prev ? '这一课已经学过了，复习得很好。' : `这一课学完了，+${20 + right * 5} 经验。`}</span><button class="btn" type="button">再做一次</button></div>`;
       box.querySelector('button').onclick = () => { i = 0; right = 0; show(); };

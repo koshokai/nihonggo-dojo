@@ -103,6 +103,7 @@ function animeQuiz(box, w, list) {
     if (i >= qs.length) {
       box.innerHTML = `<p>答对 ${right} / ${qs.length}。</p><button class="btn" type="button">再来一次</button>`;
       box.querySelector('button').onclick = () => animeQuiz(box, w, list);
+      if (typeof actLog === 'function') actLog('a', 'ja');   // 学习方案：今天练了一段台词
       if (right) addXP(right * 5);
       return;
     }

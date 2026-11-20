@@ -211,7 +211,12 @@ const startOfToday = () => { const d = new Date(); d.setHours(0, 0, 0, 0); retur
 function streak() {
   const d = new Date(); let n = 0;
   if (!(S.days[dkey(d)] > 0)) d.setDate(d.getDate() - 1);
-  while (S.days[dkey(d)] > 0) { n++; d.setDate(d.getDate() - 1); }
+  // 学习方案里的休息日（plan.js）：没学也不算断，但不计入天数
+  for (let i = 0; i < 4000; i++) {
+    if (S.days[dkey(d)] > 0) n++;
+    else if (!(typeof planRest === 'function' && planRest(d))) break;
+    d.setDate(d.getDate() - 1);
+  }
   return n;
 }
 const todayXP = () => S.days[dkey()] || 0;
@@ -945,7 +950,7 @@ function quizSummary(host, r, { title, again, extraHTML = '' }) {
 }
 
 /* ---------- 页面 ---------- */
-const VIEWS = { home: viewHome, week: viewWeek, vip: viewVip, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, study: viewStudy, ri: viewRI, ko: () => { location.replace('#home'); },   // 韩语板块已删除，旧链接回首页
+const VIEWS = { plan: () => viewPlan(), home: viewHome, week: viewWeek, vip: viewVip, read: viewRead, biz: viewBiz, game: viewGame, dict: viewDict, kana: viewKana, vocab: viewVocab, kanji: viewKanji, grammar: viewGrammar, exam: viewExam, listen: viewListen, study: viewStudy, ri: viewRI, ko: () => { location.replace('#home'); },   // 韩语板块已删除，旧链接回首页
    zh: sub => viewZh(sub), commute: () => viewCommute(), calendar: () => viewCalendar(), reader: () => { location.replace('#home'); },   // 「贴一段就能读」已下线（注音、读音常对不上），旧链接回首页
    fav: () => viewFav(), offline: () => viewOffline(), en: viewEn, me: viewMe, welcome: viewWelcome, about: viewAbout, anime: viewAnime, trans: () => viewTrans('ja'), conj: viewConj, dictation: () => viewDictation('ja'), course: viewCourse, duel: viewDuel, buddy: viewBuddy, hi: sub => viewHi(sub), check: () => viewCheck(), diag: () => viewDiag(), path: arg => viewPath(arg) };
 // 大的数据文件用到才加载（首页少加载约 1.3 MB）：阅读 800 KB、商务 314 KB、模拟考 172 KB
@@ -970,7 +975,7 @@ function render() {
   if (lsStop) lsStop();
   if (typeof fxPageOut === 'function') fxPageOut();   // 旧页面化成颗粒消失（fx.js）
   main.innerHTML = '';
-  if (trackOf(view) === 'ja' && ['home', 'week', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict', 'study', 'ri', 'conj', 'anime', 'trans', 'dictation', 'course'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
+  if (trackOf(view) === 'ja' && ['home', 'week', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict', 'study', 'ri', 'conj', 'anime', 'trans', 'dictation', 'course', 'plan'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
   applyTrack(view);
   document.body.classList.toggle('welcome-mode', view === 'welcome');   // 选语言页：先隐藏顶部状态、搜索和底部导航，专心选
   document.body.classList.toggle('hi-mode', view === 'hi');
@@ -1255,7 +1260,8 @@ function viewHome() {
   const progress = homeProgress();
 
   const ns = nextStage(S.level);
-  const tasks = [
+  const usePlan = typeof planOn === 'function' && planOn();
+  const tasks = usePlan ? planTasks() : [
     { ic: '関', t: `闯关 · ${S.level} 第 ${ns} 关${isBoss(ns) ? '（头目关）' : ''}`, d: `已获得 ${totalStars(S.level)} 颗星，每关一组新词`, go: () => stageIntro(S.level, ns) },
     { ic: '復', t: '复习到期卡片', d: due ? `${due} 张卡片到了复习时间` : '没有到期的卡片', done: !due, go: () => { if (due) { const host = h('<div></div>'); main.innerHTML = ''; main.append(host); startCards(host, shuffle(dueList(LEVELS)).map(v => v.id), '复习到期卡片', () => go('home')); } } },
     { ic: '新', t: `学习 ${S.level} 新单词`, d: nl ? `今天还可以学 ${nl} 个新词` : newList(S.level).length ? `今天的 ${S.newPerDay} 个新词已学完` : `${S.level} 的单词都学过了，去「我的」换个级别吧`, done: !nl, go: () => { if (nl) { const host = h('<div></div>'); main.innerHTML = ''; main.append(host); startCards(host, newList(S.level).slice(0, nl).map(v => v.id), `${S.level} 新单词`, () => go('home')); } } },
@@ -1264,13 +1270,14 @@ function viewHome() {
     typeof nightTask === 'function' ? nightTask() : null,   // 傍晚以后：睡前复习（conv.js）
     S.level === 'N5' ? { ic: 'あ', t: '假名热身', d: '10 道假名识读题', go: () => go('kana') } : null
   ].filter(Boolean);
-  const tp = h(`<section class="panel"><div class="row between"><h2>今日任务</h2><span class="small muted">目标级别 ${S.level}</span></div><div class="tasks"></div></section>`);
+  const tp = h(`<section class="panel"><div class="row between"><h2>${usePlan ? tj('今日任务 · 我的方案', '今日のタスク・マイプラン') : '今日任务'}</h2>${usePlan ? `<a class="small" href="#plan">${tj('调整方案', 'プランを調整')}</a>` : `<span class="small muted">目标级别 ${S.level}</span>`}</div>${typeof planHead === 'function' ? planHead() : ''}<div class="tasks"></div></section>`);
   tasks.forEach(t => {
     const el = h(`<div class="task ${t.done ? 'done' : ''}"><span class="task-ic" lang="ja">${t.done ? '✓' : t.ic}</span><div class="task-t"><b>${esc(t.t)}</b><div class="small muted">${esc(t.d)}</div></div>${t.done ? '' : '<button class="btn pri" type="button">开始</button>'}</div>`);
     const b = el.querySelector('button'); if (b) b.onclick = t.go;
     tp.querySelector('.tasks').append(el);
   });
-  main.append(homeHead(hi, ...top), tp, ...after);
+  const rv = typeof planReviewCard === 'function' && planReviewCard();   // 每周回顾（周日）
+  main.append(homeHead(hi, ...top), ...(rv ? [rv] : []), tp, ...after);
 
   const lvRows = LEVELS.map(L => { const n = VOCAB[L].filter(learned).length, t = VOCAB[L].length; return `<div class="lv-row"><b>${L}</b><div class="bar"><i style="width:${n / t * 100}%"></i></div></div>`; }).join('');
   main.append(homeFold([progress, homeRecords(lvRows), homeStamps()]), ...banners);
@@ -1786,6 +1793,7 @@ function viewMe(sec) {
     { id: 'inbox', ic: '信', t: tj('消息与学习提醒', 'お知らせと学習リマインダー'), d: tj('站内消息、每天的学习提醒', 'アプリ内のお知らせ、毎日の学習リマインダー'), show: () => cloudOn() || typeof appReminderPanel === 'function', badge: 'inbox',
       build: () => [typeof appReminderPanel === 'function' ? appReminderPanel() : null, typeof inboxPanel === 'function' ? inboxPanel() : null] },
     { id: 'features', ic: '✨', t: tj('功能地图', '機能マップ'), d: tj('容易被忽略的好用功能', '見落としがちな便利機能'), build: () => [featuresPanel()] },
+    { id: 'plan', ic: '案', t: tj('我的学习方案', 'わたしの学習プラン'), d: tj('自己定目标、每天多久、哪几天学', '目標・1 日の時間・学ぶ曜日を自分で決める'), href: '#plan', show: () => (S.track || 'ja') === 'ja' },
     { id: 'calendar', ic: '暦', t: tj('学习日历', '学習カレンダー'), d: tj('每天学了多少、断签补签', '毎日の学習量・連続記録の補填'), href: '#calendar' },
     { id: 'fav', ic: '★', t: tj('收藏夹', 'お気に入り'), d: tj('收藏的单词、句子、语法', '保存した単語・文・文法'), href: '#fav' },
     { id: 'offline', ic: '⬇', t: tj('离线录音', 'オフライン音声'), d: tj('下载录音，没网也能听', '音声を保存して電波がなくても聞ける'), href: '#offline' },
@@ -1813,7 +1821,7 @@ function viewMe(sec) {
   const EN_ME = { invite: ['Invite friends', 'A free week for you when a friend studies 3 days'], path: ['Learning roadmap', 'Where to start, where you are, stage tests'], vip: ['Membership', 'What members get, plans and prices'], buddy: ['Study buddies', 'Check in together and nudge each other'], inbox: ['Messages & reminders', 'In-app messages and daily study reminders'], features: ['Feature map', 'Handy features you might have missed'], calendar: ['Study calendar', 'What you studied each day, streak repair'], fav: ['Favorites', 'Saved words and sentences'], offline: ['Offline audio', 'Download audio to listen without a connection'], exam: ['Exam goal', 'Countdown and how many new words a day'], weak: ['Weak spots', 'Missed questions, accuracy by type, targeted practice'], weekly: ['This week', 'How much you studied, compared with last week'], rank: ['Weekly ranking', 'Optional; shows only your nickname and XP'], share: ['Share your progress', 'Make an image to share'], settings: ['Settings', 'Language, level, daily goal, display'], voice: ['Audio', 'Speed, voice source, auto-play'], device: ['Device & backup', 'Add to home screen, backup, switching phones'], account: ['Account & sync', 'Sign in, cloud sync, delete account'] };
   if (S.track === 'en') SECTIONS.forEach(x => { if (EN_ME[x.id]) [x.t, x.d] = EN_ME[x.id]; });
   // 分组显示：会员 → 学习 → 和朋友一起 → 设置与账号（一长串同样分量的行，常用的设置找不到）
-  const GROUPS = [['top', '', ['vip']], ['study', tje('学习', '学習', 'Study'), ['path', 'calendar', 'fav', 'offline', 'exam', 'weak', 'weekly', 'diag', 'check']], ['social', tje('和朋友一起', '仲間と一緒に', 'With friends'), ['invite', 'buddy', 'inbox', 'rank', 'share']], ['settings', tje('设置与账号', '設定とアカウント', 'Settings & account'), ['settings', 'voice', 'device', 'account', 'features']]];
+  const GROUPS = [['top', '', ['vip']], ['study', tje('学习', '学習', 'Study'), ['plan', 'path', 'calendar', 'fav', 'offline', 'exam', 'weak', 'weekly', 'diag', 'check']], ['social', tje('和朋友一起', '仲間と一緒に', 'With friends'), ['invite', 'buddy', 'inbox', 'rank', 'share']], ['settings', tje('设置与账号', '設定とアカウント', 'Settings & account'), ['settings', 'voice', 'device', 'account', 'features']]];
   const row = x => `<a class="me-row" href="${x.href || '#me/' + x.id}" data-sec="${x.id}">
       <span class="course-ic">${x.ic}</span><div><b>${esc(x.t)}</b><span class="small muted">${esc(x.d)}</span></div>
       ${x.badge ? `<span class="red-dot" data-badge="${x.badge}" hidden></span>` : ''}<span class="me-go" aria-hidden="true">›</span></a>`;

@@ -150,6 +150,7 @@ function bizScene(sc) {
     const first = st.s[sc.id] == null;
     st.s[sc.id] = Math.max(st.s[sc.id] || 0, right);
     const xp = first ? 20 + right * 5 : right * 2;
+    if (typeof actLog === 'function') actLog('b', 'ja');   // 学习方案：今天学了一段商务日语
     addXP(xp); save();
     if (right === sc.q.length) celebrate();
     const next = BIZ.scenes.find(x => st.s[x.id] == null);
@@ -272,6 +273,7 @@ function bizMail(m) {
     const first = st.m[m.id] == null;
     st.m[m.id] = Math.max(st.m[m.id] || 0, right);
     const xp = first ? 15 + right * 5 : right * 2;
+    if (typeof actLog === 'function') actLog('b', 'ja');   // 学习方案：今天学了一段商务日语
     addXP(xp); save();
     const next = BIZ.mails.find(x => st.m[x.id] == null);
     qbox.append(h(`<div class="ra-done"><b>${right === m.q.length ? '全对！' : `答对 ${right}/${m.q.length}`}</b> 获得 ${xp} 经验。

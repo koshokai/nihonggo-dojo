@@ -143,6 +143,7 @@ function playStage(L, n) {
           const v = x.q.item;
           if (x.ok && v && !S.srs[v.id]) { S.srs[v.id] = { i: 1, e: 2.5, r: 1, due: startOfToday() + DAY }; added++; }
         }
+        if (typeof actLog === 'function') actLog('s', 'ja');   // 学习方案：今天闯了一关
         addXP((isBoss(n) ? 40 : 15) + stars * 5);
       }
       checkBadges(); save();
