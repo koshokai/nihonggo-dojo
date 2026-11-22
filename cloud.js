@@ -9,7 +9,8 @@ function cloudClient() {
     sbLoading = new Promise((ok, fail) => {
       const s = document.createElement('script');
       s.src = 'vendor/supabase.js';   // 放在本站：jsDelivr 在中国大陆经常连不上
-      s.onload = () => { sb = window.supabase.createClient(CLOUD.url, CLOUD.anonKey, { auth: { persistSession: true, autoRefreshToken: true } }); ok(sb); };
+      // App 里的一键登录用 PKCE：跳回 App 的链接里只有一次性的 code，被别的 App 截到也换不出登录凭证
+      s.onload = () => { sb = window.supabase.createClient(CLOUD.url, CLOUD.anonKey, { auth: { persistSession: true, autoRefreshToken: true, flowType: window.DOJO_APP ? 'pkce' : 'implicit' } }); ok(sb); };
       s.onerror = () => { sbLoading = null; fail(new Error(tj('无法连接服务器', 'サーバーに接続できません'))); };
       document.head.append(s);
     });

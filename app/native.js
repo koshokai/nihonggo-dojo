@@ -141,7 +141,7 @@
       async line() {
         if (LineLogin && CLOUD.lineChannelId) {
           let r;
-          try { r = await LineLogin.login({ channelId: CLOUD.lineChannelId }); } catch (e) {
+          try { r = await LineLogin.login({ channelId: CLOUD.lineChannelId, ...(CLOUD.lineBot ? { botPrompt: 'normal' } : {}) }); } catch (e) {   // lineBot：登录时顺便加官方账号为好友
             if (e && (e.code === 'CANCELLED' || /cancel/i.test(e.message || ''))) throw cancelled(e);
             throw e;
           }

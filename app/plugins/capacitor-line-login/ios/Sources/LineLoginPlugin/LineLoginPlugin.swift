@@ -40,7 +40,10 @@ public class LineLoginPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject("no view controller")
                 return
             }
-            LoginManager.shared.login(permissions: [.profile, .openID], in: vc) { result in
+            // 登录时顺便加 LINE 官方账号为好友（官方账号要先在 LINE Developers 里关联到这个登录频道；JS 传 botPrompt: "normal" / "aggressive"）
+            var params = LoginManager.Parameters()
+            if let bp = call.getString("botPrompt"), !bp.isEmpty { params.botPromptStyle = bp == "aggressive" ? .aggressive : .normal }
+            LoginManager.shared.login(permissions: [.profile, .openID], in: vc, parameters: params) { result in
                 switch result {
                 case .success(let r):
                     guard let idToken = r.accessToken.IDTokenRaw else {

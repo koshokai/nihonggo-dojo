@@ -11,7 +11,7 @@ const TRACKS = {
   en: { name: 'English', home: 'en', title: 'English', tts: 'en-US', data: () => true }
 };
 // 「我的」这类公共页面不属于某一门语言：留在当前正在学的语言里（导航栏不跳回日语）
-const TRACK_NEUTRAL = ['hi', 'check', 'diag', 'path', 'me', 'welcome', 'about', 'buddy', 'duel', 'commute', 'reader', 'fav', 'offline', 'calendar', 'vip'];   // 伙伴、对战也是公共页面（学中文的日本用户也用）
+const TRACK_NEUTRAL = ['hi', 'check', 'diag', 'path', 'me', 'welcome', 'about', 'buddy', 'duel', 'commute', 'reader', 'fav', 'offline', 'calendar', 'vip', 'plan'];   // 伙伴、对战也是公共页面（学中文的日本用户也用）
 const trackOf = view => view === 'zh' || view === 'en' ? view : TRACK_NEUTRAL.includes(view) ? (S.track || 'ja') : 'ja';
 
 // MeloTTS 预生成的音频（audio/index-ko.json、index-en.json：朗读文本 → mp3），没有的再用浏览器朗读

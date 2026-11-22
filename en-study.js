@@ -139,7 +139,7 @@ function enGramQuiz(list, pairs, title) {
   });
   main.innerHTML = '';
   const host = h('<div></div>'); main.append(host);
-  runQuiz(host, qs, { title, noRecord: true, xpEach: 5, onDone: r => { if (!r) { render(); return; } quizSummary(host, r, { title, again: () => enGramQuiz(list, pairs.length === 2 ? pairs : sample(list.flatMap(x => x.quiz.map(q => [x, q])), 10), title) }); } });
+  runQuiz(host, qs, { title, noRecord: true, xpEach: 5, act: ['g', 'en'], onDone: r => { if (!r) { render(); return; } quizSummary(host, r, { title, again: () => enGramQuiz(list, pairs.length === 2 ? pairs : sample(list.flatMap(x => x.quiz.map(q => [x, q])), 10), title) }); } });
 }
 
 /* ---------- 阅读 ---------- */

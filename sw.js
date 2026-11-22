@@ -3,7 +3,7 @@
 // 发音 MP3：先用缓存（离线也能听），同时在后台向网络确认一次，录音重录过（同名文件内容变了）就更新缓存，下次播放就是新录音。
 // AUDIO 换名字（audio-v3）：清掉以前缓存的全部录音（有些录音重录时没换文件名，听过的人一直是旧录音）。
 // 账号、同步等跨域请求（Supabase、jsDelivr）不经过缓存。
-const VERSION = 'v284';
+const VERSION = 'v286';
 const SHELL = `shell-${VERSION}`, AUDIO = 'audio-v3';
 const CORE = ['./', 'index.html', 'style.css', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-maskable-192.png', 'icon-maskable-512.png', 'icon.svg',
   'boot.js', 'lazyja.js', 'i18n.js', 'mascot.js', 'fx.js', 'japlus.js', 'furi-map.js', 'kanapad.js', 'swipe.js', 'conv.js', 'pitch.js', 'tour.js', 'zh.js', 'zh-biz.js', 'practice2.js', 'week2.js', 'vocab.js', 'kanji.js', 'grammar.js', 'data.js', 'daily.js', 'jlpt.js', 'game.js', 'dict.js', 'reading.js',
@@ -37,9 +37,10 @@ self.addEventListener('fetch', e => {
     return;
   }
   // 页面跳转：离线时回到首页
-  const key = req.mode === 'navigate' ? 'index.html' : req;
+  // 只有首页本身存成 index.html（打开 admin.html、promo.html 时不能把它们存成首页）
+  const nav = req.mode === 'navigate', key = nav ? 'index.html' : req, isIndex = /\/(index\.html)?$/.test(url.pathname);
   e.respondWith(caches.open(SHELL).then(async c => {
-    const fromNet = fetch(req, { cache: 'no-cache' }).then(res => { if (res.ok) c.put(key, res.clone()); return res; });
+    const fromNet = fetch(req, { cache: 'no-cache' }).then(res => { if (res.ok && (!nav || isIndex)) c.put(key, res.clone()); return res; });
     const timeout = new Promise(r => setTimeout(r, 3000));
     try {
       const res = await Promise.race([fromNet, timeout]);

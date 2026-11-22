@@ -1842,3 +1842,8 @@ html.boot header.top, html.boot main, html.boot .foot { visibility: hidden; }
 html.boot body::after { content: ''; position: fixed; inset: 0; margin: auto; width: 64px; height: 64px; border-radius: 16px; background: url(icon-192.png) center / contain no-repeat; opacity: 0; animation: bootMark .5s ease .8s forwards; pointer-events: none; }
 @keyframes bootMark { to { opacity: .85; } }
 @media (prefers-reduced-motion: reduce) { html.boot body::after { animation-duration: .01s; } }
+
+/* 学习方案：级别按钮单独一行、平均分宽（HSK 有 6 级，放在标签旁边会折成两行） */
+.plan .pl-sub { flex-wrap: wrap; row-gap: 6px; }
+.plan .pl-sub .seg.read-lv { width: 100%; display: flex; flex-wrap: nowrap; }
+.plan .pl-sub .seg.read-lv > button { flex: 1 1 0; min-width: 0; padding-left: 2px; padding-right: 2px; }

@@ -143,7 +143,7 @@ function enCoLesson(tid, lid) {
     if (box) enCoQuiz(box, l.quiz, score => {
       const first = !(l.id in S.enCourse), xp = first ? 10 + score * 5 : 0;
       S.enCourse[l.id] = Math.max(score, S.enCourse[l.id] || 0);
-      if (typeof actLog === 'function') actLog('r', 'en');
+      if (typeof actLog === 'function') actLog('c', 'en');
       if (xp) addXP(xp); else save();
       enCoDone(box, score, l.quiz.length, xp, `${next ? `<a class="btn pri" href="#en/course/${esc(tid)}/${esc(next.id)}">${'Next lesson'}</a>` : ''}<a class="btn" href="#en/course/${esc(tid)}">${'All lessons'}</a>`);
     });
@@ -225,7 +225,7 @@ function enBizMail(id) {
     if (box) enCoQuiz(box, m.quiz, score => {
       const first = !(m.id in S.enBizM), xp = first ? 15 + score * 5 : 0;
       S.enBizM[m.id] = Math.max(score, S.enBizM[m.id] || 0);
-      if (typeof actLog === 'function') actLog('r', 'en');
+      if (typeof actLog === 'function') actLog('b', 'en');
       if (xp) addXP(xp); else save();
       enCoDone(box, score, m.quiz.length, xp, `${next ? `<a class="btn pri" href="#en/biz/m/${esc(next.id)}">${'Next email'}</a>` : ''}<a class="btn" href="#en/biz">${'All emails'}</a>`);
     });
@@ -258,5 +258,5 @@ function enBizVocabQuiz(c, cats) {
   main.innerHTML = '';
   const host = h('<div></div>'); main.append(host);
   const title = `Business vocabulary · ${c.title_en}`;
-  runQuiz(host, qs, { title, noRecord: true, xpEach: 5, onDone: r => { if (!r) { render(); return; } quizSummary(host, r, { title, again: () => enBizVocabQuiz(c, cats) }); } });
+  runQuiz(host, qs, { title, noRecord: true, xpEach: 5, act: ['b', 'en'], onDone: r => { if (!r) { render(); return; } quizSummary(host, r, { title, again: () => enBizVocabQuiz(c, cats) }); } });
 }

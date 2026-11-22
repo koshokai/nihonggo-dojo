@@ -101,7 +101,7 @@ function zhBizMail(d, i) {
     const ob = new MutationObserver(() => { if (main.querySelector('[data-again]')) { ob.disconnect(); if (st.m[m.id] == null) { st.m[m.id] = Date.now(); addXP(10); save(); } } if (!document.body.contains(qb) && !main.querySelector('.quiz, [data-again]')) ob.disconnect(); });
     ob.observe(main, { childList: true, subtree: true });
   };
-  if (typeof actLog === 'function') actLog('r', 'zh');
+  if (typeof actLog === 'function') actLog('b', 'zh');
   return p;
 }
 

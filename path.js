@@ -199,7 +199,7 @@ async function ptStart(tr, lv, x, confirmed) {
   if (!host.isConnected) return;
   if (qs.length < 5) { host.innerHTML = `<section class="panel"><p class="muted">${T('题目还没准备好（需要联网下载），请稍后再试。', '問題を準備できませんでした（通信が必要です）。しばらくしてからもう一度お試しください。')}</p><a class="btn" href="#path/${lv}">${T('回到路线', 'ロードマップへ')}</a></section>`; return; }
   const title = `${x.grad ? '' : T('阶段测试 · ', 'ステージテスト・')}${x.t}`;
-  runQuiz(host, qs, { title, exam: true, xpEach: 0, onDone: r => { if (!r) return go(`path/${lv}`); ptResult(host, tr, lv, x, r, title); } });
+  runQuiz(host, qs, { title, exam: true, xpEach: 0, act: ['s', tr], onDone: r => { if (!r) return go(`path/${lv}`); ptResult(host, tr, lv, x, r, title); } });
 }
 const PT_SK = { v: ['单词', '単語'], g: ['语法', '文法'], r: ['阅读', '読解'], l: ['听力', '聴解'], k: ['假名 / 发音', 'かな・発音'] };
 function ptResult(host, tr, lv, x, r, title) {

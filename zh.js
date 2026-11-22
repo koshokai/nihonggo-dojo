@@ -151,7 +151,8 @@ function zhHome() {
     }
     // 今日の読み物（写真つき）：日本語・英語のホームと同じく、いちばん上に
     const artEl = art && !(S.zhRead || {})[art.id] ? h(`<a class="today-art ${art.ph ? '' : 'no-img'}" href="#zh/read/${art.id}">${art.ph ? `<div class="ta-img">${zhArtImg(art)}</div>` : ''}<div><span class="tag done">今日の読み物</span> <span class="tag lv">${esc(art.lv)}</span><div class="rc-title" ${ZHL}>${esc(art.title)}</div><div class="small muted">${esc(art.title_ja || '')}</div></div></a>`) : null;
-    frag.append(homeHead(hiEl, artEl, dailyEl), taskPanel('今日のタスク', tasks, '終わったら自由に'));
+    const rv = typeof planReviewCard === 'function' && planReviewCard();   // 学習プランの週ふりかえり（日曜）
+    frag.append(homeHead(hiEl, artEl, dailyEl), ...(rv ? [rv] : []), typeof planTaskPanel === 'function' ? planTaskPanel('zh', '今日のタスク', tasks, '終わったら自由に', { list }) : taskPanel('今日のタスク', tasks, '終わったら自由に'));
     if (typeof w2Card === 'function') frag.append(w2Card('zh'));   // 今週のピックアップはタスクの下に
     if (typeof buddyStrip === 'function') frag.append(buddyStrip());
     // 進み具合・学習記録・スタンプ（日本語・英語のホームと同じ折りたたみ）
@@ -180,16 +181,16 @@ function zhWordQuiz(list, title) {
       ? makeQ(x, 'meaning', others.map(short), short(x), { prompt: `<div class="eyebrow">この単語の意味は？</div><div class="q-big" ${ZHL}>${esc(x.w)}</div><div class="small muted">${esc(x.py)}</div>`, say: x.w, sayLang: 'zh-CN', explain: `<span ${ZHL}>${esc(x.w)}</span> ${esc(x.py)}：${esc(x.ja)}` })
       : makeQ(x, 'word', others.map(y => y.w), x.w, { prompt: `<div class="eyebrow">「${esc(short(x))}」は中国語で？</div>`, optLang: 'zh-CN', say: x.w, sayLang: 'zh-CN', explain: `<span ${ZHL}>${esc(x.w)}</span> ${esc(x.py)}：${esc(x.ja)}` });
   });
-  zhRunQuiz(qs, title || `${zhLevel()} 単語テスト`, 5);
+  zhRunQuiz(qs, title || `${zhLevel()} 単語テスト`, 5, undefined, 'v');
 }
-function zhRunQuiz(qs, title, xpEach = 5, back) {
+function zhRunQuiz(qs, title, xpEach = 5, back, act = null) {
   main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
-  runQuiz(host, qs, { title, noRecord: true, xpEach, onDone: r => {
+  runQuiz(host, qs, { title, noRecord: true, xpEach, act: act && [act, 'zh'], onDone: r => {
     if (!r) return back ? back() : render();
     // 答错的词进单词卡，今天复习
     r.res.forEach(x => { if (!x.ok && x.q.id && x.q.id.startsWith('zh|w|')) S.srs[x.q.id] = Object.assign({ i: 0, e: 2.5, r: 0 }, S.srs[x.q.id], { due: Date.now() }); });
     save();
-    quizSummary(host, r, { title, again: () => zhRunQuiz(qs.map(q => Object.assign({}, q)), title, xpEach, back) });
+    quizSummary(host, r, { title, again: () => zhRunQuiz(qs.map(q => Object.assign({}, q)), title, xpEach, back, act) });
   } });
 }
 
@@ -258,7 +259,7 @@ function zhStage(n, i, list) {
         : makeQ(x, 'word', others.map(y => y.w), x.w, { prompt: `<div class="eyebrow">「${esc(short(x))}」は中国語で？</div>`, optLang: 'zh-CN', say: x.w, sayLang: 'zh-CN', explain: `<span ${ZHL}>${esc(x.w)}</span> ${esc(x.py)}：${esc(x.ja)}` });
     });
     main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
-    runQuiz(host, qs, { title: `HSK${n} ステージ ${i + 1}`, hearts: 3, noRecord: true, xpEach: 5, onDone: r => {
+    runQuiz(host, qs, { title: `HSK${n} ステージ ${i + 1}`, hearts: 3, noRecord: true, xpEach: 5, act: ['s', 'zh'], onDone: r => {
       if (!r) return go(`zh/path/HSK${n}`);
       r.res.forEach(x => { if (!x.ok && x.q.id) S.srs[x.q.id] = Object.assign({ i: 0, e: 2.5, r: 0 }, S.srs[x.q.id], { due: Date.now() }); });
       const stars = r.failed ? 0 : Math.max(1, r.hearts);
@@ -357,7 +358,7 @@ function zhToneQuiz() {
     }), {}));
     // 选项按 1–4 声的顺序排，方便记位置
     qs.forEach(q => { const right = q.options[q.answer]; q.options = names.slice(); q.answer = names.indexOf(right); });
-    zhRunQuiz(zhAutoPlay(qs), '声調クイズ', 5, () => go('zh/pinyin'));
+    zhRunQuiz(zhAutoPlay(qs), '声調クイズ', 5, () => go('zh/pinyin'), 't');
   }).catch(() => toast('読み込めませんでした'));
 }
 // 听音选拼音：混淆项来自容易混的音（zh/z、an/ang、ü/u……）
@@ -370,7 +371,7 @@ function zhSylQuiz() {
       const opts = [...new Set([...sample(near, 2), ...sample(all.filter(s => s !== x.s), 4)])].filter(s => s !== x.s).slice(0, 3).map(s => zhMark(s, x.k));
       return makeQ(null, 'listen', opts, zhMark(x.s, x.k), { prompt: zhPlayPrompt(x.ch, '聞こえた音はどれ？'), explain: `<span ${ZHL}>${esc(x.ch)}</span> ${esc(zhMark(x.s, x.k))}`, say: x.ch, sayLang: 'zh-CN' });
     });
-    zhRunQuiz(zhAutoPlay(qs), '聞き取りクイズ', 5, () => go('zh/pinyin'));
+    zhRunQuiz(zhAutoPlay(qs), '聞き取りクイズ', 5, () => go('zh/pinyin'), 't');
   }).catch(() => toast('読み込めませんでした'));
 }
 
@@ -603,7 +604,7 @@ function zhGrammarPage(Lsel) {
       <div class="zh-arts">${list.map(g => `<a class="zh-art ${seen[g.id] ? 'done' : ''}" href="#zh/grammar/${g.id}"><span class="course-ic">文</span><div><b>${esc(g.title)}</b><span class="small zh-py" ${ZHL}>${esc(g.p)}</span></div>${seen[g.id] ? '<span class="tag done">✓</span>' : ''}</a>`).join('')}</div></section>`);
     p.querySelector('[data-q]').onclick = () => {
       if (zhGuest() && zhLvNum(lv) > 1) return zhLocked('文法 ' + lv);
-      zhRunQuiz(shuffle(list.flatMap(g => g.q.map(q => ({ kind: 'grammar', options: q.opts, answer: q.a, explain: `<b>${esc(g.title)}</b>：${esc(q.why)}`, prompt: `<div class="eyebrow">${esc(g.title)}</div><div class="duel-m" ${/[\u4e00-\u9fff]{3}/.test(q.q) ? '' : ''}>${esc(q.q)}</div>` })))).slice(0, 10), `${lv} 文法クイズ`, 8, () => go(`zh/grammar/${lv}`));
+      zhRunQuiz(shuffle(list.flatMap(g => g.q.map(q => ({ kind: 'grammar', options: q.opts, answer: q.a, explain: `<b>${esc(g.title)}</b>：${esc(q.why)}`, prompt: `<div class="eyebrow">${esc(g.title)}</div><div class="duel-m" ${/[\u4e00-\u9fff]{3}/.test(q.q) ? '' : ''}>${esc(q.q)}</div>` })))).slice(0, 10), `${lv} 文法クイズ`, 8, () => go(`zh/grammar/${lv}`), 'g');
     };
     box.replaceWith(p);
   }).catch(() => zhFail(box));
@@ -624,7 +625,7 @@ function zhGrammarItem(id) {
       <div class="zh-memo ng"><b class="small">ワンポイント</b><p>${esc(g.tip)}</p></div>
       <div class="row"><button class="btn pri" type="button" data-q>練習問題（${g.q.length}問）</button></div>
       <div class="row between">${prev ? `<a class="btn ghost" href="#zh/grammar/${prev.id}">← ${esc(prev.title)}</a>` : '<span></span>'}${next ? `<a class="btn ghost" href="#zh/grammar/${next.id}">${esc(next.title)} →</a>` : ''}</div></article>`);
-    p.querySelector('[data-q]').onclick = () => zhRunQuiz(g.q.map(q => ({ kind: 'grammar', options: q.opts, answer: q.a, explain: esc(q.why), prompt: `<div class="eyebrow">${esc(g.title)}</div><div class="duel-m">${esc(q.q)}</div>` })), g.title, 8, () => go(`zh/grammar/${g.id}`));
+    p.querySelector('[data-q]').onclick = () => zhRunQuiz(g.q.map(q => ({ kind: 'grammar', options: q.opts, answer: q.a, explain: esc(q.why), prompt: `<div class="eyebrow">${esc(g.title)}</div><div class="duel-m">${esc(q.q)}</div>` })), g.title, 8, () => go(`zh/grammar/${g.id}`), 'g');
     if (!(S.zhGr = S.zhGr || {})[g.id]) { S.zhGr[g.id] = 1; addXP(3); save(); }
     box.replaceWith(p);
   }).catch(() => zhFail(box));
@@ -719,6 +720,7 @@ function zhListenRun(items, back = 'zh/listen') {   // back：やめた・もう
   const pick = k => {
     const x = items[i], ok = k === x.a;
     if (stage.querySelector('[data-fb]').innerHTML) return;
+    if (typeof actLog === 'function') actLog('l', 'zh');
     if (ok) { right++; addXP(10); } else save();
     (S.zhLs = S.zhLs || {})[x.id] = ok ? 2 : 1;
     if (typeof weakNote === 'function') weakNote('zh', `l:${x.id}`, ok, { sk: 'l', l: x.q || x.t || '', m: (x.opts || [])[x.a] || '', href: '#zh/listen' });   // 弱点ノート
@@ -884,7 +886,7 @@ function zhLesson(tid, lid) {
     p.querySelector('[data-tg]').append(zhToggles(p));
     zhBindToks(p, l.gloss || {});
     const qb = p.querySelector('[data-q]');
-    if (qb) qb.onclick = () => zhRunQuiz(l.quiz.map(q => ({ kind: 'meaning', options: q.opts || q.options, answer: q.a != null ? q.a : q.answer, explain: q.why ? esc(q.why) : '', prompt: `<div class="eyebrow">${esc(l.title)}</div><div class="duel-m">${esc(q.q)}</div>` })), l.title, 10, () => go(`zh/course/${tid}/${l.id}`));
+    if (qb) qb.onclick = () => zhRunQuiz(l.quiz.map(q => ({ kind: 'meaning', options: q.opts || q.options, answer: q.a != null ? q.a : q.answer, explain: q.why ? esc(q.why) : '', prompt: `<div class="eyebrow">${esc(l.title)}</div><div class="duel-m">${esc(q.q)}</div>` })), l.title, 10, () => go(`zh/course/${tid}/${l.id}`), 'c');
     box.replaceWith(p);
   }).catch(() => zhFail(box));
 }

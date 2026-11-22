@@ -10,6 +10,8 @@ const CLOUD = {
   appleApp: true,       // App 里原生的「通过 Apple 登录」（需在 Supabase 的 Apple provider 里加上 Client ID com.koshokai.omnisphere，App 打包时带上 Sign in with Apple 权限）
                         // App 里有第三方登录时苹果要求同时有 Apple 登录，所以这个打开后，App 里才显示 Google / LINE / Facebook（在系统浏览器里登录再跳回 App）
   line: true,           // LINE 登录（需在 LINE Developers 建 LINE Login 频道、部署 Edge Function line-auth，见第 22 节）
+  lineBot: true,       // LINE 官方账号关联到登录频道以后改成 true：用 LINE 登录时顺便询问是否加官方账号为好友（docs/SUPABASE_SETUP.md 第 26 节）
+  lineOaUrl: 'https://lin.ee/qc9ktGX',        // LINE 官方账号的加好友链接（https://lin.ee/…，公开的）：填了以后「我的」里给日本用户显示「LINEで毎日ひとこと」
   lineChannelId: '2012706004',   // LINE Login 频道的 Channel ID（公开的，每个 LINE 登录链接里都有）：App 里用 LINE SDK 直接打开 LINE App 授权时要用
   facebook: false,      // Facebook 登录（需在 Meta for Developers 建应用、在 Supabase 开通 Facebook provider，见第 22 节）
   rcKey: 'appl_yufgUCyHHcmUIlTPfYPZwSpMwYU',   // RevenueCat 的公开 SDK Key（App 内购用，本来就放在 App 里，不是密码）；secret key 只放在 Supabase Secrets

@@ -46,7 +46,7 @@ function enStage(lv, i, list) {
       : makeQ(x, 'word', others.map(y => y.w), x.w, { prompt: `<div class="eyebrow">${enNat('用英语怎么说？', '英語で言うと？')}</div><div class="q-big">${esc(enShort(x))}</div>`, optLang: 'en', say: x.w, sayLang: 'en-US', explain: `<b lang="en">${esc(x.w)}</b> ${esc(enNat(x.zh, x.ja))}` });
   });
   main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
-  runQuiz(host, qs, { title: `${lv} Stage ${i + 1}`, hearts: 3, noRecord: true, xpEach: 5, onDone: r => {
+  runQuiz(host, qs, { title: `${lv} Stage ${i + 1}`, hearts: 3, noRecord: true, xpEach: 5, act: ['s', 'en'], onDone: r => {
     if (!r) return go(`en/path/${lv}`);
     r.res.forEach(x => { if (!x.ok && x.q.id) S.srs[x.q.id] = Object.assign({ i: 0, e: 2.5, r: 0 }, S.srs[x.q.id], { due: Date.now() }); });
     const stars = r.failed ? 0 : Math.max(1, r.hearts);

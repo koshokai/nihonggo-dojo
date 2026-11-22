@@ -852,7 +852,8 @@ function qKana([kana, ro], reverse, pool) {
 const itemQ = it => it.type === 'v' ? qVocab(it, sample(['reading', 'meaning', 'word'], 1)[0]) : it.type === 'k' ? qKanji(it) : qGrammar(it);
 
 /* ---------- 测验引擎 ---------- */
-function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false, noRecord = false, noWeak = false, xpEach = 10, hearts = 0, requeue = false, onDone }) {
+function runQuiz(host, qs, { title, exam = false, minutes = 0, fromWrong = false, noRecord = false, noWeak = false, xpEach = 10, hearts = 0, requeue = false, act = null, onDone }) {
+  if (act) { const od = onDone; onDone = r => { if (r && typeof actLog === 'function') actLog(act[0], act[1]); if (od) od(r); }; }   // act：[种类, 语言]，做完记一次（学习诊断、学习方案看这个）
   let i = 0, combo = 0, answered = false, life = hearts, failed = false;
   const requeued = new Set();
   const heartsHTML = () => hearts ? `<span class="hearts" aria-label="${tje(`剩余 ${life} 条命`, `残りライフ ${life}`, `${life} lives left`)}">${Array.from({ length: hearts }, (_, k) => `<svg viewBox="0 0 24 24" class="${k < life ? 'on' : ''}"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.6 4.5c2 0 3.6 1.1 4.4 2.6.8-1.5 2.4-2.6 4.4-2.6 3.6 0 5.7 3.9 4.2 7.3C19.5 16.4 12 21 12 21z"/></svg>`).join('')}</span>` : '';
@@ -994,7 +995,7 @@ function render() {
   if (lsStop) lsStop();
   if (typeof fxPageOut === 'function') fxPageOut();   // 旧页面化成颗粒消失（fx.js）
   main.innerHTML = '';
-  if (trackOf(view) === 'ja' && ['home', 'week', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict', 'study', 'ri', 'conj', 'anime', 'trans', 'dictation', 'course', 'plan'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
+  if (trackOf(view) === 'ja' && ['home', 'week', 'game', 'kana', 'vocab', 'kanji', 'grammar', 'read', 'biz', 'listen', 'exam', 'dict', 'study', 'ri', 'conj', 'anime', 'trans', 'dictation', 'course'].includes(view) && S.track !== 'ja') { S.track = 'ja'; save(); }
   applyTrack(view);
   document.body.classList.toggle('welcome-mode', view === 'welcome');   // 选语言页：先隐藏顶部状态、搜索和底部导航，专心选
   document.body.classList.toggle('hi-mode', view === 'hi');
@@ -1806,13 +1807,14 @@ function viewMe(sec) {
   const ps = bk.querySelector('[data-persist]');
   requestPersist().then(ok => { ps.innerHTML = ok ? tj('<span class="tag done">已开启</span> 浏览器已同意持久保存，空间不足时也不会自动清理这里的数据。', '<span class="tag done">オン</span> ブラウザが永続保存を許可しています。空き容量が少なくなっても、ここのデータは自動で削除されません。') : tj('<span class="tag">未开启</span> 这个浏览器没有同意持久保存，建议添加到主屏幕并定期备份。', '<span class="tag">オフ</span> このブラウザは永続保存を許可していません。ホーム画面に追加して、定期的にバックアップすることをおすすめします。'); });
   // 「我的」是一个菜单：一行一个入口，点开才显示对应内容（#me/<入口>），有新消息的入口带小红点
+  const lineOa = typeof CLOUD !== 'undefined' && /^https:\/\/lin\.ee\/\w+$/.test(CLOUD.lineOaUrl || '') ? CLOUD.lineOaUrl : '';   // LINE 官方账号的加好友链接（日本用户看得到）
   const SECTIONS = [
     { id: 'vip', ic: '会', t: tj('会员', 'メンバー'), d: tj('会员能学到的内容、方案和价格', 'メンバーで使える内容・プラン・料金'), href: '#vip' },
     { id: 'buddy', ic: '伴', t: tj('学习伙伴', '学習仲間'), d: tj('和朋友一起打卡、互相提醒', '友だちと一緒に記録して、声をかけ合う'), href: '#buddy', show: () => cloudOn() && buddyReady !== false, badge: 'buddy' },
     { id: 'inbox', ic: '信', t: tj('消息与学习提醒', 'お知らせと学習リマインダー'), d: tj('站内消息、每天的学习提醒', 'アプリ内のお知らせ、毎日の学習リマインダー'), show: () => cloudOn() || typeof appReminderPanel === 'function', badge: 'inbox',
       build: () => [typeof appReminderPanel === 'function' ? appReminderPanel() : null, typeof inboxPanel === 'function' ? inboxPanel() : null] },
     { id: 'features', ic: '✨', t: tj('功能地图', '機能マップ'), d: tj('容易被忽略的好用功能', '見落としがちな便利機能'), build: () => [featuresPanel()] },
-    { id: 'plan', ic: '案', t: tj('我的学习方案', 'わたしの学習プラン'), d: tj('自己定目标、每天多久、哪几天学', '目標・1 日の時間・学ぶ曜日を自分で決める'), href: '#plan', show: () => (S.track || 'ja') === 'ja' },
+    { id: 'plan', ic: '案', t: tj('我的学习方案', 'わたしの学習プラン'), d: tj('自己定目标、每天多久、哪几天学', '目標・1 日の時間・学ぶ曜日を自分で決める'), href: '#plan', show: () => true },
     { id: 'calendar', ic: '暦', t: tj('学习日历', '学習カレンダー'), d: tj('每天学了多少、断签补签', '毎日の学習量・連続記録の補填'), href: '#calendar' },
     { id: 'fav', ic: '★', t: tj('收藏夹', 'お気に入り'), d: tj('收藏的单词、句子、语法', '保存した単語・文・文法'), href: '#fav' },
     { id: 'offline', ic: '⬇', t: tj('离线录音', 'オフライン音声'), d: tj('下载录音，没网也能听', '音声を保存して電波がなくても聞ける'), href: '#offline' },
@@ -1824,6 +1826,7 @@ function viewMe(sec) {
     { id: 'invite', ic: tj('邀', '招'), t: tje('邀请好友', '友だちを招待', 'Invite friends'), d: tje('好友学满 3 天，你得一周会员；好友注册送 3 天', '友だちが 3 日学ぶとあなたに 1 週間、友だちに 3 日間', 'A free week for you when a friend studies 3 days'), build: () => [invitePanel()], show: () => cloudOn() && typeof invitePanel === 'function' },
     { id: 'path', ic: tj('路', '道'), t: tje('学习路线', '学習ロードマップ', 'Learning roadmap'), d: tje('从哪里开始、学到哪一步、阶段测试', 'どこから始めるか・いまどこか・ステージテスト', 'Where to start, where you are, stage tests'), href: '#path' },
     { id: 'check', ic: tj('测', '測'), t: tje('水平测试', 'レベルチェック', 'Level check'), d: tje('20 题测测现在是几级、进步了多少', '20 問で今のレベルと伸びをチェック', '20 questions: your level now and your progress'), href: '#check' },
+    { id: 'line', ic: 'L', t: 'LINEで毎日ひとこと', d: '中国語・英語のひとことを毎週お届け。「今日」と送ればいつでも', href: lineOa, show: () => !!lineOa && uiJa() },
     { id: 'share', ic: tj('图', '図'), t: tj('分享学习成果', '学習の成果をシェア'), d: tj('生成打卡图发朋友圈、小红书', '記録画像を作って SNS でシェア'), show: () => typeof sharePanel === 'function', build: () => [sharePanel()] },
     { id: 'settings', ic: tj('设', '設'), t: tj('学习设置', '学習設定'), d: tj('学习的语言、目标级别、每日目标、外观', '学ぶ言語・1日の目標・テーマ'), build: () => [p] },
     { id: 'voice', ic: '音', t: tj('发音', '発音'), d: tj('语速、自动朗读', '読み上げの速さ・自動読み上げ'), build: () => [voiceP] },
@@ -1840,8 +1843,8 @@ function viewMe(sec) {
   const EN_ME = { invite: ['Invite friends', 'A free week for you when a friend studies 3 days'], path: ['Learning roadmap', 'Where to start, where you are, stage tests'], vip: ['Membership', 'What members get, plans and prices'], buddy: ['Study buddies', 'Check in together and nudge each other'], inbox: ['Messages & reminders', 'In-app messages and daily study reminders'], features: ['Feature map', 'Handy features you might have missed'], calendar: ['Study calendar', 'What you studied each day, streak repair'], fav: ['Favorites', 'Saved words and sentences'], offline: ['Offline audio', 'Download audio to listen without a connection'], exam: ['Exam goal', 'Countdown and how many new words a day'], weak: ['Weak spots', 'Missed questions, accuracy by type, targeted practice'], weekly: ['This week', 'How much you studied, compared with last week'], rank: ['Weekly ranking', 'Optional; shows only your nickname and XP'], share: ['Share your progress', 'Make an image to share'], settings: ['Settings', 'Language, level, daily goal, display'], voice: ['Audio', 'Speed, voice source, auto-play'], device: ['Device & backup', 'Add to home screen, backup, switching phones'], account: ['Account & sync', 'Sign in, cloud sync, delete account'] };
   if (S.track === 'en') SECTIONS.forEach(x => { if (EN_ME[x.id]) [x.t, x.d] = EN_ME[x.id]; });
   // 分组显示：会员 → 学习 → 和朋友一起 → 设置与账号（一长串同样分量的行，常用的设置找不到）
-  const GROUPS = [['top', '', ['vip']], ['study', tje('学习', '学習', 'Study'), ['plan', 'path', 'calendar', 'fav', 'offline', 'exam', 'weak', 'weekly', 'diag', 'check']], ['social', tje('和朋友一起', '仲間と一緒に', 'With friends'), ['invite', 'buddy', 'inbox', 'rank', 'share']], ['settings', tje('设置与账号', '設定とアカウント', 'Settings & account'), ['settings', 'voice', 'device', 'account', 'features']]];
-  const row = x => `<a class="me-row" href="${x.href || '#me/' + x.id}" data-sec="${x.id}">
+  const GROUPS = [['top', '', ['vip']], ['study', tje('学习', '学習', 'Study'), ['plan', 'path', 'calendar', 'fav', 'offline', 'exam', 'weak', 'weekly', 'diag', 'check']], ['social', tje('和朋友一起', '仲間と一緒に', 'With friends'), ['invite', 'buddy', 'inbox', 'rank', 'share', 'line']], ['settings', tje('设置与账号', '設定とアカウント', 'Settings & account'), ['settings', 'voice', 'device', 'account', 'features']]];
+  const row = x => `<a class="me-row" href="${x.href || '#me/' + x.id}" data-sec="${x.id}"${/^https:/.test(x.href || '') ? ' target="_blank" rel="noopener"' : ''}>
       <span class="course-ic">${x.ic}</span><div><b>${esc(x.t)}</b><span class="small muted">${esc(x.d)}</span></div>
       ${x.badge ? `<span class="red-dot" data-badge="${x.badge}" hidden></span>` : ''}<span class="me-go" aria-hidden="true">›</span></a>`;
   const menu = h(`<section class="panel me-menu"><h2>${tje('我的', 'マイページ', 'Me')}</h2>${GROUPS.map(([, name, ids]) => { const xs = ids.map(id => SECTIONS.find(x => x.id === id)).filter(Boolean); return xs.length ? `${name ? `<h3 class="me-group">${esc(name)}</h3>` : ''}<div class="me-list">${xs.map(row).join('')}</div>` : ''; }).join('')}${SECTIONS.filter(x => !GROUPS.some(g => g[2].includes(x.id))).map(row).join('')}</section>`);

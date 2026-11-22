@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>每日宣传素材</title>
+<style>
+:root { --bg: #FAF7F4; --surface: #fff; --ink: #2A2226; --muted: #7A6F74; --line: #E8DFE3; --ai: #D9578A; }
+@media (prefers-color-scheme: dark) { :root { --bg: #1B1619; --surface: #241D21; --ink: #F1E9ED; --muted: #A99CA3; --line: #3A3036; --ai: #F28DB0; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 system-ui, -apple-system, "PingFang SC", "Hiragino Sans", sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 1.3rem; margin: 0 0 4px; } h2 { font-size: 1.02rem; margin: 0 0 8px; }
+.muted { color: var(--muted); } .small { font-size: .86rem; }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+.btn { border: 1px solid var(--line); background: var(--surface); color: inherit; border-radius: 999px; padding: 6px 14px; font: inherit; cursor: pointer; }
+.btn.pri { background: var(--ai); border-color: var(--ai); color: #fff; font-weight: 600; }
+input[type=date] { font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.card canvas { width: 100%; height: auto; border-radius: 10px; display: block; background: #eee; }
+.card textarea { width: 100%; min-height: 150px; margin-top: 8px; font: inherit; font-size: .84rem; color: inherit; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px; resize: vertical; }
+.card .bar { margin: 8px 0 0; }
+</style>
+</head>
+<body>
+<main id="promo">
+<h1>每日宣传素材</h1>
+<p class="muted small">每天的「今日一句」做成图片 + 配文，手动发小红书、Instagram、LINE VOOM 用（Threads 已经自动发了）。内容和网站、App 里当天的「今日一句」一样。只用公开内容，不需要登录。</p>
+<div class="bar"><label>日期 <input type="date" data-date></label><button class="btn" type="button" data-prev>前一天</button><button class="btn" type="button" data-next>后一天</button><button class="btn" type="button" data-today>今天</button></div>
+<div class="grid" data-grid><p class="muted">生成中……</p></div>
+</main>
+<script src="daily.js"></script>
+<script src="mascot.js"></script>
+<script src="promo.js"></script>
+</body>
+</html>

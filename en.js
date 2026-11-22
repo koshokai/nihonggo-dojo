@@ -141,12 +141,14 @@ function enHome() {
     ].filter(Boolean);
     box.innerHTML = '';
     // 第一次来：先推荐做定级测试（做过或者自己换过级别就不再提示）
-    const tp = taskPanel('Today\'s tasks', tasks);
+    const tp = typeof planTaskPanel === 'function' ? planTaskPanel('en', 'Today\'s tasks', tasks, '', { items }) : taskPanel('Today\'s tasks', tasks);
+    const rv = typeof planReviewCard === 'function' && planReviewCard();   // 学习方案的每周回顾（周日）
+    if (rv) box.append(rv);
     box.append(tp);
     if (typeof w2Card === 'function') box.append(w2Card('en'));   // 每周精选放在今日任务下面
     // 第一次来：在任务下面推荐定级测试
     if (!S.enPlaced && !S.enLevel) box.append(h(`<a class="panel wk-more en-more" href="#en/placement"><div class="wk-more-t">🎯 ${'Not sure where to start?'}</div><div class="small">${'Take a 3-minute placement test and we\'ll pick your level.'}</div><div class="wk-more-go">${'Start the placement test ›'}</div></a>`));
-    enStudyTasks(lv).then(more => { if (tp.isConnected && more.length) tp.replaceWith(taskPanel('Today\'s tasks', [...tasks, ...more])); });
+    enStudyTasks(lv).then(more => { if (tp.isConnected && more.length && !(typeof planOn === 'function' && planOn('en'))) tp.replaceWith(planTaskPanel('en', 'Today\'s tasks', [...tasks, ...more], '', { items })); });
     if (typeof buddyStrip === 'function') box.append(buddyStrip());
     // 级别进度放进折叠区（和日语、中文首页一样）
     const ex = EN_EXAM[enJa() ? 'ja' : 'zh'];
@@ -271,7 +273,7 @@ function enQuiz(items, title) {
   });
   main.innerHTML = '';
   const host = h('<div></div>'); main.append(host);
-  runQuiz(host, qs, { title, noRecord: true, xpEach: 5, onDone: r => {
+  runQuiz(host, qs, { title, noRecord: true, xpEach: 5, act: ['v', 'en'], onDone: r => {
     if (!r) { render(); return; }
     r.res.forEach(y => { if (!y.ok && y.q.item) { const id = y.q.item.id; S.srs[id] = Object.assign({ i: 0, e: 2.5, r: 0 }, S.srs[id], { due: Date.now() }); } });
     save();

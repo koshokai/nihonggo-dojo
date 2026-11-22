@@ -163,15 +163,24 @@ function memberData(track, path) {
   memberMem[key] = p;
   return p;
 }
-// 会员录音：私有存储 member-audio 里的文件 → 临时播放地址（6 小时有效；只有对应语言的会员能取到）
+// 会员录音：私有存储 member-audio 里的文件 → 临时播放地址（1 小时有效；只有对应语言的会员能取到）
+// 由服务器的 member-url 函数签（有效期由服务器定，docs/SUPABASE_SETUP.md 第 25 节）；函数还没部署时退回直接向存储要（同样 1 小时）
 const MEMBER_SIGNED = {};
+let memberUrlFn = true;
 async function memberSign(paths) {
   const now = Date.now(), need = [...new Set(paths)].filter(p => !(MEMBER_SIGNED[p] && MEMBER_SIGNED[p].t > now));
   if (need.length && typeof sbUser !== 'undefined' && sbUser) {
     const c = await cloudClient();
     for (let i = 0; i < need.length; i += 100) {
-      const { data } = await c.storage.from('member-audio').createSignedUrls(need.slice(i, i + 100), 6 * 3600);
-      for (const x of data || []) if (x && x.signedUrl && !x.error) MEMBER_SIGNED[x.path] = { u: x.signedUrl, t: now + 5 * 3600e3 };
+      const part = need.slice(i, i + 100);
+      let got = null;
+      if (memberUrlFn) {
+        try { const { data, error } = await c.functions.invoke('member-url', { body: { paths: part } }); if (error) throw error; got = data && data.urls; }
+        catch (e) { memberUrlFn = false; }
+      }
+      if (got) { for (const p of part) if (got[p]) MEMBER_SIGNED[p] = { u: got[p], t: now + 50 * 60e3 }; continue; }
+      const { data } = await c.storage.from('member-audio').createSignedUrls(part, 3600);
+      for (const x of data || []) if (x && x.signedUrl && !x.error) MEMBER_SIGNED[x.path] = { u: x.signedUrl, t: now + 50 * 60e3 };
     }
   }
   return Object.fromEntries(paths.map(p => [p, MEMBER_SIGNED[p] && MEMBER_SIGNED[p].t > now ? MEMBER_SIGNED[p].u : null]));

@@ -7,7 +7,7 @@
 
 // 每天各项练了多少：S.act[日期][语言] = { v: 单词, g: 语法, r: 阅读, l: 听力 }，只留 60 天
 function actLog(skill, tr = (S.track === 'en' || S.track === 'zh') ? S.track : 'ja', n = 1) {
-  if (!'vgrlcabs'.includes(skill)) return;   // v 单词 g 语法 r 阅读 l 听力；c 情景会话 a 动漫台词 b 商务 s 闯关（学习方案用，plan.js）
+  if (!'vgrlcabst'.includes(skill)) return;   // v 单词 g 语法 r 阅读 l 听力；c 情景会话 a 动漫台词 b 商务 s 闯关 t 声调（学习方案用，plan.js）
   const d = dkey(), a = (S.act = S.act || {}), day = (a[d] = a[d] || {}), t = (day[tr] = day[tr] || {});
   t[skill] = (t[skill] || 0) + n;
   const old = dkey(new Date(Date.now() - 60 * DAY));
