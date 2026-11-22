@@ -7,7 +7,7 @@ import { join } from 'node:path';
 const ROOT = new URL('..', import.meta.url).pathname;
 const OUT = new URL('www/', import.meta.url).pathname;
 const SITE = 'https://koshokai.github.io/nihonggo-dojo/';
-const SKIP = new Set(['audio', 'w', 'g', 'tools', 'docs', 'tests', 'app', 'node_modules', 'supabase', 'admin.html', 'admin.js', 'promo.html', 'promo.js', 'sw.js',
+const SKIP = new Set(['audio', 'w', 'g', 'e', 'ej', 'z', 'd', 'seo.css', 'tools', 'docs', 'tests', 'app', 'node_modules', 'supabase', 'admin.html', 'admin.js', 'promo.html', 'promo.js', 'sw.js',
   'sitemap.xml', 'robots.txt', 'README.md', 'share-qr.png']);
 
 rmSync(OUT, { recursive: true, force: true });
