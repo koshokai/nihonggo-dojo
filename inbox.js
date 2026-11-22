@@ -83,7 +83,10 @@ async function pushEnable(hour) {
   const c = await cloudClient();
   const { error } = await c.rpc('save_push_sub', { ep: j.endpoint, p256dh: j.keys.p256dh, auth_key: j.keys.auth, tzname: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Tokyo', hr: hour });
   if (error) throw error;
+  pushPrefsSync();
 }
+// 推送设置：附带今日一句、新内容通知（服务器 push_subs.tips / news，SQL 第 24 节；没建好时忽略）
+function pushPrefsSync() { cloudClient().then(c => c.rpc('set_push_prefs', { p_tips: S.pushTips !== false, p_news: S.pushNews !== false })).catch(() => {}); }
 async function pushDisable() {
   const sub = await pushSub();
   if (!sub) return;
@@ -106,10 +109,15 @@ function inboxPanel() {
     pushBox.innerHTML = `<div class="row between"><span>${tj('学习提醒', '学習リマインダー')}</span><div class="seg"><button type="button" data-on class="${on ? 'on' : ''}">${tj('开', 'オン')}</button><button type="button" data-off class="${on ? '' : 'on'}">${tj('关', 'オフ')}</button></div></div>
       <div class="row between"><span>${tj('提醒时间', '通知の時刻')}</span><div class="seg">${hours.map(([v, t]) => `<button type="button" data-hr="${v}" class="${hr === v ? 'on' : ''}">${t}</button>`).join('')}<button type="button" data-hr="smart" class="${hr === 'smart' ? 'on' : ''}">${tj('智能', 'おまかせ')}</button></div></div>
       ${hr === 'smart' ? `<p class="small">${smartH != null ? tj(`按你的习惯，每天 ${smartH} 点左右提醒（会随着习惯自动调整）。`, `あなたの習慣に合わせて毎日 ${smartH} 時ごろお知らせします（自動で調整）。`) : tj('再学几天，摸清你的习惯后自动设定时间（先按晚上 9 点）。', '数日分の学習時間から自動で決めます（それまでは夜 9 時）。')}</p>` : ''}
-      <p class="small muted">${tj('每天最多一条：到了这个时间、当天还没学才提醒。很多天没来会越提醒越少，最后不再打扰。', '通知は 1 日 1 回まで。この時刻になってもまだ学習していない日だけお知らせします。しばらくお休みが続くと通知は少しずつ減り、最後は届かなくなります。')}<span data-pst></span></p>`;
+      ${on ? `<label class="row small" style="gap:8px;margin-top:6px"><input type="checkbox" data-ptip ${S.pushTips !== false ? 'checked' : ''}> ${tj('提醒里附带「今日一句」', '通知に「今日のひとこと」をつける')}</label>
+      <label class="row small" style="gap:8px"><input type="checkbox" data-pnews ${S.pushNews !== false ? 'checked' : ''}> ${tj('有新功能、新内容时通知我（这一天就不再发普通提醒）', '新機能・新コンテンツのお知らせを受け取る（その日は通常の通知なし）')}</label>` : ''}
+      <p class="small muted">${tj('每天最多一条：到了这个时间、当天还没学才提醒（有新内容通知的那天除外）。很多天没来会越提醒越少，最后不再打扰。', '通知は 1 日 1 回まで。この時刻になってもまだ学習していない日だけ（新しいお知らせがある日は除く）お知らせします。しばらくお休みが続くと通知は少しずつ減り、最後は届かなくなります。')}<span data-pst></span></p>`;
     const st = pushBox.querySelector('[data-pst]');
     const turnOn = async h0 => { st.textContent = tj(' 设置中……', ' 設定中…'); try { await pushEnable(h0); S.remindHour = h0; save(); drawPush(); toast(tj('学习提醒已开启', '学習リマインダーをオンにしました')); } catch (e) { st.textContent = ' ' + (e.message || e); } };
     pushBox.querySelector('[data-on]').onclick = () => turnOn(hr);
+    const ptip = pushBox.querySelector('[data-ptip]'), pnews = pushBox.querySelector('[data-pnews]');
+    if (ptip) ptip.onchange = () => { S.pushTips = ptip.checked; save(); pushPrefsSync(); };
+    if (pnews) pnews.onchange = () => { S.pushNews = pnews.checked; save(); pushPrefsSync(); };
     pushBox.querySelector('[data-off]').onclick = async () => { await pushDisable().catch(() => {}); drawPush(); toast(tj('学习提醒已关闭', '学習リマインダーをオフにしました')); };
     pushBox.querySelectorAll('[data-hr]').forEach(b => { b.onclick = () => { const smart = b.dataset.hr === 'smart'; S.remindSmart = smart; const v = smart ? (habitHour() ?? 21) : +b.dataset.hr; if (on) turnOn(v); else { S.remindHour = v; save(); drawPush(); } }; });
   };

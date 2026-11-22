@@ -198,7 +198,7 @@ function enArticle(id) {
       const again = repI === i; stopAll(); el.classList.toggle('show');
       if (loopEl.checked && again) return;
       const r = ++run; repI = loopEl.checked ? i : -1;
-      const one = () => enSeq([{ t: sents[i][0] }], { onItem: mark, onEnd: () => { if (r === run && loopEl.checked && repI === i && el.isConnected) setTimeout(() => { if (r === run && repI === i) one(); }, 700); } });
+      const one = () => enSeq([{ t: sents[i][0] }], { onItem: x => mark(x < 0 ? -1 : i), onEnd: () => { if (r === run && loopEl.checked && repI === i && el.isConnected) setTimeout(() => { if (r === run && repI === i) one(); }, 700); } });
       one();
     }; });
     const playAll = r => enSeq(sents.map(s => ({ t: s[0], pause: .5 })), { onItem: i => { mark(i); if (i >= 0 && sEls[i]) sEls[i].scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' }); },

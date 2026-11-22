@@ -1342,7 +1342,7 @@ body.hi-mode .top .chips, body.hi-mode .gsearch, body.hi-mode .track-seg, body.h
 .en-tip-t { font-size: .92rem; line-height: 1.6; }
 .en-title { font-family: "Nunito", sans-serif; margin-bottom: 2px; }
 .en-fig { margin: 8px 0; }
-.en-fig .rc-photo { width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; }
+.en-fig .rc-photo { width: 100%; height: auto; max-height: 260px; object-fit: cover; border-radius: 12px; }   /* 高度按图片算（不用 .rc-photo 的 100%）：外框才会把两行的图片来源包进去，不压到标题 */
 .en-art { display: grid; gap: 14px; margin: 12px 0; }
 .en-par { display: grid; gap: 8px; }
 .en-s { padding: 4px 8px; border-radius: 8px; cursor: pointer; font-family: "Nunito", sans-serif; font-size: 1.06rem; line-height: 1.6; transition: background .2s; }

@@ -127,7 +127,7 @@ function enCoLesson(tid, lid) {
     // 对话：点一句听一句（每个人物用不同的声音），连续播放时跟着高亮
     const lEls = [...p.querySelectorAll('.cl-line')];
     const mark = k => lEls.forEach((el, j) => el.classList.toggle('on', j === k));
-    const one = k => enSeq([{ t: l.lines[k].en, spk: spk(l.lines[k]) }], { onItem: mark });
+    const one = k => enSeq([{ t: l.lines[k].en, spk: spk(l.lines[k]) }], { onItem: x => mark(x < 0 ? -1 : k) });   // 只放这一句：回报的序号是 0，要换成这一句在全文里的位置
     p.querySelectorAll('[data-cl-say]').forEach(b => { b.onclick = e => { e.stopPropagation(); one(+b.dataset.clSay); }; });
     p.querySelectorAll('.cl-line .cl-jp').forEach(el => { el.onclick = e => { if (e.target.closest('.zw')) return; one(+el.closest('.cl-line').dataset.i); }; });
     const allBtn = p.querySelector('[data-all]');
@@ -207,7 +207,7 @@ function enBizMail(id) {
     p.prepend(enLangBar());
     const art = p.querySelector('.en-art'), sEls = [...p.querySelectorAll('.en-s')];
     const mark = j => sEls.forEach((el, n) => el.classList.toggle('on', n === j));
-    sEls.forEach((el, j) => { el.onclick = e => { if (e.target.closest('a,button')) return; el.classList.toggle('show'); enSeq([{ t: sents[j][0] }], { onItem: mark }); }; });
+    sEls.forEach((el, j) => { el.onclick = e => { if (e.target.closest('a,button')) return; el.classList.toggle('show'); enSeq([{ t: sents[j][0] }], { onItem: x => mark(x < 0 ? -1 : j) }); }; });
     const allBtn = p.querySelector('[data-all]');
     let playing = false;
     const allOff = () => { playing = false; if (allBtn.isConnected) allBtn.textContent = `▶ ${'Listen to all'}`; };
