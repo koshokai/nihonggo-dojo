@@ -200,7 +200,7 @@ function l2BizScene(tr, sc, scenes) {
   const tts = TRACKS[tr].tts, i = scenes.indexOf(sc), next = scenes[i + 1];
   const p = h(`<article class="panel an-work">
     <a class="an-back" href="#${tr}/biz">← 返回商务${TRACKS[tr].title}</a>
-    ${sc.ph ? `<div class="an-hero"><img src="${esc(sc.ph[0])}" alt="" decoding="async" onerror="this.parentElement.remove()"></div>${photoCredit(sc)}` : ''}
+    ${sc.ph ? `<div class="an-hero"><img src="${esc(sc.ph[0])}" alt="" decoding="async" data-fail="parent"></div>${photoCredit(sc)}` : ''}
     <div class="row"><span class="tag lv">${esc(sc.lv)}</span><span class="tag">${L2_BIZ_IC[sc.cat] || ''} ${esc(sc.cat)}</span></div>
     <h2 lang="${tr}">${esc(sc.title)}</h2><p class="muted">${esc(sc.zh)}</p>
     <div class="biz-lines">${sc.lines.map(([who, x, zh]) => `<div class="an-t"><span class="an-who small">${esc(who)}</span><div><span lang="${tr}">${esc(x)}</span>${sayBtn(x, tts)}${shadowBtn(x, '', zh, tr)}<div class="small muted">${esc(zh)}</div></div></div>`).join('')}</div>
@@ -377,7 +377,7 @@ function l2Quotes(tr, id) {
     const grid = p.querySelector('.an-grid');
     const draw = () => {
       grid.innerHTML = list.filter(x => !l2QKind || x.kind === l2QKind).map(x => `<a class="an-card" href="#${tr}/quotes/${esc(x.id)}">
-        <div class="an-img">${x.ph ? `<img src="${esc(x.ph[0])}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="an-cover" lang="${tr}">${esc(x.title)}</span>`}</div>
+        <div class="an-img">${x.ph ? `<img src="${esc(x.ph[0])}" alt="" loading="lazy" decoding="async" data-fail="self">` : `<span class="an-cover" lang="${tr}">${esc(x.title)}</span>`}</div>
         <div class="an-meta"><b lang="${tr}">${esc(x.title)}</b><span class="small muted">${esc(x.zh)} · ${x.lines.length} 句</span>
         <span class="small an-first" lang="${tr}">“${esc(x.lines[0].t)}”</span></div></a>`).join('');
     };
@@ -390,7 +390,7 @@ function l2QuoteWork(tr, w, list) {
   const T = TRACKS[tr];
   const p = h(`<article class="panel an-work">
     <a class="an-back" href="#${tr}/quotes">← 全部作品</a>
-    ${w.ph ? `<div class="an-hero"><img src="${esc(w.ph[0])}" alt="${esc(w.place)}" decoding="async" onerror="this.parentElement.remove()"></div>${photoCredit(w)}` : ''}
+    ${w.ph ? `<div class="an-hero"><img src="${esc(w.ph[0])}" alt="${esc(w.place)}" decoding="async" data-fail="parent"></div>${photoCredit(w)}` : ''}
     <h2 lang="${tr}">${esc(w.title)} <span class="small muted">${esc(w.zh)}${w.year ? ' · ' + esc(w.year) : ''}</span></h2>
     ${w.place ? `<p class="small muted">${w.ph ? '📍 ' : ''}${esc(w.place)}</p>` : ''}
     <div class="an-lines">${w.lines.map(l => `<section class="an-line">

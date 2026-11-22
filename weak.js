@@ -114,7 +114,7 @@ function weakLogPanel() {
       <div class="wk-sk">${Object.entries(by).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<span class="tag">${esc(skn(k))} ${n}</span>`).join('')}</div>
       ${quizN ? `<div class="row"><button class="btn pri" type="button" data-wkgo>${T('专练弱项', '弱点トレーニング')}</button></div>` : ''}
       <h3>${T('反复出错', 'よく間違えるもの')}</h3>
-      <div class="wk-list">${top.map(([k, e]) => `<div class="wk-item"><div class="wk-top"><b lang="${L}">${esc(String(e.l || '').slice(0, 60))}</b><span class="tag">${esc(skn(e.sk || 'v'))} · ${T(`错 ${e.n} 次`, `${e.n} 回ミス`)}</span></div>${e.m ? `<div class="small muted">${esc(String(e.m).slice(0, 80))}</div>` : ''}${e.href && !e.q ? `<a class="small" href="${esc(e.href)}">${T('去重做 ›', 'もう一度 ›')}</a>` : ''}</div>`).join('')}</div>`
+      <div class="wk-list">${top.map(([k, e]) => `<div class="wk-item"><div class="wk-top"><b lang="${L}">${esc(String(e.l || '').slice(0, 60))}</b><span class="tag">${esc(skn(e.sk || 'v'))} · ${T(`错 ${e.n} 次`, `${e.n} 回ミス`)}</span></div>${e.m ? `<div class="small muted">${esc(String(e.m).slice(0, 80))}</div>` : ''}${e.href && !e.q ? `<a class="small" href="${esc(/^#[\w/%.-]*$/.test(String(e.href || '')) ? e.href : '#me/weak')}">${T('去重做 ›', 'もう一度 ›')}</a>` : ''}</div>`).join('')}</div>`
       : `<p class="muted">${T('还没有记录。做测验、闯关、阅读、听力答错的题会自动记在这里，方便集中复习。', 'まだ記録はありません。クイズ・ステージ・読解・聴解で間違えた問題がここに自動で記録され、まとめて復習できます。')}</p>`}
     ${ptLogHTML(tr)}
   </section>`);

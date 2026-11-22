@@ -4,7 +4,7 @@
 //   网站和 App 里只有免费部分；会员打开时用 memberJson() 取完整版，取不到就用公开版。
 //   取到的完整版存在设备的 IndexedDB 里（没网也能看）；到期、退款、换语言、退出登录、换账号时删掉。
 const MEMBER_DB = 'neko-member', MEMBER_STORE = 'files';
-let memberMem = {}, memberGen = 0, memberSig = '';
+let memberMem = {}, memberGen = 0, memberSig = '', memberBoot = null;   // memberBoot：打开网站时设备里存的会员身份（页面按它画的）
 
 /* ---------- 设备上的存储（IndexedDB：App 的 capacitor:// 页面也能用） ---------- */
 let memberDbP = null;
@@ -60,11 +60,14 @@ function memberCheck() {
   if (!first && was && !s.endsWith('+') && typeof askSheet === 'function')
     setTimeout(() => askSheet(tje('会员已经到期了，会员内容暂时收起来了。续订以后马上恢复，学习记录都还在。', 'メンバー期間が終了したため、メンバーコンテンツは非表示になりました。再登録するとすぐに元どおり使えます。学習記録はそのまま残っています。', 'Your membership has ended, so member content is hidden for now. Renew to get it back right away — your progress is saved.'),
       [[false, tje('知道了', 'OK', 'OK')], [true, tje('续订会员', 'メンバーを再開', 'Renew'), 'pri']]).then(v => { if (v) location.hash = '#vip'; }), 300);
+  // 和打开网站时存的身份一样：页面已经按这个身份画好了，不重画（以前会员每次打开都重画一次首页）；只补上语法的会员例句
+  if (first && s === memberBoot) { if (isMember('ja') && typeof gramMember === 'function') gramMember(); return; }
   if (!first || isMember()) memberChanged();   // 第一次检查：不是会员就不用重画（不打断正在做的事）
 }
 async function memberRefresh() {
   if (typeof sbUser === 'undefined' || !sbUser || typeof cloudClient !== 'function') return;
   const uid = sbUser.id;
+  if (memberBoot === null && !memberSig) memberBoot = memberState();
   try {
     const c = await cloudClient();
     const { data, error } = await c.from('memberships').select('tier, langs, until, langs_changed_at, period_start').eq('user_id', uid).maybeSingle();

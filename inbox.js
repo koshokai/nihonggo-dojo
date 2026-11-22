@@ -58,7 +58,8 @@ function msgCard(m, onDone) {
       ${m.read_at ? '' : `<button class="msg-x" type="button" data-x>${tj('知道了', '確認しました')}</button>`}</div></section>`);
   const done = () => { if (onDone) onDone(el); };
   const go = el.querySelector('[data-act]');
-  if (go) go.onclick = async e => { e.stopPropagation(); await inboxMark(m); done(); if (/^#/.test(m.action)) navTo(m.action); else window.open(m.action, '_blank', 'noopener'); };
+  // 按钮只允许跳到站内页面和可信网址（不跳 javascript: 之类）
+  if (go) go.onclick = async e => { e.stopPropagation(); await inboxMark(m); done(); if (/^#[\w/%.-]*$/.test(m.action)) navTo(m.action); else if (/^https:\/\/(koshokai\.github\.io|apps\.apple\.com)\//.test(m.action)) window.open(m.action, '_blank', 'noopener'); };
   el.querySelectorAll('[data-rep]').forEach(b => { b.onclick = async e => { e.stopPropagation(); await inboxMark(m, reps[+b.dataset.rep]); toast(tj('收到，谢谢你的回复', '返信ありがとうございます')); done(); }; });
   const x = el.querySelector('[data-x]');
   if (x) x.onclick = async e => { e.stopPropagation(); await inboxMark(m); done(); };

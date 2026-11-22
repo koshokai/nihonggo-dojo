@@ -29,6 +29,7 @@ await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());   // 不访问�
 const page = await ctx.newPage();
 let cur = '';
 page.on('pageerror', e => fails.push(`${cur}: JS 错误 ${e.message}`));
+page.on('console', m => { if (/Content Security Policy|Refused to (load|execute|connect|apply)/.test(m.text())) fails.push(`${cur}: 被安全策略（CSP）拦下 ${m.text().slice(0, 160)}`); });
 await page.addInitScript(() => {
   if (!localStorage.getItem('nihongo-dojo:v1')) localStorage.setItem('nihongo-dojo:v1', JSON.stringify({ onboarded: true, xp: 40, track: 'ja', petals: false, uiV2: 1, installHint: 1, level: 'N5' }));
   localStorage.setItem('sb-test-auth-token', '1');

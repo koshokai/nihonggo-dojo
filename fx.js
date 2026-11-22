@@ -31,8 +31,8 @@ function fxPageOut() {
 }
 function fxPageIn() {
   const m = document.getElementById('main');
-  const changed = fxChanged(); fxRoute = location.hash;
-  if (!m || fxCalm() || !changed) return;
+  const first = fxRoute === null, changed = fxChanged(); fxRoute = location.hash;
+  if (!m || fxCalm() || !changed || first) return;   // 第一次打开网站：直接显示，不放动画
   m.classList.remove('page-in', 'page-back', 'swipe-l', 'swipe-r');
   void m.offsetWidth;
   const sw = document.body.dataset.swipe;   // 左右滑动换页（swipe.js）：新页面从滑动的方向进来

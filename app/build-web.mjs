@@ -21,7 +21,8 @@ cpSync(new URL('native.js', import.meta.url).pathname, join(OUT, 'native.js'));
 cpSync(new URL('native-sr.js', import.meta.url).pathname, join(OUT, 'native-sr.js'));
 // App 模式标记放在最前面（录音地址、关掉 Service Worker、隐藏 App 里不能用的登录方式），原生功能脚本放在最后
 let html = readFileSync(join(OUT, 'index.html'), 'utf8');
-html = html.replace('<script>', `<script>window.DOJO_APP = { remote: '${SITE}' };</script>\n<script src="native-sr.js"></script>\n<script>`);   // 原生语音识别要在跟读脚本之前装上
+html = html.replace('<script src="boot.js"></script>', `<script>window.DOJO_APP = { remote: '${SITE}' };</script>\n<script src="native-sr.js"></script>\n<script src="boot.js"></script>`);
+html = html.replace(/<meta http-equiv="Content-Security-Policy"[^>]*>\n/, '');   // App 里不用网页的 CSP（上面插入了内嵌脚本，而且运行在 capacitor:// 下）   // 原生语音识别要在跟读脚本之前装上
 html = html.replace('</body>', '<script src="native.js"></script>\n</body>');
 // App 里：页面不能被双指放大、也不在边缘回弹，像原生 App 一样固定（网站保留放大，方便看小字）
 html = html.replace('content="width=device-width, initial-scale=1, viewport-fit=cover"', 'content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"');

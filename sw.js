@@ -3,11 +3,11 @@
 // 发音 MP3：先用缓存（离线也能听），同时在后台向网络确认一次，录音重录过（同名文件内容变了）就更新缓存，下次播放就是新录音。
 // AUDIO 换名字（audio-v3）：清掉以前缓存的全部录音（有些录音重录时没换文件名，听过的人一直是旧录音）。
 // 账号、同步等跨域请求（Supabase、jsDelivr）不经过缓存。
-const VERSION = 'v281';
+const VERSION = 'v283';
 const SHELL = `shell-${VERSION}`, AUDIO = 'audio-v3';
 const CORE = ['./', 'index.html', 'style.css', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-maskable-192.png', 'icon-maskable-512.png', 'icon.svg',
-  'i18n.js', 'mascot.js', 'fx.js', 'japlus.js', 'furi-map.js', 'kanapad.js', 'swipe.js', 'conv.js', 'pitch.js', 'tour.js', 'zh.js', 'zh-biz.js', 'practice2.js', 'week2.js', 'vocab.js', 'kanji.js', 'grammar.js', 'data.js', 'daily.js', 'jlpt.js', 'game.js', 'dict.js', 'reading.js',
-  'scenes.js', 'read.js', 'week.js', 'weekly.js', 'vip.js', 'en.js', 'en-study.js', 'en-course.js', 'en-path.js', 'exam2.js', 'anime.js', 'course.js', 'duel.js', 'buddy.js', 'trans.js', 'conj.js', 'dictation.js', 'strokes.js', 'sharecard.js', 'share.js', 'invite.js', 'levelcheck.js', 'diagnose.js', 'path.js', 'plan.js', 'weak.js', 'hub.js', 'leaderboard.js', 'business.js', 'biz.js', 'shadow.js', 'listen.js', 'listening.js', 'furi-listen.js', 'lang.js', 'lang2.js', 'stats.js', 'config.js', 'member.js', 'cloud.js', 'inbox.js', 'online.js', 'guest.js', 'app.js', 'privacy.html', 'terms.html', 'share-qr.png', 'vendor/supabase.js', 'vendor/qrcode.js'];
+  'boot.js', 'lazyja.js', 'i18n.js', 'mascot.js', 'fx.js', 'japlus.js', 'furi-map.js', 'kanapad.js', 'swipe.js', 'conv.js', 'pitch.js', 'tour.js', 'zh.js', 'zh-biz.js', 'practice2.js', 'week2.js', 'vocab.js', 'kanji.js', 'grammar.js', 'data.js', 'daily.js', 'jlpt.js', 'game.js', 'dict.js', 'reading.js',
+  'scenes.js', 'read.js', 'week.js', 'weekly.js', 'vip.js', 'en.js', 'en-study.js', 'en-course.js', 'en-path.js', 'exam2.js', 'anime.js', 'course.js', 'duel.js', 'buddy.js', 'trans.js', 'conj.js', 'dictation.js', 'strokes.js', 'sharecard.js', 'share.js', 'invite.js', 'levelcheck.js', 'diagnose.js', 'path.js', 'plan.js', 'remind.js', 'weak.js', 'hub.js', 'leaderboard.js', 'business.js', 'biz.js', 'shadow.js', 'listen.js', 'listening.js', 'furi-listen.js', 'lang.js', 'lang2.js', 'stats.js', 'config.js', 'member.js', 'cloud.js', 'inbox.js', 'online.js', 'guest.js', 'app.js', 'privacy.html', 'terms.html', 'share-qr.png', 'vendor/supabase.js', 'vendor/qrcode.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(SHELL).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

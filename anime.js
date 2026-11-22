@@ -57,7 +57,7 @@ function animeList(list, full) {
   const grid = p.querySelector('.an-grid');
   const draw = () => {
     grid.innerHTML = list.filter(w => !animeKind || w.kind === animeKind).map(w => `<a class="an-card has-vip ${w.kind}" href="#anime/${esc(w.id)}" data-t="${esc(w.title)}">${w.vip ? vipTag() : ''}
-      <div class="an-img">${w.ph ? `<img src="${esc(w.ph[0])}" alt="" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'an-cover',textContent:this.closest('.an-card').dataset.t}))">` : `<span class="an-cover" lang="ja">${esc(w.title)}</span>`}</div>
+      <div class="an-img">${w.ph ? `<img src="${esc(w.ph[0])}" alt="" loading="lazy" decoding="async" data-fail="cover">` : `<span class="an-cover" lang="ja">${esc(w.title)}</span>`}</div>
       <div class="an-meta"><b lang="ja" class="furi">${animeTitle(w)}</b><span class="small muted">${w.orig ? '<span class="tag">原创</span> ' : ''}${esc(w.zh)}</span>
       ${w.lock ? '<span class="small muted an-first">🔒 会员</span>' : `<span class="small an-first furi" lang="ja">「${furiHTML(w.lines[0].jp, w.lines[0].furi)}」</span>`}</div></a>`).join('');
   };
@@ -71,7 +71,7 @@ function animeWork(w, list) {
   if (w.aud) for (const k in w.aud) AUDIO_IDX[k] = AUDIO_IDX[k] || w.aud[k];   // 这部作品的录音（地址不在公开的索引里）
   const p = h(`<article class="panel an-work">
     <a class="an-back" href="#anime">← 全部作品</a>
-    ${w.ph ? `<div class="an-hero"><img src="${esc(w.ph[0])}" alt="${esc(w.place)}" decoding="async" onerror="this.parentElement.remove()"></div>${photoCredit(w)}` : ''}
+    ${w.ph ? `<div class="an-hero"><img src="${esc(w.ph[0])}" alt="${esc(w.place)}" decoding="async" data-fail="parent"></div>${photoCredit(w)}` : ''}
     <h2 lang="ja" class="furi">${animeTitle(w)} <span class="small muted">${w.orig ? '<span class="tag">原创</span> ' : ''}${esc(w.zh)}${w.year ? ' · ' + esc(w.year) : ''}</span></h2>
     ${w.place ? `<p class="small muted">${w.ph ? '📍 ' : ''}${esc(w.place)}</p>` : ''}
     <label class="small"><input type="checkbox" data-kana checked> 显示读音</label>

@@ -50,7 +50,7 @@ async function cloudPull(interactive) {
 function useRemote(data, remoteAt) {
   const keep = localKeep(), member = S.memberUser === sbUser.id ? S.member : undefined, memberUser = member ? S.memberUser : undefined;
   // 会员身份不从同步数据里恢复（客户端能写自己那一行，不可信）；1.1 起由服务器的会员表提供
-  S = Object.assign(blank(), data.data, keep, { syncUser: sbUser.id, syncedAt: remoteAt, modAt: remoteAt, member, memberUser });
+  S = cleanState(Object.assign(blank(), data.data, keep, { syncUser: sbUser.id, syncedAt: remoteAt, modAt: remoteAt, member, memberUser }));
   try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* 忽略 */ }
   syncNote = tj('已从云端恢复进度', 'クラウドから学習記録を復元しました');
   applyTheme(); render(); updateTop();
@@ -75,21 +75,33 @@ async function cloudPush() {
   const el = document.querySelector('[data-sync-note]'); if (el) el.textContent = syncNote;
 }
 // save() 每次都会调用这里：停止操作 8 秒后再上传，避免频繁请求
+// 服务器记「今天学过」（邀请奖励按服务器的日期算，见 docs/SUPABASE_SETUP.md 第 23 节）：每天第一次有学习记录时报一次
+function cloudTouchDay() {
+  const k = dkey();
+  if (!sbUser || !(S.days[k] > 0)) return;
+  const tag = sbUser.id + k;
+  try { if (localStorage.getItem('dojo-touch') === tag) return; } catch (e) { /* 忽略 */ }
+  cloudClient().then(c => c.rpc('touch_day')).then(r => { if (r && !r.error) try { localStorage.setItem('dojo-touch', tag); } catch (e) { /* 忽略 */ } }).catch(() => {});
+}
 function cloudQueue() {
   if (!sbUser) return;
+  cloudTouchDay();
   clearTimeout(syncTimer);
   syncTimer = setTimeout(cloudPush, 8000);
 }
 addEventListener('pagehide', () => { if (sbUser && (S.modAt || 0) > (S.syncedAt || 0)) cloudPush(); });
 
 const fromEmailLink = () => /access_token=|type=recovery|error_description=|[?&]code=|[?&]line_(token|error)=/.test(location.hash + location.search);
+const hasSession = () => { try { return Object.keys(localStorage).some(k => /^sb-.+-auth-token$/.test(k)); } catch (e) { return false; } };
 const mustLogin = () => cloudOn() && CLOUD.requireLogin && !(typeof guestFlag === 'function' && guestFlag()) && !/^#hi\//.test(location.hash);   // 别人分享的学习成果页（#hi/…）不用登录就能看   // 选了游客模式就不挡
 async function cloudInit() {
   if (!cloudOn()) return;
   document.querySelectorAll('[data-feedback-link]').forEach(a => { a.hidden = false; });
   // 不用账号的人不多下载任何东西：只有以前登录过、要求必须登录、或者从邮件链接回来时才加载 SDK
   if (!mustLogin() && !fromEmailLink() && !Object.keys(localStorage).some(k => k.startsWith('sb-'))) return;
-  if (mustLogin()) authGate('loading');
+  // 必须登录时：这台设备存着登录状态（以前登录过）就直接进网站，在后台确认；确认不了（已退出、过期）再显示登录界面。
+  // 只有没登录过的人才先看到「正在连接」的画面（以前每次打开都先盖一层，网站闪两次）
+  if (mustLogin() && !hasSession()) authGate('loading');
   try {
     const c = await cloudClient();
     connStep(88);
@@ -104,7 +116,8 @@ async function cloudInit() {
     const lq = new URLSearchParams(location.search);
     if (lq.has('line_token') || lq.has('line_error')) {   // 从 LINE 登录跳回来：用一次性凭证登录，再把它从地址栏去掉
       history.replaceState(null, '', location.pathname + location.hash);
-      try { await socialReturn(lq); } catch (e) { authFlash = authMsg(e); }
+      if (lq.has('line_token') && !takeAuthPending()) { /* 不是这台设备发起的登录：不接受 */ }
+      else try { await socialReturn(lq); } catch (e) { authFlash = authMsg(e); }
     }
     const { data } = await c.auth.getSession();
     sbUser = data.session ? data.session.user : null;
@@ -149,7 +162,7 @@ function accountPanel() {
         if (last !== true) return;
         const { error } = await sb.rpc('delete_my_account');
         if (error) return toast(tj('删除失败：', '削除に失敗しました：') + error.message);
-        await sb.auth.signOut(); sbUser = null; memberSignedOut(); delete S.syncUser; delete S.syncedAt; save(); draw(); toast(tj('账号已删除', 'アカウントを削除しました')); if (mustLogin()) authScreen('login');
+        await sb.auth.signOut(); sbUser = null; memberSignedOut(); delete S.syncUser; delete S.syncedAt; save(); try { localStorage.removeItem(LAST_EMAIL); } catch (e) { /* 忽略 */ } draw(); toast(tj('账号已删除', 'アカウントを削除しました')); if (mustLogin()) authScreen('login');
       };
       return;
     }
@@ -280,7 +293,8 @@ function authGate(state) {
   if (!g) { g = h('<div id="auth-gate" class="auth-gate" role="dialog" aria-modal="true"></div>'); document.body.append(g); }
   document.body.classList.add('gated');
   if (state === 'loading') { g.innerHTML = connectScene(); connStart(g); }
-  if (state === 'offline') g.innerHTML = `<div class="auth-card"><div class="auth-brand">${authBrand()}</div><p>${tje('需要联网登录一次。', '最初の 1 回はインターネットに接続してログインする必要があります。', 'Please connect to the internet and sign in once.')}</p><p class="small muted">${tje('请检查网络后重新打开。登录过的设备之后没有网络也能使用。', 'ネットワークを確認して、もう一度開いてください。一度ログインした端末は、その後オフラインでも使えます。', 'Check your connection and reopen. Once signed in, this device works offline too.')}</p><button class="btn pri" type="button" onclick="location.reload()">${tje('重试', '再試行', 'Retry')}</button></div>`;
+  if (state === 'offline') g.innerHTML = `<div class="auth-card"><div class="auth-brand">${authBrand()}</div><p>${tje('需要联网登录一次。', '最初の 1 回はインターネットに接続してログインする必要があります。', 'Please connect to the internet and sign in once.')}</p><p class="small muted">${tje('请检查网络后重新打开。登录过的设备之后没有网络也能使用。', 'ネットワークを確認して、もう一度開いてください。一度ログインした端末は、その後オフラインでも使えます。', 'Check your connection and reopen. Once signed in, this device works offline too.')}</p><button class="btn pri" type="button" data-reload>${tje('重试', '再試行', 'Retry')}</button></div>`;
+  if (state === 'offline') { const rb = g.querySelector('[data-reload]'); if (rb) rb.onclick = () => location.reload(); }
   return g;
 }
 function authMsg(m) {
@@ -301,15 +315,10 @@ function authMsg(m) {
 // 记住上次登录的邮箱（只存在这台设备上），下次登录自动填好，只要输密码
 const LAST_EMAIL = 'dojo-last-email';
 const lastEmail = () => { try { return localStorage.getItem(LAST_EMAIL) || ''; } catch (e) { return ''; } };
-// 记住密码：勾选时只存在这台设备上（App 里是 App 自己的存储；网页是这个网站的本地存储），下次登录自动填好；取消勾选再登录就删掉
-const SAVED_PW = 'dojo-saved-pw', SAVED_PW_OFF = 'dojo-saved-pw-off';
-const savedPw = () => { try { const v = JSON.parse(localStorage.getItem(SAVED_PW) || 'null'); return v && v.e && v.p ? v : null; } catch (e) { return null; } };
+// 密码不再由网站自己保存（以前的「记住密码」把密码存在本地存储里，同一设备上的恶意代码或别人能读到）：
+// 交给浏览器 / iPhone 自带的密码管理（钥匙串、Chrome 等，有 Face ID / 系统加密保护）。以前存过的密码打开时自动删掉
+try { localStorage.removeItem('dojo-saved-pw'); localStorage.removeItem('dojo-saved-pw-off'); } catch (e) { /* 无痕模式 */ }
 function rememberPw(form, email, pwd) {
-  try {
-    if (form.remember && form.remember.checked) { localStorage.setItem(SAVED_PW, JSON.stringify({ e: email, p: btoa(unescape(encodeURIComponent(pwd))) })); localStorage.removeItem(SAVED_PW_OFF); }
-    else { localStorage.removeItem(SAVED_PW); localStorage.setItem(SAVED_PW_OFF, '1'); }
-  } catch (e) { /* 无痕模式 */ }
-  // 浏览器自带的密码管理（Chrome 等）：顺便请它保存
   try { if (window.PasswordCredential && navigator.credentials) navigator.credentials.store(new PasswordCredential({ id: email, password: pwd })).catch(() => {}); } catch (e) { /* 不支持 */ }
 }
 async function afterLogin(user) {
@@ -353,6 +362,11 @@ const SOCIAL_LABEL = {
   facebook: () => tje('用 Facebook 登录', 'Facebook でログイン', 'Continue with Facebook'),
 };
 const SOCIAL_BTN = k => `<button class="soc-btn soc-${k}" type="button" data-social="${k}" aria-label="${SOCIAL_LABEL[k]()}" title="${SOCIAL_LABEL[k]()}">${SOCIAL_ICON[k]}</button>`;
+// 一键登录必须是这台设备上自己发起的：发起时记一个时间，跳回来时要对得上（15 分钟内）。
+// 防止别人把「自己账号的登录链接」（?line_token=… 或 App 的回跳链接）发给你，让你在不知情时登进他的账号
+const AUTH_PENDING = 'dojo-auth-pending';
+window.markAuthPending = () => { try { localStorage.setItem(AUTH_PENDING, String(Date.now())); } catch (e) { /* 无痕模式 */ } };
+const takeAuthPending = () => { try { const t = +localStorage.getItem(AUTH_PENDING) || 0; localStorage.removeItem(AUTH_PENDING); return Date.now() - t < 15 * 60e3; } catch (e) { return false; } };
 async function socialGo(p, say, btn) {
   const A = window.appAuth;
   if (btn) btn.disabled = true;
@@ -363,6 +377,7 @@ async function socialGo(p, say, btn) {
       if (user) await afterLogin(user);
       return;
     }
+    markAuthPending();
     if (p === 'line') { location.href = `${CLOUD.url}/functions/v1/line-auth?redirect=${encodeURIComponent(REDIRECT())}`; return; }
     const c = await cloudClient();
     const { error } = await c.auth.signInWithOAuth({ provider: p, options: { redirectTo: REDIRECT() } });
@@ -389,6 +404,7 @@ async function socialReturn(q) {
 // App：系统浏览器跳回 com.koshokai.omnisphere://login?…#… 时（native.js 调用）
 window.appAuthReturn = async url => {
   const q = new URLSearchParams(url.replace(/^[^?#]*[?#]?/, '').replace('#', '&'));
+  if ((q.get('line_token') || q.get('access_token') || q.get('code')) && !takeAuthPending()) return;   // 不是这台设备刚发起的登录：忽略
   try {
     const user = await socialReturn(q);
     if (user) await afterLogin(user);
@@ -414,7 +430,6 @@ function authScreen(mode = 'login') {
   const EM = tje('邮箱', 'メールアドレス', 'Email'), CODE = tje('邮件里的验证码', 'メールに記載の確認コード', 'Code from the email'), BACK = tje('← 返回登录', '← ログインに戻る', '← Back to sign in');
   const forms = {
     login: `<input type="email" name="email" placeholder="${EM}" autocomplete="username" required>${pw('pw', tje('密码', 'パスワード', 'Password'), 'current-password')}
-      <label class="remember-pw small"><input type="checkbox" name="remember" ${savedPw() || !localStorage.getItem(SAVED_PW_OFF) ? 'checked' : ''}> ${tje('记住密码（只保存在这台设备上）', 'パスワードを保存（この端末だけ）', 'Remember password (this device only)')}</label>
       <button class="btn pri big" type="submit">${tje('登录', 'ログイン', 'Sign in')}</button><button class="btn ghost small" type="button" data-mode="forgot">${tje('忘记密码？', 'パスワードを忘れた方', 'Forgot password?')}</button>`,
     signup: `<input type="email" name="email" placeholder="${EM}" autocomplete="email" required>${pw('pw', tje('密码（至少 8 位）', 'パスワード（8 文字以上）', 'Password (8+ characters)'), 'new-password')}${pw('pw2', tje('再输一次密码', 'パスワード（確認）', 'Repeat password'), 'new-password')}
       <label class="small agree"><input type="checkbox" name="agree" required> ${tje('我已阅读并同意 <a href="privacy.html" target="_blank">隐私政策</a>', '<a href="privacy.html" target="_blank">プライバシーポリシー</a>を読み、同意します', 'I have read and agree to the <a href="privacy.html" target="_blank">Privacy Policy</a>')}</label>
@@ -448,8 +463,7 @@ function authScreen(mode = 'login') {
   </div>`;
   const form = host.querySelector('[data-af]'), msg = host.querySelector('[data-msg]');
   const say = (t, ok) => { msg.textContent = t; msg.classList.toggle('ok', !!ok); };
-  const remembered = lastEmail(), sp = savedPw();
-  if (mode === 'login' && sp && form.pw) { form.email.value = sp.e; try { form.pw.value = decodeURIComponent(escape(atob(sp.p))); } catch (e) { /* 忽略 */ } }
+  const remembered = lastEmail();
   if (remembered && mode !== 'signup' && form.email && !form.email.value) {
     form.email.value = remembered;
     if (mode === 'login' && form.pw) setTimeout(() => { try { form.pw.focus({ preventScroll: true }); } catch (e) { /* 忽略 */ } }, 300);

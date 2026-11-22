@@ -186,8 +186,27 @@ function migrateIds() {
   }
 }
 const blank = () => ({ xp: 0, days: {}, goal: 50, newPerDay: 10, level: 'N5', srs: {}, wrong: {}, badges: {}, exams: [], kanaRight: 0, goalDays: {}, newLog: {}, best: 0, fixed: 0, theme: '', onboarded: false, rate: .8, voice: '', petals: false, autoSpeak: true, lastBackup: 0, lastBackupXp: 0, stages: {}, games: {}, read: {}, biz: {}, voiceSrc: 'vv' });
+// 学习数据可能来自云同步或导入的备份，内容不可信：按默认值修正类型；学习记录只认「日期 → 数字」；几个会写进页面的文字字段只接受安全的值
+function cleanState(o) {
+  const b = blank();
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return b;
+  const n = (v, d) => typeof v === 'number' && Number.isFinite(v) ? v : (typeof v === 'string' && v.trim() !== '' && Number.isFinite(+v) ? +v : d);
+  for (const k of Object.keys(b)) {
+    const d = b[k], v = o[k];
+    if (typeof d === 'number') o[k] = n(v, d);
+    else if (typeof d === 'boolean') o[k] = typeof v === 'boolean' ? v : d;
+    else if (typeof d === 'string') o[k] = typeof v === 'string' && !/[<>"'`]/.test(v) ? v : d;
+    else if (Array.isArray(d)) o[k] = Array.isArray(v) ? v : d;
+    else o[k] = v && typeof v === 'object' && !Array.isArray(v) ? v : d;
+  }
+  for (const k of ['days', 'goalDays', 'newLog']) { const x = {}; for (const [dk, dv] of Object.entries(o[k])) if (/^\d{4}-\d{2}-\d{2}$/.test(dk) && Number.isFinite(+dv)) x[dk] = +dv; o[k] = x; }
+  for (const k of ['track', 'zhLevel', 'enLevel', 'enNative', 'syncUser', 'memberUser']) if (o[k] != null && !(typeof o[k] === 'string' && /^[\w.|:-]{0,64}$/.test(o[k]))) delete o[k];
+  for (const k of ['appRemind', 'syncedAt', 'modAt']) if (o[k] != null && !Number.isFinite(+o[k])) delete o[k];
+  if (o.goal <= 0) o.goal = b.goal;
+  return o;
+}
 function load() {
-  try { const t = localStorage.getItem(KEY); if (t) return Object.assign(blank(), JSON.parse(t)); } catch (e) { /* 浏览器禁用存储时从空进度开始 */ }
+  try { const t = localStorage.getItem(KEY); if (t) return cleanState(Object.assign(blank(), JSON.parse(t))); } catch (e) { /* 浏览器禁用存储时从空进度开始 */ }
   return blank();
 }
 let S = load();
@@ -1771,7 +1790,7 @@ function viewMe(sec) {
       const o = JSON.parse(txt);
       if (!o || o.app !== 'nihongo-dojo' || typeof o.xp !== 'number') throw new Error();
       // 会员身份不能从备份导入（备份是可以随便改的文字）
-      delete o.app; delete o.v; const member = S.member; S = Object.assign(blank(), o, { member });
+      delete o.app; delete o.v; delete o.member; delete o.memberUser; const member = S.member, memberUser = S.memberUser; S = cleanState(Object.assign(blank(), o, { member, memberUser }));
       S.onboarded = true; save(); applyTheme(); startPetals(); toast(tj('导入成功，欢迎回来', '読み込みました。おかえりなさい！')); go(homeView());
     } catch (e) { toast(tj('导入失败：这不是猫先生的备份', '読み込めませんでした。このアプリのバックアップではないようです')); }
   };
@@ -1983,6 +2002,7 @@ function installPanel() {
 applyTheme();
 checkBadges();
 render();
+document.documentElement.classList.remove('boot');   // 首屏：页面画好了，顶栏、页脚和内容一起出来（index.html）
 initGlobalSearch();
 initTrackSwitch();
 // 按当前页面重画导航（以前传的是语言名「ja」，直接打开或刷新日语的「学习」「单词」等页面时，底部导航会亮成「今天」）
@@ -1991,10 +2011,8 @@ initTrackSwitch();
 if (window.LAZY_JA) setTimeout(() => window.LAZY_JA.forEach(f => loadScript(f).then(() => { LAZY_JS[f].done = true; }).catch(() => {})), 2000);
 cloudInit();
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-  // 新版本的离线缓存接管页面时刷新一次，保证看到的是最新代码（第一次安装不刷新）
-  const hadController = !!navigator.serviceWorker.controller;
-  let reloaded = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !reloaded) { reloaded = true; location.reload(); } });
+  // 新版本的离线缓存接管页面时不刷新：sw.js 有网时页面和脚本都先取最新版，打开的已经是新代码；
+  // 以前这里会整页刷新一次，每次更新后打开网站，加载画面都要出现两次
   if (!window.DOJO_APP) navigator.serviceWorker.register('sw.js').then(r => r.update()).catch(() => {});
 }
 startPetals();

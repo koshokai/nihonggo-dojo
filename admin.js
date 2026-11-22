@@ -25,14 +25,18 @@ const actionFor = (a, u) => a === 'home' ? (u.track === 'ja' ? '#home' : '#' + u
 
 let users = [], filter = 'all', selected = new Set(), tpl = TEMPLATES[0], draft = { ...TEMPLATES[0] };
 
+// 用户数据（学习记录）是用户自己同步上来的，可能被改成任何内容：只认「日期 → 数字」，数字字段一律转成数字（防止注入后台页面）
+const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
 function summarize(u) {
-  const days = u.days || {}, today = dkey(), yest = dkey(new Date(Date.now() - DAY));
+  const days = {}, today = dkey(), yest = dkey(new Date(Date.now() - DAY));
+  if (u.days && typeof u.days === 'object') for (const [k, v] of Object.entries(u.days)) if (/^\d{4}-\d{2}-\d{2}$/.test(k) && typeof v === 'number' && Number.isFinite(v)) days[k] = v;
+  u.days = days; u.xp = num(u.xp); u.due = num(u.due); u.subs = num(u.subs); u.unread = num(u.unread);
   const studied = Object.keys(days).filter(k => days[k] > 0).sort();
   const last = studied[studied.length - 1] || null;
   const gap = last ? Math.round((Date.parse(today) - Date.parse(last)) / DAY) : null;
   let streak = 0;
   if (last === today || last === yest) for (let d = new Date(Date.parse(last)); (days[d.toISOString().slice(0, 10)] || 0) > 0; d = new Date(d.getTime() - DAY)) streak++;
-  return Object.assign(u, { last, gap, streak, todayXP: days[today] || 0, lang: LANG[u.track] || '日语' });
+  return Object.assign(u, { last, gap, streak, todayXP: days[today] || 0, lang: Object.prototype.hasOwnProperty.call(LANG, u.track) ? LANG[u.track] : '日语' });
 }
 const FILTERS = [
   ['all', '全部', () => true],
@@ -89,10 +93,10 @@ function draw() {
   <div class="panel"><div class="row between"><div class="row">${FILTERS.map(([k, t]) => `<button class="chip ${k === filter ? 'on' : ''}" data-f="${k}">${t}</button>`).join('')}</div>
     <div class="row small"><button class="btn" id="all">全选这一组</button><button class="btn" id="none">清空</button><span>已选 <b>${selected.size}</b> 人</span></div></div>
   <div class="tbl-wrap"><table><thead><tr><th></th><th>邮箱</th><th>在学</th><th>最后学习</th><th>连续</th><th>今日经验</th><th>待复习</th><th>总经验</th><th>提醒</th><th>未读</th><th>注册</th></tr></thead><tbody>
-  ${shown.map(u => `<tr class="${selected.has(u.user_id) ? 'sel' : ''}" data-u="${u.user_id}"><td><input type="checkbox" ${selected.has(u.user_id) ? 'checked' : ''}></td>
-    <td>${esc(u.email)}</td><td>${u.lang}</td>
-    <td>${u.last ? `${u.last} ${u.gap === 0 ? '<span class="tag t-ok">今天</span>' : u.gap === 1 ? '<span class="tag t-warn">昨天</span>' : `<span class="tag ${u.gap >= 7 ? 't-bad' : 't-warn'}">${u.gap} 天前</span>`}` : '<span class="tag t-bad">没学过</span>'}</td>
-    <td>${u.streak}</td><td>${u.todayXP}</td><td>${u.due}</td><td>${u.xp}</td><td>${u.subs ? '🔔' : ''}</td><td>${u.unread || ''}</td><td class="muted">${String(u.created_at).slice(0, 10)}</td></tr>`).join('') || '<tr><td colspan="11" class="muted">这一组没有人</td></tr>'}
+  ${shown.map(u => `<tr class="${selected.has(u.user_id) ? 'sel' : ''}" data-u="${esc(u.user_id)}"><td><input type="checkbox" ${selected.has(u.user_id) ? 'checked' : ''}></td>
+    <td>${esc(u.email)}</td><td>${esc(u.lang)}</td>
+    <td>${u.last ? `${esc(u.last)} ${u.gap === 0 ? '<span class="tag t-ok">今天</span>' : u.gap === 1 ? '<span class="tag t-warn">昨天</span>' : `<span class="tag ${u.gap >= 7 ? 't-bad' : 't-warn'}">${u.gap} 天前</span>`}` : '<span class="tag t-bad">没学过</span>'}</td>
+    <td>${num(u.streak)}</td><td>${num(u.todayXP)}</td><td>${num(u.due)}</td><td>${num(u.xp)}</td><td>${u.subs ? '🔔' : ''}</td><td>${num(u.unread) || ''}</td><td class="muted">${esc(String(u.created_at).slice(0, 10))}</td></tr>`).join('') || '<tr><td colspan="11" class="muted">这一组没有人</td></tr>'}
   </tbody></table></div></div>
   <div class="panel"><h2>发消息</h2>
     <div class="row">${TEMPLATES.map(t => `<button class="chip ${t === tpl ? 'on' : ''}" data-t="${t.k}">${t.name}</button>`).join('')}</div>
@@ -174,7 +178,7 @@ async function loadReplies() {
     ...(reps || []).map(r => ({ at: r.read_at || r.created_at, html: `<b>${esc(r.reply)}</b> <span class="small muted">— ${esc(email(r.user_id))} 回复「${esc(r.title)}」</span>` })),
     ...(fb || []).map(f => ({ at: f.created_at, html: `<span class="tag t-warn">反馈·${esc(f.kind)}</span> ${esc(f.message)} <span class="small muted">— ${esc(f.user_id ? email(f.user_id) : '未登录')}${f.contact ? ' · ' + esc(f.contact) : ''}</span>` })),
   ].sort((a, b) => String(b.at).localeCompare(String(a.at)));
-  box.innerHTML = rows.length ? rows.map(r => `<div><span class="small muted">${String(r.at).slice(0, 16).replace('T', ' ')}</span> ${r.html}</div>`).join('') : '<p class="small muted">还没有回复。</p>';
+  box.innerHTML = rows.length ? rows.map(r => `<div><span class="small muted">${esc(String(r.at).slice(0, 16).replace('T', ' '))}</span> ${r.html}</div>`).join('') : '<p class="small muted">还没有回复。</p>';
 }
 
 start();
@@ -193,9 +197,9 @@ async function loadFeedback() {
     <div class="row">${[['open', '待处理'], ['fixed', '已修正'], ['wontfix', '不用改'], ['all', '全部']].map(([k, t]) => `<button class="btn ${fbFilter === k ? 'pri' : ''}" data-ff="${k}">${t}</button>`).join('')}</div>
     ${error ? `<p class="small">读取失败：${esc(error.message)}。${/status/.test(error.message) ? '请先在 SQL Editor 运行 docs/SUPABASE_SETUP.md 第 17 节。' : ''}</p>`
     : !data.length ? '<p class="small muted">这里没有反馈。</p>'
-    : data.map(f => `<div class="fb-row" data-id="${f.id}"><div><span class="tag ${f.kind === 'content' ? 't-warn' : ''}">${KIND[f.kind] || f.kind}</span> <span class="small muted">${String(f.created_at).slice(0, 16).replace('T', ' ')} · ${esc(f.user_id ? email(f.user_id) || '已登录用户' : '未登录')}${f.page ? ` · 页面 ${esc(f.page)}` : ''}${f.contact ? ` · 联系方式 ${esc(f.contact)}` : ''}</span></div>
+    : data.map(f => `<div class="fb-row" data-id="${num(f.id)}"><div><span class="tag ${f.kind === 'content' ? 't-warn' : ''}">${esc(KIND[f.kind] || f.kind)}</span> <span class="small muted">${esc(String(f.created_at).slice(0, 16).replace('T', ' '))} · ${esc(f.user_id ? email(f.user_id) || '已登录用户' : '未登录')}${f.page ? ` · 页面 ${esc(f.page)}` : ''}${f.contact ? ` · 联系方式 ${esc(f.contact)}` : ''}</span></div>
         <div class="fb-msg">${esc(f.message)}</div>${f.note ? `<div class="small muted">备注：${esc(f.note)}</div>` : ''}
-        <div class="row"><span class="small">${ST[f.status] || f.status}</span>
+        <div class="row"><span class="small">${esc(ST[f.status] || f.status)}</span>
           ${f.status !== 'fixed' ? `<button class="btn pri" data-st="fixed">✓ 已修正${f.user_id ? '（发感谢）' : ''}</button>` : ''}${f.status !== 'wontfix' ? '<button class="btn" data-st="wontfix">不用改</button>' : ''}${f.status !== 'open' ? '<button class="btn" data-st="open">重新打开</button>' : ''}
           <input class="fb-note" placeholder="备注（可选，会附在感谢消息里）" maxlength="300"></div></div>`).join('')}`;
   box.querySelectorAll('[data-ff]').forEach(b => { b.onclick = () => { fbFilter = b.dataset.ff; loadFeedback(); }; });
