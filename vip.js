@@ -1,6 +1,6 @@
 /* 猫先生会员（1.1）：入口在左上角的小猫图标（会员的图标右下角显示 VIP）。
    iPhone App 里用 App Store 订阅（RevenueCat，app/native.js 的 appIAP）；网页暂不销售，同一账号登录网页也能用会员。
-   会员身份在服务器（memberships 表，member.js 读进 S.member）；档位：l1 一种语言、l2 两种、l3 三种，买完选语言。 */
+   会员身份在服务器（memberships 表，member.js 读进 S.member）；档位：l1 一种语言、l2 两种（母语以外能学的两种全部开放）；l3（三种）不再出售，只有以前买的和邀请奖励送的会员。 */
 function vipBadge() {
   const b = document.querySelector('.brand');
   if (!b) return;
@@ -10,6 +10,9 @@ function vipBadge() {
 const VIP_LANGS = { ja: ['日语', '日本語', 'Japanese'], zh: ['中文', '中国語', 'Chinese'], en: ['英语', '英語', 'English'] };
 const vipLang = k => tje(...VIP_LANGS[k]);
 const VIP_TIERS = { l1: 1, l2: 2, l3: 3 };
+// 这个用户能学的两种语言（母语以外）：中文母语 → 日语、英语；日语母语 → 中文、英语；英语母语 → 日语、中文
+const vipMine = () => ['ja', 'zh', 'en'].filter(k => k !== (typeof nativeLang === 'function' ? nativeLang() : 'zh'));
+const vipPair = () => vipMine().map(vipLang).join(tje('和', '・', ' + '));
 // 会员能多学到什么：三种语言用同一套分类、同样的写法（不写「共多少个」这种数字）；界面语言不同只是翻译不同
 const VIP_CAT = {
   course: ['情景课程', 'シーン別レッスン', 'Scenario lessons'],
@@ -76,8 +79,8 @@ function viewVip() {
     <h3>${tje('会员能多学到什么', 'メンバーになると', 'What you get')}</h3>
     ${on && isMember(S.track || 'ja') ? '' : `<div class="vip-now"><p>${esc(tje(`你正在学${vipLang(S.track || 'ja')}。开通${vipLang(S.track || 'ja')}会员后，这些内容全部开放：`, `いま${vipLang(S.track || 'ja')}を学習中です。${vipLang(S.track || 'ja')}のメンバーになると、次のコンテンツがすべて使えます：`, `You're learning ${vipLang(S.track || 'ja')}. Membership unlocks all of:`))}</p>
       <div class="row">${VIP_PERKS[S.track || 'ja'].map(([c]) => `<span class="tag">${esc(tje(...VIP_CAT[c]))}</span>`).join('')}</div></div>`}
-    <p class="small muted">${tje('选了哪种语言，就开放那种语言的全部会员内容（三种语言方案全部开放）。最下面「所有会员」的功能，每个方案都有。', '選んだ言語のメンバーコンテンツがすべて使えます（3 言語プランはすべて）。いちばん下の「すべてのメンバー」の機能はどのプランにもついています。', 'You get all member content for the languages you choose (the 3-language plan includes everything). The "All members" features come with every plan.')}</p>
-    <div class="vip-perks">${['ja', 'zh', 'en'].map(k => `<details class="vip-perk" ${k === (S.track || 'ja') ? 'open' : ''}><summary><b>${vipLang(k)}</b>${vipTag('inl')}</summary>${vipPerkRows(VIP_PERKS[k])}</details>`).join('')}
+    <p class="small muted">${tje(`一种语言方案：选${vipPair()}其中一种；两种语言方案：${vipPair()}全部开放。最下面「所有会员」的功能，每个方案都有。`, `1 言語プランは${vipPair()}から 1 つ、2 言語プランは${vipPair()}の両方のメンバーコンテンツが使えます。いちばん下の「すべてのメンバー」の機能はどのプランにもついています。`, `1-language plan: choose ${vipPair().replace(' + ', ' or ')}. 2-language plan: both ${vipMine().map(vipLang).join(' and ')}. The "All members" features come with every plan.`)}</p>
+    <div class="vip-perks">${vipMine().map(k => `<details class="vip-perk" ${k === (S.track || 'ja') ? 'open' : ''}><summary><b>${vipLang(k)}</b>${vipTag('inl')}</summary>${vipPerkRows(VIP_PERKS[k])}</details>`).join('')}
       <details class="vip-perk"><summary><b>${tje('所有会员', 'すべてのメンバー', 'All members')}</b></summary><ul>${VIP_ALL.map(t => `<li>${esc(tje(...t))}</li>`).join('')}</ul></details></div>
     <h3>${tje('选择方案', 'プランを選ぶ', 'Choose a plan')}</h3>
     <div data-plans>${app ? (login ? `<p class="small muted">${tje('正在读取价格…', '価格を読み込み中…', 'Loading prices…')}</p>`
@@ -85,15 +88,15 @@ function viewVip() {
       : `<p>${tje('网页版暂时不能购买：请在 iPhone 的「猫先生」App 里开通。用同一个账号登录网页，会员也能用。', 'ウェブ版では購入できません。iPhone の「猫先生」アプリで登録してください。同じアカウントでログインすれば、ウェブでもメンバー機能が使えます。', 'Membership can be purchased in the Neko Sensei iPhone app. Sign in here with the same account to use it on the web.')}</p>
         <div class="row"><a class="btn pri" href="https://apps.apple.com/app/id6830187313" target="_blank" rel="noopener">${tje('在 App Store 打开', 'App Store で開く', 'Open in the App Store')}</a><a class="btn" href="#${S.track === 'zh' ? 'zh' : S.track === 'en' ? 'en' : 'home'}">${tje('继续学习', '学習に戻る', 'Back to learning')}</a></div>`}</div>
     ${app ? `<div class="row"><button class="btn ghost" type="button" data-restore>${tje('恢复购买', '購入を復元', 'Restore purchases')}</button>${on ? `<button class="btn ghost" type="button" data-manage>${tje('管理订阅', 'サブスクリプションを管理', 'Manage subscription')}</button>` : ''}</div>` : ''}
-    <p class="small muted vip-legal">${tje('订阅会自动续费：1 个月方案每月、3 个月方案每 3 个月按所选价格从 Apple ID 账户扣款。可以随时在 iPhone「设置 → Apple ID → 订阅」中取消；在当前周期结束前至少 24 小时取消，就不会续费。购买时选择要学的语言（一种方案选 1 个、两种方案选 2 个，三种方案全部开放），之后每个付费周期可以改选一次。',
-      'サブスクリプションは自動更新です。1 か月プランは毎月、3 か月プランは 3 か月ごとに、選んだ料金が Apple ID アカウントに請求されます。iPhone の「設定 → Apple ID → サブスクリプション」からいつでも解約でき、現在の期間が終わる 24 時間前までに解約すれば更新されません。購入時に学ぶ言語を選びます（1 言語プランは 1 つ、2 言語プランは 2 つ、3 言語プランはすべて）。その後、言語は支払い期間ごとに 1 回変更できます。',
-      'Subscriptions renew automatically: monthly plans every month, 3-month plans every 3 months, charged to your Apple ID. Cancel anytime in iPhone Settings → Apple ID → Subscriptions at least 24 hours before the current period ends to avoid renewal. Choose your languages when you buy (1 for the 1-language plan, 2 for the 2-language plan, all for the 3-language plan); after that you can change them once per billing period.')}
+    <p class="small muted vip-legal">${tje('订阅会自动续费：1 个月方案每月、3 个月方案每 3 个月按所选价格从 Apple ID 账户扣款。可以随时在 iPhone「设置 → Apple ID → 订阅」中取消；在当前周期结束前至少 24 小时取消，就不会续费。一种语言方案在购买时选择要学的语言，之后每个付费周期可以改选一次；两种语言方案开放你能学的两种语言。',
+      'サブスクリプションは自動更新です。1 か月プランは毎月、3 か月プランは 3 か月ごとに、選んだ料金が Apple ID アカウントに請求されます。iPhone の「設定 → Apple ID → サブスクリプション」からいつでも解約でき、現在の期間が終わる 24 時間前までに解約すれば更新されません。1 言語プランは購入時に学ぶ言語を選び、その後は支払い期間ごとに 1 回変更できます。2 言語プランでは学べる 2 つの言語が両方使えます。',
+      'Subscriptions renew automatically: monthly plans every month, 3-month plans every 3 months, charged to your Apple ID. Cancel anytime in iPhone Settings → Apple ID → Subscriptions at least 24 hours before the current period ends to avoid renewal. With the 1-language plan you choose your language when you buy and can change it once per billing period; the 2-language plan includes both languages you can learn.')}
       <br><a href="terms.html" target="_blank">${tje('服务条款', '利用規約', 'Terms of Use')}</a> · <a href="privacy.html" target="_blank">${tje('隐私政策', 'プライバシーポリシー', 'Privacy Policy')}</a> · <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" rel="noopener">${tje('Apple 标准许可协议', 'Apple 標準使用許諾契約', 'Apple Standard EULA')}</a></p>
   </section>`);
   main.append(p);
   const lg = p.querySelector('[data-login]'); if (lg) lg.onclick = () => authScreen('login');
   if (need) vipLangPicker(p.querySelector('[data-langs]'), m);
-  else if (on && m.tier && m.tier !== 'l3') {
+  else if (on && m.tier === 'l1') {   // 改选语言只有一种语言方案需要（两种语言方案已经是能学的两种）
     // 每个付费周期只能改一次：这个周期改过了就告诉用户下次什么时候能改
     const used = m.lc && m.ps && m.lc >= m.ps, next = new Date(m.exp || 0).toLocaleDateString(uiJa() ? 'ja-JP' : S.track === 'en' ? 'en-US' : 'zh-CN');
     const b = h(used ? `<p class="small muted">${tje(`这个付费周期已经改过语言了，${next} 续费以后可以再改。`, `この支払い期間はすでに言語を変更済みです。${next} の更新後にまた変更できます。`, `You've already changed languages this period. You can change again after renewal on ${next}.`)}</p>`
@@ -135,15 +138,17 @@ async function vipPlans(box) {
   const by = {};
   for (const x of pk) { const m = /^neko\.(l[123])\.(\d)m$/.exec(x.product && x.product.identifier || ''); if (m) (by[m[1]] = by[m[1]] || {})[m[2]] = x; }
   const cur = S.member && S.member.tier, on = isMember();
-  const names = { l1: tje('一种语言', '1 言語', '1 language'), l2: tje('两种语言', '2 言語', '2 languages'), l3: tje('三种语言', '3 言語（すべて）', 'All 3 languages') };
+  const names = { l1: tje(`一种语言（${vipPair()}选一种）`, `1 言語（${vipPair()}から 1 つ）`, `1 language (${vipPair().replace(' + ', ' or ')})`), l2: tje(`两种语言（${vipPair()}）`, `2 言語（${vipPair()}）`, `2 languages (${vipPair()})`), l3: tje('三种语言', '3 言語（すべて）', 'All 3 languages') };
   if (!Object.keys(by).length) { box.innerHTML = `<p class="muted">${tje('暂时没有可以购买的方案。', '現在購入できるプランはありません。', 'No plans available right now.')}</p>`; return; }
-  box.innerHTML = ['l1', 'l2', 'l3'].filter(t => by[t]).map(t => `<div class="vip-tier ${on && cur === t ? 'cur' : ''}"><div class="vip-tier-t"><b>${names[t]}</b>${on && cur === t ? `<span class="tag done">${tje('当前方案', '現在のプラン', 'Current')}</span>` : ''}</div>
+  // 三种语言方案不再出售（每个人能学的只有母语以外的两种）：只有正在用这个方案的会员还看得到「当前方案」
+  box.innerHTML = ['l1', 'l2', 'l3'].filter(t => by[t] && (t !== 'l3' || (on && cur === 'l3'))).map(t => `<div class="vip-tier ${on && cur === t ? 'cur' : ''}"><div class="vip-tier-t"><b>${names[t]}</b>${on && cur === t ? `<span class="tag done">${tje('当前方案', '現在のプラン', 'Current')}</span>` : ''}</div>
     <div class="vip-buy">${['1', '3'].filter(d => by[t][d]).map(d => `<button class="btn ${d === '3' ? 'pri' : 'vip-1m'}" type="button" data-pk="${t}.${d}"><span>${d === '1' ? tje('1 个月', '1 か月', '1 month') : tje('3 个月', '3 か月', '3 months')}</span><b>${esc(by[t][d].product.priceString)}</b></button>`).join('')}</div></div>`).join('');
   box.querySelectorAll('[data-pk]').forEach(b => { b.onclick = async () => {
     const [t, d] = b.dataset.pk.split('.'), pkg = by[t][d];
-    // 一种、两种方案：先选语言，再付款（三种方案全部开放，直接付款）
+    // 一种语言方案：先选语言，再付款；两种语言方案：能学的两种全部开放，直接付款（三种方案不再出售）
     let langs = null;
-    if (t !== 'l3') { langs = await vipPickSheet(t, pkg.product.priceString); if (!langs) return; }
+    if (t === 'l1') { langs = await vipPickSheet(t, pkg.product.priceString); if (!langs) return; }
+    else if (t === 'l2') langs = vipMine();
     box.querySelectorAll('[data-pk]').forEach(x => { x.disabled = true; });
     try {
       const ok = await window.appIAP.buy(pkg);
@@ -164,13 +169,13 @@ async function vipPlans(box) {
 // 购买前选语言：一种方案选 1 个、两种方案选 2 个。返回选好的语言，取消返回 null
 function vipPickSheet(tier, price) {
   const n = VIP_TIERS[tier], m = S.member || {}, sel = new Set();
-  for (const k of [...(m.langs || []), S.track || 'ja']) if (sel.size < n && VIP_LANGS[k]) sel.add(k);
+  for (const k of [S.track || 'ja', ...(m.langs || [])]) if (sel.size < n && vipMine().includes(k)) sel.add(k);
   return new Promise(res => {
     const box = h(`<div class="ask-mask" role="dialog" aria-modal="true"><div class="ask-box vip-pick"></div></div>`), inner = box.querySelector('.vip-pick');
     const close = v => { box.remove(); res(v); };
     const draw = () => {
       inner.innerHTML = `<p><b>${tje(`请选择要学的 ${n} 种语言`, `学ぶ言語を ${n} つ選んでください`, `Choose ${n} language${n > 1 ? 's' : ''}`)}</b></p>
-        <div class="row">${['ja', 'zh', 'en'].map(k => `<button type="button" class="btn ${sel.has(k) ? 'pri' : ''}" data-l="${k}">${sel.has(k) ? '✓ ' : ''}${vipLang(k)}</button>`).join('')}</div>
+        <div class="row">${vipMine().map(k => `<button type="button" class="btn ${sel.has(k) ? 'pri' : ''}" data-l="${k}">${sel.has(k) ? '✓ ' : ''}${vipLang(k)}</button>`).join('')}</div>
         <p class="small muted">${tje('买完以后，每个付费周期可以改选一次。', '購入後も、支払い期間ごとに 1 回変更できます。', 'You can change once per billing period after purchase.')}</p>
         <div class="ask-opts"><button class="btn" type="button" data-x>${tje('取消', 'キャンセル', 'Cancel')}</button><button class="btn pri" type="button" data-ok ${sel.size === n ? '' : 'disabled'}>${tje(`购买 ${price}`, `${price} で購入`, `Buy for ${price}`)}</button></div>`;
       inner.querySelectorAll('[data-l]').forEach(b => { b.onclick = () => { const k = b.dataset.l; if (sel.has(k)) sel.delete(k); else if (sel.size < n) sel.add(k); else if (n === 1) { sel.clear(); sel.add(k); } draw(); }; });
@@ -201,10 +206,11 @@ async function vipApplyPend() {
 
 // 选语言（一种方案选 1 个、两种方案选 2 个）
 function vipLangPicker(box, m) {
-  const n = VIP_TIERS[m.tier], sel = new Set((m.langs || []).slice(0, n));
+  const n = VIP_TIERS[m.tier], sel = new Set((m.langs || []).filter(k => vipMine().includes(k)).slice(0, n));
+  if (n >= vipMine().length) vipMine().forEach(k => sel.add(k));   // 两种语言方案：能学的两种都选上
   const draw = () => {
     box.innerHTML = `<div class="vip-langs"><p><b>${tje(`请选择要学的 ${n} 种语言`, `学ぶ言語を ${n} つ選んでください`, `Choose ${n} language${n > 1 ? 's' : ''}`)}</b></p>
-      <div class="row">${['ja', 'zh', 'en'].map(k => `<button type="button" class="btn ${sel.has(k) ? 'pri' : ''}" data-l="${k}">${sel.has(k) ? '✓ ' : ''}${vipLang(k)}</button>`).join('')}</div>
+      <div class="row">${vipMine().map(k => `<button type="button" class="btn ${sel.has(k) ? 'pri' : ''}" data-l="${k}">${sel.has(k) ? '✓ ' : ''}${vipLang(k)}</button>`).join('')}</div>
       <p class="small muted">${tje('每个付费周期可以改选一次。', '言語は支払い期間ごとに 1 回変更できます。', 'You can change once per billing period.')}</p>
       <button class="btn pri" type="button" data-ok ${sel.size === n ? '' : 'disabled'}>${tje('确定', '決定', 'Confirm')}</button></div>`;
     box.querySelectorAll('[data-l]').forEach(b => { b.onclick = () => { const k = b.dataset.l; if (sel.has(k)) sel.delete(k); else if (sel.size < n) sel.add(k); else if (n === 1) { sel.clear(); sel.add(k); } draw(); }; });

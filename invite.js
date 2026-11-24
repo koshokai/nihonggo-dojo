@@ -75,7 +75,7 @@ async function refClaim(code, auto) {
   if (r === 'ok') {
     S.ref.claimed = Date.now(); save();
     try { localStorage.removeItem(REF_KEY); } catch (e) { /* 忽略 */ }
-    toast(refT('邀请码有效：送你 3 天会员，三种语言都能用', '招待コードを確認しました。3 日間メンバーになりました（3 言語すべて）', 'Invite code accepted: 3 free days of membership'));
+    toast(refT('邀请码有效：送你 3 天会员，你学的语言都能用', '招待コードを確認しました。3 日間メンバーになりました（学ぶ言語すべて）', 'Invite code accepted: 3 free days of membership'));
     if (typeof memberRefresh === 'function') memberRefresh();
   } else if (REF_MSG[r]) {
     if (r === 'used') { S.ref.claimed = S.ref.claimed || 1; save(); }
@@ -113,7 +113,7 @@ function refAskApp() {
   const T = refT;
   const m = h(`<div class="ask-mask inv-land" role="dialog" aria-modal="true"><div class="ask-box">
     <h2>${T('有好友的邀请码吗？', '友だちの招待コードはありますか？', 'Have a friend\'s invite code?')}</h2>
-    <p class="small muted">${T('填上就送你 3 天会员（三种语言都能用）。扫过好友二维码的话，邀请码已经复制好了，点「粘贴」即可。', '入力すると 3 日間メンバーになれます（3 言語すべて）。友だちの QR コードを読み取った場合はコピー済みなので「貼り付け」を押してください。', 'Enter it to get 3 free days. If you scanned a friend\'s QR code, it is already copied — tap Paste.')}</p>
+    <p class="small muted">${T('填上就送你 3 天会员（你学的语言都能用）。扫过好友二维码的话，邀请码已经复制好了，点「粘贴」即可。', '入力すると 3 日間メンバーになれます（学ぶ言語すべて）。友だちの QR コードを読み取った場合はコピー済みなので「貼り付け」を押してください。', 'Enter it to get 3 free days. If you scanned a friend\'s QR code, it is already copied — tap Paste.')}</p>
     <div class="row"><input type="text" maxlength="8" placeholder="${T('6 位邀请码', '6 桁のコード', '6-character code')}" data-code autocapitalize="characters"><button class="btn" type="button" data-paste>${T('粘贴', '貼り付け', 'Paste')}</button></div>
     <div class="ask-opts"><button class="btn ghost" type="button" data-no>${T('没有', 'ない', 'No')}</button><button class="btn pri" type="button" data-ok>${T('领取 3 天会员', '3 日間を受け取る', 'Get 3 days')}</button></div>
   </div></div>`);
@@ -147,7 +147,7 @@ function invitePanel() {
       <div><b>🎁 ${T('你得一周会员', 'あなたに 1 週間', 'You get a week')}</b><span class="small muted">${T('好友用你的邀请码注册、学满 3 天', '友だちが招待コードで登録して 3 日学習', 'When a friend signs up with your code and studies 3 days')}</span></div>
       <div><b>🎉 ${T('好友得 3 天会员', '友だちに 3 日間', 'Your friend gets 3 days')}</b><span class="small muted">${T('用邀请码注册就送', '招待コードで登録するとすぐ', 'Right after signing up with your code')}</span></div>
     </div>
-    <p class="small muted">${T('会员三种语言都能用。每人通过邀请最多累计 12 周；正在付费订阅的话，奖励先存起来，订阅停了自动接上。', 'メンバーは 3 言語すべて使えます。招待で受け取れるのは合計 12 週まで。サブスク中の場合は貯めておき、サブスクが終わったら自動で使われます。', 'Membership covers all three languages. Up to 12 weeks in total. If you have an active subscription, the weeks are saved and start when it ends.')}</p>
+    <p class="small muted">${T('会员期间你学的语言都能用。每人通过邀请最多累计 12 周；正在付费订阅的话，奖励先存起来，订阅停了自动接上。', 'メンバー期間中は学ぶ言語すべてが使えます。招待で受け取れるのは合計 12 週まで。サブスク中の場合は貯めておき、サブスクが終わったら自動で使われます。', 'Membership covers every language you learn. Up to 12 weeks in total. If you have an active subscription, the weeks are saved and start when it ends.')}</p>
     <div data-body><div class="skel" role="status"><i></i><i></i></div></div></section>`);
   const body = p.querySelector('[data-body]');
   // 直接打开这个页面时登录状态可能还没恢复：有登录记录就等一会儿（最多 8 秒）再画
