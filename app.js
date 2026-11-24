@@ -1804,11 +1804,15 @@ function setNative(k) {
   if (k === 'en') { S.native = 'en'; if (S.track === 'en') S.track = 'ja'; }
   else { delete S.native; S.enNative = k; if ((S.track || 'ja') === k) S.track = k === 'ja' ? 'zh' : 'ja'; }   // 日语母语：学中文或英语（英语讲解用日语）；中文母语：学日语或英语
   try { localStorage.setItem('dojo-ui', k); } catch (e) { /* 忽略 */ }
-  save(); location.reload();
+  save();
+  // 回到新的「正在学」的首页再重新打开：停在原来那门课的页面上的话，打开时会按页面把「正在学」改回去（母语也跟着变回去）
+  try { history.replaceState(null, '', '#' + ((typeof TRACKS !== 'undefined' && TRACKS[S.track || 'ja'] && TRACKS[S.track || 'ja'].home) || 'home')); } catch (e) { /* 忽略 */ }
+  location.reload();
 }
 function nativeMenu() {
   askSheet(tj('我的母语（界面和讲解用这种语言）', '母語（画面と解説はこの言語になります）', 'Your native language (used for the interface and explanations)'),
     [...[['zh', '中文'], ['ja', '日本語'], ...(enUiOpen() ? [['en', 'English']] : [])].map(([k, t]) => [k, (k === nativeLang() ? '✓ ' : '') + t, k === nativeLang() ? 'pri' : '']), [null, tj('取消', 'キャンセル', 'Cancel')]]).then(setNative);
+  const o = document.querySelector('.ask-mask:last-of-type .ask-opts'); if (o) o.setAttribute('data-noen', '');   // 语言名用各自的文字写（中文 / 日本語 / English），英文界面也不翻译
 }
 
 /* 我的 */
