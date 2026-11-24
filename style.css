@@ -654,6 +654,7 @@ body.gated { overflow: hidden; }
 .track-seg { order: 10; flex: 1 0 100%; display: flex; gap: 6px; justify-content: center; }
 .track-seg button { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 2px 14px; font: inherit; font-size: .85rem; cursor: pointer; }
 .track-seg button.on { background: var(--ai); border-color: var(--ai); color: var(--ai-ink); }
+.track-seg .ts-nat { padding: 2px 10px; display: inline-flex; align-items: center; gap: 4px; border-style: dashed; }
 .hg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(80px, 100%), 1fr)); gap: 6px; }
 .hg-cell .small.muted { font-size: .72rem; line-height: 1.35; }
 .hg-grid.abc { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); }

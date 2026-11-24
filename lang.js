@@ -528,8 +528,10 @@ const viewEn = sub => viewEnglish(sub);   // 英语板块：en.js
 // 顶部「日本語 / 한국어 / English」切换；导航栏只显示当前语言的栏目
 function initTrackSwitch() {
   const form = document.querySelector('.gsearch'); if (!form) return;
-  const seg = h(`<div class="track-seg" role="group" aria-label="${tj('学习的语言', '学ぶ言語')}">${Object.entries(TRACKS).map(([k, t]) => `<button type="button" data-track="${k}">${t.name}</button>`).join('')}</div>`);
+  // 最后一个地球按钮：换母语（界面和讲解的语言），不用到「我的」里找
+  const seg = h(`<div class="track-seg" role="group" aria-label="${tj('学习的语言', '学ぶ言語')}">${Object.entries(TRACKS).map(([k, t]) => `<button type="button" data-track="${k}">${t.name}</button>`).join('')}<button type="button" class="ts-nat" data-native-menu aria-label="${tj('我的母语', '母語', 'Native language')}" title="${tj('我的母语', '母語', 'Native language')}"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span>${tj('母语', '母語', 'Native')}</span></button></div>`);
   form.after(seg);
+  seg.querySelector('[data-native-menu]').onclick = () => { if (typeof nativeMenu === 'function') nativeMenu(); };
   seg.querySelectorAll('[data-track]').forEach(b => {
     b.onclick = () => { const tr = b.dataset.track; S.track = tr; save(); go(TRACKS[tr].home); };
   });

@@ -1797,16 +1797,29 @@ function viewExam() {
   main.append(p);
 }
 
+// 换母语（「我的 → 学习设置」和顶部的地球按钮）：母语决定界面和讲解的语言，「正在学」只能是另外两种；
+// 正在学的刚好是新的母语时换成另一种能学的。英文版的界面对照表和内容在打开时加载（boot.js），所以保存后重新打开页面
+function setNative(k) {
+  if (!k || k === nativeLang()) return;
+  if (k === 'en') { S.native = 'en'; if (S.track === 'en') S.track = 'ja'; }
+  else { delete S.native; S.enNative = k; if ((S.track || 'ja') === k) S.track = k === 'ja' ? 'zh' : 'ja'; }   // 日语母语：学中文或英语（英语讲解用日语）；中文母语：学日语或英语
+  try { localStorage.setItem('dojo-ui', k); } catch (e) { /* 忽略 */ }
+  save(); location.reload();
+}
+function nativeMenu() {
+  askSheet(tj('我的母语（界面和讲解用这种语言）', '母語（画面と解説はこの言語になります）', 'Your native language (used for the interface and explanations)'),
+    [...[['zh', '中文'], ['ja', '日本語'], ...(enUiOpen() ? [['en', 'English']] : [])].map(([k, t]) => [k, (k === nativeLang() ? '✓ ' : '') + t, k === nativeLang() ? 'pri' : '']), [null, tj('取消', 'キャンセル', 'Cancel')]]).then(setNative);
+}
+
 /* 我的 */
 function viewMe(sec) {
   const opt = (arr, cur, attr) => arr.map(([v, t]) => `<button type="button" ${attr}="${v}" class="${String(cur) === String(v) ? 'on' : ''}">${t}</button>`).join('');
   const J = uiJa(), onOff = [[1, tj('开', 'オン')], [0, tj('关', 'オフ')]];
   const p = h(`<section class="panel"><h2>${tj('学习设置', '学習設定')}</h2>
-    <div class="row between"><span>${tj('正在学', '学習中の言語')}</span><div class="seg">${Object.entries(TRACKS).filter(([k]) => k !== nativeLang()).map(([k, t]) => `<button type="button" data-trk-set="${k}" class="${(S.track || 'ja') === k ? 'on' : ''}">${t.name}</button>`).join('')}</div></div>
+    <div class="row between"><span>${tj('我的母语', '母語', 'My native language')}</span><div class="seg" data-noen>${opt([['zh', '中文'], ['ja', '日本語'], ...(enUiOpen() ? [['en', 'English']] : [])], nativeLang(), 'data-native')}</div></div>
+    <div class="row between"><span>${tj('正在学', '学習中の言語', 'Learning')}</span><div class="seg">${Object.entries(TRACKS).filter(([k]) => k !== nativeLang()).map(([k, t]) => `<button type="button" data-trk-set="${k}" class="${(S.track || 'ja') === k ? 'on' : ''}">${t.name}</button>`).join('')}</div></div>
     ${(S.track || 'ja') === 'ja' ? `<div class="row between"><span>日语目标级别</span>${levelSeg(S.level)}</div>` : ''}
     ${S.track === 'zh' ? `<div class="row between"><span>目標の級</span><div class="seg read-lv">${opt(ZH_LEVELS.map(([L]) => [L, L]), zhLevel(), 'data-zlv')}</div></div>` : ''}
-    ${S.track === 'en' ? `<div class="row between"><span>${tj('解释的语言', '解説の言語')}</span><div class="seg">${opt([['zh', '中文'], ['ja', '日本語']], S.enNative || 'zh', 'data-enat')}</div></div>` : ''}
-    ${S.track !== 'en' && enUiOpen() ? `<div class="row between"><span>${tj('界面和讲解的语言', '画面と解説の言語', 'Interface language')}</span><div class="seg">${opt([[S.track === 'zh' ? 'ja' : 'zh', S.track === 'zh' ? '日本語' : '中文'], ['en', 'English']], S.native === 'en' ? 'en' : S.track === 'zh' ? 'ja' : 'zh', 'data-native')}</div></div>` : ''}
     ${S.track === 'en' ? `<div class="row between"><span>${tj('英语目标级别', '英語の目標レベル')}</span><div class="seg read-lv">${opt(EN_LV.map(L => [L, L]), enLevel(), 'data-elv')}</div></div>` : ''}
     <div class="row between"><span>${tj('每日经验目标', '1日の目標 XP')}</span><div class="seg">${opt(J ? [[30, '30 ゆったり'], [50, '50 標準'], [100, '100 しっかり'], [200, '200 猛特訓']] : [[30, '30 轻松'], [50, '50 标准'], [100, '100 认真'], [200, '200 冲刺']], S.goal, 'data-goal')}</div></div>
     <div class="row between"><span>${tj('每天新单词', '1日の新しい単語')}</span><div class="seg">${opt([[5, '5'], [10, '10'], [20, '20'], [30, '30']], S.newPerDay, 'data-new')}</div></div>
@@ -1825,9 +1838,9 @@ function viewMe(sec) {
   p.querySelectorAll('[data-goal]').forEach(b => { b.onclick = () => { S.goal = +b.dataset.goal; save(); render(); }; });
   // 中文・英語のレベルと表示設定（各ページのボタンと同じ値を変える）
   p.querySelectorAll('[data-zlv]').forEach(b => { b.onclick = () => { S.zhLevel = b.dataset.zlv; save(); render(); }; });
-  p.querySelectorAll('[data-enat]').forEach(b => { b.onclick = () => { S.enNative = b.dataset.enat; save(); applyTrack('en'); render(); }; });
-  // 换界面语言：英文版的界面对照表和内容要在打开时加载（boot.js），所以保存后重新打开页面
-  p.querySelectorAll('[data-native]').forEach(b => { b.onclick = () => { if (b.dataset.native === 'en') S.native = 'en'; else delete S.native; save(); location.reload(); }; });
+  // 母语：决定界面和讲解的语言，「正在学」只列另外两种。正在学的刚好是新的母语时，换成另一种能学的
+  // （英文版的界面对照表和内容要在打开时加载（boot.js），所以保存后重新打开页面）
+  p.querySelectorAll('[data-native]').forEach(b => { b.onclick = () => setNative(b.dataset.native); });
   p.querySelectorAll('[data-elv]').forEach(b => { b.onclick = () => { S.enLevel = b.dataset.elv; save(); render(); }; });
   p.querySelectorAll('[data-zpy]').forEach(b => { b.onclick = () => { S.zhShow = Object.assign({ py: true, ja: true }, S.zhShow, { py: b.dataset.zpy === '1' }); save(); render(); }; });
   p.querySelectorAll('[data-zja]').forEach(b => { b.onclick = () => { S.zhShow = Object.assign({ py: true, ja: true }, S.zhShow, { ja: b.dataset.zja === '1' }); save(); render(); }; });
