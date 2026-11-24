@@ -34,7 +34,7 @@ function featuresPanel() {
 /* ---------- 第一次打开时的介绍：一步一步，可以跳过；之后在「我的 → 功能地图」里能再看 ---------- */
 // [图标, 中文标题, 中文说明, 日语标题, 日语说明, 英语标题, 英语说明]
 const INTRO = [
-  ['icon', '欢迎来到猫先生', '日语、中文、英语，一个 App 一起学。先花半分钟看看怎么用。', '猫先生へようこそ', '日本語・中国語・英語をひとつのアプリで。まずは 30 秒で使い方をご紹介します。', 'Welcome to 猫先生', 'Japanese, Chinese and English in one app. Here is a 30-second tour.'],
+  ['icon', '欢迎来到猫先生', '日语、中文、英语，一个 App 一起学。先花半分钟看看怎么用。', '猫先生へようこそ', '日本語・中国語・英語をひとつのアプリで。まずは 30 秒で使い方をご紹介します。', 'Welcome to Neko Sensei', 'Japanese, Chinese and English in one app. Here is a 30-second tour.'],
   ['📅', '每天几分钟', '「今天」页会排好当天的任务：新单词、到期的复习、一篇短文。照着做完就可以了。', '1 日数分でOK', '「今日」のページに、その日のタスク（新しい単語・復習・短い読み物）が並びます。順番にこなすだけです。', 'A few minutes a day', 'The Today page lines up your tasks: new words, reviews that are due, and a short story. Just follow the list.'],
   ['🔊', '能听，能点', '例句和文章都有录音。点句子听发音，点单词看意思，点 ☆ 收藏起来以后复习。', '聞ける・タップできる', '例文と読み物には音声があります。文をタップで再生、単語をタップで意味を表示、☆ でお気に入りに保存できます。', 'Listen and tap', 'Examples and stories have audio. Tap a sentence to hear it, tap a word to see its meaning, tap ☆ to save it.'],
   ['🧠', '自动安排复习', '学过的内容会按记忆规律自动回来复习。闯关、模拟考试和水平测试，随时检查自己的进步。', '復習は自動で', '学んだ内容は、忘れかけた頃に自動で復習に出てきます。ステージ・模擬試験・レベルチェックで上達を確認できます。', 'Reviews come back by themselves', 'What you learn returns for review just before you forget it. Stages, mock exams and the level check show your progress.'],

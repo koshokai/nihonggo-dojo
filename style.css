@@ -1847,3 +1847,239 @@ html.boot body::after { content: ''; position: fixed; inset: 0; margin: auto; wi
 .plan .pl-sub { flex-wrap: wrap; row-gap: 6px; }
 .plan .pl-sub .seg.read-lv { width: 100%; display: flex; flex-wrap: nowrap; }
 .plan .pl-sub .seg.read-lv > button { flex: 1 1 0; min-width: 0; padding-left: 2px; padding-right: 2px; }
+
+/* 欢迎页第一步：三种语言的问题各占一行 */
+.welcome-ask span { display: block; }
+.welcome-ask span + span { font-size: .85em; color: var(--muted, #666); font-weight: 600; }
+.welcome-nat { margin: 0 0 4px; }
+
+/* ===== 视觉方案「清爽」（v288 起默认；boot.js 给 <html> 加 data-look="clean"，开发时 localStorage dojo-look=old 可以看回旧样式） ===== */
+/* A「清爽」：中性灰白底、白卡片、每门语言一个主色（日语 藍、中文 翡翠绿、英语 紫），粉色只留给招财猫和品牌 */
+:root[data-look="clean"] {
+  --paper: #F5F6F8; --paper-2: #F5F6F8; --surface: #FFFFFF; --ink: #16181D; --muted: #5F6673; --line: #E3E5EA; --grid: #ECEEF2;
+  --ai: #3451D1; --ai-soft: #EBEFFD; --ai-ink: #FFFFFF; --heat0: #ECEEF2; --r: 16px;
+}
+:root[data-look="clean"] body[data-track="ja"] { --ai: #3451D1; --ai-soft: #EBEFFD; }
+:root[data-look="clean"] body[data-track="zh"] { --ai: #0C7C63; --ai-soft: #E3F4EE; }
+:root[data-look="clean"] body[data-track="en"] { --ai: #6A3FE0; --ai-soft: #EFEAFD; }
+:root[data-look="clean"] body { background: var(--paper); }
+:root[data-look="clean"] .panel { border-color: var(--line); box-shadow: 0 1px 2px rgb(16 24 40 / .05), 0 1px 3px rgb(16 24 40 / .04); }
+:root[data-look="clean"] .btn { border-radius: 12px; }
+:root[data-look="clean"] .btn.big { border-radius: 12px; padding: 12px 24px; }
+:root[data-look="clean"] .btn.pri, :root[data-look="clean"] .listen { background: var(--ai); box-shadow: 0 1px 2px rgb(16 24 40 / .12); }
+:root[data-look="clean"] .btn.pri:hover:not(:disabled) { box-shadow: 0 4px 10px -4px color-mix(in srgb, var(--ai) 60%, transparent); }
+:root[data-look="clean"] .seg { background: var(--grid); border-color: transparent; border-radius: 12px; padding: 3px; }
+:root[data-look="clean"] .seg button, :root[data-look="clean"] .seg a { border-radius: 9px; }
+:root[data-look="clean"] .seg button.on, :root[data-look="clean"] .seg a.on { background: var(--surface); color: var(--ai); font-weight: 700; box-shadow: 0 1px 3px rgb(16 24 40 / .14); }
+:root[data-look="clean"] .lvl-opt { border-radius: 14px; border: 1px solid var(--line); }
+:root[data-look="clean"] .lvl-opt.on { border-color: var(--ai); box-shadow: inset 0 0 0 1px var(--ai); background: var(--ai-soft); }
+:root[data-look="clean"] .lvl-badge { background: var(--grid); color: var(--ink); }
+:root[data-look="clean"] h1, :root[data-look="clean"] h2 { font-family: var(--f-ui); letter-spacing: -.01em; }
+:root[data-look="clean"] .brand > span { background: none; color: var(--ink); }
+
+/* 「清爽」的去花哨：虚线框改实线、顶部小标签改中性色、不飘樱花、品牌图标不带粉色光晕 */
+:root[data-look="clean"] #petals { display: none; }
+:root[data-look="clean"] .proverb { border: 1px solid var(--line); }
+:root[data-look="clean"] a.pl-cta { border: 1px solid color-mix(in srgb, var(--ai) 35%, var(--line)); }
+:root[data-look="clean"] .chip { background: var(--grid); color: var(--ink); }
+:root[data-look="clean"] .chip.lv { background: var(--surface); border: 1px solid var(--line); color: var(--ink); }
+:root[data-look="clean"] .chip.lit { background: var(--grid); color: var(--shu); }
+:root[data-look="clean"] .brand-mark { box-shadow: none; }
+:root[data-look="clean"] .tag { background: var(--grid); color: var(--muted); }
+:root[data-look="clean"] h2 { font-size: 1.25rem; }
+:root[data-look="clean"] .panel { padding: 22px; }
+
+/* 「清爽」的深色模式 */
+@media (prefers-color-scheme: dark) {
+  :root[data-look="clean"]:not([data-theme="light"]) { --paper: #111318; --paper-2: #111318; --surface: #1A1D23; --ink: #E8EAEE; --muted: #9AA1AD; --line: #2A2E36; --grid: #23272E; --heat0: #23272E; --ai: #7C93FF; --ai-soft: #222A45; --ai-ink: #0E1020; }
+  :root[data-look="clean"]:not([data-theme="light"]) body[data-track="ja"] { --ai: #7C93FF; --ai-soft: #222A45; }
+  :root[data-look="clean"]:not([data-theme="light"]) body[data-track="zh"] { --ai: #3CC9A0; --ai-soft: #17322B; }
+  :root[data-look="clean"]:not([data-theme="light"]) body[data-track="en"] { --ai: #A78BFA; --ai-soft: #2A2342; }
+}
+:root[data-look="clean"][data-theme="dark"] { --paper: #111318; --paper-2: #111318; --surface: #1A1D23; --ink: #E8EAEE; --muted: #9AA1AD; --line: #2A2E36; --grid: #23272E; --heat0: #23272E; --ai: #7C93FF; --ai-soft: #222A45; --ai-ink: #0E1020; }
+:root[data-look="clean"][data-theme="dark"] body[data-track="ja"] { --ai: #7C93FF; --ai-soft: #222A45; }
+:root[data-look="clean"][data-theme="dark"] body[data-track="zh"] { --ai: #3CC9A0; --ai-soft: #17322B; }
+:root[data-look="clean"][data-theme="dark"] body[data-track="en"] { --ai: #A78BFA; --ai-soft: #2A2342; }
+:root[data-look="clean"][data-theme="dark"] .panel, :root[data-look="clean"]:not([data-theme="light"]) .panel { box-shadow: none; }
+/* 「清爽」排版：不再「卡片套卡片」——外层面板里放着成组列表（我的）、任务（首页）时，里面的去掉边框，用分隔线 */
+:root[data-look="clean"] .panel:has(> .me-list) { background: transparent; border: 0; box-shadow: none; padding: 8px 0; }
+:root[data-look="clean"] .me-list { border-radius: 14px; box-shadow: 0 1px 2px rgb(16 24 40 / .05); }
+:root[data-look="clean"] .tasks { gap: 0; }
+:root[data-look="clean"] .tasks .task { border: 0; border-radius: 0; border-top: 1px solid var(--line); padding: 14px 2px; }
+:root[data-look="clean"] .tasks .task:first-child { border-top: 0; }
+:root[data-look="clean"] .tasks .task .btn.pri { background: var(--ai-soft); color: var(--ai); box-shadow: none; padding: 7px 16px; font-size: .92rem; }
+:root[data-look="clean"] .tasks .task .btn.pri:hover:not(:disabled) { background: color-mix(in srgb, var(--ai) 18%, var(--surface)); }
+:root[data-look="clean"] a.pl-cta { border-radius: 12px; }
+
+/* ===== 「清爽」逐页打磨（v289）：去掉残留的粉色、卡片不再层层套框、一屏只留一个实心主按钮 ===== */
+/* 品牌色跟着当前语言的主色走（以前 --brand 固定是紫色，--brand-2 是粉色） */
+:root[data-look="clean"] body { --brand: var(--ai); --brand-2: var(--ai); --brand-soft: var(--ai-soft); accent-color: var(--ai); }
+/* 浅色下成功 / 错误 / 朱红再深一点：小字也够清楚（对比度 ≥ 4.5） */
+:root[data-look="clean"] { --ok: #137352; --bad: #C2342C; --shu: #C8333A; }
+:root[data-look="clean"][data-theme="dark"] { --ok: #4CC992; --bad: #F08478; --shu: #F27A6E; }
+@media (prefers-color-scheme: dark) { :root[data-look="clean"]:not([data-theme="light"]) { --ok: #4CC992; --bad: #F08478; --shu: #F27A6E; } }
+
+/* 残留的粉色、渐变 */
+:root[data-look="clean"] .bar > i { background: var(--ai); }
+:root[data-look="clean"] .conn-bar { background: var(--grid); }
+:root[data-look="clean"] .conn-bar i { background: var(--ai); }
+:root[data-look="clean"] .fx-card h2 { background: none; color: var(--ai); }
+:root[data-look="clean"] .week-card .wc-ic { background: var(--ai-soft); color: var(--ai); }
+:root[data-look="clean"] .wk-step.ok { background: var(--ai-soft); border-color: transparent; color: var(--ai); }
+:root[data-look="clean"] .wk-qo .btn.wrong { border-color: var(--bad); color: var(--bad); }
+:root[data-look="clean"] .bubble, :root[data-look="clean"] .bubble::before { border-color: var(--line); }
+:root[data-look="clean"] .omikuji { background: linear-gradient(135deg, color-mix(in srgb, var(--gold) 16%, var(--surface)), var(--surface)); }
+:root[data-look="clean"] .intro-ic img { box-shadow: 0 4px 14px rgb(16 24 40 / .14); }
+:root[data-look="clean"] .vip-mark { box-shadow: none; }
+:root[data-look="clean"] .vip-soon { color: var(--ai); }
+/* 「还有更多」「水平测试」这类提示卡：浅浅的主色底，不再是粉黄渐变 */
+:root[data-look="clean"] .wk-more { background: color-mix(in srgb, var(--ai-soft) 60%, var(--surface)); border: 1px solid color-mix(in srgb, var(--ai) 20%, var(--line)); box-shadow: none; }
+:root[data-look="clean"] .wk-more-go { color: var(--ai); }
+/* VIP 角标：低调的金色，不再是橙粉紫渐变（一屏十几个时很吵） */
+:root[data-look="clean"] .vip-tag { background: color-mix(in srgb, var(--gold) 26%, var(--surface)); color: #7A4B00; border: 1px solid color-mix(in srgb, var(--gold) 55%, var(--surface)); box-shadow: none; line-height: 1.4; }
+:root[data-look="clean"] .vip-tag:not(.inl) { box-shadow: 0 0 0 2px var(--surface); }
+:root[data-look="clean"] .brand::after { background: var(--gold); color: #3D2800; }
+:root[data-look="clean"][data-theme="dark"] .vip-tag { color: var(--gold); }
+@media (prefers-color-scheme: dark) { :root[data-look="clean"]:not([data-theme="light"]) .vip-tag { color: var(--gold); } }
+/* 「魔鬼挑战」：和旁边的「单词测验」一样的次要按钮（主按钮只留「背单词」） */
+:root[data-look="clean"] .demon-btn { background: var(--surface); color: var(--ink); border-color: var(--line); }
+
+/* 金色的星：没收藏时用灰色，收藏了用深一点的金色（浅底上看得清） */
+:root[data-look="clean"] .speak.fav { color: var(--muted); }
+:root[data-look="clean"] .speak.fav.on, :root[data-look="clean"] .star-t { color: #9A6700; }
+:root[data-look="clean"][data-theme="dark"] .speak.fav.on, :root[data-look="clean"][data-theme="dark"] .star-t { color: var(--gold); }
+@media (prefers-color-scheme: dark) { :root[data-look="clean"]:not([data-theme="light"]) .speak.fav.on, :root[data-look="clean"]:not([data-theme="light"]) .star-t { color: var(--gold); } }
+
+/* 「学习」页：分区小图标统一用当前语言的主色（以前基础、练习、场景三种颜色，绿色字对比度也不够） */
+:root[data-look="clean"] .g-prac, :root[data-look="clean"] .g-scene { --g: var(--ai); --g-soft: var(--ai-soft); }
+:root[data-look="clean"] .sh-tools { --g: var(--muted); --g-soft: var(--grid); }
+
+/* 间距：「本周精选」几个面板之间原来是贴在一起的 */
+:root[data-look="clean"] .week { display: grid; gap: 16px; }
+/* 听力、对战的题目框和选项之间原来没有空隙 */
+:root[data-look="clean"] [data-stage]:not(.quiz) > .q-prompt + .opts { margin-top: 12px; }
+:root[data-look="clean"] [data-stage]:not(.quiz) > .opts + [data-fb]:not(:empty) { margin-top: 12px; }
+
+/* 虚线一律改成细实线（清爽不要「草稿感」） */
+:root[data-look="clean"] .gram-item .ex, :root[data-look="clean"] .tr-ans { border-top-style: solid; }
+:root[data-look="clean"] .zh-rules > div, :root[data-look="clean"] .zh-script .zh-sent, :root[data-look="clean"] .en-wd, :root[data-look="clean"] .zbz-w[open] > summary { border-bottom-style: solid; }
+:root[data-look="clean"] .tr-slot { border: 1px solid var(--line); background: var(--paper); }
+:root[data-look="clean"] .inv-code, :root[data-look="clean"] .vip-langs { border-style: solid; border-color: color-mix(in srgb, var(--ai) 30%, var(--line)); }
+:root[data-look="clean"] .pl-fc { border-style: solid; }
+:root[data-look="clean"] .banner { border: 1px solid color-mix(in srgb, var(--gold) 50%, var(--line)); }
+
+/* 卡片里的长列表：不再一项一个框，改成分隔线（和首页「今日任务」、「我的」一样） */
+:root[data-look="clean"] .course-grid, :root[data-look="clean"] .course-list, :root[data-look="clean"] .zh-arts, :root[data-look="clean"] .feat-list, :root[data-look="clean"] .ls-list { gap: 0; }
+:root[data-look="clean"] .course-grid > .course-card, :root[data-look="clean"] .course-list > .course-row, :root[data-look="clean"] .zh-arts > .zh-art, :root[data-look="clean"] .feat-list > .feat, :root[data-look="clean"] .ls-list > li > .ls-item, :root[data-look="clean"] .ls-list > .ls-item {
+  border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; padding: 14px 2px; }
+:root[data-look="clean"] .course-grid > .course-card:first-child, :root[data-look="clean"] .course-list > .course-row:first-child, :root[data-look="clean"] .zh-arts > .zh-art:first-child, :root[data-look="clean"] .feat-list > .feat:first-child, :root[data-look="clean"] .ls-list > li:first-child > .ls-item, :root[data-look="clean"] .ls-list > .ls-item:first-child { border-top: 0; }
+:root[data-look="clean"] .course-list > .course-row.done, :root[data-look="clean"] .zh-arts > .zh-art.done { background: transparent; }
+:root[data-look="clean"] .course-grid > .course-card:hover, :root[data-look="clean"] .course-list > .course-row:hover, :root[data-look="clean"] .zh-arts > .zh-art:hover, :root[data-look="clean"] .ls-list .ls-item:hover { border-color: var(--line); }
+:root[data-look="clean"] .course-grid > .course-card:hover b, :root[data-look="clean"] .course-list > .course-row:hover b, :root[data-look="clean"] .zh-arts > .zh-art:hover b, :root[data-look="clean"] .feat-list > .feat:hover b, :root[data-look="clean"] .ls-list .ls-item:hover .ls-q { color: var(--ai); }
+/* VIP 角标在分隔线列表里放到这一行的右上角（不压在线上） */
+:root[data-look="clean"] .zh-arts > .zh-art > .vip-tag:not(.inl) { top: 8px; right: 0; box-shadow: none; }
+:root[data-look="clean"] .course-list > .course-row > .vip-tag:not(.inl) { position: static; order: 9; margin-left: auto; flex: none; box-shadow: none; }
+:root[data-look="clean"] .feat .tag { background: var(--ai-soft); color: var(--ai); }
+/* 语法列表（可以点开）：同样改成分隔线 */
+:root[data-look="clean"] div:has(> details.gp) { gap: 0 !important; }
+:root[data-look="clean"] details.gp { border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; }
+:root[data-look="clean"] details.gp:first-child { border-top: 0; }
+:root[data-look="clean"] details.gp summary { padding: 12px 2px; }
+:root[data-look="clean"] details.gp[open] summary { border-bottom: 0; }
+:root[data-look="clean"] details.gp .gp-body { padding: 0 2px 14px; }
+/* 格子类的小卡片：用浅灰底代替边框（假名表、学习页四格、汉字的相关单词、打卡格子） */
+:root[data-look="clean"] .kana, :root[data-look="clean"] .sh-tile, :root[data-look="clean"] .kw, :root[data-look="clean"] .wk-step, :root[data-look="clean"] .wk-grid > div { border-color: transparent; background: var(--paper); }
+:root[data-look="clean"] .kana:hover, :root[data-look="clean"] .sh-tile:hover, :root[data-look="clean"] .kw:hover { border-color: color-mix(in srgb, var(--ai) 40%, transparent); }
+:root[data-look="clean"][data-theme="dark"] :is(.kana, .sh-tile, .kw, .wk-step, .wk-grid > div) { background: var(--grid); }
+@media (prefers-color-scheme: dark) { :root[data-look="clean"]:not([data-theme="light"]) :is(.kana, .sh-tile, .kw, .wk-step, .wk-grid > div) { background: var(--grid); } }
+
+/* 一屏只留一个实心主按钮：列表里每一行的按钮改成浅色（伙伴、挑战、离线下载） */
+:root[data-look="clean"] .buddy-row .btn.pri, :root[data-look="clean"] .off-row .btn.pri, :root[data-look="clean"] .duel-chals .btn.pri { background: var(--ai-soft); color: var(--ai); box-shadow: none; }
+:root[data-look="clean"] .buddy-row .btn.pri:hover:not(:disabled), :root[data-look="clean"] .off-row .btn.pri:hover:not(:disabled), :root[data-look="clean"] .duel-chals .btn.pri:hover:not(:disabled) { background: color-mix(in srgb, var(--ai) 18%, var(--surface)); }
+/* 消息卡片：未读用浅主色底、不加粗框 */
+:root[data-look="clean"] .msg-card { border: 1px solid transparent; background: var(--ai-soft); }
+:root[data-look="clean"] .msg-card.read { border-color: var(--line); background: var(--surface); }
+
+/* 设置类的「标题 + 分段按钮」：标题在上、按钮占满一行（以前有的并排、有的折行，参差不齐） */
+:root[data-look="clean"] .panel > .row.between:has(> span:first-child + .seg:last-child) { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+:root[data-look="clean"] .panel > .row.between:has(> span:first-child + .seg:last-child) > span:first-child { font-weight: 600; font-size: .92rem; }
+:root[data-look="clean"] .panel > .row.between:has(> span:first-child + .seg:last-child) > .seg { display: flex; flex-wrap: wrap; gap: 2px; width: 100%; max-width: none; }
+:root[data-look="clean"] .panel > .row.between:has(> span:first-child + .seg:last-child) > .seg > * { flex: 1 1 auto; min-width: 0; justify-content: center; text-align: center; padding: 7px 6px; white-space: nowrap; }
+:root[data-look="clean"] .panel > .row.between:has(> span:first-child + .seg:last-child) + .row.between:has(> span:first-child + .seg:last-child) { margin-top: 4px; }
+:root[data-look="clean"] .row.between > input[type="date"] { flex: 0 0 auto; width: 170px; }
+
+/* 分段按钮：深色下选中的那一格要比底色亮（以前比底色还暗） */
+:root[data-look="clean"][data-theme="dark"] :is(.seg button.on, .seg a.on) { background: color-mix(in srgb, var(--ink) 10%, var(--surface)); }
+@media (prefers-color-scheme: dark) { :root[data-look="clean"]:not([data-theme="light"]) :is(.seg button.on, .seg a.on) { background: color-mix(in srgb, var(--ink) 10%, var(--surface)); } }
+
+/* 手指好点：小按钮外面加一圈看不见的点击区域（≥ 40px），样子不变 */
+:root[data-look="clean"] :where(.speak, .chip-btn, .track-seg button, .seg button, .seg a, .report-btn, .top .chip) { position: relative; }
+:root[data-look="clean"] :is(.speak, .chip-btn, .track-seg button)::after { content: ""; position: absolute; inset: -5px -3px; }
+:root[data-look="clean"] :is(.seg button, .seg a)::after { content: ""; position: absolute; inset: -5px 0; }
+/* 做题页右上角的「退出」：文字和卡片右边对齐 */
+:root[data-look="clean"] .panel > .row.between > .btn.ghost:last-child { margin-right: -14px; }
+/* 语法页：「语法填空」和「加入复习卡」两个按钮各占一行、一样宽（以前一个长一个短，参差不齐） */
+:root[data-look="clean"] .panel > .row:has(> [data-gcards]) { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+/* 面板里的小标题（h3）和上面的按钮、文字之间多留一点空 */
+:root[data-look="clean"] .panel > h3:not(:first-child) { margin-top: 8px; }
+/* 面板里的分段标签（商务的「邮件 / 词汇」、变形练习的词类）：占满一行、每格一样宽 */
+:root[data-look="clean"] .panel > .seg:not(.lv-seg):not(.read-lv):not(.zh-lvseg) { display: flex; flex-wrap: wrap; gap: 2px; width: 100%; }
+:root[data-look="clean"] .panel > .seg:not(.lv-seg):not(.read-lv):not(.zh-lvseg) > * { flex: 1 1 auto; justify-content: center; text-align: center; padding: 7px 8px; white-space: nowrap; }
+:root[data-look="clean"] .panel > .seg.biz-tabs { display: grid; grid-template-columns: 1fr 1fr; }
+/* 标题旁的级别切换（单词、汉字、语法、听力、模拟考…）：同一行时填满标题右边，放不下时整行，每格一样宽 */
+:root[data-look="clean"] .panel > .row.between:has(> h2 + .seg.lv-seg) > .seg.lv-seg { display: flex; flex-wrap: nowrap; flex: 1 1 180px; max-width: 320px; gap: 2px; }
+:root[data-look="clean"] .panel > .row.between:has(> h2 + .seg.lv-seg) > .seg.lv-seg > * { flex: 1 1 0; min-width: 0; padding: 6px 2px; text-align: center; }
+/* 可多选的小按钮（变形、分类、收藏筛选）：选中用浅主色底 + 主色边，不再一排实心色块 */
+:root[data-look="clean"] .chip-btn.on { background: var(--ai-soft); color: var(--ai); border-color: color-mix(in srgb, var(--ai) 55%, transparent); font-weight: 600; }
+/* 单词卡背面的例句：一条一条用浅灰底，不再白框套在白卡片里 */
+:root[data-look="clean"] .ex-box .ex { background: var(--paper); border-color: transparent; }
+:root[data-look="clean"][data-theme="dark"] .ex-box .ex { background: var(--grid); }
+@media (prefers-color-scheme: dark) { :root[data-look="clean"]:not([data-theme="light"]) .ex-box .ex { background: var(--grid); } }
+/* 卡片的格子底纹淡一点（稿纸感保留，但不抢字） */
+:root[data-look="clean"] .card { background-image: linear-gradient(color-mix(in srgb, var(--grid) 60%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--grid) 60%, transparent) 1px, transparent 1px); }
+/* 四个评分按钮：一样的外框，只用字的颜色区分「重来」「简单」 */
+:root[data-look="clean"] .grades .btn { border-color: var(--line); min-height: 48px; }
+:root[data-look="clean"] .grades .g0 { color: var(--bad); }
+:root[data-look="clean"] .grades .g3 { color: var(--ok); }
+/* 字母、音标格子（英语）、韩文格子：和五十音图一样用浅灰底 */
+:root[data-look="clean"] .hg-cell { border-color: transparent; background: var(--paper); border-radius: 12px; }
+:root[data-look="clean"] .hg-cell:hover { border-color: color-mix(in srgb, var(--ai) 40%, transparent); }
+:root[data-look="clean"][data-theme="dark"] .hg-cell { background: var(--grid); }
+@media (prefers-color-scheme: dark) { :root[data-look="clean"]:not([data-theme="light"]) .hg-cell { background: var(--grid); } }
+/* 闯关地图的关卡（中文、英语）：没解锁的是平的浅灰圆，不再是厚重的立体灰按钮；能玩的那一关立体感也收一点 */
+:root[data-look="clean"] .zh-node { box-shadow: 0 4px 0 color-mix(in srgb, var(--ai) 55%, #000); }
+:root[data-look="clean"] .zh-node:disabled { background: var(--grid); color: var(--muted); box-shadow: inset 0 0 0 1.5px var(--line); }
+:root[data-look="clean"] .zh-node.done { box-shadow: 0 4px 0 #C98F1A; }
+:root[data-look="clean"] .node:disabled { background: var(--grid); opacity: 1; }
+/* 对话里的人物头像：男声蓝色深一点（白字看得清），第二位女声不用粉色 */
+:root[data-look="clean"] .cl-av.v-M { background: #3F6A96; }
+:root[data-look="clean"] .cl-av.v-F2 { background: #8B5E3C; }
+/* 深色模式：主色变浅了，实心主色底上的字改用深色（以前白字看不清） */
+:root[data-look="clean"][data-theme="dark"] :is(.sh-c-ic, .pt-step.cur .pt-n, .zh-node:not(:disabled):not(.done), .cl-av:not(.v-M):not(.v-M2):not(.v-F2):not(.v-N), .lv-menu button.on),
+:root[data-look="clean"][data-theme="dark"] .dg-plan a::before { color: var(--ai-ink); }
+:root[data-look="clean"][data-theme="dark"] :is(.pt-step.done .pt-n, .buddy-row.done .buddy-st, .ls-item.done .ls-n) { color: var(--paper); }
+@media (prefers-color-scheme: dark) {
+  :root[data-look="clean"]:not([data-theme="light"]) :is(.sh-c-ic, .pt-step.cur .pt-n, .zh-node:not(:disabled):not(.done), .cl-av:not(.v-M):not(.v-M2):not(.v-F2):not(.v-N), .lv-menu button.on),
+  :root[data-look="clean"]:not([data-theme="light"]) .dg-plan a::before { color: var(--ai-ink); }
+  :root[data-look="clean"]:not([data-theme="light"]) :is(.pt-step.done .pt-n, .buddy-row.done .buddy-st, .ls-item.done .ls-n) { color: var(--paper); }
+}
+/* 顶部的语言切换（日本語 / English）：选中的用浅主色底，不再一块实心色抢眼 */
+:root[data-look="clean"] .track-seg button { border-color: transparent; background: transparent; color: var(--muted); font-weight: 600; padding: 3px 14px; }
+:root[data-look="clean"] .track-seg button.on { background: var(--ai-soft); color: var(--ai); border-color: transparent; }
+/* 「我的」列表外框会裁掉键盘焦点框：焦点框画在里面 */
+:root[data-look="clean"] .me-list .me-row:focus-visible { outline-offset: -3px; }
+/* 小的勾选框（假名、循环播放、慢速…）：框大一点、用主色，整行文字都好点 */
+:root[data-look="clean"] main label:not(.pl-tog):not(.agree):has(> input[type="checkbox"]) { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; cursor: pointer; }
+:root[data-look="clean"] main label:not(.pl-tog):not(.agree) > input[type="checkbox"] { width: 18px; height: 18px; margin: 0; accent-color: var(--ai); flex: none; }
+:root[data-look="clean"] .report-btn::after, :root[data-look="clean"] .top .chip::after { content: ""; position: absolute; inset: -6px -2px; }
+/* 「← 返回」「Back」「测测水平 ›」这类小链接：主色、加粗、不加下划线（像文字按钮），和「继续 ›」一致 */
+:root[data-look="clean"] main a.small:not(.btn) { text-decoration: none; font-weight: 600; color: var(--ai); }
+:root[data-look="clean"] main a.small:not(.btn):hover { text-decoration: underline; text-underline-offset: 3px; }
+/* 读物列表里没有照片的那篇：图标和照片一样大，标题对齐 */
+:root[data-look="clean"] .zh-arts:has(.zh-art-ph) .zh-art > .course-ic { width: 64px; height: 64px; border-radius: 12px; }
+/* 「本周精选」里的文章：面板里不再套一个边框卡片 */
+:root[data-look="clean"] .panel .wk-arts .today-art { border: 0; padding: 0; background: transparent; margin: 4px 0 0; }
+:root[data-look="clean"] .panel .wk-arts .today-art .ta-img { border-radius: 10px; }
+:root[data-look="clean"] .panel .wk-arts .today-art:hover .rc-title { color: var(--ai); }
+.gp-list { display: grid; gap: 8px; }
+.row.between > a.an-back { margin-bottom: 0; }

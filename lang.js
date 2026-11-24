@@ -546,7 +546,7 @@ function applyTrack(view) {
   const tr = trackOf(view);
   document.body.dataset.track = tr;
   const lv = document.getElementById('chip-lv');
-  document.documentElement.lang = tr === 'zh' || (tr === 'en' && S.enNative === 'ja') ? 'ja' : 'zh-CN';
+  document.documentElement.lang = typeof uiEn === 'function' && uiEn() ? 'en' : tr === 'zh' || (tr === 'en' && S.enNative === 'ja') ? 'ja' : 'zh-CN';
   if (tr !== 'ja' && TRACKS[tr] && TRACKS[tr].tts) langAudioIdx(TRACKS[tr].tts.slice(0, 2));   // 提前加载录音目录，点读时能立刻播放   // 学中文时界面是日语（汉字用日本字形）
   if (lv && tr === 'en') {   // 英语：CEFR 级别，点开换
     lv.textContent = typeof enLevel === 'function' ? enLevel() : 'A1'; lv.href = 'javascript:void 0'; lv.title = tj('当前学习级别，点击更改', '学習レベル（タップで変更）');
@@ -560,17 +560,20 @@ function applyTrack(view) {
     lv.title = tr === 'ja' ? '当前目标级别，点击更改' : '当前学习级别，点击更改';
     lv.onclick = async e => { e.preventDefault(); e.stopPropagation(); if (await leaveOk()) { if (tr === 'ja') jaLevelMenu(); else l2LevelMenu(tr, lv); } };
   }
-  document.querySelectorAll('.track-seg [data-track]').forEach(b => b.classList.toggle('on', b.dataset.track === tr));
+  document.querySelectorAll('.track-seg [data-track]').forEach(b => { b.classList.toggle('on', b.dataset.track === tr); b.hidden = typeof nativeLang === 'function' && b.dataset.track === nativeLang(); });   // 只显示能学的两门（不学自己的母语）
   const input = document.getElementById('gs-q');
   if (input) input.placeholder = tr === 'ja' ? '查词：日语 / 假名 / 中文 / 英文' : tr === 'zh' ? '辞書：中国語・ピンイン・日本語' : tr === 'en' ? 'Search: English / 中文 / 日本語' : `查${TRACKS[tr].title}：${TRACKS[tr].title} / 中文`;
   // 站名随语言变化
   const name = BRAND;
   const bn = document.querySelector('.brand span'); if (bn) bn.textContent = name;
-  const tagline = !S.onboarded ? (uiJa() ? '日本語・中国語・英語をもっと楽しく' : '日语、中文、英语，轻松学') : tr === 'zh' ? '中国語を、もっと楽しく' : tr === 'en' ? 'English, made fun' : '玩转' + { ja: '日语', ko: '韩语', en: '英语' }[tr];   // 还没选语言：不偏向哪一门
-  const fb = document.querySelector('[data-foot-brand]'); if (fb) fb.textContent = `${name} · ${tagline}${tr === 'en' ? '. ' : '。'}`;   // 英语板块的标语是英文，用英文句号
+  const EN = uiEn();   // 英语母语的用户：标语用英文
+  const tagline = EN ? (!S.onboarded ? 'Japanese and Chinese, made fun' : tr === 'zh' ? 'Chinese, made fun' : 'Japanese, made fun')
+    : !S.onboarded ? (uiJa() ? '日本語・中国語・英語をもっと楽しく' : '日语、中文、英语，轻松学') : tr === 'zh' ? '中国語を、もっと楽しく' : tr === 'en' ? 'English, made fun' : '玩转' + { ja: '日语', ko: '韩语', en: '英语' }[tr];   // 还没选语言：不偏向哪一门
+  const fb = document.querySelector('[data-foot-brand]'); if (fb) fb.textContent = `${EN ? 'Neko Sensei' : name} · ${tagline}${EN || tr === 'en' ? '. ' : '。'}`;   // 英文标语用英文句号和空格
   document.title = name + ' · ' + tagline;
   if (typeof i18nStatic === 'function') i18nStatic();
   buildNav(tr, view);
+  if (typeof enUiStart === 'function') enUiStart();   // 英语母语的用户：界面文字换成英语（i18n.js）
 }
 // 导航只有 5 个主栏目：今天 / 学习 / 阅读听力 / 考试 / 我的（手机上固定在底部）。其余栏目在「学习」「阅读听力」分组页里
 const NAV_ICON = {

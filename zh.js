@@ -13,14 +13,16 @@ const zhSayBtn = text => sayBtn(text, 'zh-CN');
 /* ---------- 数据 ---------- */
 const ZH = { hsk: {}, py: null, read: null, course: null, theme: {} };
 const zhFetch = url => fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+// 英语母语的用户：日文讲解、译文换成英文版（en/zh-*.json，i18n.js 的 enApply；会员内容的英文版也是会员内容）
+const zhOvl = (file, kind) => d => (typeof enApply === 'function' ? enApply('zh', file, kind, d) : d);
 function zhHsk(n) {
   // HSK4–6 的例句是会员内容：会员读服务器上的完整版（member.js），其他人读网站上的（没有例句）
-  return ZH.hsk[n] || (ZH.hsk[n] = (n >= 4 && typeof memberJson === 'function' ? memberJson('zh', `lang/zh-hsk${n}.json`) : zhFetch(`lang/zh-hsk${n}.json`)).then(rows => rows.map(r => ({
+  return ZH.hsk[n] || (ZH.hsk[n] = (n >= 4 && typeof memberJson === 'function' ? memberJson('zh', `lang/zh-hsk${n}.json`) : zhFetch(`lang/zh-hsk${n}.json`)).then(zhOvl(`zh-hsk${n}.json`, 'zhword')).then(rows => rows.map(r => ({
     id: 'zh|w|' + r[0], w: r[0], py: r[1], ja: r[2] || r[7], ex: r[3], expy: r[4], exja: r[5], note: r[6], en: r[7], trad: r[8], cl: r[9], L: n
   }))).catch(e => { delete ZH.hsk[n]; throw e; }));
 }
 // HSK 以外の常用語（辞書用、lang/zh-dict.json：[単語, ピンイン, 日本語]）。L は 7（HSK の外）
-const zhDictExt = () => ZH.ext || (ZH.ext = zhFetch('lang/zh-dict.json').then(rows => rows.map(([w, py, ja]) => ({ id: 'zh|w|' + w, w, py, ja, L: 7, ext: 1 }))).catch(() => []));
+const zhDictExt = () => ZH.ext || (ZH.ext = zhFetch('lang/zh-dict.json').then(zhOvl('zh-dict.json', 'zhdict')).then(rows => rows.map(([w, py, ja]) => ({ id: 'zh|w|' + w, w, py, ja, L: 7, ext: 1 }))).catch(() => []));
 const zhAllWords = () => Promise.all([1, 2, 3, 4, 5, 6].map(zhHsk)).then(a => a.flat());
 const zhDictWords = () => Promise.all([zhAllWords(), zhDictExt()]).then(([a, b]) => { const seen = new Set(a.map(x => x.w)); return a.concat(b.filter(x => !seen.has(x.w))); });
 let ZH_BY = null;   // 词 → 词条
@@ -29,16 +31,16 @@ const zhPy = () => ZH.py || (ZH.py = zhFetch('lang/zh-pinyin.json'));
 // 会员：读物、听力加上服务器上的会员篇目（member.js；带 m: 1），课程读完整版
 const zhPlus = (pub, mem) => Promise.all([pub, memberData('zh', mem).catch(() => null)]).then(([a, b]) => b ? a.concat(b.filter(x => !a.some(y => y.id === x.id))) : a);
 // 写真（Wikimedia Commons、lang/zh-photos.json：id → [画像, 作者, ライセンス, 元ページ]）は読み物データとは別に読み込んで合わせる
-const zhRead = () => ZH.read || (ZH.read = Promise.all([zhPlus(zhFetch('lang/zh-read.json').catch(() => []), 'lang/zh-read-member.json'), fetch('lang/zh-photos.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))])
+const zhRead = () => ZH.read || (ZH.read = Promise.all([zhPlus(zhFetch('lang/zh-read.json').then(zhOvl('zh-read.json', 'zhread')).catch(() => []), 'lang/zh-read-member.json').then(zhOvl('zh-read-member.json', 'zhread')), fetch('lang/zh-photos.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))])
   .then(([d, ph]) => { d.forEach(a => { if (ph[a.id]) a.ph = ph[a.id]; }); return (window.__zhRead = d); }));
 const zhArtImg = a => a.ph ? `<img class="rc-photo" src="${esc(a.ph[0])}" alt="${esc(a.title_ja || '')}" loading="lazy" decoding="async">` : '';
 const zhPhotoCredit = a => a.ph ? `<div class="ph-credit small muted">写真：${esc(a.ph[1])} · ${esc(a.ph[2])} · <a href="${esc(a.ph[3])}" target="_blank" rel="noopener">Wikimedia Commons</a></div>` : '';
-const zhListen = () => ZH.listen || (ZH.listen = zhPlus(zhFetch('lang/zh-listen.json').catch(() => []), 'lang/zh-listen-member.json'));
+const zhListen = () => ZH.listen || (ZH.listen = zhPlus(zhFetch('lang/zh-listen.json').then(zhOvl('zh-listen.json', 'zhlisten')).catch(() => []), 'lang/zh-listen-member.json').then(zhOvl('zh-listen-member.json', 'zhlisten')));
 // HSK3 以上的语法：网站上每项 1 句例句，会员读全部（member.js）
-const zhGrammar = () => ZH.grammar || (ZH.grammar = memberJson('zh', 'lang/zh-grammar.json').catch(() => []).then(d => (window.__zhGrammar = d)));
-const zhDaily = () => ZH.daily || (ZH.daily = zhFetch('lang/zh-daily.json').catch(() => []));
-const zhCourse = () => ZH.course || (ZH.course = memberJson('zh', 'lang/zh-course.json').catch(() => []));
-const zhTheme = id => ZH.theme[id] || (ZH.theme[id] = memberJson('zh', `lang/zh-course-${id}.json`).catch(e => { delete ZH.theme[id]; throw e; }));
+const zhGrammar = () => ZH.grammar || (ZH.grammar = memberJson('zh', 'lang/zh-grammar.json').then(zhOvl('zh-grammar.json', 'zhgrammar')).catch(() => []).then(d => (window.__zhGrammar = d)));
+const zhDaily = () => ZH.daily || (ZH.daily = zhFetch('lang/zh-daily.json').then(zhOvl('zh-daily.json', 'zhdaily')).catch(() => []));
+const zhCourse = () => ZH.course || (ZH.course = memberJson('zh', 'lang/zh-course.json').then(zhOvl('zh-course.json', 'zhcourse')).catch(() => []));
+const zhTheme = id => ZH.theme[id] || (ZH.theme[id] = memberJson('zh', `lang/zh-course-${id}.json`).then(zhOvl(`zh-course-${id}.json`, 'zhcourse')).catch(e => { delete ZH.theme[id]; throw e; }));
 // 卡片 → 学习情况
 const zhCard = x => ({ id: x.id, t: x.w, pr: x.py, zh: x.ja, ex: x.ex ? [x.ex, x.exja, x.expy] : null, note: x.note });
 const zhKnown = list => list.filter(x => S.srs[x.id] && S.srs[x.id].r > 0).length;
@@ -121,7 +123,7 @@ function zhHome() {
     const art = arts.find(a => a.lv === zhLevel() && !(S.zhRead || {})[a.id]) || arts.find(a => !(S.zhRead || {})[a.id]) || arts[0];
     const hr = new Date().getHours();
     const frag = document.createDocumentFragment();
-    const hiEl = homeHi(hr < 11 ? '早上好！ おはようございます' : hr < 18 ? '你好！ こんにちは' : '晚上好！ こんばんは', '1 日 10 分。下のタスクをこなせば今日は OK！', todayXP(), streak(), `${zhLevel()} · 覚えた ${zhKnown(list)} · 復習 ${due.length}`);
+    const hiEl = homeHi(hr < 11 ? tja('早上好！ おはようございます', '早上好！ Good morning') : hr < 18 ? tja('你好！ こんにちは', '你好！ Hello') : tja('晚上好！ こんばんは', '晚上好！ Good evening'), '1 日 10 分。下のタスクをこなせば今日は OK！', todayXP(), streak(), `${zhLevel()} · 覚えた ${zhKnown(list)} · 復習 ${due.length}`);
     const tasks = [
       { ic: '復', t: '復習', d: due.length ? `${due.length} 枚のカードが復習の時間です` : '復習するカードはありません', done: !due.length, go: () => zhReview() },
       (() => {   // 学習ルートの次のステージ（新しい単語 → テスト）
@@ -430,7 +432,7 @@ function zhSheet(x) {
     ${x.cl ? `<div class="small muted">量詞：<span ${ZHL}>${esc(x.cl)}</span></div>` : ''}
     ${x.note ? `<div class="small zh-note">${esc(x.note)}</div>` : ''}
     ${x.ex ? `<div class="small zh-ex"><div class="row"><span ${ZHL}>${zhTap(x.ex)}</span>${exSayBtn(x.ex, 'zh-CN')}${shadowBtn(x.ex, x.expy, x.exja, 'zh')}</div><div class="zh-py muted">${esc(x.expy)}</div><div class="muted">${esc(x.exja)}</div></div>` : ''}
-    ${zhEn(x.en) ? `<div class="small muted">英語：${esc(zhEn(x.en))}</div>` : ''}
+    ${zhEn(x.en) && !(typeof uiEn === 'function' && uiEn()) ? `<div class="small muted">英語：${esc(zhEn(x.en))}</div>` : ''}   <!-- 英语母语的用户：上面的意思已经是英文，不再重复词典英文 -->
     <div class="row"><button class="btn soft" type="button" data-add ${inDeck ? 'disabled' : ''}>${inDeck ? '単語カードに追加済み' : '+ 単語カード'}</button><button class="btn" type="button" data-strokes>✍ 書き順・手書き</button>${favBtn('w', x.w, `${x.py} ${(x.ja || '').split('；')[0]}`, 'zh')}</div>
   </div>`);
   document.body.append(sh);
@@ -524,7 +526,7 @@ function zhDictPage(host, q) {
   if (q != null) zhDictQ = q;
   const p = h(`<section class="panel zh-dict"><h2>辞書</h2>
     <form class="dict-form" data-form role="search"><input type="search" placeholder="中国語・ピンイン・日本語・英語" value="${esc(zhDictQ)}" aria-label="辞書を検索" autocomplete="off" data-in><button class="btn pri" type="submit">検索</button></form>
-    <div class="row small"><span class="muted">例：</span>${['你好', 'xiexie', '経済', 'おいしい', '电脑', 'happy'].map(w => `<button type="button" class="chip-btn" data-try="${w}">${w}</button>`).join('')}</div>
+    <div class="row small"><span class="muted">例：</span>${(uiEn() ? ['你好', 'xiexie', '电脑', 'happy', 'delicious'] : ['你好', 'xiexie', '経済', 'おいしい', '电脑', 'happy']).map(w => `<button type="button" class="chip-btn" data-try="${w}"${/[\u4e00-\u9fff]/.test(w) && !/[\u3040-\u30ff]/.test(w) && w !== '経済' ? ' lang="zh-CN"' : ''}>${w}</button>`).join('')}</div>
     <p class="small muted" data-st>HSK 1〜6級の単語と HSK 外のよく使う語を収録。日本の漢字（経済・電話など）で入力しても簡体字に変換して探します。ピンインは声調なしでも OK です。</p>
     <div class="zh-list" data-res></div></section>`);
   host.append(p);
@@ -617,7 +619,7 @@ function zhGrammarItem(id) {
     if (!g) { box.innerHTML = '<p class="muted">見つかりませんでした。</p><a class="btn" href="#zh/grammar">一覧へ</a>'; return; }
     if (zhGuest() && zhLvNum(g.lv) > 1) { box.remove(); return zhLocked(g.title); }
     const prev = all[i - 1], next = all[i + 1];
-    const p = h(`<article class="panel zh-article"><a class="small" href="#zh/grammar/${g.lv}">← ${g.lv} 文法</a>
+    const p = h(`<article class="panel zh-article"><a class="an-back" href="#zh/grammar/${g.lv}">← ${g.lv} 文法</a>
       <div class="row between"><span class="tag lv">${g.lv}</span></div>
       <div class="row between"><h2>${esc(g.title)}</h2>${favBtn('g', g.p, g.title, 'zh')}</div><div class="zh-gp" ${ZHL}>${esc(g.p)}</div>
       <p>${esc(g.ja)}</p>
@@ -749,7 +751,7 @@ let ZH_READ_IDX = null;
 let zhReadLv = '';   // 読み物の級フィルター（空 = いま学んでいる級）
 function zhReadList() {
   const box = zhLoading(); main.append(box);
-  Promise.all([zhRead(), ZH_READ_IDX || isMember('zh') ? null : fetch('lang/zh-read-index.json').then(r => r.ok ? r.json() : []).catch(() => [])]).then(([arts, idx]) => {
+  Promise.all([zhRead(), ZH_READ_IDX || isMember('zh') ? null : fetch('lang/zh-read-index.json').then(r => r.ok ? r.json() : []).then(zhOvl('zh-read-index.json', 'zhreadidx')).catch(() => [])]).then(([arts, idx]) => {
     if (idx) ZH_READ_IDX = idx;
     if (!box.isConnected) return;
     if (!arts.length) { box.innerHTML = '<h2>読み物</h2><p class="muted">読み物を準備中です。もうしばらくお待ちください。</p>'; return; }

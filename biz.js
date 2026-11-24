@@ -13,7 +13,7 @@ function bizMember() {
   const want = typeof isMember === 'function' && isMember('ja');
   if (!want) { if (BIZ_FULL) { for (const k in BIZ) delete BIZ[k]; Object.assign(BIZ, JSON.parse(JSON.stringify(BIZ_PUBLIC))); BIZ_FULL = false; } return Promise.resolve(false); }
   if (BIZ_FULL) return Promise.resolve(false);
-  return memberData('ja', 'business.json').then(d => { if (!d) return false; Object.assign(BIZ, d); BIZ_FULL = true; return true; }).catch(() => false);
+  return memberData('ja', 'business.json').then(d => enApply('ja', 'business.json', 'business', d)).then(d => { if (!d) return false; Object.assign(BIZ, d); BIZ_FULL = true; return true; }).catch(() => false);   // 英语母语的用户换上英文版
 }
 function viewBiz(arg = '') {
   // 会员第一次打开：先取完整版，取到后重新画
@@ -29,10 +29,10 @@ function viewBiz(arg = '') {
   const sub = ['keigo', 'mail', 'vocab'].includes(kind) ? kind : 'scenes';
   const st = bizState();
   const head = h(`<section class="panel biz-head">
-    <div class="row between"><h2>商务日语</h2></div>
-    <p class="small muted">在日企工作、和日本客户打交道用得上的日语：电话、拜访、会议、道歉、邮件，以及最容易出错的敬语。</p>
+    <div class="row between"><h2>${tz('商务日语', 'Business Japanese')}</h2></div>
+    <p class="small muted">${tz('在日企工作、和日本客户打交道用得上的日语：电话、拜访、会议、道歉、邮件，以及最容易出错的敬语。', 'Japanese for working at a Japanese company and dealing with Japanese clients: phone calls, visits, meetings, apologies, emails, and the keigo that is easiest to get wrong.')}</p>
     <div class="seg biz-tabs" role="tablist">
-      ${[['scenes', '💬 场景会话', ''], ['keigo', '🎎 敬语', 'keigo'], ['mail', '✉️ 商务邮件', 'mail'], ['vocab', '📒 商务词汇', 'vocab']].map(([k, label, path]) => `<a role="tab" href="#biz${path ? '/' + path : ''}" class="${sub === k ? 'on' : ''}" aria-selected="${sub === k}">${label}</a>`).join('')}
+      ${[['scenes', tz('💬 场景会话', '💬 Scenarios'), ''], ['keigo', tz('🎎 敬语', '🎎 Keigo'), 'keigo'], ['mail', tz('✉️ 商务邮件', '✉️ Business email'), 'mail'], ['vocab', tz('📒 商务词汇', '📒 Business vocabulary'), 'vocab']].map(([k, label, path]) => `<a role="tab" href="#biz${path ? '/' + path : ''}" class="${sub === k ? 'on' : ''}" aria-selected="${sub === k}">${label}</a>`).join('')}
     </div>
   </section>`);
   main.append(head);
@@ -42,9 +42,9 @@ function viewBiz(arg = '') {
 /* ---------- 场景会话 → 情景课程 ---------- */
 function bizToCourse() {
   main.append(h(`<section class="panel biz-course">
-    <h2>💬 场景会话在「情景课程」里</h2>
-    <p>商务场景（自我介绍、接电话、拜访、会议、汇报、投诉、谈判、面试……）整理成了情景课程：每个角色不同的声音，逐句假名和中文，生词、句型、什么时候该这样说，以及日本职场的文化说明。现在可以先学第 1 课样课。</p>
-    <a class="btn pri big" href="#course/biz">去学商务日语课程 →</a>
+    <h2>${tz('💬 场景会话在「情景课程」里', '💬 Business scenarios are in the scenario courses')}</h2>
+    <p>${tz('商务场景（自我介绍、接电话、拜访、会议、汇报、投诉、谈判、面试……）整理成了情景课程：每个角色不同的声音，逐句假名和中文，生词、句型、什么时候该这样说，以及日本职场的文化说明。现在可以先学第 1 课样课。', 'Business situations (self-introductions, phone calls, client visits, meetings, reporting, complaints, negotiations, interviews…) are organized as a scenario course: a different voice for each character, kana and a translation for every line, vocabulary, patterns, when to say what, and notes on Japanese workplace culture. You can start with the free sample, Lesson 1.')}</p>
+    <a class="btn pri big" href="#course/biz">${tz('去学商务日语课程 →', 'Go to the business Japanese course →')}</a>
   </section>`));
 }
 
@@ -52,12 +52,12 @@ function bizToCourse() {
 function bizScenes() {
   const st = bizState();
   const cats = [...new Set(BIZ.scenes.map(x => x.cat))];
-  const bar = h(`<div class="row cat-row">${['', ...cats].map(c => `<button type="button" class="chip-btn ${bizCat === c ? 'on' : ''}" data-cat="${c}">${c ? (BIZ_CAT_IC[c] || '') + ' ' + c : '全部场景'}</button>`).join('')}</div>`);
+  const bar = h(`<div class="row cat-row">${['', ...cats].map(c => `<button type="button" class="chip-btn ${bizCat === c ? 'on' : ''}" data-cat="${c}">${c ? (BIZ_CAT_IC[c] || '') + ' ' + esc(catName(c)) : tz('全部场景', 'All scenes')}</button>`).join('')}</div>`);
   const grid = h('<div class="read-grid"></div>');
   for (const sc of BIZ.scenes.filter(x => !bizCat || x.cat === bizCat)) {
     grid.append(h(`<a class="read-card" href="#biz/s/${sc.id}">
       <div class="rc-img">${artImg(sc)}<span class="tag lv">${sc.L}</span>${st.s[sc.id] != null ? '<span class="rc-done">済</span>' : ''}</div>
-      <div class="rc-body"><div class="rc-cat">${BIZ_CAT_IC[sc.cat] || ''} ${sc.cat}</div><div class="rc-title" lang="ja">${esc(sc.title)}</div><div class="rc-zh">${esc(sc.zh)}</div>
+      <div class="rc-body"><div class="rc-cat">${BIZ_CAT_IC[sc.cat] || ''} ${esc(catName(sc.cat))}</div><div class="rc-title" lang="ja">${esc(sc.title)}</div><div class="rc-zh">${esc(sc.zh)}</div>
       ${sc.lock ? `<div class="rc-first small muted">🔒 会员</div>` : `<div class="rc-first" lang="ja">${esc(sc.lines[0][1])}</div>`}</div>
     </a>`));
   }
@@ -119,7 +119,7 @@ function bizScene(sc) {
   let i = 0;
   const p = h(`<article class="panel read-art">
     <div class="ra-hero">${artImg(sc)}</div>${photoCredit(sc)}
-    <div class="row between"><a class="small" href="#biz">← 返回商务日语</a><span class="row"><span class="tag lv">${sc.L}</span><span class="tag">${BIZ_CAT_IC[sc.cat] || ''} ${sc.cat}</span>${st.s[sc.id] != null ? '<span class="tag done">已学</span>' : ''}</span></div>
+    <div class="row between"><a class="small" href="#biz">← 返回商务日语</a><span class="row"><span class="tag lv">${sc.L}</span><span class="tag">${BIZ_CAT_IC[sc.cat] || ''} ${esc(catName(sc.cat))}</span>${st.s[sc.id] != null ? '<span class="tag done">已学</span>' : ''}</span></div>
     <h2 class="ra-title" lang="ja">${esc(sc.title)}</h2>
     <div class="muted">${esc(sc.zh)}</div>
     ${sc.note ? `<div class="biz-note"><b>礼仪要点</b><div>${esc(sc.note)}</div></div>` : ''}
@@ -288,8 +288,8 @@ function bizVocab() {
   bizVocabCat = Math.min(bizVocabCat, cats.length - 1);
   const c = cats[bizVocabCat];
   const p = h(`<section class="panel">
-    <div class="row cat-row">${cats.map((x, i) => `<button type="button" class="chip-btn ${i === bizVocabCat ? 'on' : ''}" data-vc="${i}">${esc(x.cat)}${bizVip(BIZ_PUBLIC && BIZ_PUBLIC.vocab, x) ? vipTag('inl') : ''}</button>`).join('')}</div>
-    <div class="row"><button class="btn pri" type="button" data-quiz>「${esc(c.cat)}」测验 10 题</button></div>
+    <div class="row cat-row">${cats.map((x, i) => `<button type="button" class="chip-btn ${i === bizVocabCat ? 'on' : ''}" data-vc="${i}">${esc(catName(x.cat))}${bizVip(BIZ_PUBLIC && BIZ_PUBLIC.vocab, x) ? vipTag('inl') : ''}</button>`).join('')}</div>
+    <div class="row"><button class="btn pri" type="button" data-quiz>${tz(`「${esc(c.cat)}」测验 10 题`, `${esc(catName(c.cat))} quiz · 10 questions`)}</button></div>
     <div class="ra-words">${c.words.map(([w, r, zh, ex, exk, exzh], i) => `<details class="ra-word biz-w"><summary><span lang="ja" class="rw-w furi">${jrWord(w, r)}</span><span lang="ja" class="rw-r">${esc(r)}</span>${speakBtn(r)}<span class="rw-m">${esc(zh)}</span></summary>
       <div class="ex"><div style="flex:1;min-width:0"><div class="jp furi jtap" lang="ja">${jrTap(ex, exk)}</div><div class="small muted">${esc(exzh)}</div></div>${speakBtn(exk, '朗读例句')}</div></details>`).join('')}</div>
     ${c.lock ? '<p class="small muted biz-more">🔒 这里是免费体验的一部分，这个分类的词汇是会员内容。<a href="#vip">了解会员 ›</a></p>' : ''}
@@ -308,7 +308,7 @@ function bizVocabQuiz(ci) {
     return makeQ(null, 'meaning', distract(zh, c.words.map(x => x[2])), zh, { prompt: `<div class="eyebrow">这个词是什么意思？</div><div class="q-big" lang="ja">${esc(w)}</div>`, say: r, explain });
   });
   main.innerHTML = ''; const host = h('<div></div>'); main.append(host);
-  const title = `商务词汇 · ${c.cat}`;
+  const title = tz(`商务词汇 · ${c.cat}`, `Business vocabulary · ${catName(c.cat)}`);
   runQuiz(host, qs, { title, noRecord: true, xpEach: 5, onDone: r => { if (!r) return render(); quizSummary(host, r, { title, again: () => bizVocabQuiz(ci) }); } });
 }
 

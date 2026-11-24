@@ -57,7 +57,7 @@ function viewWeek(arg) {
   main.append(box);
   const at = location.hash;
   // listening.js 可能已经被听力页用自己的方式加载过，再加载会重复定义，所以先看 LISTEN 在不在
-  const files = ['weekly.js', 'reading.js', 'scenes.js'].concat(typeof LISTEN === 'undefined' ? ['listening.js', 'furi-listen.js'] : []);
+  const files = ['weekly.js', 'reading.js', 'scenes.js'].concat(typeof LISTEN === 'undefined' ? ['listening.js', 'furi-listen.js'] : [], uiEn() ? ['en/ja-reading.json', 'en/ja-listen.json', 'en/ja-weekly.json'] : []);
   needScripts(files).then(() => { audioIdx('reading'); if (location.hash === at) box.replaceWith(weekPage(arg)); })
     .catch(() => { box.innerHTML = '<h2>本周精选</h2><p class="muted">加载失败，请检查网络后重试。</p>'; });
 }

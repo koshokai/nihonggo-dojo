@@ -96,7 +96,7 @@ function l2Article(tr, a) {
   let idx = 0;
   const p = h(`<article class="panel read-art">
     <div class="ra-hero">${l2Img(a)}</div>${a.ph ? `<div class="ph-credit small muted">照片：${esc(a.ph[1])} · ${esc(a.ph[2])} · <a href="${esc(a.ph[3])}" target="_blank" rel="noopener">Wikimedia Commons</a></div>` : ''}
-    <div class="row between"><a class="small" href="#${tr}/read">← 返回阅读</a><span class="row"><span class="tag lv">${a.lv}</span><span class="tag">${esc(a.cat)}</span></span></div>
+    <div class="row between"><a class="an-back" href="#${tr}/read">← 返回阅读</a><span class="row"><span class="tag lv">${a.lv}</span><span class="tag">${esc(a.cat)}</span></span></div>
     <h2 class="ra-title" lang="${tr}">${esc(a.title)}</h2><div class="muted">${esc(a.zh)}</div>
     <div class="ra-tools"><button class="btn pri" type="button" data-play>${SPEAK_SVG}<span>全文朗读</span></button><label class="switch"><input type="checkbox" data-zh> 全部中文</label></div>
     <p class="small muted">点一句话：朗读并显示中文；🎙 跟读打分。</p>

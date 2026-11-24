@@ -63,10 +63,19 @@ function jrWord(w, r) {
   return parts.map((p, i) => KJ.test(p) && (typeof furiWanted !== 'function' || furiWanted(p)) ? `<ruby>${esc(p)}<rt>${esc(m[i + 1])}</rt></ruby>` : esc(p)).join('');
 }
 // jr(文字, 读音?)：句子查 furi-map.js（生成时用形态分析算好，和人工读音对齐过）；查不到但有读音就按读音对齐；都没有就原样
+// 注音表的读法（文字 + 「起点.长度读音」→ 整个读音，平假名、去掉空格标点），用来和条目自带的读音比较
+const furiReadingOf = (t, f) => {
+  const marks = {}; String(f || '').split(',').forEach(x => { const m = x.match(/^(\d+)\.(\d+)(.*)$/); if (m) marks[+m[1]] = [+m[2], m[3]]; });
+  let out = ''; for (let i = 0; i < t.length;) { if (marks[i]) { out += marks[i][1]; i += marks[i][0]; } else out += t[i++]; }
+  return out;
+};
+const kanaKey = s => String(s || '').replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60)).replace(/[\s、。，．！？!?「」『』（）()・…〜～―\-：:]/g, '');
+// 同一个写法在不同地方读法不同（開く：ひらく / あく）：注音表只存一种，条目自带读音时以条目为准
+const furiFits = (t, f, r) => !r || kanaKey(furiReadingOf(t, f)) === kanaKey(r);
 const jr = (t, r) => {
   if (!t) return '';
   const f = typeof FURI_MAP !== 'undefined' && FURI_MAP[t];
-  if (f) return furiHTML(t, f);
+  if (f && furiFits(t, f, r)) return furiHTML(t, f);
   if (r) return jrWord(t, r);
   if (/\s[/／]\s/.test(t)) return t.split(/(\s[/／]\s)/).map((x, i) => i % 2 ? esc(x) : jr(x)).join('');   // 「弊社 / 当社」：每个写法分别查
   const br = t.match(/^([【「『（(〔])(.+?)([】」』）)〕])$/);   // 【御礼】：查括号里的词
@@ -74,7 +83,7 @@ const jr = (t, r) => {
   return esc(t);
 };
 // jrTap(文字, 读音?)：和 jr 一样标假名，查得到假名表的句子还能点词看释义（jaTapHTML，外层要有 .jtap）
-const jrTap = (t, r) => { const f = typeof FURI_MAP !== 'undefined' && FURI_MAP[t]; return f && typeof jaTapHTML === 'function' ? jaTapHTML(t, f) : jr(t, r); };
+const jrTap = (t, r) => { const f = typeof FURI_MAP !== 'undefined' && FURI_MAP[t]; return f && furiFits(t, f, r) && typeof jaTapHTML === 'function' ? jaTapHTML(t, f) : jr(t, r); };
 // jrNote(中文说明)：只给「」里引用的日语标假名，其余原样
 const jrNote = s => esc(s || '').replace(/「([^「」]{1,40})」/g, (all, q) => { const raw = q.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'"); const f = typeof FURI_MAP !== 'undefined' && FURI_MAP[raw]; return f ? `「<span class="furi" lang="ja">${furiHTML(raw, f)}</span>」` : all; });
 const gramEg = ([s, kana, t, furi]) => ({ s, kana, t, furi, at: s.indexOf('['), frag: s.match(/\[(.+?)\]/)[1], full: s.replace(/[[\]]/g, ''), blank: s.replace(/\[.+?\]/, '＿＿＿') });
@@ -82,7 +91,10 @@ const gramEg = ([s, kana, t, furi]) => ({ s, kana, t, furi, at: s.indexOf('['), 
 function gramMember() {
   const back = () => { for (const L of ['N3', 'N2', 'N1']) for (const g of GRAM[L] || []) g.eg = g.eg0.map(gramEg); };
   if (!(typeof isMember === 'function' && isMember('ja')) || typeof memberData !== 'function') return back();
-  memberData('ja', 'grammar-member.json').then(d => {
+  memberData('ja', 'grammar-member.json').then(d => (d && uiEn() ? memberJson('ja', 'en/grammar-member.json').catch(() => null).then(en => {   // 英语母语的用户：例句译文换成英文版 { 级别: { 句型: { 日语原句: 英文 } } }
+    if (en) for (const L in d) for (const x of d[L]) { const m = (en[L] || {})[x.p] || {}; x.eg.forEach(e => { if (m[e[0]]) e[2] = m[e[0]]; }); }
+    return d;
+  }) : d)).then(d => {
     if (!d || !isMember('ja')) return;
     for (const L in d) { const by = new Map(d[L].map(x => [x.p, x])); for (const g of GRAM[L] || []) { const x = by.get(g.p); if (x && x.eg.length) g.eg = x.eg.map(gramEg); } }
     if ((location.hash || '').startsWith('#grammar') && !busy()) render();
@@ -95,7 +107,7 @@ function jlptMember() {
   if (typeof JLPT === 'undefined') return Promise.resolve(false);
   if (!(typeof isMember === 'function' && isMember('ja')) || typeof memberData !== 'function') { for (const L of JLPT_MEMBER_LV) JLPT[L] = []; jlptP = null; return Promise.resolve(false); }
   if (JLPT_MEMBER_LV.every(L => (JLPT[L] || []).length)) return Promise.resolve(true);
-  return jlptP || (jlptP = memberData('ja', 'jlpt-member.json').then(d => {
+  return jlptP || (jlptP = memberData('ja', 'jlpt-member.json').then(d => enApply('ja', 'jlpt-member.json', 'jlpt', d)).then(d => {   // 英语母语的用户：解说换成英文版
     jlptP = null;
     if (!d || !isMember('ja')) return false;
     for (const L of JLPT_MEMBER_LV) if (d[L]) JLPT[L] = d[L];
@@ -106,6 +118,14 @@ const exHTML = (w, n = 5) => exList(w).slice(0, n).map(([jp, kana, zh, furi, src
 
 /* ---------- 数据 ---------- */
 const VOCAB = {}, KANJI = {}, GRAM = {}, ITEMS = {};
+/* 英语母语的用户：单词意思、语法讲解和例句译文换成英文版（en/ja-vocab.js、en/ja-grammar.js，boot.js 只给英语用户加载）。
+   按原文对应，不按顺序：单词「写法|读音」、语法按句型、例句按日语原句。原数据增删、调整顺序也不会错配；英文版缺的条目保留原文（tools/check_en.py 会报出来） */
+if (typeof EN_JA_VOCAB !== 'undefined') for (const L of LEVELS) (VOCAB_DATA[L] || []).forEach(r => { const m = (EN_JA_VOCAB[L] || {})[r[0] + '|' + r[1]]; if (m) r[2] = m; });
+if (typeof EN_JA_GRAMMAR !== 'undefined') for (const L of LEVELS) (GRAMMAR_DATA[L] || []).forEach(g => {
+  const e = (EN_JA_GRAMMAR[L] || {})[g.p]; if (!e) return;
+  if (e.m) g.m = e.m; if (e.how) g.how = e.how;
+  (g.eg || []).forEach(x => { const t = e.eg && e.eg[x[0]]; if (t) x[2] = t; });
+});
 // 早期版本手写的汉字中文释义，作为补充显示
 const KANJI_ZH = {};
 LEVELS.forEach(L => KANJI_RAW[L].trim().split('\n').forEach(l => { const p = l.split('|'); KANJI_ZH[p[0]] = p[3]; }));
@@ -117,7 +137,7 @@ for (const L of LEVELS) {
     // 词缀（～円）和带括号的条目只在词表里显示，不拿来出题
     return { id, type: 'v', L, w, r, m, en: en || '', alt: alt || [], q: !/[～〜(（]/.test(w + r) };
   });
-  KANJI[L] = KANJI_DATA[L].map(([k, on, kun, en, strokes]) => ({ id: `k|${L}|${k}`, type: 'k', L, k, on, kun, en, strokes, zh: KANJI_ZH[k] || '' }));
+  KANJI[L] = KANJI_DATA[L].map(([k, on, kun, en, strokes]) => ({ id: `k|${L}|${k}`, type: 'k', L, k, on, kun, en, strokes, get zh() { return typeof uiEn === 'function' && uiEn() ? '' : KANJI_ZH[this.k] || ''; } }));   // 英语用户只看英文释义（每次取时判断：欢迎页选了 English 之后也对）
   // 每个句型 3–5 句例句：eg = [{s: 带 [填空] 的句子, kana, t: 译文, frag, full, blank}]（N3–N1 网站上只有 1 句，会员从服务器取全部：gramMember）
   GRAM[L] = GRAMMAR_DATA[L].map(g => ({
     id: `g|${L}|${g.p}`, type: 'g', L, p: g.p, m: g.m, how: g.how, ex: g.ex, eg: g.eg.map(gramEg), eg0: g.eg
@@ -200,7 +220,7 @@ function cleanState(o) {
     else o[k] = v && typeof v === 'object' && !Array.isArray(v) ? v : d;
   }
   for (const k of ['days', 'goalDays', 'newLog']) { const x = {}; for (const [dk, dv] of Object.entries(o[k])) if (/^\d{4}-\d{2}-\d{2}$/.test(dk) && Number.isFinite(+dv)) x[dk] = +dv; o[k] = x; }
-  for (const k of ['track', 'zhLevel', 'enLevel', 'enNative', 'syncUser', 'memberUser']) if (o[k] != null && !(typeof o[k] === 'string' && /^[\w.|:-]{0,64}$/.test(o[k]))) delete o[k];
+  for (const k of ['track', 'zhLevel', 'enLevel', 'enNative', 'native', 'syncUser', 'memberUser']) if (o[k] != null && !(typeof o[k] === 'string' && /^[\w.|:-]{0,64}$/.test(o[k]))) delete o[k];
   for (const k of ['appRemind', 'syncedAt', 'modAt']) if (o[k] != null && !Number.isFinite(+o[k])) delete o[k];
   if (o.goal <= 0) o.goal = b.goal;
   return o;
@@ -215,6 +235,19 @@ if (S.voiceSrc === 'tts') S.voiceSrc = 'vv';   // 不再用手机自带的机器
 // 新版界面：樱花飘落默认关闭（会分散注意力），想要的人在「我的」里打开
 if (!S.uiV2) { S.uiV2 = 1; S.petals = false; }
 if (!['ja', 'zh', 'en'].includes(S.track || 'ja')) S.track = 'ja';   // 已删除的语言（韩语）回到日语
+// 单词表改正后（例如同一个词以前在 N3、N4 各有一条，读音改正后合并成一条），旧条目的学习记录转到现在同一个词的条目，不丢进度
+(() => {
+  if (!S.srs) return;
+  const byWord = {};
+  for (const L of LEVELS) for (const v of VOCAB[L]) if (!byWord[v.w]) byWord[v.w] = v.id;
+  let moved = 0;
+  for (const id of Object.keys(S.srs)) {
+    if (!id.startsWith('v|') || ITEMS[id]) continue;
+    const to = byWord[id.split('|')[2]];
+    if (to && !S.srs[to]) { S.srs[to] = S.srs[id]; delete S.srs[id]; moved++; }
+  }
+  if (moved) setTimeout(save, 0);
+})();
 // 打开 App 回到上次在学的语言（render：不带 # 打开时去那门语言的首页）。以前是一律回日语首页，三门语言以后改了
 const homeHash = () => /^#?(home)?$/.test(location.hash);
 migrateIds();
@@ -975,10 +1008,24 @@ const VIEWS = { plan: () => viewPlan(), home: viewHome, week: viewWeek, vip: vie
    fav: () => viewFav(), offline: () => viewOffline(), en: viewEn, me: viewMe, welcome: viewWelcome, about: viewAbout, anime: viewAnime, trans: () => viewTrans('ja'), conj: viewConj, dictation: () => viewDictation('ja'), course: viewCourse, duel: viewDuel, buddy: viewBuddy, hi: sub => viewHi(sub), check: () => viewCheck(), diag: () => viewDiag(), path: arg => viewPath(arg) };
 // 大的数据文件用到才加载（首页少加载约 1.3 MB）：阅读 800 KB、商务 314 KB、模拟考 172 KB
 const VIEW_NEEDS = { read: ['reading.js', 'scenes.js'], trans: ['reading.js', 'scenes.js'], biz: ['business.js'], exam: ['jlpt.js'] };
+// 英语母语的用户：阅读、听力等大数据的英文版（en/*.json，{ 中文原文: 英文 }，tools/ennat/overlay.py 生成），数据加载后换上
+const OVL_DATA = { 'en/ja-reading.json': ['reading', () => typeof READING !== 'undefined' && READING], 'en/ja-listen.json': ['listen', () => typeof LISTEN !== 'undefined' && LISTEN], 'en/ja-weekly.json': ['weekly', () => typeof WEEKLY !== 'undefined' && WEEKLY], 'en/ja-business.json': ['business', () => typeof BIZ !== 'undefined' && BIZ], 'en/ja-jlpt.json': ['jlpt', () => typeof JLPT !== 'undefined' && JLPT] };
+const OVL_NEEDS = { read: ['en/ja-reading.json'], trans: ['en/ja-reading.json'], biz: ['en/ja-business.json'], exam: ['en/ja-jlpt.json'] };
+const OVL_MAPS = {}, OVL_GET = {}, OVL_DONE = new WeakSet();
+function ovlApply() {
+  for (const [f, [kind, get]] of Object.entries(OVL_DATA)) {
+    const m = OVL_MAPS[f], d = get();
+    if (m && d && !OVL_DONE.has(d)) { enSwap(d, EN_RULES[kind], m); OVL_DONE.add(d); }
+  }
+}
+// 取英文版并换上（不是英语用户、或者取不到时什么都不做，显示原文）；数据还没加载的，等数据加载完（loadScript）再换
+const ovlReady = f => (!uiEn() ? Promise.resolve() : (OVL_GET[f] || (OVL_GET[f] = fetch(f).then(r => (r.ok ? r.json() : null)).catch(() => null).then(m => { OVL_MAPS[f] = m; }))).then(ovlApply));
 const LAZY_JS = {};
-const loadScript = src => LAZY_JS[src] || (LAZY_JS[src] = new Promise((res, rej) => {
-  const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => { delete LAZY_JS[src]; rej(new Error(src)); }; document.body.append(s);
-}));
+const loadScript = src => LAZY_JS[src] || (LAZY_JS[src] = src.endsWith('.json')
+  ? ovlReady(src)   // 英文版（取不到也不报错）
+  : new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = src; s.onload = () => { if (typeof enDailyApply === 'function') enDailyApply(); ovlApply(); res(); }; s.onerror = () => { delete LAZY_JS[src]; rej(new Error(src)); }; document.body.append(s);
+  }));
 const needScripts = files => Promise.all(files.map(loadScript));
 const scriptsReady = files => files.every(f => LAZY_JS[f] && LAZY_JS[f].done);
 function render() {
@@ -1005,7 +1052,7 @@ function render() {
   // 游客模式：没开放的内容显示注册提示（guest.js）
   const lk = typeof guestLock === 'function' && guestLock(view, arg ? decodeURIComponent(arg) : '');
   // 日语页面：注音表和今日一句如果还没加载（学中文、英语时先不加载，见 index.html），先等它们
-  const needs = (VIEW_NEEDS[view] || []).concat(trackOf(view) === 'ja' && window.LAZY_JA ? window.LAZY_JA : []);
+  const needs = (VIEW_NEEDS[view] || []).concat(trackOf(view) === 'ja' && window.LAZY_JA ? window.LAZY_JA : [], uiEn() ? OVL_NEEDS[view] || [] : []);
   if (!needs.length) needs.length = 0;
   if (!lk && needs.length && !scriptsReady(needs)) {   // 数据还没加载：先显示骨架，加载完再画（地址没变的话）
     const at = location.hash;
@@ -1085,55 +1132,82 @@ document.addEventListener('click', e => {
 });
 
 /* 欢迎 + 分级测试 */
-const START_OPTS = [
-  ['zero', 'あ', '零基础', '还不会假名，从五十音开始'],
-  ['N5', 'N5', '入门', '会假名，认识一些简单单词'],
-  ['N4', 'N4', '初级', '能看懂简单的句子和对话'],
-  ['N3', 'N3', '中级', '日常会话基本没问题'],
-  ['N2', 'N2', '中高级', '能读文章、看新闻'],
-  ['N1', 'N1', '高级', '冲刺最高级别 N1']
+const START_OPTS = [   // [值, 徽章, 中文标题, 中文说明, 英文标题, 英文说明]
+  ['zero', 'あ', '零基础', '还不会假名，从五十音开始', 'Total beginner', 'Start with hiragana and katakana'],
+  ['N5', 'N5', '入门', '会假名，认识一些简单单词', 'Beginner', 'I know kana and some simple words'],
+  ['N4', 'N4', '初级', '能看懂简单的句子和对话', 'Elementary', 'I can read simple sentences and dialogues'],
+  ['N3', 'N3', '中级', '日常会话基本没问题', 'Intermediate', 'I can handle everyday conversation'],
+  ['N2', 'N2', '中高级', '能读文章、看新闻', 'Upper intermediate', 'I can read articles and follow the news'],
+  ['N1', 'N1', '高级', '冲刺最高级别 N1', 'Advanced', 'Aiming for the top level, N1']
 ];
 // 新用户引导：先选要学的语言，再选水平和每天的量
-let welcomeLang = null, welcomeUiOrig;
+let welcomeLang = null;
+// 欢迎页第一步：母语（中文 / 日本語 / English）。决定界面和讲解的语言，第二步只给能学的两门：
+//   中文母语 → 日语、英语；日语母语 → 中文、英语；英语母语 → 日语、中文。选了以后记在 dojo-ui（英语要重新加载界面对照表，所以也记在 sessionStorage）
+let welcomeNative = (() => { try { return sessionStorage.getItem('dojo-wn'); } catch (e) { return null; } })();
+function welcomeNativePage() {
+  const cur = uiEn() ? 'en' : uiJa() ? 'ja' : 'zh';   // 按手机语言先帮着选好（还是要点一下确认）
+  const opts = [['zh', '中文', '我说中文', '学日语 · 学英语（中文讲解）', 'zh-CN'], ['ja', '日本語', '日本語を話します', '中国語・英語を学ぶ（日本語の解説）', 'ja'],
+    ['en', 'English', 'I speak English', 'Learn Japanese or Chinese (explained in English)', 'en']].filter(o => o[0] !== 'en' || enUiOpen());
+  const p = h(`<section class="panel welcome">
+    <div class="welcome-hi">${mascotDuo('happy', 'big')}<div class="bubble"><b data-noen>欢迎！ようこそ！${enUiOpen() ? 'Welcome!' : ''}</b></div></div>
+    <h2 data-noen class="welcome-ask"><span lang="zh-CN">你的母语是？</span><span lang="ja">母語は？</span>${enUiOpen() ? '<span lang="en">Your native language?</span>' : ''}</h2>
+    <div class="lvl-opts">${opts.map(([k, badge, t, d, lg]) => `<button type="button" class="lvl-opt ${cur === k ? 'on' : ''}" data-native-pick="${k}" data-noen><span class="lvl-badge" lang="${lg}">${badge}</span><b lang="${lg}">${t}</b><span class="small muted" lang="${lg}">${d}</span></button>`).join('')}</div>
+  </section>`);
+  p.querySelectorAll('[data-native-pick]').forEach(b => { b.onclick = () => {
+    const k = b.dataset.nativePick, reload = (k === 'en') !== uiEn();
+    try { localStorage.setItem('dojo-ui', k); sessionStorage.setItem('dojo-wn', k); } catch (e) { /* 忽略 */ }
+    welcomeNative = k; welcomeLang = null;
+    if (k === 'zh' && S.track === 'zh') S.track = 'ja';   // 中文母语不学中文
+    if (reload) location.reload(); else render();   // 英语界面的对照表在打开时加载（boot.js）
+  }; });
+  return p;
+}
 const LANG_START = {
   // 英语：CEFR 级别。[级别, 徽章, 中文标题, 中文说明, 日文标题, 日文说明]（学英语的人可能说中文，也可能说日语）
   en: [['A1', 'A1', '入门', '从最常用的词和简单句开始', '入門', '基本の単語と簡単な文から'], ['A2', 'A2', '初级', '能应付日常简单对话', '初級', '日常の簡単な会話ができる'],
     ['B1', 'B1', '中级', '能读懂日常文章，旅行没问题', '中級', '日常の文章が読める・旅行で困らない'], ['B2', 'B2', '中高级', '能看新闻、在工作中使用', '中上級', 'ニュースや仕事で使える'], ['C1', 'C1', '高级', '复杂的内容也能流利表达', '上級', '複雑な内容も流暢に']],
   // 中国語：学的人是日本用户，说明文字用日语
-  zh: [['pinyin', 'pīn', 'はじめて', 'ピンインと声調から'], ['HSK1', 'HSK1', '入門', '基本の単語とあいさつから'], ['HSK3', 'HSK3', '初級', '日常会話ができる'], ['HSK5', 'HSK5', '中上級', 'ニュースや文章を読みたい']]
+  zh: [['pinyin', 'pīn', 'はじめて', 'ピンインと声調から', 'Total beginner', 'Start with pinyin and the four tones'], ['HSK1', 'HSK1', '入門', '基本の単語とあいさつから', 'Beginner', 'Basic words and greetings'], ['HSK3', 'HSK3', '初級', '日常会話ができる', 'Elementary', 'I can hold everyday conversations'], ['HSK5', 'HSK5', '中上級', 'ニュースや文章を読みたい', 'Upper intermediate', 'I want to read the news and longer texts']]
 };
 function viewWelcome() {
+  if (!welcomeNative && !welcomeLang) return main.append(welcomeNativePage());   // 第一步：先选母语
   let pick = null, goal = S.goal;
-  const L = welcomeLang, J = L === 'zh' || (L === 'en' && uiJa());   // 界面用日语：选了「中国語」（用户是日本人），或说日语的人选了英语
-  const JA = J || (!L && uiJa());   // 还没选：按手机语言（或注册页选的界面语言）显示
-  const langCards = JA
-    ? [['ja', '日本語', '日本語', '中国語話者向け：五十音・JLPT N5〜N1'], ['zh', '中文', '中国語', '日本語で学ぶ中国語：ピンイン・HSK 1〜6級・読み物'], ['en', 'English', '英語', '日本語の解説つき：単語・文法・読む・聴く（CEFR A1〜C1）']]
-    : [['ja', '日本語', '日语', '五十音、JLPT N5–N1、阅读、听力、商务日语'], ['zh', '中文', '中国語', '日本語で学ぶ中国語：ピンイン・HSK 1〜6級・読み物'], ['en', 'English', '英语', '中文讲解：单词、语法、阅读、听力（CEFR A1–C1）']];
-  const goals = J ? [[30, 'ゆったり · 約5分'], [50, '標準 · 約10分'], [100, 'しっかり · 約20分']] : [[30, '轻松 · 约 5 分钟'], [50, '标准 · 约 10 分钟'], [100, '认真 · 约 20 分钟']];
+  const E = uiEn();   // 英语母语的用户（EN_UI_OPEN 打开以后才会出现）：日语、中文都用英语界面学
+  const L = welcomeLang, J = !E && (L === 'zh' || (L === 'en' && uiJa()));   // 界面用日语：选了「中国語」（用户是日本人），或说日语的人选了英语
+  const JA = J || (!E && !L && uiJa());   // 还没选：按手机语言（或注册页选的界面语言）显示
+  const langCards = E
+    ? [['ja', '日本語', 'Japanese', 'Hiragana & katakana, JLPT N5–N1, reading, listening'], ['zh', '中文', 'Chinese', 'Pinyin & tones, HSK 1–6, reading, listening']]
+    : JA
+    ? [['zh', '中文', '中国語', '日本語で学ぶ中国語：ピンイン・HSK 1〜6級・読み物'], ['en', 'English', '英語', '日本語の解説つき：単語・文法・読む・聴く（CEFR A1〜C1）']]   // 日语母语：学中文、学英语
+    : [['ja', '日本語', '日语', '五十音、JLPT N5–N1、阅读、听力、商务日语'], ['en', 'English', '英语', '中文讲解：单词、语法、阅读、听力（CEFR A1–C1）']];   // 中文母语：学日语、学英语
+  const goals = E ? [[30, 'Light · about 5 min'], [50, 'Regular · about 10 min'], [100, 'Serious · about 20 min']] : J ? [[30, 'ゆったり · 約5分'], [50, '標準 · 約10分'], [100, 'しっかり · 約20分']] : [[30, '轻松 · 约 5 分钟'], [50, '标准 · 约 10 分钟'], [100, '认真 · 约 20 分钟']];
+  // 第一步选的母语（可以回去改）
+  const natName = E ? 'English' : JA ? '日本語' : '中文';
+  const uiSw = `<p class="small muted welcome-nat">${E ? 'Native language' : JA ? '母語' : '母语'}：<b data-noen>${natName}</b> · <a href="#" data-native-change>${E ? 'Change' : JA ? '変更' : '更改'}</a></p>`;
   const p = h(`<section class="panel welcome">
-    <div class="welcome-hi">${mascotDuo('happy', 'big')}<div class="bubble"><b>ようこそ！ 欢迎！</b><span>${L ? (J ? '今のレベルを教えてください。今日の学習メニューを用意します。' : '再告诉我你的水平，我帮你安排今天学什么。') : JA ? '学びたい言語を選んでください。あとから上部でいつでも切り替えられます。' : '欢迎！先选一门你想学的语言，以后随时可以在顶部切换。'}</span></div></div>
-    <h2>${JA ? '学びたい言語は？' : '想学哪种语言？'}</h2>
-    ${L ? '' : JA ? '<p class="small muted" lang="zh-CN">想学日语的中文用户，请选「日语」。</p>' : '<p class="small muted" lang="ja">中国語を学びたい方は「中国語」を選んでください。</p>'}
-    <div class="lvl-opts">${langCards.map(([k, n, zh, d]) => `<button type="button" class="lvl-opt ${L === k ? 'on' : ''}" data-lang-pick="${k}"><span class="lvl-badge" ${k === 'zh' ? 'lang="zh-CN"' : ''}>${n}</span><b ${k === 'zh' || J ? 'lang="ja"' : ''}>${zh}</b><span class="small muted" ${k === 'zh' || J ? 'lang="ja"' : ''}>${d}</span></button>`).join('')}</div>
-    ${!L ? '' : L === 'ja' ? `<h2>你现在的日语水平？</h2>
-    <div class="lvl-opts">${START_OPTS.map(o => `<button type="button" class="lvl-opt" data-pick="${o[0]}"><span class="lvl-badge" lang="ja">${o[1]}</span><b>${o[2]}</b><span class="small muted">${o[3]}</span></button>`).join('')}</div>
-    <button type="button" class="btn soft" data-place>不确定？做个 2 分钟分级小测试</button>`
-    : `<h2>${L === 'zh' ? '今の中国語レベルは？' : J ? '今の英語レベルは？' : '你现在的英语水平？'}</h2>
-    <div class="lvl-opts">${LANG_START[L].map(o => `<button type="button" class="lvl-opt" data-pick="${o[0]}"><span class="lvl-badge">${o[1]}</span><b>${L === 'en' && J ? o[4] : o[2]}</b><span class="small muted">${L === 'en' && J ? o[5] : o[3]}</span></button>`).join('')}</div>${L === 'zh' ? '<button type="button" class="btn soft" data-zhplace>わからない場合は 2 分のレベル診断へ</button>' : L === 'en' ? `<button type="button" class="btn soft" data-enplace>${J ? 'わからない場合は 3 分のレベル診断へ' : '不确定？做个 3 分钟分级测试'}</button>` : ''}`}
-    ${L ? `<h2>${J ? '1日にどれくらい学びますか？' : '每天想学多少？'}</h2>
+    ${uiSw}<div class="welcome-hi">${mascotDuo('happy', 'big')}<div class="bubble"><b>${E ? 'Welcome!' : JA ? 'ようこそ！' : '欢迎！'}</b><span>${E ? (L ? 'Tell me your level and I\'ll plan what to study today.' : 'Pick a language to learn. You can switch any time at the top.') : L ? (J ? '今のレベルを教えてください。今日の学習メニューを用意します。' : '再告诉我你的水平，我帮你安排今天学什么。') : JA ? '学びたい言語を選んでください。あとから上部でいつでも切り替えられます。' : '欢迎！先选一门你想学的语言，以后随时可以在顶部切换。'}</span></div></div>
+    <h2>${E ? 'Which language do you want to learn?' : JA ? '学びたい言語は？' : '想学哪种语言？'}</h2>
+    <div class="lvl-opts">${langCards.map(([k, n, zh, d]) => `<button type="button" class="lvl-opt ${L === k ? 'on' : ''}" data-lang-pick="${k}"><span class="lvl-badge" ${k === 'zh' ? 'lang="zh-CN"' : ''} data-noen>${n}</span><b ${k === 'zh' || J ? 'lang="ja"' : ''}>${zh}</b><span class="small muted" ${k === 'zh' || J ? 'lang="ja"' : ''}>${d}</span></button>`).join('')}</div>
+    ${!L ? '' : L === 'ja' ? `<h2>${E ? 'How much Japanese do you know?' : '你现在的日语水平？'}</h2>
+    <div class="lvl-opts">${START_OPTS.map(o => `<button type="button" class="lvl-opt" data-pick="${o[0]}"><span class="lvl-badge" lang="ja">${o[1]}</span><b>${E ? o[4] : o[2]}</b><span class="small muted">${E ? o[5] : o[3]}</span></button>`).join('')}</div>
+    <button type="button" class="btn soft" data-place>${E ? 'Not sure? Take a 2-minute placement test' : '不确定？做个 2 分钟分级小测试'}</button>`
+    : `<h2>${E ? 'How much Chinese do you know?' : L === 'zh' ? '今の中国語レベルは？' : J ? '今の英語レベルは？' : '你现在的英语水平？'}</h2>
+    <div class="lvl-opts">${LANG_START[L].map(o => `<button type="button" class="lvl-opt" data-pick="${o[0]}"><span class="lvl-badge">${o[1]}</span><b>${(L === 'en' && J) || (L === 'zh' && E) ? o[4] : o[2]}</b><span class="small muted">${(L === 'en' && J) || (L === 'zh' && E) ? o[5] : o[3]}</span></button>`).join('')}</div>${L === 'zh' ? `<button type="button" class="btn soft" data-zhplace>${E ? 'Not sure? Take a 2-minute placement test' : 'わからない場合は 2 分のレベル診断へ'}</button>` : L === 'en' ? `<button type="button" class="btn soft" data-enplace>${J ? 'わからない場合は 3 分のレベル診断へ' : '不确定？做个 3 分钟分级测试'}</button>` : ''}`}
+    ${L ? `<h2>${E ? 'How much do you want to study each day?' : J ? '1日にどれくらい学びますか？' : '每天想学多少？'}</h2>
     <div class="seg" data-goals>${goals.map(([v, t]) => `<button type="button" data-goal="${v}">${t}</button>`).join('')}</div>
-    <div class="row"><button type="button" class="btn pri big" data-start disabled>${J ? '学習をはじめる' : '开始学习'}</button><a class="btn ghost" href="#me">${J ? 'アカウントやバックアップから進み具合を復元' : '我有账号或备份，去恢复进度'}</a></div>` : ''}
+    <div class="row"><button type="button" class="btn pri big" data-start disabled>${E ? 'Start learning' : J ? '学習をはじめる' : '开始学习'}</button><a class="btn ghost" href="#me">${E ? 'Restore progress from an account or backup' : J ? 'アカウントやバックアップから進み具合を復元' : '我有账号或备份，去恢复进度'}</a></div>` : ''}
   </section>`);
+  p.querySelector('[data-native-change]').onclick = e => {   // 回到第一步重新选母语
+    e.preventDefault(); welcomeNative = null; welcomeLang = null;
+    try { sessionStorage.removeItem('dojo-wn'); } catch (err) { /* 忽略 */ }
+    render();
+  };
   p.querySelectorAll('[data-lang-pick]').forEach(b => {
     b.onclick = () => {
       welcomeLang = b.dataset.langPick;
-      // 学中文＝日本用户，界面日语；学日语＝中文界面；学英语：界面不变（按手机语言，说中文、说日语的人都有）
-      try {
-        if (welcomeUiOrig === undefined) welcomeUiOrig = localStorage.getItem('dojo-ui');   // 进欢迎页之前的界面语言（注册页选的，或没选）
-        if (welcomeLang !== 'en') localStorage.setItem('dojo-ui', welcomeLang === 'zh' ? 'ja' : 'zh');
-        else if (welcomeUiOrig == null) localStorage.removeItem('dojo-ui'); else localStorage.setItem('dojo-ui', welcomeUiOrig);   // 先点了别的再改选英语：回到原来的（按手机语言）
-      } catch (e) { /* 忽略 */ }
-      // 选了中国語就先把界面切成日语（「我的」恢复进度等页面也跟着变）；改选别的语言再切回来。只改内存，不保存
+      if (E) { S.native = 'en'; S.track = welcomeLang; render(); return; }   // 英语母语：界面一直用英语，只记下要学的语言
+      // 界面语言已经由母语决定（dojo-ui）；学中文时 track 先切到 zh（「我的」等页面跟着用日语）。只改内存，不保存
       if (welcomeLang === 'zh') S.track = 'zh'; else if (S.track === 'zh') S.track = 'ja';
       render();
     };
@@ -1237,7 +1311,16 @@ const needBackup = () => S.xp >= 150 && (S.xp - S.lastBackupXp >= 300 || (S.last
 const dailyOff = 0;
 const LEAP_MONTHS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const dailySlot = d => LEAP_MONTHS.slice(0, d.getMonth()).reduce((a, b) => a + b, 0) + d.getDate() - 1;
+// 今日一句的英文版（en/ja-daily.js：{ 日语原文: [意思, 解说, 例句译文, 类别] }）：英语母语的用户把中文的意思、解说、译文、类别直接换掉
+// （DAILY 可能是后加载的：启动时、每个脚本加载完、用到今日一句时都调用一次，换过就不再换）
+function enDailyApply() {
+  if (enDailyApply.done || typeof DAILY === 'undefined' || typeof EN_JA_DAILY === 'undefined' || !(typeof uiEn === 'function' && uiEn())) return;
+  DAILY.forEach(r => { const e = EN_JA_DAILY[r[0]]; if (e) { r[2] = e[0] || r[2]; r[3] = e[1] || r[3]; r[6] = e[2] || r[6]; r[7] = e[3] || r[7]; } });
+  enDailyApply.done = true;
+}
+enDailyApply();
 function dailyCard() {
+  enDailyApply();
   const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + dailyOff);
   if (typeof DAILY === 'undefined' || !DAILY.length) {
     const pv = PROVERBS[Math.floor(startOfToday() / DAY) % PROVERBS.length];
@@ -1272,7 +1355,7 @@ function viewHome() {
   const top = [];
   const after = [];
   const ta = typeof todayArticle === 'function' && todayArticle();
-  if (ta && !(S.read || {})[ta.id]) top.push(h(`<a class="today-art" href="#read/${ta.id}"><div class="ta-img">${artImg(ta)}</div><div><span class="tag done">今日上新</span> <span class="tag lv">${ta.L}</span><div class="rc-title furi" lang="ja">${jr(ta.title)}</div><div class="small muted">${esc(ta.zh)} · 日本生活阅读，每天一篇</div></div></a>`));
+  if (ta && !(S.read || {})[ta.id]) top.push(h(`<a class="today-art" href="#read/${ta.id}"><div class="ta-img">${artImg(ta)}</div><div><span class="tag done">今日上新</span> <span class="tag lv">${ta.L}</span><div class="rc-title furi" lang="ja">${jr(ta.title)}</div><div class="small muted">${esc(ta.zh)} · ${tz('日本生活阅读，每天一篇', 'Life in Japan · a new article every day')}</div></div></a>`));
   if (typeof buddyStrip === 'function') after.push(buddyStrip());   // 学习伙伴今天的情况
   top.push(dailyCard());
   const wc = typeof weekCard === 'function' && weekCard(); if (wc) after.unshift(wc);   // 本周精选放在今日任务下面（任务先出现在第一屏）   // 本周精选（每周一换新）
@@ -1306,7 +1389,7 @@ function viewHome() {
 function homeBanners() {
   const banners = [];
   if (!isStandalone() && !window.DOJO_APP && S.xp >= 30 && !S.installHint) {
-    const ib = h(`<section class="banner"><div><b>${tje('把猫先生装到手机上', '猫先生をホーム画面に追加', 'Add 猫先生 to your home screen')}</b><div class="small">${tje('像 App 一样从主屏幕打开，没有网络也能学。', 'アプリのようにホーム画面から開けて、オフラインでも学習できます。', 'Open it like an app, and keep studying offline.')}</div></div><div class="row"><button class="btn pri" type="button" data-i>${tje('安装', '追加する', 'Install')}</button><button class="btn ghost" type="button" data-x>${tje('不用了', '今はしない', 'Not now')}</button></div></section>`);
+    const ib = h(`<section class="banner"><div><b>${tje('把猫先生装到手机上', '猫先生をホーム画面に追加', 'Add Neko Sensei to your home screen')}</b><div class="small">${tje('像 App 一样从主屏幕打开，没有网络也能学。', 'アプリのようにホーム画面から開けて、オフラインでも学習できます。', 'Open it like an app, and keep studying offline.')}</div></div><div class="row"><button class="btn pri" type="button" data-i>${tje('安装', '追加する', 'Install')}</button><button class="btn ghost" type="button" data-x>${tje('不用了', '今はしない', 'Not now')}</button></div></section>`);
     ib.querySelector('[data-i]').onclick = e => { e.stopPropagation(); doInstall(); };
     ib.querySelector('[data-x]').onclick = () => { S.installHint = 1; save(); ib.remove(); };
     banners.push(ib);
@@ -1453,7 +1536,7 @@ function viewVocab() {
     </div>
     <button class="btn pri big vk-main" type="button" data-study ${due + nl ? '' : 'disabled'}>背单词（复习 ${due} + 新词 ${nl}）</button>
     <div class="vk-two"><button class="btn" type="button" data-quiz>单词测验 10 题</button><button class="btn demon-btn" type="button" data-demon>😈 魔鬼挑战</button></div>
-    <details class="vk-help"><summary>单词卡怎么用 · 导出到 Anki</summary><p class="small muted">单词卡和 Anki 一样用间隔重复：记得越牢，下次出现越晚。看完答案后按「重来 / 困难 / 记得 / 简单」评分，键盘可用 1–4。阅读时点生词，也能「+ 单词卡」。习惯用 Anki 的话，可以把学过和加入的单词导出，在 Anki 里「文件 → 导入」。</p><button class="btn ghost" type="button" data-anki>导出到 Anki</button></details>
+    <details class="vk-help"><summary>${tz('单词卡怎么用 · 导出到 Anki', 'How flashcards work · Export to Anki')}</summary><p class="small muted">${tz('单词卡和 Anki 一样用间隔重复：记得越牢，下次出现越晚。看完答案后按「重来 / 困难 / 记得 / 简单」评分，键盘可用 1–4。阅读时点生词，也能「+ 单词卡」。习惯用 Anki 的话，可以把学过和加入的单词导出，在 Anki 里「文件 → 导入」。', 'Flashcards use spaced repetition, just like Anki: the better you remember a word, the later it comes back. After seeing the answer, rate it Again / Hard / Good / Easy (keys 1–4 work too). While reading, tap an unknown word to add it with "+ Flashcard". If you use Anki, you can export the words you have studied or added and import them in Anki with File → Import.')}</p><button class="btn ghost" type="button" data-anki>${tz('导出到 Anki', 'Export to Anki')}</button></details>
   </section>`);
   bindLevel(top);
   top.querySelector('[data-anki]').onclick = exportAnki;
@@ -1559,7 +1642,7 @@ function viewGrammar() {
     <div class="row between"><h2>语法 · ${L}</h2>${levelSeg(L)}</div>
     <div class="row"><button class="btn pri" type="button" data-quiz>${GRAM[L].some(g => g.eg.length) ? '语法填空 8 题' : '句型意思 8 题'}</button><button class="btn" type="button" data-gcards>${gIn ? `语法卡复习（到期 ${gDue.length}）` : '把本级语法加入复习卡'}</button></div>
     <p class="small muted">${GRAM[L].some(g => g.eg.length) ? '每个句型都有例句，点开看接续和例句。' : '点开看接续。'}加入复习的句型会按遗忘曲线安排复习，填空答错的也会自动加入。</p>
-    <div style="display:grid;gap:8px">${GRAM[L].map(g => `<details class="gp"><summary><span class="pat" lang="ja">${esc(g.p)}</span><span class="muted">${esc(g.m)}</span>${typeof favBtn === 'function' ? favBtn('g', g.p, g.m, 'ja') : ''}</summary>
+    <div class="gp-list">${GRAM[L].map(g => `<details class="gp"><summary><span class="pat" lang="ja">${esc(g.p)}</span><span class="muted">${esc(g.m)}</span>${typeof favBtn === 'function' ? favBtn('g', g.p, g.m, 'ja') : ''}</summary>
       <div class="gp-body"><div class="row between"><div><span class="small muted">接续</span>　${jrNote(g.how)}</div><button type="button" class="chip-btn" data-gadd="${esc(g.id)}">${S.srs[g.id] ? '已在复习' : '+ 加入复习'}</button></div>
       ${g.eg.map(e => `<div class="ex"><div style="flex:1;min-width:0"><div class="jp furi jtap" lang="ja">${jaTapHTML(e.full, e.furi, e.at, e.at + e.frag.length)}</div><div class="small muted">${esc(e.t)}</div></div>${exSpeakBtn(e.kana)}</div>`).join('')}${['N3', 'N2', 'N1'].includes(g.L) && !isMember('ja') ? `<p class="small muted">${vipTag('inl')} ${tj('这个句型的例句和配音是会员内容', 'この文型の例文と音声はメンバー向けです')} <a href="#vip">${tj('了解会员', 'メンバーについて')} ›</a></p>` : ''}</div></details>`).join('')}</div>
   </section>`);
@@ -1674,7 +1757,7 @@ function viewExam() {
       </section>`);
       bindLevel(p);
       main.append(p);
-      if (member) jlptMember().then(ok => { if (p.isConnected) { if (ok) render(); else p.querySelector('.skel').outerHTML = '<p class="muted">暂时打不开，请检查网络后再试。</p>'; } });
+      if (member) jlptMember().then(ok => { if (p.isConnected) { if (ok) render(); else p.querySelector('.skel').outerHTML = `<p class="muted">${tz('暂时打不开，请检查网络后再试。', 'Could not load. Please check your connection and try again.')}</p>`; } });
       return;
     }
   }
@@ -1719,10 +1802,11 @@ function viewMe(sec) {
   const opt = (arr, cur, attr) => arr.map(([v, t]) => `<button type="button" ${attr}="${v}" class="${String(cur) === String(v) ? 'on' : ''}">${t}</button>`).join('');
   const J = uiJa(), onOff = [[1, tj('开', 'オン')], [0, tj('关', 'オフ')]];
   const p = h(`<section class="panel"><h2>${tj('学习设置', '学習設定')}</h2>
-    <div class="row between"><span>${tj('正在学', '学習中の言語')}</span><div class="seg">${Object.entries(TRACKS).map(([k, t]) => `<button type="button" data-trk-set="${k}" class="${(S.track || 'ja') === k ? 'on' : ''}">${t.name}</button>`).join('')}</div></div>
+    <div class="row between"><span>${tj('正在学', '学習中の言語')}</span><div class="seg">${Object.entries(TRACKS).filter(([k]) => k !== nativeLang()).map(([k, t]) => `<button type="button" data-trk-set="${k}" class="${(S.track || 'ja') === k ? 'on' : ''}">${t.name}</button>`).join('')}</div></div>
     ${(S.track || 'ja') === 'ja' ? `<div class="row between"><span>日语目标级别</span>${levelSeg(S.level)}</div>` : ''}
     ${S.track === 'zh' ? `<div class="row between"><span>目標の級</span><div class="seg read-lv">${opt(ZH_LEVELS.map(([L]) => [L, L]), zhLevel(), 'data-zlv')}</div></div>` : ''}
     ${S.track === 'en' ? `<div class="row between"><span>${tj('解释的语言', '解説の言語')}</span><div class="seg">${opt([['zh', '中文'], ['ja', '日本語']], S.enNative || 'zh', 'data-enat')}</div></div>` : ''}
+    ${S.track !== 'en' && enUiOpen() ? `<div class="row between"><span>${tj('界面和讲解的语言', '画面と解説の言語', 'Interface language')}</span><div class="seg">${opt([[S.track === 'zh' ? 'ja' : 'zh', S.track === 'zh' ? '日本語' : '中文'], ['en', 'English']], S.native === 'en' ? 'en' : S.track === 'zh' ? 'ja' : 'zh', 'data-native')}</div></div>` : ''}
     ${S.track === 'en' ? `<div class="row between"><span>${tj('英语目标级别', '英語の目標レベル')}</span><div class="seg read-lv">${opt(EN_LV.map(L => [L, L]), enLevel(), 'data-elv')}</div></div>` : ''}
     <div class="row between"><span>${tj('每日经验目标', '1日の目標 XP')}</span><div class="seg">${opt(J ? [[30, '30 ゆったり'], [50, '50 標準'], [100, '100 しっかり'], [200, '200 猛特訓']] : [[30, '30 轻松'], [50, '50 标准'], [100, '100 认真'], [200, '200 冲刺']], S.goal, 'data-goal')}</div></div>
     <div class="row between"><span>${tj('每天新单词', '1日の新しい単語')}</span><div class="seg">${opt([[5, '5'], [10, '10'], [20, '20'], [30, '30']], S.newPerDay, 'data-new')}</div></div>
@@ -1742,6 +1826,8 @@ function viewMe(sec) {
   // 中文・英語のレベルと表示設定（各ページのボタンと同じ値を変える）
   p.querySelectorAll('[data-zlv]').forEach(b => { b.onclick = () => { S.zhLevel = b.dataset.zlv; save(); render(); }; });
   p.querySelectorAll('[data-enat]').forEach(b => { b.onclick = () => { S.enNative = b.dataset.enat; save(); applyTrack('en'); render(); }; });
+  // 换界面语言：英文版的界面对照表和内容要在打开时加载（boot.js），所以保存后重新打开页面
+  p.querySelectorAll('[data-native]').forEach(b => { b.onclick = () => { if (b.dataset.native === 'en') S.native = 'en'; else delete S.native; save(); location.reload(); }; });
   p.querySelectorAll('[data-elv]').forEach(b => { b.onclick = () => { S.enLevel = b.dataset.elv; save(); render(); }; });
   p.querySelectorAll('[data-zpy]').forEach(b => { b.onclick = () => { S.zhShow = Object.assign({ py: true, ja: true }, S.zhShow, { py: b.dataset.zpy === '1' }); save(); render(); }; });
   p.querySelectorAll('[data-zja]').forEach(b => { b.onclick = () => { S.zhShow = Object.assign({ py: true, ja: true }, S.zhShow, { ja: b.dataset.zja === '1' }); save(); render(); }; });
@@ -1855,6 +1941,21 @@ function viewMe(sec) {
 // 内容来源和授权（只从页脚的小链接进入；VOICEVOX 和 CC BY / CC BY-SA 的素材要求注明出处）
 function viewAbout() {
   main.append(h(`<a class="an-back me-back" href="#me">← ${tj('我的', 'マイページ')}</a>`));
+  // 英语母语的用户（学日语、学中文）看到英语版
+  if (uiEn()) return main.append(h(`<section class="panel"><h2>Content sources</h2>
+    <h3>Japanese</h3>
+    <p class="small">Vocabulary, kanji and grammar cover JLPT N5–N1, plus reading articles ("Life in Japan" adds a new one every day), business Japanese, listening and mock exams. Meanings, example sentences, articles and questions are written by this site and have not been professionally reviewed; for exam preparation, please use them together with official past papers and textbooks.</p>
+    <p class="small muted">Data sources: word lists <a href="https://github.com/jamsinclair/open-anki-jlpt-decks" target="_blank" rel="noopener">open-anki-jlpt-decks</a> (MIT), based on <a href="http://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller's JLPT resources</a> (CC BY); kanji <a href="https://github.com/davidluzgouveia/kanji-data" target="_blank" rel="noopener">kanji-data</a> (MIT) and KANJIDIC; dictionary English definitions <a href="https://www.edrdg.org/jmdict/j_jmdict.html" target="_blank" rel="noopener">JMdict</a> (EDRDG, CC BY-SA 4.0).</p>
+    <p class="small muted">Voices: <a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>:冥鳴ひまり (<a href="https://meimeihimari.wixsite.com/himari/terms-of-use" target="_blank" rel="noopener">terms of use</a>), VOICEVOX:剣崎雌雄; listening and scenario courses also use VOICEVOX:春日部つむぎ, VOICEVOX:九州そら, VOICEVOX:雀松朱司, VOICEVOX:玄野武宏, VOICEVOX:小夜/SAYO, VOICEVOX:WhiteCUL, VOICEVOX:四国めたん, VOICEVOX:白上虎太郎 and VOICEVOX:麒ヶ島宗麟.</p>
+    <p class="small muted">Japanese example sentences marked "Tatoeba" come from <a href="https://tatoeba.org" target="_blank" rel="noopener">Tatoeba</a> (CC BY 2.0 FR), translated by volunteers.</p>
+    <p class="small muted">Kanji stroke-order animations: <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> (Ulrich Apel, CC BY-SA 3.0). Pitch accent: <a href="https://github.com/mifunetoshiro/kanjium" target="_blank" rel="noopener">Kanjium</a> (CC BY-SA 4.0): The pitch accent notation was provided by Uros O. through his free database.</p>
+    <p class="small muted">Photos in the reading articles come from <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a> under free licenses (CC0 / public domain / CC BY / CC BY-SA); the author and license are shown under each photo.</p>
+    <h3>Chinese</h3>
+    <p class="small">HSK levels 1–6 (HSK 2.0) vocabulary, reading, scenario dialogues and pinyin and tone training. Meanings, example sentences, study notes, readings and dialogues are original to this site. Pinyin is added automatically with <a href="https://github.com/mozillazg/python-pinyin" target="_blank" rel="noopener">pypinyin</a> (MIT), so a reading may occasionally be wrong (please tell us through Feedback if you notice one).</p>
+    <p class="small muted">Data sources: HSK word lists <a href="https://github.com/drkameleon/complete-hsk-vocabulary" target="_blank" rel="noopener">complete-hsk-vocabulary</a> (MIT); English definitions <a href="https://www.mdbg.net/chinese/dictionary?page=cc-cedict" target="_blank" rel="noopener">CC-CEDICT</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>). Classical poems are public-domain works from the Tang and Song dynasties.</p>
+    <p class="small muted">Stroke order and handwriting practice: <a href="https://github.com/chanind/hanzi-writer" target="_blank" rel="noopener">Hanzi Writer</a> (MIT); character data <a href="https://github.com/skishore/makemeahanzi" target="_blank" rel="noopener">Make Me a Hanzi</a> (<a href="vendor/hanzi/ARPHICPL.TXT" target="_blank" rel="noopener">Arphic Public License</a>). Chinese audio is generated with <a href="https://github.com/myshell-ai/MeloTTS" target="_blank" rel="noopener">MeloTTS</a> (MIT).</p>
+    <p class="small muted">Invite QR codes: <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a> (MIT; QR Code is a registered trademark of DENSO WAVE).</p>
+  </section>`));
   // 学中文的日本用户看到的是日语版（出处和授权的名称保持原样）
   if (uiJa()) return main.append(h(`<section class="panel"><h2>コンテンツの出典</h2>
     <h3>中国語（日本語話者向け）</h3>
@@ -2043,7 +2144,13 @@ const EX_MEMBER_LV = ['N3', 'N2', 'N1'];   // 这几级的例句是会员内容
 // N3–N1 的例句是会员内容（member.js 从服务器取；网站上的文件是空的）
 function exFetch(L) {
   const path = `lang/ja-ex-${L}.json`;
-  return (EX_MEMBER_LV.includes(L) && typeof memberJson === 'function' ? memberJson('ja', path) : fetch(path).then(r => r.ok ? r.json() : {})).catch(() => ({}));
+  const get = p => (EX_MEMBER_LV.includes(L) && typeof memberJson === 'function' ? memberJson('ja', p) : fetch(p).then(r => r.ok ? r.json() : {})).catch(() => ({}));
+  if (!(typeof uiEn === 'function' && uiEn())) return get(path);
+  // 英语母语的用户：同时取英文译文（en/ja-ex-N5.json：{ 单词: { 日语原句: 英文 } }），换掉中文译文
+  return Promise.all([get(path), get(`en/ja-ex-${L}.json`)]).then(([d, en]) => {
+    for (const [w, rows] of Object.entries(d)) rows.forEach(x => { const t = en && en[w] && en[w][x[0]]; if (t) x[2] = t; });
+    return d;
+  });
 }
 // 会员身份变了（member.js 调用）：N3–N1 的例句重新加载（成为会员时加上，到期时去掉）
 function exMemberReload() {

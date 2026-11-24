@@ -2,7 +2,7 @@
 // 两人同一天都完成今日目标就累计「一起打卡」天数（7 / 30 / 100 天有纪念）。
 // 只公开昵称和这几个数字。数据库表和函数见 docs/SUPABASE_SETUP.md 第 13 节，没建表时整个功能不显示。
 let buddyCache = null, buddyLast = 0, buddyReady = null;   // buddyReady：null 还不知道，true / false 后台有没有建表
-const BUDDY_MILES = () => [[100, tj('百日之约', '100 日の約束')], [30, tj('一月同行', '1 か月いっしょ')], [7, tj('一周同行', '1 週間いっしょ')]];
+const BUDDY_MILES = () => [[100, tj('百日之约', '100 日の約束', '100-day promise')], [30, tj('一月同行', '1 か月いっしょ', 'One month together')], [7, tj('一周同行', '1 週間いっしょ', 'One week together')]];
 const buddyNick = () => typeof duelNick === 'function' ? duelNick() : (S.duelNick || tj('学习者', '学習者'));
 
 // 学习时（cloudPush 之后）更新自己的状态，最多两分钟一次
@@ -51,8 +51,8 @@ function chalBlock(list, max = 8) {
   const box = h(`<div class="buddy-list chal-list">${rows.map(c => {
     const done = c.to_score != null, me = c.mine ? c.from_score : c.to_score, them = c.mine ? c.to_score : c.from_score;
     const res = !done ? '' : me > them ? `<span class="tag done">${tj('赢了', '勝ち')}</span>` : me === them ? `<span class="tag">${tj('平手', '引き分け')}</span>` : `<span class="tag lose">${tj('输了', '負け')}</span>`;
-    const line = !done ? (c.mine ? tj(`你 ${c.from_score} 分 · 等对方来做`, `あなた ${c.from_score} 点 · 相手の挑戦待ち`) : tj(`对方 ${c.from_score} 分 · ${esc(c.lv)} · 10 题`, `相手 ${c.from_score} 点 · ${esc(c.lv)} · 10 問`)) : tj(`你 ${me} : ${them} ${esc(c.nickname)} · ${esc(c.lv)}`, `あなた ${me} : ${them} ${esc(c.nickname)} · ${esc(c.lv)}`);
-    return `<div class="buddy-row"><span class="buddy-st" aria-hidden="true">⚔</span><div class="buddy-n"><b>${c.mine ? tj(`挑战 ${esc(c.nickname)}`, `${esc(c.nickname)} さんへの挑戦`) : tj(`${esc(c.nickname)} 的挑战`, `${esc(c.nickname)} さんからの挑戦`)} ${res}</b><span class="small muted">${line}</span></div>
+    const line = !done ? (c.mine ? tj(`你 ${c.from_score} 分 · 等对方来做`, `あなた ${c.from_score} 点 · 相手の挑戦待ち`, `You scored ${c.from_score} · waiting for them`) : tj(`对方 ${c.from_score} 分 · ${esc(c.lv)} · 10 题`, `相手 ${c.from_score} 点 · ${esc(c.lv)} · 10 問`, `They scored ${c.from_score} · ${esc(c.lv)} · 10 questions`)) : tj(`你 ${me} : ${them} ${esc(c.nickname)} · ${esc(c.lv)}`, `あなた ${me} : ${them} ${esc(c.nickname)} · ${esc(c.lv)}`, `You ${me} : ${them} ${esc(c.nickname)} · ${esc(c.lv)}`);
+    return `<div class="buddy-row"><span class="buddy-st" aria-hidden="true">⚔</span><div class="buddy-n"><b>${c.mine ? tj(`挑战 ${esc(c.nickname)}`, `${esc(c.nickname)} さんへの挑戦`, `Challenge to ${esc(c.nickname)}`) : tj(`${esc(c.nickname)} 的挑战`, `${esc(c.nickname)} さんからの挑戦`, `Challenge from ${esc(c.nickname)}`)} ${res}</b><span class="small muted">${line}</span></div>
       ${!done && !c.mine ? `<button class="btn pri" type="button" data-chal="${esc(c.id)}">${tj('接受挑战', '挑戦を受ける')}</button>` : ''}</div>`;
   }).join('')}</div>`);
   box.querySelectorAll('[data-chal]').forEach(b => {
@@ -100,8 +100,8 @@ function buddyPage(list) {
     ${ok.length ? `<div class="buddy-list">${ok.map(b => `<div class="buddy-row ${doneToday(b) ? 'done' : ''}">
       <span class="buddy-st" aria-label="${doneToday(b) ? tj('今天已完成', '今日は達成済み') : tj('今天还没完成', '今日はまだ未達成')}">${doneToday(b) ? '✓' : '·'}</span>
       <div class="buddy-n"><b>${esc(b.nickname)} <span class="buddy-on" data-on="${b.buddy_id}" hidden>${tj('在线', 'オンライン')}</span></b>
-        <span class="small muted">${b.today === today ? tj(`今天 ${b.today_xp} 经验`, `今日 ${b.today_xp} XP`) : tj('今天还没学', '今日はまだ学習していません')} · ${tj(`连续 ${b.streak} 天`, `${b.streak} 日連続`)} · ${tj(`本周 ${b.week_xp}`, `今週 ${b.week_xp}`)}</span>
-        ${b.pair_streak ? `<span class="small buddy-pair">🔥 ${tj(`一起打卡 ${b.pair_streak} 天`, `一緒に達成 ${b.pair_streak} 日`)}${buddyMile(b.pair_streak) ? ` · ${buddyMile(b.pair_streak)}` : ''}</span>` : ''}</div>
+        <span class="small muted">${b.today === today ? tj(`今天 ${b.today_xp} 经验`, `今日 ${b.today_xp} XP`, `${b.today_xp} XP today`) : tj('今天还没学', '今日はまだ学習していません', 'Not studied yet today')} · ${tj(`连续 ${b.streak} 天`, `${b.streak} 日連続`, `${b.streak}-day streak`)} · ${tj(`本周 ${b.week_xp}`, `今週 ${b.week_xp}`, `${b.week_xp} this week`)}</span>
+        ${b.pair_streak ? `<span class="small buddy-pair">🔥 ${tj(`一起打卡 ${b.pair_streak} 天`, `一緒に達成 ${b.pair_streak} 日`, `${b.pair_streak} days together`)}${buddyMile(b.pair_streak) ? ` · ${buddyMile(b.pair_streak)}` : ''}</span>` : ''}</div>
       <button class="btn ${b.poked ? 'ghost' : 'pri'}" type="button" data-poke="${b.buddy_id}" data-kind="${doneToday(b) ? 'cheer' : 'poke'}" ${b.poked ? 'disabled' : ''}>${b.poked ? (doneToday(b) ? tj('已点赞', 'いいね済み') : tj('已戳', 'つつき済み')) : (doneToday(b) ? tj('点赞 👍', 'いいね 👍') : tj('戳一下', 'つつく'))}</button>
       <button class="btn ghost buddy-more" type="button" data-more="${b.buddy_id}" aria-label="${tj('更多', 'その他')}">⋯</button></div>`).join('')}</div>`
       : `<p class="small muted">${tj('还没有伙伴。把你的伙伴码发给朋友，或者输入朋友的伙伴码。', 'まだ仲間がいません。自分の仲間コードを友だちに送るか、友だちのコードを入力しましょう。')}</p>`}
@@ -119,7 +119,7 @@ function buddyPage(list) {
   if (ok.length) chalLoad(true).then(cl => {
     const slot = p.querySelector('[data-chals]');
     if (!slot || !cl) return;
-    slot.append(h(`<h3>${tj('伙伴挑战', '仲間からの挑戦状')}${chalPending(cl).length ? ` <span class="small muted">${tj(`${chalPending(cl).length} 个待接受`, `${chalPending(cl).length} 件が未対応`)}</span>` : ''}</h3>`));
+    slot.append(h(`<h3>${tj('伙伴挑战', '仲間からの挑戦状')}${chalPending(cl).length ? ` <span class="small muted">${tj(`${chalPending(cl).length} 个待接受`, `${chalPending(cl).length} 件が未対応`, `${chalPending(cl).length} waiting`)}</span>` : ''}</h3>`));
     if (cl.length) slot.append(chalBlock(cl));
     else slot.append(h(`<p class="small muted">${tj('在「对战」里打完一局，点「发给伙伴挑战」：伙伴做同一组题，比比谁分高，不用同时在线。', '「対戦」で 1 局終えたら「仲間に挑戦状を送る」をタップ。仲間が同じ問題に挑戦して点数を競えます。同時にオンラインでなくても大丈夫です。')}</p>`));
   }).catch(() => {});
@@ -160,7 +160,7 @@ function buddyPage(list) {
   p.querySelectorAll('[data-more]').forEach(b => {
     b.onclick = async () => {
       const it = ok.find(x => x.buddy_id === b.dataset.more);
-      const act = await askSheet(tj(`和「${it.nickname}」`, `「${it.nickname}」さん`), [['remove', tj('解除伙伴', '仲間を解除')], ['block', tj('拉黑（对方不能再申请你）', 'ブロック（相手からリクエストできなくなります）'), 'danger'], [null, tj('取消', 'キャンセル')]]);
+      const act = await askSheet(tj(`和「${it.nickname}」`, `「${it.nickname}」さん`, `With ${it.nickname}`), [['remove', tj('解除伙伴', '仲間を解除')], ['block', tj('拉黑（对方不能再申请你）', 'ブロック（相手からリクエストできなくなります）'), 'danger'], [null, tj('取消', 'キャンセル')]]);
       if (act === 'remove') rpc('buddy_act', { b: it.buddy_id, act: 'remove' }).then(() => { toast(tj('已解除伙伴', '仲間を解除しました')); reload(); });
       if (act === 'block') rpc('buddy_act', { b: it.buddy_id, act: 'block' }).then(() => { toast(tj('已拉黑', 'ブロックしました')); reload(); });
     };
@@ -184,7 +184,7 @@ function buddyStrip() {
       if (!strip.isConnected) return removeEventListener('online-change', paint);
       const on = window.ONLINE_HASHES || new Set();
       let n = 0; for (const b of ok) if (on.has(await onlineHash(b.buddy_id))) n++;
-      const el = strip.querySelector('[data-n]'); el.hidden = !n; el.textContent = tj(`${n} 人在线`, `${n} 人オンライン`);
+      const el = strip.querySelector('[data-n]'); el.hidden = !n; el.textContent = tj(`${n} 人在线`, `${n} 人オンライン`, `${n} online`);
     };
     addEventListener('online-change', paint);
     if (typeof onlineHash === 'function') paint();

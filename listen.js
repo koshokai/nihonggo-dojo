@@ -103,7 +103,7 @@ function lsMember() {
   if (!want && LS_MEMBER) { for (const L in LISTEN) LISTEN[L] = LISTEN[L].filter(x => !x.m); LS_MEMBER = false; }
   if (!want || LS_MEMBER || lsMemLoading) return;
   lsMemLoading = true;
-  memberData('ja', 'listening-member.json').then(d => {
+  memberData('ja', 'listening-member.json').then(d => enApply('ja', 'listening-member.json', 'listen', d)).then(d => {
     lsMemLoading = false;
     if (!d) return;
     for (const L in d) { const have = new Set((LISTEN[L] || []).map(x => x.id)); LISTEN[L] = (LISTEN[L] || []).concat(d[L].filter(x => !have.has(x.id))); }
@@ -121,7 +121,7 @@ function viewListen() {
       s.src = 'listening.js';
       s.onload = () => {
         const f = document.createElement('script'); f.src = 'furi-listen.js';   // 听力原文的假名
-        f.onload = f.onerror = () => { if ((location.hash || '').startsWith('#listen') && !busy()) render(); };
+        f.onload = f.onerror = () => ovlReady('en/ja-listen.json').then(() => { if ((location.hash || '').startsWith('#listen') && !busy()) render(); });   // 英语母语的用户：先换上英文版
         document.body.append(f);
       };
       s.onerror = () => { listenLoading = false; toast('听力题加载失败，请检查网络'); };

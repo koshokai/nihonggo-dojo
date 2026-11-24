@@ -7,6 +7,7 @@ const EXAM2 = {
 };
 const EXAM2_DATA = {};
 const exam2Load = (tr, lv) => EXAM2_DATA[tr + lv] || (EXAM2_DATA[tr + lv] = (typeof memberJson === 'function' ? memberJson(tr, EXAM2[tr].file(lv)) : fetch(EXAM2[tr].file(lv)).then(r => r.json()))
+  .then(d => (tr === 'zh' && typeof enApply === 'function' ? enApply('zh', `zh-exam-${lv}.json`, 'zhexam', d) : d))   // 英语母语的用户：解说换成英文
   .catch(e => { delete EXAM2_DATA[tr + lv]; throw e; }));
 // 界面文字：中文板块是日语界面；英语板块按母语（中文 / 日语）
 // 英语板块：标题和按钮用英语（和底部导航一样），说明文字用母语

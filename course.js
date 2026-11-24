@@ -6,8 +6,8 @@
 let COURSE_IDX = null, COURSE_AUD = null, COURSE_ALL = {};
 const COURSE = {};
 // 会员读完整版（member.js：服务器上的 member_content），其他人读网站上的样课版
-const courseIdx = () => COURSE_IDX ? Promise.resolve(COURSE_IDX) : memberJson('ja', 'lang/ja-course.json').then(d => (COURSE_IDX = d));
-const courseTheme = id => COURSE[id] ? Promise.resolve(COURSE[id]) : memberJson('ja', `lang/ja-course-${id}.json`).then(d => (COURSE[id] = d));
+const courseIdx = () => COURSE_IDX ? Promise.resolve(COURSE_IDX) : memberJson('ja', 'lang/ja-course.json').then(d => enApply('ja', 'ja-course.json', 'course', d)).then(d => (COURSE_IDX = d));   // 英语母语的用户换上英文（i18n.js enApply）
+const courseTheme = id => COURSE[id] ? Promise.resolve(COURSE[id]) : memberJson('ja', `lang/ja-course-${id}.json`).then(d => enApply('ja', `ja-course-${id}.json`, 'course', d)).then(d => (COURSE[id] = d));
 // 会员身份变了（登录、购买、到期）：重新加载
 function courseReset() { COURSE_IDX = null; for (const k in COURSE) delete COURSE[k]; COURSE_AUD = null; COURSE_ALL = {}; }
 // 会员课的录音：在服务器的私有存储里（member.js），打开这一课时取临时播放地址，填进 COURSE_AUD / COURSE_ALL
@@ -124,13 +124,13 @@ function courseLesson(t, l) {
     <h2>${esc(l.title)}</h2>
     <section class="cl-box"><h3>场景</h3><p>${jrNote(l.scene)}</p>
       <div class="cl-who">${l.who.map(w => `<div class="cl-person"><span class="cl-av v-${esc(w.v)}">${esc(w.k)}</span><div><b lang="ja">${esc(w.name)}</b><div class="small muted">${esc(w.role)}</div></div></div>`).join('')}</div>
-      <p class="small cl-rel"><b>人物关系：</b>${jrNote(l.relation)}</p></section>
+      <p class="small cl-rel"><b>${tz('人物关系：', 'Relationship: ')}</b>${jrNote(l.relation)}</p></section>
 
     <h3>对话</h3>
     <div class="cl-ctrl">
       <button class="btn pri" type="button" data-all>${SPEAK_SVG}<span>连续播放</span></button>
       <label class="small"><input type="checkbox" data-kana checked> 假名</label>
-      <label class="small"><input type="checkbox" data-zh checked> 中文</label>
+      <label class="small"><input type="checkbox" data-zh checked> ${tz('中文', 'English')}</label>
       <button class="btn ghost small" type="button" data-copyall>复制全文</button>
     </div>
     <p class="small muted">点日语原文或 🔊 听这一句，点有下划线的词看释义和词典；「为什么这样说」里有讲解。</p>

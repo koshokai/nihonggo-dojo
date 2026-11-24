@@ -6,7 +6,7 @@ const readList = () => (typeof READING === 'undefined' ? [] : READING).filter(a 
 const todayArticle = () => readList().find(a => a.date === dkey());
 // 实拍照片（Wikimedia Commons，注明作者和授权）；没有照片的旧文章用插画
 const artImg = (a, big) => a.ph ? `<img class="rc-photo" src="${esc(a.ph[0])}" alt="${esc(a.zh)}" loading="lazy" decoding="async">`
-  : `<div class="rc-ph-none${BIZ_ICON[a.cat] ? ' biz' : ''}"><span>${READ_CATS[a.cat] || BIZ_ICON[a.cat] || '📖'}</span><b>${esc(a.cat || '')}</b></div>`;   // 没有贴切的照片时用分类封面，不用卡通插画
+  : `<div class="rc-ph-none${BIZ_ICON[a.cat] ? ' biz' : ''}"><span>${READ_CATS[a.cat] || BIZ_ICON[a.cat] || '📖'}</span><b>${esc(catName(a.cat || ''))}</b></div>`;   // 没有贴切的照片时用分类封面，不用卡通插画
 const BIZ_ICON = { 职场基础: '🏢', 电话: '📞', 拜访接待: '🤝', 会议: '📊', 报联商: '🗣️', 道歉拒绝: '🙇', 谈判销售: '💼', 求职面试: '👔', 应酬: '🍶', 出差: '🚄' };
 const photoCredit = a => a.ph ? `<div class="ph-credit small muted">照片：${esc(a.ph[1])} · ${esc(a.ph[2])} · <a href="${esc(a.ph[3])}" target="_blank" rel="noopener">Wikimedia Commons</a></div>` : '';
 let readFilter = { L: null, cat: '' };
@@ -139,7 +139,7 @@ function readMember() {
   const want = typeof isMember === 'function' && isMember('ja');
   if (!want) { if (READ_FULL) { READING.splice(0, READING.length, ...READ_PUBLIC); READ_FULL = false; } return Promise.resolve(false); }
   if (READ_FULL) return Promise.resolve(false);
-  return memberData('ja', 'reading-member.json').then(d => {
+  return memberData('ja', 'reading-member.json').then(d => enApply('ja', 'reading-member.json', 'reading', d)).then(d => {   // 英语母语的用户换上英文版（会员内容）
     if (!d || !isMember('ja')) return false;
     const by = new Map(d.map(a => [a.id, a]));
     READING.splice(0, READING.length, ...READ_PUBLIC.map(a => (a.lock && by.get(a.id)) || a));
@@ -152,9 +152,9 @@ function viewRead(id) {
   audioIdx('reading');
   if (id) {
     const a = readList().find(x => x.id === id);
-    if (a && a.lock) return main.append(h(`<section class="panel lock-panel"><a class="small" href="#read">← 返回阅读</a><div class="lock-ic" aria-hidden="true">✨</div>
-      <h2 class="furi" lang="ja">${jr(a.title)}</h2><p class="muted">${esc(a.zh)}</p><p>N2、N1 的文章是会员内容：更深入的话题、更长的文章，每句都能点读，读完有小测验。</p>
-      <a class="btn pri" href="#vip">了解会员</a></section>`));
+    if (a && a.lock) return main.append(h(`<section class="panel lock-panel"><a class="small" href="#read">← ${tz('返回阅读', 'Back to reading')}</a><div class="lock-ic" aria-hidden="true">✨</div>
+      <h2 class="furi" lang="ja">${jr(a.title)}</h2><p class="muted">${esc(a.zh)}</p><p>${tz('N2、N1 的文章是会员内容：更深入的话题、更长的文章，每句都能点读，读完有小测验。', 'N2 and N1 articles are for members: deeper topics and longer articles, audio for every sentence, and a short quiz at the end.')}</p>
+      <a class="btn pri" href="#vip">${tz('了解会员', 'About membership')}</a></section>`));
     if (a) return readArticle(a);
   }
   if (!readFilter.L) readFilter.L = S.level;
@@ -164,13 +164,13 @@ function viewRead(id) {
   const list = all.filter(a => (readFilter.L === 'all' || a.L === readFilter.L) && (!readFilter.cat || a.cat === readFilter.cat)).sort((x, y) => (done[x.id] ? 1 : 0) - (done[y.id] ? 1 : 0));
   const p = h(`<section class="panel">
     <h2>阅读</h2>
-    ${today ? `<a class="today-art" href="#read/${today.id}"><div class="ta-img">${artImg(today)}</div><div><span class="tag done">今日上新</span> <span class="tag lv">${today.L}</span><div class="rc-title furi" lang="ja">${jr(today.title)}</div><div class="small muted">${esc(today.zh)} · ${READ_CATS[today.cat]} ${today.cat}</div></div></a>` : ''}
+    ${today ? `<a class="today-art" href="#read/${today.id}"><div class="ta-img">${artImg(today)}</div><div><span class="tag done">今日上新</span> <span class="tag lv">${today.L}</span><div class="rc-title furi" lang="ja">${jr(today.title)}</div><div class="small muted">${esc(today.zh)} · ${READ_CATS[today.cat] || ''} ${esc(catName(today.cat))}</div></div></a>` : ''}
     <p class="small muted">「日本生活」每天上新一篇：便利店、地方美食、各行各业的一天、节日季节……配真实照片。点开卡片就能读。每句都能点读、看中文；读完做个小测验拿经验。</p>
     <div class="seg read-lv" role="group" aria-label="级别">
       ${LEVELS.map(L => `<button type="button" data-lv="${L}" class="${readFilter.L === L ? 'on' : ''}">${L}</button>`).join('')}
       <button type="button" data-lv="all" class="${readFilter.L === 'all' ? 'on' : ''}">全部</button>
     </div>
-    ${pickSelect('题材', 'data-cat', [['', '全部题材'], ...Object.entries(READ_CATS).map(([c, e]) => [c, `${e} ${c}`])], readFilter.cat || '')}
+    ${pickSelect('题材', 'data-cat', [['', tz('全部题材', 'All topics')], ...Object.entries(READ_CATS).map(([c, e]) => [c, `${e} ${catName(c)}`])], readFilter.cat || '')}
   </section>`);
   const grid = h(`<div class="read-grid"></div>`);
   if (!list.length) grid.append(h(`<p class="muted">这个分类还没有文章，换一个看看吧。</p>`));
@@ -180,7 +180,7 @@ function viewRead(id) {
     grid.append(h(`<a class="read-card has-vip" href="#read/${a.id}">${a.lock || (READ_PUBLIC && (READ_PUBLIC.find(x => x.id === a.id) || { lock: 1 }).lock) ? vipTag() : ''}
       <div class="rc-img">${artImg(a)}<span class="tag lv">${a.L}</span>${a.date === dkey() ? '<span class="tag done rc-new">今日</span>' : ''}${done[a.id] ? `<span class="rc-done" title="已读">読了</span>` : ''}</div>
       <div class="rc-body">
-        <div class="rc-cat">${READ_CATS[a.cat] || ''} ${a.cat}</div>
+        <div class="rc-cat">${READ_CATS[a.cat] || ''} ${esc(catName(a.cat))}</div>
         <div class="rc-title furi" lang="ja">${jr(a.title)}</div>
         <div class="rc-zh">${esc(a.zh)}</div>
         ${a.lock ? '<div class="rc-first small muted">🔒 会员</div>' : `<div class="rc-first furi" lang="ja">${furiHTML(first, a.p[0][0][4] || '')}</div>`}
@@ -207,7 +207,7 @@ function readArticle(a) {
   const keyset = new Map(a.w.map(x => [x[0], x]));
   const p = h(`<article class="panel read-art">
     <div class="ra-hero">${artImg(a, true)}</div>${photoCredit(a)}
-    <div class="row between"><a class="small" href="#read">← 返回阅读</a><span class="row"><span class="tag lv">${a.L}</span><span class="tag">${READ_CATS[a.cat] || ''} ${a.cat}</span>${done ? '<span class="tag done">已读</span>' : ''}</span></div>
+    <div class="row between"><a class="an-back" href="#read">← 返回阅读</a><span class="row"><span class="tag lv">${a.L}</span><span class="tag">${READ_CATS[a.cat] || ''} ${esc(catName(a.cat))}</span>${done ? '<span class="tag done">已读</span>' : ''}</span></div>
     <h2 class="ra-title furi" lang="ja">${jr(a.title)}</h2>
     <div class="muted">${esc(a.zh)}</div>
     <div class="ra-tools">

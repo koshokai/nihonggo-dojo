@@ -8,15 +8,15 @@ function animeWeekLoad() {
   if (typeof cloudClient !== 'function' || typeof cloudOn !== 'function' || !cloudOn()) return Promise.resolve(null);
   const day = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // 日本时间的今天
   ANIME_WEEK = cloudClient().then(c => c.from('daily_content').select('data').eq('kind', 'anime-week').eq('id', day).maybeSingle())
-    .then(({ data, error }) => { if (error) throw error; return data ? data.data : null; })
+    .then(({ data, error }) => { if (error) throw error; return data ? enDaily(data.data, 'animeweek') : null; })   // 英语母语的用户换上英文版
     .catch(() => { ANIME_WEEK = null; return null; });
   return ANIME_WEEK;
 }
 // { list: 能看的作品（vip = 不在本周精选里）, full: 是不是会员的全部作品 }
 // 非会员：本周精选 + 其他作品的目录（lang/ja-anime-index.json，只有标题和照片；lock = 只能看标题）
 const animeLoad = () => ANIME ? Promise.resolve(ANIME) : Promise.all([animeWeekLoad(),
-  typeof isMember === 'function' && isMember('ja') && typeof memberData === 'function' ? memberData('ja', 'lang/ja-anime.json').catch(() => null) : null,
-  fetch('lang/ja-anime-index.json').then(r => r.ok ? r.json() : []).catch(() => [])])
+  typeof isMember === 'function' && isMember('ja') && typeof memberData === 'function' ? memberData('ja', 'lang/ja-anime.json').then(d => enApply('ja', 'ja-anime.json', 'animeweek', d)).catch(() => null) : null,
+  fetch('lang/ja-anime-index.json').then(r => r.ok ? r.json() : []).then(d => enApply('ja', 'ja-anime-index.json', 'animeweek', d)).catch(() => [])])
   .then(([wk, all, idx]) => {
     const week = (wk && wk.works) || [], free = new Set(week.map(w => w.id));
     const list = all || (week.length ? week.concat(idx.filter(x => !free.has(x.id)).map(x => Object.assign({ lock: 1 }, x))) : []);
@@ -34,7 +34,7 @@ function viewAnime(arg) {
   if (arg && arg.startsWith('d/')) { box.remove(); return animeDaily(arg.slice(2)); }   // 每日一课
   animeLoad().then(({ list, full }) => {
     box.innerHTML = '';
-    if (!list.length) { box.innerHTML = '<section class="panel"><p class="muted">暂时打不开，请检查网络后再试。</p></section>'; box.prepend(animeDailyBox()); return; }
+    if (!list.length) { box.innerHTML = `<section class="panel"><p class="muted">${tz('暂时打不开，请检查网络后再试。', 'Could not load. Please check your connection and try again.')}</p></section>`; box.prepend(animeDailyBox()); return; }
     const w = arg && list.find(x => x.id === arg);
     if (w && w.lock) {   // 会员作品：只有标题
       box.append(h(`<section class="panel lock-panel has-vip">${vipTag()}<a class="an-back" href="#anime">← 全部作品</a>
@@ -128,7 +128,7 @@ function animeDailyLoad() {
   if (ANIME_DAILY) return ANIME_DAILY;
   if (typeof cloudClient !== 'function' || typeof cloudOn !== 'function' || !cloudOn()) return Promise.resolve([]);
   ANIME_DAILY = cloudClient().then(c => c.from('daily_content').select('id,d,data').eq('kind', 'anime').order('d', { ascending: false }).limit(400))
-    .then(({ data, error }) => { if (error) throw error; return data || []; })
+    .then(({ data, error }) => { if (error) throw error; (data || []).forEach(r => enDaily(r.data, 'animeday')); return data || []; })
     .catch(() => { ANIME_DAILY = null; return []; });
   return ANIME_DAILY;
 }

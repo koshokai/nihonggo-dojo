@@ -7,7 +7,7 @@ const zhBizMem = () => typeof isMember === 'function' && isMember('zh');
 // 会员身份变了就重新读（member.js 的 memberChanged 不知道这个缓存）
 function zhBizData() {
   const k = zhBizMem();
-  if (!ZHB.p || ZHB.k !== k) { ZHB.k = k; ZHB.p = memberJson('zh', 'lang/zh-biz.json').catch(e => { ZHB.p = null; throw e; }); }
+  if (!ZHB.p || ZHB.k !== k) { ZHB.k = k; ZHB.p = memberJson('zh', 'lang/zh-biz.json').then(d => (typeof zhEn === 'function' ? zhOvl('zh-biz.json', 'zhbiz')(d) : d)).catch(e => { ZHB.p = null; throw e; }); }
   return ZHB.p;
 }
 const zhBizSt = () => { S.zhBiz = S.zhBiz || {}; S.zhBiz.m = S.zhBiz.m || {}; return S.zhBiz; };

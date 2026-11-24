@@ -107,7 +107,7 @@ function guestListenOne(tr) {
   if (tr === 'ja') {
     if (typeof LISTEN !== 'undefined') return go(sample(LISTEN.N5, 1), 'N5');
     const s = document.createElement('script'); s.src = 'listening.js';
-    s.onload = () => go(sample(LISTEN.N5, 1), 'N5'); document.body.append(s);
+    s.onload = () => ovlReady('en/ja-listen.json').then(() => go(sample(LISTEN.N5, 1), 'N5')); document.body.append(s);
     return;
   }
   const lv = LV_NAMES[tr][0];

@@ -3,7 +3,7 @@
 // 每期：主题、本周阅读、本周听力（从现有的阅读、听力里按主题挑）、本周单词 8 个（各级词表里的词）、本周会话 5 句（原创）、单词小测。
 // 四项都完成盖「本期完成」章 +30 经验。数据：lang/zh-weekly.json、lang/en-weekly.json（tools/build_week2.py 生成）。
 const W2 = {};
-const w2Load = tr => W2[tr] || (W2[tr] = fetch(`lang/${tr}-weekly.json`).then(r => r.ok ? r.json() : []).catch(() => { delete W2[tr]; return []; }));
+const w2Load = tr => W2[tr] || (W2[tr] = fetch(`lang/${tr}-weekly.json`).then(r => r.ok ? r.json() : []).then(d => (tr === 'zh' && typeof enApply === 'function' ? enApply('zh', 'zh-weekly.json', 'zhweekly', d) : d)).catch(() => { delete W2[tr]; return []; }));
 const w2T = (tr, zh, ja, en) => tr === 'zh' ? ja : en || enNat(zh, ja);   // 英语：标题、按钮用英语
 const w2State = (tr, wk) => { const a = ((S.wk2 = S.wk2 || {})[tr] = S.wk2[tr] || {}); return a[wk] || (a[wk] = { t: {}, q: 0 }); };
 const w2Cur = list => { const shown = wkShown(); return list.filter(x => shown.includes(x.wk)).sort((a, b) => b.wk.localeCompare(a.wk)); };
