@@ -2110,3 +2110,7 @@ html.boot body::after { content: ''; position: fixed; inset: 0; margin: auto; wi
 .proverb > *, .daily-more-b > * { min-width: 0; }
 .proverb .row { flex-wrap: wrap; min-width: 0; }
 .proverb .jp-big, .proverb .zh-daily-zh, .proverb .en-big, .proverb .jp, .proverb .small { overflow-wrap: anywhere; min-width: 0; }
+/* 今日一句（Safari 加固）：旧版 Safari 不认 overflow-wrap:anywhere，用 word-break 兜底；例句和按钮在一行里时文字可收缩 */
+.proverb, .proverb * { word-break: break-word; }
+.proverb .ex > div { min-width: 0; flex: 1 1 auto; }
+.proverb .ex > button, .proverb .row > button, .proverb .daily-btns { flex: 0 0 auto; }

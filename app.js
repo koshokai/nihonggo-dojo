@@ -58,7 +58,9 @@ function jrWord(w, r) {
   const clean = s => toHiraS(s).replace(/[\s・～〜()（）]/g, '');
   const parts = w.match(/[㐀-鿿々〆ヶ]+|[^㐀-鿿々〆ヶ]+/g);
   let m = null;
-  try { m = new RegExp('^' + parts.map(p => KJ.test(p) ? '(.+?)' : '(' + clean(p).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')').join('') + '$').exec(clean(r)); } catch (e) { m = null; }
+  // 朗读用的读音按发音写助词（を→お、は→わ、へ→え），标点也可能省掉：对齐时都要认，不然整句只能套成一个大注音块（Safari 里没法换行，会撑出屏幕）
+  const kanaPat = s => clean(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/[をはへ、。！？「」]/g, c => ({ 'を': '[をお]', 'は': '[はわ]', 'へ': '[へえ]' })[c] || c + '?');
+  try { m = new RegExp('^' + parts.map(p => KJ.test(p) ? '(.+?)' : '(' + kanaPat(p) + ')').join('') + '$').exec(clean(r)); } catch (e) { m = null; }
   if (!m) return typeof furiWanted !== 'function' || furiWanted(w) ? `<ruby>${esc(w)}<rt>${esc(toHiraS(r))}</rt></ruby>` : esc(w);
   return parts.map((p, i) => KJ.test(p) && (typeof furiWanted !== 'function' || furiWanted(p)) ? `<ruby>${esc(p)}<rt>${esc(m[i + 1])}</rt></ruby>` : esc(p)).join('');
 }
