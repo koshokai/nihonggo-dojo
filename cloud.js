@@ -21,7 +21,7 @@ function cloudClient() {
 /* ---------- 同步 ---------- */
 // 进度整份存成一行 JSON：progress(user_id, data, xp, updated_at)。
 // 登录后：云端没有 → 上传本机；本机没学过 → 用云端；两边都有且不是同一份 → 让用户选。
-const localKeep = () => ({ theme: S.theme, voice: S.voice, rate: S.rate, petals: S.petals, voiceSrc: S.voiceSrc });   // 这些是设备偏好，不跟着账号走
+const localKeep = () => ({ theme: S.theme, accent: S.accent, voice: S.voice, rate: S.rate, petals: S.petals, voiceSrc: S.voiceSrc });   // 这些是设备偏好，不跟着账号走
 async function cloudPull(interactive) {
   const c = await cloudClient();
   const { data, error } = await c.from('progress').select('data, xp, updated_at').eq('user_id', sbUser.id).maybeSingle();

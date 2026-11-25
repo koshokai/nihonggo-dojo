@@ -220,7 +220,7 @@ function cleanState(o) {
     else o[k] = v && typeof v === 'object' && !Array.isArray(v) ? v : d;
   }
   for (const k of ['days', 'goalDays', 'newLog']) { const x = {}; for (const [dk, dv] of Object.entries(o[k])) if (/^\d{4}-\d{2}-\d{2}$/.test(dk) && Number.isFinite(+dv)) x[dk] = +dv; o[k] = x; }
-  for (const k of ['track', 'zhLevel', 'enLevel', 'enNative', 'native', 'syncUser', 'memberUser']) if (o[k] != null && !(typeof o[k] === 'string' && /^[\w.|:-]{0,64}$/.test(o[k]))) delete o[k];
+  for (const k of ['track', 'zhLevel', 'enLevel', 'enNative', 'native', 'accent', 'syncUser', 'memberUser']) if (o[k] != null && !(typeof o[k] === 'string' && /^[\w.|:-]{0,64}$/.test(o[k]))) delete o[k];
   for (const k of ['appRemind', 'syncedAt', 'modAt']) if (o[k] != null && !Number.isFinite(+o[k])) delete o[k];
   if (o.goal <= 0) o.goal = b.goal;
   return o;
@@ -564,9 +564,13 @@ function updateTop() {
   const tr = document.body.dataset.track || 'ja';
   document.getElementById('chip-lv').textContent = tr === 'ja' ? S.level : tr === 'en' && typeof enLevel === 'function' ? enLevel() : tr === 'zh' && typeof zhLevel === 'function' ? zhLevel() : typeof l2CurLevel === 'function' ? l2CurLevel(tr) : '';
 }
+// 主题颜色：[色块颜色, 中文, 日文, 英文]；'' 是默认的紫色
+const ACCENT_DEFAULT = { ja: '#3451D1', zh: '#D0508F', en: '#2F6FE0' };   // 不选颜色时各板块本来的主色（色块用）
+const ACCENTS = { '': ['', '默认', 'デフォルト', 'Default'], purple: ['#6A4CF5', '薰衣草紫', 'ラベンダー', 'Lavender'], pink: ['#D63A73', '樱花粉', '桜ピンク', 'Pink'], green: ['#23824F', '抹茶绿', '抹茶グリーン', 'Green'], orange: ['#C9590C', '橙色', 'オレンジ', 'Orange'], teal: ['#0B7F8A', '青绿', 'ティール', 'Teal'] };
 function applyTheme() {
   if (typeof applyFontSize === 'function') applyFontSize();
   if (S.theme) document.documentElement.dataset.theme = S.theme; else delete document.documentElement.dataset.theme;
+  if (ACCENTS[S.accent]) document.documentElement.dataset.accent = S.accent; else delete document.documentElement.dataset.accent;   // 主题颜色（style.css 的 data-accent）
   // 手机状态栏颜色跟着浅色 / 深色走
   const dark = S.theme ? S.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
   document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.remove());
@@ -1828,6 +1832,7 @@ function viewMe(sec) {
     <div class="row between"><span>${tj('每日经验目标', '1日の目標 XP')}</span><div class="seg">${opt(J ? [[30, '30 ゆったり'], [50, '50 標準'], [100, '100 しっかり'], [200, '200 猛特訓']] : [[30, '30 轻松'], [50, '50 标准'], [100, '100 认真'], [200, '200 冲刺']], S.goal, 'data-goal')}</div></div>
     <div class="row between"><span>${tj('每天新单词', '1日の新しい単語')}</span><div class="seg">${opt([[5, '5'], [10, '10'], [20, '20'], [30, '30']], S.newPerDay, 'data-new')}</div></div>
     <div class="row between"><span>${tj('外观', 'テーマ')}</span><div class="seg">${opt([['', tj('跟随系统', '端末に合わせる')], ['light', tj('浅色', 'ライト')], ['dark', tj('深色', 'ダーク')]], S.theme, 'data-theme-set')}</div></div>
+    <div class="row between"><span>${tj('主题颜色', 'テーマカラー', 'Theme color')}</span><div class="accent-sw" role="group" aria-label="${tj('主题颜色', 'テーマカラー', 'Theme color')}">${Object.entries(ACCENTS).map(([k, [c, zh, ja, en]]) => `<button type="button" data-accent-set="${k}" class="${(S.accent || '') === k ? 'on' : ''}" style="background:${c || ACCENT_DEFAULT[S.track || 'ja'] || '#3451D1'}" title="${tj(zh, ja, en)}" aria-label="${tj(zh, ja, en)}" aria-pressed="${(S.accent || '') === k}"></button>`).join('')}</div></div>
     <div class="row between"><span>${tj('字体大小', '文字の大きさ')}</span><div class="seg">${opt([['m', tj('标准', '標準')], ['l', tj('大', '大')], ['xl', tj('特大', '特大')]], S.fontSize || 'm', 'data-fs')}</div></div>
     ${S.track === 'zh' ? `<div class="row between"><span>ピンイン</span><div class="seg">${opt(onOff, (S.zhShow || {}).py === false ? 0 : 1, 'data-zpy')}</div></div>
     <div class="row between"><span>日本語訳</span><div class="seg">${opt(onOff, (S.zhShow || {}).ja === false ? 0 : 1, 'data-zja')}</div></div>` : ''}
@@ -1840,6 +1845,7 @@ function viewMe(sec) {
   bindLevel(p);
   p.querySelectorAll('[data-trk-set]').forEach(b => { b.onclick = () => { S.track = b.dataset.trkSet; save(); render(); }; });
   p.querySelectorAll('[data-goal]').forEach(b => { b.onclick = () => { S.goal = +b.dataset.goal; save(); render(); }; });
+  p.querySelectorAll('[data-accent-set]').forEach(b => { b.onclick = () => { if (b.dataset.accentSet) S.accent = b.dataset.accentSet; else delete S.accent; save(); applyTheme(); render(); }; });
   // 中文・英語のレベルと表示設定（各ページのボタンと同じ値を変える）
   p.querySelectorAll('[data-zlv]').forEach(b => { b.onclick = () => { S.zhLevel = b.dataset.zlv; save(); render(); }; });
   // 母语：决定界面和讲解的语言，「正在学」只列另外两种。正在学的刚好是新的母语时，换成另一种能学的
