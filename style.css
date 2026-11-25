@@ -2104,3 +2104,9 @@ html.boot body::after { content: ''; position: fixed; inset: 0; margin: auto; wi
 .accent-sw { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 .accent-sw button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--line); cursor: pointer; padding: 0; }
 .accent-sw button.on { box-shadow: 0 0 0 2px var(--ink); }
+
+/* 今日一句：长句、注音和说明不能把卡片撑出屏幕（网格默认按内容最小宽度排，会被长句撑宽） */
+.proverb, .daily-more-b { grid-template-columns: minmax(0, 1fr); }
+.proverb > *, .daily-more-b > * { min-width: 0; }
+.proverb .row { flex-wrap: wrap; min-width: 0; }
+.proverb .jp-big, .proverb .zh-daily-zh, .proverb .en-big, .proverb .jp, .proverb .small { overflow-wrap: anywhere; min-width: 0; }
