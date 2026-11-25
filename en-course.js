@@ -1,5 +1,5 @@
 'use strict';
-/* 英语：情景课程（11 个主题，每课一段对话或独白）和商务英语（商务邮件、商务词汇）。讲解、翻译跟着 S.enNative（中文 / 日本語）。
+/* 英语：情景课程（12 个主题，每课一段对话或独白）和商务英语（商务邮件、商务词汇）。讲解、翻译跟着 S.enNative（中文 / 日本語）。
    路由：#en/course（主题）  #en/course/<主题>（课程列表）  #en/course/<主题>/<课>
         #en/biz（商务邮件）  #en/biz/m/<邮件>  #en/biz/vocab[/<分类>]
    数据：lang/en-course.json（主题和全部课的标题）、lang/en-course-<主题>.json、lang/en-business.json（tools/en/build_course.py 生成）。
