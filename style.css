@@ -2114,3 +2114,10 @@ html.boot body::after { content: ''; position: fixed; inset: 0; margin: auto; wi
 .proverb, .proverb * { word-break: break-word; }
 .proverb .ex > div { min-width: 0; flex: 1 1 auto; }
 .proverb .ex > button, .proverb .row > button, .proverb .daily-btns { flex: 0 0 auto; }
+
+/* VIP 角标：放回卡片里面（贴在卡片上边缘时会被卡片圆角/图片切掉一半），配色恢复成以前的渐变彩色 */
+/* 只在会把角标切掉的卡片里（照片卡片、作品卡片：overflow 隐藏）放进卡片内部 */
+:root .read-card > .vip-tag:not(.inl), :root .an-card > .vip-tag:not(.inl) { top: 8px; right: 8px; }
+:root[data-look="clean"] .vip-tag, :root[data-look="clean"][data-theme="dark"] .vip-tag { color: #fff; background: linear-gradient(135deg, #ffb347, #ff5f8f 55%, #a06bff); border: 0; line-height: 1.5; box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+@media (prefers-color-scheme: dark) { :root[data-look="clean"]:not([data-theme="light"]) .vip-tag { color: #fff; } }
+:root[data-look="clean"] .vip-tag:not(.inl) { box-shadow: 0 1px 3px rgba(0,0,0,.18); }

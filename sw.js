@@ -3,7 +3,7 @@
 // 发音 MP3：先用缓存（离线也能听），同时在后台向网络确认一次，录音重录过（同名文件内容变了）就更新缓存，下次播放就是新录音。
 // AUDIO 换名字（audio-v3）：清掉以前缓存的全部录音（有些录音重录时没换文件名，听过的人一直是旧录音）。
 // 账号、同步等跨域请求（Supabase、jsDelivr）不经过缓存。
-const VERSION = 'v330';
+const VERSION = 'v331';
 const SHELL = `shell-${VERSION}`, AUDIO = 'audio-v3';
 const CORE = ['./', 'index.html', 'style.css', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-maskable-192.png', 'icon-maskable-512.png', 'icon.svg',
   'boot.js', 'lazyja.js', 'i18n.js', 'mascot.js', 'fx.js', 'japlus.js', 'furi-map.js', 'kanapad.js', 'swipe.js', 'conv.js', 'pitch.js', 'tour.js', 'zh.js', 'zh-biz.js', 'practice2.js', 'week2.js', 'vocab.js', 'kanji.js', 'grammar.js', 'data.js', 'daily.js', 'jlpt.js', 'game.js', 'dict.js', 'reading.js',
