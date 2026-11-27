@@ -668,7 +668,7 @@ function zhPlayLines(lines, onDone) {
   stopSpeech(); el.pause();
   // 两个录音目录都加载好了再开始（第一次要等网络：先在点击当下解锁播放器，iPhone 才能接着自动播放）
   const go = () => { if (!stop) next(); };
-  if (LANG_IDX_READY.zh && ZH_VOICES_READY) go();
+  if (LANG_IDX_DONE.zh && ZH_VOICES_READY) go();
   else { langUnlock(); Promise.all([langAudioIdx('zh'), zhVoiceIdx()]).then(go, go); }
   return () => { stop = true; el.pause(); el.onended = null; if (hasTTS) speechSynthesis.cancel(); };
 }

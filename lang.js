@@ -59,8 +59,10 @@ const langIdxUrls = code => [code === 'zh' || code === 'en' ? `${AUD2}index-dict
 const langAudioIdx = code => LANG_AUDIO[code] || (LANG_AUDIO[code] = (() => {
   const urls = langIdxUrls(code), parts = urls.map(() => ({}));
   const merge = () => (LANG_IDX_READY[code] = Object.assign({}, ...parts));
-  return Promise.all(urls.map((u, i) => u && jsonOr(u, d => { parts[i] = d; merge(); }).then(d => { parts[i] = d; }))).then(merge);
+  return Promise.all(urls.map((u, i) => u && jsonOr(u, d => { parts[i] = d; merge(); }).then(d => { parts[i] = d; }))).then(() => { LANG_IDX_DONE[code] = true; return merge(); });
 })());
+// 几个目录都下载完了没有（LANG_IDX_READY 在第一个小目录到了就有，主目录可能还在下载：查不到时要先等它）
+const LANG_IDX_DONE = {};
 // 有目录没取到时：重新取一次（以前失败的这次打开期间就一直没声音）
 const langIdxRetry = code => {
   if (!langIdxUrls(code).some(u => u && IDX_FAILED.has(u))) return null;
@@ -91,6 +93,15 @@ function speakLang(text, lang, rate, retried) {
     let done = false;
     const give = setTimeout(() => { if (!done && seq === langSeq) { done = true; speakLangTTS(text, lang, rt, 'net'); } }, 10000);
     langAudioIdx(code).then(() => { if (done || seq !== langSeq) return; done = true; clearTimeout(give); speakLang(text, lang, rate); });
+    return;
+  }
+  // 目录只到了一部分（主目录还在下载）、这句还查不到：等全部下载完再放
+  if (!idx[text] && !LANG_IDX_DONE[code]) {
+    const seq = ++langSeq;
+    el.src = SILENT_WAV; el.play().catch(() => {});
+    let done = false;
+    const give = setTimeout(() => { if (!done && seq === langSeq) { done = true; speakLangTTS(text, lang, rt, 'net'); } }, 15000);
+    langAudioIdx(code).then(() => { if (done || seq !== langSeq) return; done = true; clearTimeout(give); speakLang(text, lang, rate, retried); });
     return;
   }
   ++langSeq;

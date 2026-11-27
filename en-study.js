@@ -43,7 +43,15 @@ function enPlayFile(file, end, fail) {
   el.play().catch(once(fail));
 }
 // segs：[{t: 英文, spk: 'M'|'F'|'N'…, pause: 秒}]；onItem(i) 用来高亮正在读的句子
-function enSeq(segs, { onItem, onEnd } = {}) {
+function enSeq(segs, opts = {}) {
+  // 录音目录还没下载完（主目录较大）：先解锁播放器，等下载完再开始，不然整段会误报没有录音
+  if (typeof LANG_IDX_DONE !== 'undefined' && !LANG_IDX_DONE.en && !opts.waited) {
+    enStop(); const tok0 = ++enSeqTok; if (typeof langUnlock === 'function') langUnlock();
+    const go = () => { if (tok0 === enSeqTok) enSeq(segs, Object.assign({}, opts, { waited: 1 })); };
+    Promise.race([langAudioIdx('en'), new Promise(r => setTimeout(r, 15000))]).then(go, go);
+    return;
+  }
+  const { onItem, onEnd } = opts;
   enStop();
   const tok = ++enSeqTok, idx = (typeof LANG_IDX_READY !== 'undefined' && LANG_IDX_READY.en) || {};
   let i = 0;

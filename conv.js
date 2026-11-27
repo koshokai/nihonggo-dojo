@@ -15,11 +15,13 @@ function sayTTS(text) { return waitMs(Math.min(3500, 900 + text.length * 120)); 
 // 中文、英语：有录音（MeloTTS / Kokoro）用录音（没有就跳过，不用手机朗读）
 // 录音目录还没好时先等一下（最多 8 秒）；公开目录里没有、是会员的话再到会员录音里找
 async function sayZh(text, code = 'zh', tts = 'zh-CN') {
-  if (!LANG_IDX_READY[code] && typeof langAudioIdx === 'function') await Promise.race([langAudioIdx(code), waitMs(8000)]).catch(() => {});
+  // 目录只到了一部分（主目录还在下载）时也要等完，不然会误报「还在准备中」
+  if (!(LANG_IDX_READY[code] || {})[text] && !LANG_IDX_DONE[code] && typeof langAudioIdx === 'function') await Promise.race([langAudioIdx(code), waitMs(15000)]).catch(() => {});
+  if (!(LANG_IDX_READY[code] || {})[text] && typeof langIdxRetry === 'function') await Promise.race([langIdxRetry(code) || Promise.resolve(), waitMs(15000)]).catch(() => {});
   let src = (LANG_IDX_READY[code] || {})[text];
   if (src) src = audUrl(src);
   else if (typeof memberTextAudio === 'function' && typeof isMember === 'function' && isMember(code)) src = await memberTextAudio(code, text).catch(() => null);
-  if (!src) return new Promise(res => noVoice(res));
+  if (!src) return new Promise(res => noVoice(res, LANG_IDX_DONE[code] ? '' : 'net'));
   return new Promise(res => { let done = false; const fin = () => { if (!done) { done = true; res(); } }; const el = langPlayer(); el.src = src; el.onended = fin; el.onerror = fin; el.play().catch(fin); setTimeout(fin, 1500 + text.length * 450); });
 }
 async function commuteItems(src, n) {
@@ -66,7 +68,9 @@ function viewCommute() {
   ['src', 'n', 'gap', 'ex'].forEach(k => p.querySelectorAll(`[data-${k}]`).forEach(b => { b.onclick = () => { const v = b.dataset[k]; o[k] = k === 'src' ? v : k === 'ex' ? v === 'true' : +v; if (k === 'src') o.userSet = 1; save(); render(); }; }));
   p.querySelector('[data-play]').onclick = async () => {
     if (typeof audioPrime === 'function') audioPrime();   // 点击当下解锁播放器：下面要先下载词表，过了点击那一刻 iPhone 就不让出声了
+    const code = isEn() ? 'en' : isZh() ? 'zh' : '';
     const items = await commuteItems(o.src, o.n).catch(() => []);
+    if (items.length && code && !LANG_IDX_DONE[code]) { toast(T2('正在准备录音…', '音声を準備しています…')); await Promise.race([langAudioIdx(code), waitMs(15000)]).catch(() => {}); }
     if (!items.length) return toast(T2('这里还没有内容，换一个试试', 'まだ内容がありません。別のものを選んでください'));
     commutePlay(items, o);
   };
@@ -321,12 +325,10 @@ function viewFav() {
 const AUDIO_CACHE = 'audio-v3';   // 和 sw.js 的 AUDIO 一样；换名字时旧缓存被清掉，下载记录也要清掉（下面 viewOffline）
 function audioFilesFor(L) {
   if (isEn()) {   // 英语的录音在同一个域名下的音频仓库（koshokai.github.io/nihonggo-dojo-audio），service worker 一样能离线读
-    const idx = LANG_IDX_READY.en || {};
-    return enFetch(`en-${L}`).then(rows => [...new Set(enItems(L, rows).flatMap(x => [idx[x.w], idx[x.ex]]).filter(Boolean))]);
+    return langAudioIdx('en').then(() => enFetch(`en-${L}`)).then(rows => { const idx = LANG_IDX_READY.en || {}; return [...new Set(enItems(L, rows).flatMap(x => [idx[x.w], idx[x.ex]]).filter(Boolean))]; });
   }
   if (isZh()) {
-    const idx = LANG_IDX_READY.zh || {};
-    return zhHsk(zhLvNum(L)).then(list => [...new Set(list.flatMap(x => [idx[x.w], idx[x.ex]]).filter(Boolean))]);
+    return langAudioIdx('zh').then(() => zhHsk(zhLvNum(L))).then(list => { const idx = LANG_IDX_READY.zh || {}; return [...new Set(list.flatMap(x => [idx[x.w], idx[x.ex]]).filter(Boolean))]; });
   }
   const files = [];
   for (const v of VOCAB[L]) { files.push(AUDIO_IDX[v.r], AUDIO_IDX[v.w]); for (const e of (typeof EXAMPLES !== 'undefined' && EXAMPLES[v.w]) || []) files.push(AUDIO_IDX[e[1]], AUDIO_IDX[e[0]]); }
