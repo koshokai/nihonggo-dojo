@@ -232,7 +232,7 @@ function courseLesson(t, l) {
   // 点词查词典（和阅读文章同一个释义面板，「查看详情」进内置词典）
   const art = { title: l.title, w: l.words.map(([w, r, zh]) => [w, r, zh]) };
   p.querySelectorAll('.cl-lines .wd').forEach(el => {
-    el.onclick = e => { e.stopPropagation(); if (!glossOK()) return; const hit = lookupWord(el.dataset.f.split('|'), keyset); showSheet(el.textContent.replace(/\s+/g, ''), hit, art); el.classList.add('on'); };
+    el.onclick = e => { e.stopPropagation(); if (!glossOK()) return; const hit = lookupWord(el.dataset.f.split('|'), keyset); const [ws, wr] = wdText(el); showSheet(ws.replace(/\s+/g, ''), hit, art, wr.replace(/\s+/g, '')); el.classList.add('on'); };
   });
   p.querySelectorAll('.cl-w').forEach(el => {
     el.onclick = e => { e.stopPropagation(); if (!glossOK()) return; const w = el.dataset.w; showSheet(w, lookupWord([w], keyset), art); };

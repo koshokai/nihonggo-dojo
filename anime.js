@@ -69,6 +69,8 @@ function animeList(list, full) {
 function animeWork(w, list) {
   const vocabOf = x => wordIndex().get(x);
   if (w.aud) for (const k in w.aud) AUDIO_IDX[k] = AUDIO_IDX[k] || w.aud[k];   // 这部作品的录音（地址不在公开的索引里）
+  // 跟读按钮按假名找录音：假名也登记上
+  if (w.aud) for (const l of w.lines || []) if (l.kana && w.aud[l.jp]) AUDIO_IDX[l.kana] = AUDIO_IDX[l.kana] || w.aud[l.jp];
   const p = h(`<article class="panel an-work">
     <a class="an-back" href="#anime">← 全部作品</a>
     ${w.ph ? `<div class="an-hero"><img src="${esc(w.ph[0])}" alt="${esc(w.place)}" decoding="async" data-fail="parent"></div>${photoCredit(w)}` : ''}

@@ -13,7 +13,10 @@ addEventListener('hashchange', () => {
 });
 const fxChanged = () => location.hash !== fxRoute;   // 同一页重画（数据更新、骨架换成内容）不放动画
 // render() 清空页面之前调用：把当前画面拍成「快照」盖在上面，快照带着颗粒噪点、变模糊、慢慢消失
+// 换页不放动画，直接切换（旧页面快照、弹出、滑入都会让画面闪一下，用户觉得不好看）
+const FX_PAGE_ANIM = false;
 function fxPageOut() {
+  if (!FX_PAGE_ANIM) return;
   const m = document.getElementById('main');
   if (!m || fxCalm() || fxRoute === null || !fxChanged() || !m.firstElementChild) return;
   document.querySelectorAll('.pg-ghost').forEach(g => g.remove());
@@ -32,6 +35,7 @@ function fxPageOut() {
 function fxPageIn() {
   const m = document.getElementById('main');
   const first = fxRoute === null, changed = fxChanged(); fxRoute = location.hash;
+  if (!FX_PAGE_ANIM && m) { m.classList.remove('page-in', 'page-back', 'swipe-l', 'swipe-r'); delete document.body.dataset.swipe; fxBack = false; return; }
   if (!m || fxCalm() || !changed || first) return;   // 第一次打开网站：直接显示，不放动画
   m.classList.remove('page-in', 'page-back', 'swipe-l', 'swipe-r');
   void m.offsetWidth;

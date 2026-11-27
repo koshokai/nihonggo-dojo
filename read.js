@@ -53,15 +53,22 @@ function tokHTML(toks, keyset, furi) {
   }).join('');
 }
 function closeSheet() { const o = document.querySelector('.word-sheet'); if (o) o.remove(); document.querySelectorAll('.wd.on').forEach(x => x.classList.remove('on')); }
-function showSheet(text, hit, a) {
+// 点到的词：去掉注音（<rt>）的原文 + 读音（有注音时把汉字换成假名）。词典里查不到的词按读音找录音
+function wdText(el) {
+  const c = el.cloneNode(true); c.querySelectorAll('rt, rp').forEach(x => x.remove());
+  const r = el.cloneNode(true); r.querySelectorAll('rp').forEach(x => x.remove());
+  r.querySelectorAll('ruby').forEach(rb => { const rt = rb.querySelector('rt'); rb.replaceWith(rt ? rt.textContent : rb.textContent); });
+  return [c.textContent.trim(), r.textContent.trim()];
+}
+function showSheet(text, hit, a, reading) {
   closeSheet();
-  const say = hit ? hit.r : text;
+  const say = hit ? hit.r : (reading || text);
   const meaning = !hit ? '' : hit.zh ? `<div class="ws-m">${esc(hit.zh)}</div>` : `<ol class="ws-en">${hit.en.map(x => `<li>${esc(x)}</li>`).join('')}</ol><div class="small muted">英文释义来自 JMdict · <a href="https://translate.google.com/?sl=ja&tl=zh-CN&text=${encodeURIComponent(hit.w)}&op=translate" target="_blank" rel="noopener">看中文翻译 ↗</a></div>`;
   const ex = hit && hit.v ? exList(hit.v.w)[0] : null;
   const inDeck = hit && hit.v && S.srs[hit.v.id];
   const sh = h(`<div class="word-sheet" role="dialog" aria-label="释义">
     <button class="ws-x" type="button" aria-label="关闭">×</button>
-    <div class="row"><span class="ws-w furi" lang="ja">${hit ? jrWord(hit.w, hit.r) : esc(text)}</span>${hit && hit.r !== hit.w ? `<span class="ws-r" lang="ja">${esc(hit.r)}</span>` : ''}${speakBtn(say)}${hit && hit.v ? `<span class="tag lv">${hit.v.L}</span>` : ''}</div>
+    <div class="row"><span class="ws-w furi" lang="ja">${hit ? jrWord(hit.w, hit.r) : esc(text)}</span>${hit && hit.r !== hit.w ? `<span class="ws-r" lang="ja">${esc(hit.r)}</span>` : !hit && reading && reading !== text ? `<span class="ws-r" lang="ja">${esc(reading)}</span>` : ''}${speakBtn(say)}${hit && hit.v ? `<span class="tag lv">${hit.v.L}</span>` : ''}</div>
     ${meaning || '<div class="ws-m ws-empty"></div>'}
     ${ex ? `<div class="small"><span lang="ja" class="furi">${furiHTML(ex[0], ex[3])}</span><br><span class="muted">${esc(ex[2])}</span></div>` : ''}
     <div class="row">
@@ -95,7 +102,8 @@ function bindWords(p, a) {
       e.stopPropagation();
       if (typeof glossOK === 'function' && !glossOK()) return;
       const hit = lookupWord(formsOf(el), keyset);
-      showSheet(el.textContent, hit, a); el.classList.add('on');
+      const [s, r] = wdText(el);
+      showSheet(s, hit, a, r); el.classList.add('on');
     };
   });
   // JMdict 加载好以后，把词表里没有、JMdict 里有的词也画上线
@@ -393,5 +401,6 @@ document.addEventListener('click', e => {
   e.stopPropagation();
   if (!glossOK()) return;
   document.querySelectorAll('.wd.on').forEach(x => x.classList.remove('on'));
-  showSheet(el.dataset.s || el.textContent, lookupWord(el.dataset.f.split('|'), null), null); el.classList.add('on');
+  const [s, r] = wdText(el);
+  showSheet(el.dataset.s || s, lookupWord(el.dataset.f.split('|'), null), null, r); el.classList.add('on');
 }, true);
